@@ -28,8 +28,8 @@ using std::cout;
 using std::endl;
 
 // Redfine if you want output to go somewhere else:
-#define reportf(format, args...) ( printf(format , ## args), fflush(stdout) )
-
+//#define reportf(format, args...) ( printf(format , ## args), fflush(stdout) )
+#define reportf printf
 
 //=================================================================================================
 // Solver -- the main class:
@@ -44,7 +44,7 @@ struct SolverStats {
 
 
 struct SearchParams {
-    double  var_decay, clause_decay, random_var_freq;    // (reasonable values are: 0.95, 0.999, 0.02)    
+    double  var_decay, clause_decay, random_var_freq;    // (reasonable values are: 0.95, 0.999, 0.02)
     SearchParams(double v = 1, double c = 1, double r = 0) : var_decay(v), clause_decay(c), random_var_freq(r) { }
 };
 
@@ -95,7 +95,7 @@ protected:
     void        record           (const vec<Lit>& clause);
 
     void        analyze          (Clause* confl, vec<Lit>& out_learnt, int& out_btlevel); // (bt = backtrack)
-    bool        analyze_removable(Lit p, uint min_level);                                 // (helper method for 'analyze()')
+    bool        analyze_removable(Lit p, unsigned int min_level);                                 // (helper method for 'analyze()')
     void        analyzeFinal     (Clause* confl,  bool skip_first = false);
     bool        enqueue          (Lit fact, GClause from = GClause_new((Clause*)NULL));
     Clause*     propagate        ();
@@ -123,10 +123,13 @@ protected:
     void     claDecayActivity  () { cla_inc *= cla_decay; }
     void     claRescaleActivity();
 
-    // Operations on clauses:
-    //
-    void     newClause(const vec<Lit>& ps, bool learnt = false);
-    void     claBumpActivity (Clause* c) { if ( (c->activity() += cla_inc) > 1e20 ) claRescaleActivity(); }
+  // Operations on clauses:
+  //
+  void     newClause(const vec<Lit>& ps, bool learnt = false);
+  void     claBumpActivity (Clause* c)
+  {
+    if ( (c->activity() += cla_inc) > 1e20 ) claRescaleActivity();
+  }
     void     remove          (Clause* c, bool just_dealloc = false);
     bool     locked          (const Clause* c) const { GClause r = reason[var((*c)[0])]; return !r.isLit() && r.clause() == c; }
     bool     simplify        (Clause* c) const;

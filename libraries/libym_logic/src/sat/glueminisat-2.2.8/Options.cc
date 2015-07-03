@@ -1,4 +1,4 @@
-﻿/**************************************************************************************[Options.cc]
+/**************************************************************************************[Options.cc]
 Copyright (c) 2008-2010, Niklas Sorensson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -19,11 +19,11 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 #include "Sort.h"
 #include "Options.h"
-//#include "ParseUtils.h"
+#include "ParseUtils.h"
 
-using namespace Minisat;
+using namespace Glueminisat;
 
-void Minisat::parseOptions(int& argc, char** argv, bool strict)
+void Glueminisat::parseOptions(int& argc, char** argv, bool strict)
 {
     int i, j;
     for (i = j = 1; i < argc; i++){
@@ -57,9 +57,9 @@ void Minisat::parseOptions(int& argc, char** argv, bool strict)
 }
 
 
-void Minisat::setUsageHelp      (const char* str){ Option::getUsageString() = str; }
-void Minisat::setHelpPrefixStr  (const char* str){ Option::getHelpPrefixString() = str; }
-void Minisat::printUsageAndExit (int argc, char** argv, bool verbose)
+void Glueminisat::setUsageHelp      (const char* str){ Option::getUsageString() = str; }
+void Glueminisat::setHelpPrefixStr  (const char* str){ Option::getHelpPrefixString() = str; }
+void Glueminisat::printUsageAndExit (int argc, char** argv, bool verbose)
 {
     const char* usage = Option::getUsageString();
     if (usage != NULL)

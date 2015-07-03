@@ -1,19 +1,19 @@
 ﻿
-/// @file SatSolverMiniSat2.cc
-/// @brief SatSolverMiniSat2 の実装ファイル
+/// @file SatSolverGlueMiniSat2.cc
+/// @brief SatSolverGlueMiniSat2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "SatSolverMiniSat2.h"
+#include "SatSolverGlueMiniSat2.h"
 #include "YmLogic/SatStats.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
 
-using namespace Minisat;
+using namespace Glueminisat;
 
 BEGIN_NONAMESPACE
 
@@ -27,12 +27,12 @@ literal2lit(Literal l)
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
-// SatSolverMiniSat2
+// SatSolverGlueMiniSat2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] option オプション文字列
-SatSolverMiniSat2::SatSolverMiniSat2(const string& option)
+SatSolverGlueMiniSat2::SatSolverGlueMiniSat2(const string& option)
 {
   if ( option == "verbose" ) {
     mSolver.verbosity = 1;
@@ -40,13 +40,13 @@ SatSolverMiniSat2::SatSolverMiniSat2(const string& option)
 }
 
 // @brief デストラクタ
-SatSolverMiniSat2::~SatSolverMiniSat2()
+SatSolverGlueMiniSat2::~SatSolverGlueMiniSat2()
 {
 }
 
 // @brief 正しい状態のときに true を返す．
 bool
-SatSolverMiniSat2::sane() const
+SatSolverGlueMiniSat2::sane() const
 {
   return mSolver.okay();
 }
@@ -56,7 +56,7 @@ SatSolverMiniSat2::sane() const
 // @return 新しい変数番号を返す．
 // @note 変数番号は 0 から始まる．
 VarId
-SatSolverMiniSat2::new_var(bool decision)
+SatSolverGlueMiniSat2::new_var(bool decision)
 {
   return VarId(mSolver.newVar(true, decision));
 }
@@ -64,7 +64,7 @@ SatSolverMiniSat2::new_var(bool decision)
 // @brief 節を追加する．
 // @param[in] lits リテラルのベクタ
 void
-SatSolverMiniSat2::add_clause(const vector<Literal>& lits)
+SatSolverGlueMiniSat2::add_clause(const vector<Literal>& lits)
 {
   vec<Lit> tmp;
   for (vector<Literal>::const_iterator p = lits.begin();
@@ -80,7 +80,7 @@ SatSolverMiniSat2::add_clause(const vector<Literal>& lits)
 // @param[in] lit_num リテラル数
 // @param[in] lits リテラルの配列
 void
-SatSolverMiniSat2::add_clause(ymuint lit_num,
+SatSolverGlueMiniSat2::add_clause(ymuint lit_num,
 			      const Literal* lits)
 {
   vec<Lit> tmp;
@@ -94,14 +94,14 @@ SatSolverMiniSat2::add_clause(ymuint lit_num,
 
 // @brief 1項の節(リテラル)を追加する．
 void
-SatSolverMiniSat2::add_clause(Literal lit1)
+SatSolverGlueMiniSat2::add_clause(Literal lit1)
 {
   mSolver.addClause(literal2lit(lit1));
 }
 
 // @brief 2項の節を追加する．
 void
-SatSolverMiniSat2::add_clause(Literal lit1,
+SatSolverGlueMiniSat2::add_clause(Literal lit1,
 			      Literal lit2)
 {
   mSolver.addClause(literal2lit(lit1), literal2lit(lit2));
@@ -109,7 +109,7 @@ SatSolverMiniSat2::add_clause(Literal lit1,
 
 // @brief 3項の節を追加する．
 void
-SatSolverMiniSat2::add_clause(Literal lit1,
+SatSolverGlueMiniSat2::add_clause(Literal lit1,
 			      Literal lit2,
 			      Literal lit3)
 {
@@ -124,7 +124,7 @@ SatSolverMiniSat2::add_clause(Literal lit1,
 // @retval kB3X わからなかった．
 // @note i 番めの変数の割り当て結果は model[i] に入る．
 Bool3
-SatSolverMiniSat2::solve(const vector<Literal>& assumptions,
+SatSolverGlueMiniSat2::solve(const vector<Literal>& assumptions,
 			 vector<Bool3>& model)
 {
   vec<Lit> tmp;
@@ -157,7 +157,7 @@ SatSolverMiniSat2::solve(const vector<Literal>& assumptions,
 
 // @brief 学習節をすべて削除する．
 void
-SatSolverMiniSat2::forget_learnt_clause()
+SatSolverGlueMiniSat2::forget_learnt_clause()
 {
   // 未実装
 }
@@ -166,7 +166,7 @@ SatSolverMiniSat2::forget_learnt_clause()
 // @param[in] val 設定する値
 // @return 以前の設定値を返す．
 ymuint64
-SatSolverMiniSat2::set_max_conflict(ymuint64 val)
+SatSolverGlueMiniSat2::set_max_conflict(ymuint64 val)
 {
   // 無効
   return 0;
@@ -175,7 +175,7 @@ SatSolverMiniSat2::set_max_conflict(ymuint64 val)
 // @brief 現在の内部状態を得る．
 // @param[out] stats 状態を格納する構造体
 void
-SatSolverMiniSat2::get_stats(SatStats& stats) const
+SatSolverGlueMiniSat2::get_stats(SatStats& stats) const
 {
   stats.mRestart = mSolver.starts;
   stats.mVarNum = mSolver.nVars();
@@ -192,21 +192,21 @@ SatSolverMiniSat2::get_stats(SatStats& stats) const
 
 // @brief 変数の数を得る．
 ymuint
-SatSolverMiniSat2::variable_num() const
+SatSolverGlueMiniSat2::variable_num() const
 {
   return mSolver.nVars();
 }
 
 // @brief 制約節の数を得る．
 ymuint
-SatSolverMiniSat2::clause_num() const
+SatSolverGlueMiniSat2::clause_num() const
 {
   return mSolver.nClauses();
 }
 
 // @brief 制約節のリテラルの総数を得る．
 ymuint
-SatSolverMiniSat2::literal_num() const
+SatSolverGlueMiniSat2::literal_num() const
 {
   return mSolver.clauses_literals;
 }
@@ -214,20 +214,20 @@ SatSolverMiniSat2::literal_num() const
 // @brief DIMACS 形式で制約節を出力する．
 // @param[in] s 出力先のストリーム
 void
-SatSolverMiniSat2::write_DIMACS(ostream& s) const
+SatSolverGlueMiniSat2::write_DIMACS(ostream& s) const
 {
 }
 
 // @brief solve() 中のリスタートのたびに呼び出されるメッセージハンドラの登録
 // @param[in] msg_handler 登録するメッセージハンドラ
 void
-SatSolverMiniSat2::reg_msg_handler(SatMsgHandler* msg_handler)
+SatSolverGlueMiniSat2::reg_msg_handler(SatMsgHandler* msg_handler)
 {
 }
 
 // @brief 時間計測機能を制御する
 void
-SatSolverMiniSat2::timer_on(bool enable)
+SatSolverGlueMiniSat2::timer_on(bool enable)
 {
 }
 

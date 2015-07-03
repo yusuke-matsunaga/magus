@@ -242,7 +242,7 @@ inline
 void
 AssignList::backtrack(int level)
 {
-  ASSERT_COND( level < mSize );
+  ASSERT_COND( level < static_cast<int>(mSize) );
   mHead = mMarker[level];
   mCurLevel = level;
 }

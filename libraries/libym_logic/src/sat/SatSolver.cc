@@ -9,9 +9,10 @@
 
 #include "YmLogic/SatSolver.h"
 
-#include "ymsat/YmSat.h"
+#include "ymsat/YmSatMS2.h"
 #include "MiniSat/SatSolverMiniSat.h"
 #include "MiniSat2/SatSolverMiniSat2.h"
+#include "glueminisat-2.2.8/SatSolverGlueMiniSat2.h"
 
 
 BEGIN_NAMESPACE_YM_SAT
@@ -36,8 +37,12 @@ SatSolver::SatSolver(const string& type,
     // minisat-2.2
     mImpl = new SatSolverMiniSat2(option);
   }
+  else if ( type == "glueminisat2" ) {
+    // glueminisat-2.2.8
+    mImpl = new SatSolverGlueMiniSat2(option);
+  }
   else {
-    mImpl = new YmSat(option);
+    mImpl = new YmSatMS2(option);
   }
   mRecOut = rec_out;
 }
@@ -218,17 +223,6 @@ SatSolver::put_lit(Literal lit) const
   else {
     *mRecOut << "N";
   }
-}
-
-// @brief 学習節の整理を行なう．
-void
-SatSolver::reduce_learnt_clause()
-{
-  if ( mRecOut ) {
-    *mRecOut << "R" << endl;
-  }
-
-  mImpl->reduce_learnt_clause();
 }
 
 // @brief 学習節をすべて削除する．

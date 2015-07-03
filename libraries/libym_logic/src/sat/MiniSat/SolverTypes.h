@@ -54,7 +54,7 @@ public:
     friend bool operator == (Lit p, Lit q);
     friend bool operator <  (Lit p, Lit q);
 
-    uint hash() const { return (uint)x; }
+  unsigned int hash() const { return (unsigned int)x; }
 };
 inline Lit operator ~ (Lit p) { Lit q; q.x = p.x ^ 1; return q; }
 inline bool sign  (Lit p) { return p.x & 1; }
@@ -77,8 +77,8 @@ inline int toDimacs(Lit p) { return sign(p) ? -var(p) - 1 : var(p) + 1; }
 
 
 class Clause {
-    uint    size_learnt;
-    Lit     data[1];
+  unsigned int    size_learnt;
+  Lit     data[1];
 public:
     // NOTE: This constructor cannot be used directly (doesn't allocate enough memory).
     Clause(bool learnt, const vec<Lit>& ps) {
@@ -96,9 +96,9 @@ public:
     float&    activity    ()      const { return *((float*)&data[size()]); }
 };
 inline Clause* Clause_new(bool learnt, const vec<Lit>& ps) {
-    assert(sizeof(Lit)      == sizeof(uint));
-    assert(sizeof(float)    == sizeof(uint));
-    void*   mem = xmalloc<char>(sizeof(Clause) - sizeof(Lit) + sizeof(uint)*(ps.size() + (int)learnt));
+  //ASSERT_COND(sizeof(Lit)      == sizeof(ymuint));
+  //ASSERT_COND(sizeof(float)    == sizeof(ymuint));
+  void*   mem = xmalloc<char>(sizeof(Clause) - sizeof(Lit) + sizeof(unsigned int)*(ps.size() + (int)learnt));
     return new (mem) Clause(learnt, ps); }
 
 
@@ -114,14 +114,17 @@ public:
     friend GClause GClause_new(Lit p);
     friend GClause GClause_new(Clause* c);
 
-    bool        isLit    () const { return ((uintp)data & 1) == 1; }
-    Lit         lit      () const { return toLit(((intp)data) >> 1); }
+  bool        isLit    () const { return (reinterpret_cast<unsigned long>(data) & 1) == 1; }
+  Lit         lit      () const { return toLit((reinterpret_cast<unsigned long>(data)) >> 1); }
     Clause*     clause   () const { return (Clause*)data; }
     bool        operator == (GClause c) const { return data == c.data; }
     bool        operator != (GClause c) const { return data != c.data; }
 };
-inline GClause GClause_new(Lit p)     { return GClause((void*)(((intp)index(p) << 1) + 1)); }
-inline GClause GClause_new(Clause* c) { assert(((uintp)c & 1) == 0); return GClause((void*)c); }
+inline GClause GClause_new(Lit p)     {
+  unsigned long i = index(p);
+  return GClause((void*)((i << 1) + 1));
+}
+inline GClause GClause_new(Clause* c) { /*ASSERT_COND(((uintp)c & 1) == 0);*/ return GClause((void*)c); }
 
 #define GClause_NULL GClause_new((Clause*)NULL)
 

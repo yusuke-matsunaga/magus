@@ -132,18 +132,18 @@ removeWatch(vec<GClause>& ws,
 /*_________________________________________________________________________________________________
 |
 |  newClause : (ps : const vec<Lit>&) (learnt : bool)  ->  [void]
-|  
+|
 |  Description:
 |    Allocate and add a new clause to the SAT solvers clause database. If a conflict is detected,
 |    the 'ok' flag is cleared and the solver is in an unusable state (must be disposed).
-|  
+|
 |  Input:
 |    ps     - The new clause as a vector of literals.
 |    learnt - Is the clause a learnt clause? For learnt clauses, 'ps[0]' is assumed to be the
 |             asserting literal. An appropriate 'enqueue()' operation will be performed on this
 |             literal. One of the watches will always be on this literal, the other will be set to
 |             the literal with the highest decision level.
-|  
+|
 |  Effect:
 |    Activity heuristics are updated.
 |________________________________________________________________________________________________@*/
@@ -157,10 +157,10 @@ Solver::newClause(const vec<Lit>& ps_,
   if ( !learnt ) {
     assert(decisionLevel() == 0);
     ps_.copyTo(qs);             // Make a copy of the input vector.
-    
+
     // Remove duplicates:
     sortUnique(qs);
-    
+
     // Check if clause is satisfied:
     for (int i = 0; i < qs.size()-1; i++) {
       if (qs[i] == ~qs[i+1])
@@ -170,7 +170,7 @@ Solver::newClause(const vec<Lit>& ps_,
       if (value(qs[i]) == l_True)
 	return;
     }
-    
+
     // Remove false literals:
     int     i, j;
     for (i = j = 0; i < qs.size(); i++)
@@ -179,7 +179,7 @@ Solver::newClause(const vec<Lit>& ps_,
     qs.shrink(i - j);
   }
   const vec<Lit>& ps = learnt ? ps_ : qs;     // 'ps' is now the (possibly) reduced vector of literals.
-  
+
   if (ps.size() == 0) {
     ok = false;
   }
@@ -193,7 +193,7 @@ Solver::newClause(const vec<Lit>& ps_,
     // Create special binary clause watch:
     watches[index(~ps[0])].push(GClause_new(ps[1]));
     watches[index(~ps[1])].push(GClause_new(ps[0]));
-    
+
     if (learnt) {
       check(enqueue(ps[0], GClause_new(~ps[1])));
       stats.learnts_literals += ps.size();
@@ -206,7 +206,7 @@ Solver::newClause(const vec<Lit>& ps_,
   else {
     // Allocate clause:
     Clause* c   = Clause_new(learnt, ps);
-    
+
     if (learnt) {
       // Put the second watch on the literal with highest decision level:
       int     max_i = 1;
@@ -217,7 +217,7 @@ Solver::newClause(const vec<Lit>& ps_,
 	    max_i = i;
       (*c)[1]     = ps[max_i];
       (*c)[max_i] = ps[1];
-      
+
       // Bump, enqueue, store clause:
       claBumpActivity(c);         // (newly learnt clauses should be considered active)
       check(enqueue((*c)[0], GClause_new(c)));
@@ -326,7 +326,7 @@ Solver::cancelUntil(int level)
     cout << endl
 	 << "backtrack until @" << level << endl;
   }
-  
+
   if (decisionLevel() > level) {
     for (int c = trail.size()-1; c >= trail_lim[level]; c--) {
       Var     x  = var(trail[c]);
@@ -355,17 +355,17 @@ Solver::cancelUntil(int level)
 /*_________________________________________________________________________________________________
 |
 |  analyze : (confl : Clause*) (out_learnt : vec<Lit>&) (out_btlevel : int&)  ->  [void]
-|  
+|
 |  Description:
 |    Analyze conflict and produce a reason clause.
-|  
+|
 |    Pre-conditions:
 |      * 'out_learnt' is assumed to be cleared.
 |      * Current decision level must be greater than root level.
-|  
+|
 |    Post-conditions:
 |      * 'out_learnt[0]' is the asserting literal at level 'out_btlevel'.
-|  
+|
 |  Effect:
 |    Will undo part of the trail, upto but not beyond the assumption of the current decision level.
 |________________________________________________________________________________________________@*/
@@ -395,7 +395,7 @@ Solver::analyze(Clause* _confl,
 #endif
     if (c.learnt())
       claBumpActivity(&c);
-    
+
     for (int j = (p == lit_Undef) ? 0 : 1; j < c.size(); j++){
       Lit q = c[j];
       if (!seen[var(q)] && level[var(q)] > 0){
@@ -409,14 +409,14 @@ Solver::analyze(Clause* _confl,
 	}
       }
     }
-    
+
     // Select next clause to look at:
     while (!seen[var(trail[index--])]);
     p     = trail[index+1];
     confl = reason[var(p)];
     seen[var(p)] = 0;
     pathC--;
-    
+
   } while (pathC > 0);
   out_learnt[0] = ~p;
 
@@ -424,7 +424,7 @@ Solver::analyze(Clause* _confl,
   if (expensive_ccmin) {
     // Simplify conflict clause (a lot):
     //
-    uint    min_level = 0;
+    unsigned int    min_level = 0;
     for (i = 1; i < out_learnt.size(); i++)
       min_level |= 1 << (level[var(out_learnt[i])] & 31);         // (maintain an abstraction of levels involved in conflict)
 
@@ -459,7 +459,7 @@ Solver::analyze(Clause* _confl,
       }
     }
   }
-  
+
   stats.max_literals += out_learnt.size();
   out_learnt.shrink(i - j);
   stats.tot_literals += out_learnt.size();
@@ -473,7 +473,7 @@ Solver::analyze(Clause* _confl,
 //
 bool
 Solver::analyze_removable(Lit p,
-			  uint min_level)
+			  unsigned int min_level)
 {
   assert(reason[var(p)] != GClause_NULL);
   analyze_stack.clear(); analyze_stack.push(p);
@@ -504,7 +504,7 @@ Solver::analyze_removable(Lit p,
       }
     }
   }
-  
+
   return true;
 }
 
@@ -512,7 +512,7 @@ Solver::analyze_removable(Lit p,
 /*_________________________________________________________________________________________________
 |
 |  analyzeFinal : (confl : Clause*) (skip_first : bool)  ->  [void]
-|  
+|
 |  Description:
 |    Specialized analysis procedure to express the final conflict in terms of assumptions.
 |    'root_level' is allowed to point beyond end of trace (useful if called after conflict while
@@ -526,14 +526,14 @@ Solver::analyzeFinal(Clause* confl,
   // -- NOTE! This code is relatively untested. Please report bugs!
   conflict.clear();
   if (root_level == 0) return;
-  
+
   vec<char>&     seen  = analyze_seen;
   for (int i = skip_first ? 1 : 0; i < confl->size(); i++){
     Var     x = var((*confl)[i]);
     if (level[x] > 0)
       seen[x] = 1;
   }
-  
+
   int     start = (root_level >= trail_lim.size()) ? trail.size()-1 : trail_lim[root_level];
   for (int i = start; i >= trail_lim[0]; i--){
     Var     x = var(trail[i]);
@@ -569,16 +569,16 @@ Solver::analyzeFinal(Clause* confl,
 /*_________________________________________________________________________________________________
 |
 |  enqueue : (p : Lit) (from : Clause*)  ->  [bool]
-|  
+|
 |  Description:
 |    Puts a new fact on the propagation queue as well as immediately updating the variable's value.
 |    Should a conflict arise, FALSE is returned.
-|  
+|
 |  Input:
 |    p    - The fact to enqueue
 |    from - [Optional] Fact propagated from this (currently) unit clause. Stored in 'reason[]'.
 |           Default value is NULL (no reason).
-|  
+|
 |  Output:
 |    TRUE if fact was enqueued without conflict, FALSE otherwise.
 |________________________________________________________________________________________________@*/
@@ -617,11 +617,11 @@ Solver::enqueue(Lit p,
 /*_________________________________________________________________________________________________
 |
 |  propagate : [void]  ->  [Clause*]
-|  
+|
 |  Description:
 |    Propagates all enqueued facts. If a conflict arises, the conflicting clause is returned,
 |    otherwise NULL.
-|  
+|
 |    Post-conditions:
 |      * the propagation queue is empty, even if there was a conflict.
 |________________________________________________________________________________________________@*/
@@ -635,11 +635,11 @@ Solver::propagate()
   while ( qhead < trail.size() ) {
     stats.propagations++;
     simpDB_props--;
-    
+
     Lit            p   = trail[qhead++];     // 'p' is enqueued fact to propagate.
     vec<GClause>&  ws  = watches[index(p)];
     GClause*       i,* j, *end;
-    
+
     if ( debug & debug_implication ) {
       cout << endl
 	   << "\t\tPick up " << p << endl;
@@ -662,7 +662,7 @@ Solver::propagate()
 	    confl = propagate_tmpbin;
 	    (*confl)[1] = ~p;
 	    (*confl)[0] = i->lit();
-	  
+
 	    qhead = trail.size();
 	    // Copy the remaining watches:
 	    while (i < end) {
@@ -690,13 +690,13 @@ Solver::propagate()
 	Lit false_lit = ~p;
 	if (c[0] == false_lit)
 	  c[0] = c[1], c[1] = false_lit;
-	
+
 	assert(c[1] == false_lit);
 
 	if ( debug & debug_implication ) {
 	  cout << "\t\texamining watcher clause " << c << endl;
 	}
-	
+
 	// If 0th watch is true, then clause is already satisfied.
 	Lit   first = c[0];
 	lbool val   = value(first);
@@ -715,7 +715,7 @@ Solver::propagate()
 	      watches[index(~c[1])].push(GClause_new(&c));
 	      goto FoundWatch;
 	    }
-	  
+
 	  // Did not find watch -- clause is unit under assignment:
 	  *j++ = GClause_new(&c);
 	  if ( !enqueue(first, GClause_new(&c)) ){
@@ -738,7 +738,7 @@ Solver::propagate()
     }
     ws.shrink(i - j);
   }
-  
+
   return confl;
 }
 
@@ -746,7 +746,7 @@ Solver::propagate()
 /*_________________________________________________________________________________________________
 |
 |  reduceDB : ()  ->  [void]
-|  
+|
 |  Description:
 |    Remove half of the learnt clauses, minus the clauses locked by the current assignment. Locked
 |    clauses are clauses that are reason to some assignment. Binary clauses are never removed.
@@ -784,7 +784,7 @@ Solver::reduceDB()
 /*_________________________________________________________________________________________________
 |
 |  simplifyDB : [void]  ->  [bool]
-|  
+|
 |  Description:
 |    Simplify the clause database according to the current top-level assigment. Currently, the only
 |    thing done here is the removal of satisfied clauses, but more things can be put here.
@@ -798,10 +798,10 @@ Solver::simplifyDB()
   if (propagate() != NULL){
     ok = false;
     return; }
-  
+
   if (nAssigns() == simpDB_assigns || simpDB_props > 0)   // (nothing has changed or preformed a simplification too recently)
     return;
-  
+
   // Clear watcher lists:
   for (int i = simpDB_assigns; i < nAssigns(); i++){
     Lit           p  = trail[i];
@@ -819,7 +819,7 @@ Solver::simplifyDB()
     watches[index( p)].clear(true);
     watches[index(~p)].clear(true);
   }
-  
+
   // Remove satisfied clauses:
   for (int type = 0; type < 2; type++){
     vec<Clause*>& cs = type ? learnts : clauses;
@@ -835,7 +835,7 @@ Solver::simplifyDB()
     }
     cs.shrink(cs.size()-j);
   }
-  
+
   simpDB_assigns = nAssigns();
   simpDB_props   = stats.clauses_literals + stats.learnts_literals;   // (shouldn't depend on 'stats' really, but it will do for now)
 }
@@ -844,12 +844,12 @@ Solver::simplifyDB()
 /*_________________________________________________________________________________________________
 |
 |  search : (nof_conflicts : int) (nof_learnts : int) (params : const SearchParams&)  ->  [lbool]
-|  
+|
 |  Description:
 |    Search for a model the specified number of conflicts, keeping the number of learnt clauses
 |    below the provided limit. NOTE! Use negative value for 'nof_conflicts' or 'nof_learnts' to
 |    indicate infinity.
-|  
+|
 |  Output:
 |    'l_True' if a partial assigment that is consistent with respect to the clauseset is found. If
 |    all variables are decision variables, this means that the clause set is satisfiable. 'l_False'
@@ -873,7 +873,7 @@ Solver::search(int nof_conflicts,
     Clause* confl = propagate();
     if (confl != NULL){
       // CONFLICT
-      
+
       stats.conflicts++; conflictC++;
       vec<Lit>    learnt_clause;
       int         backtrack_level;
@@ -882,7 +882,7 @@ Solver::search(int nof_conflicts,
 	analyzeFinal(confl);
 	return l_False; }
       analyze(confl, learnt_clause, backtrack_level);
-  
+
       if ( debug & debug_analyze ) {
 	cout << endl
 	     << "analyze for " << *confl << endl
@@ -902,29 +902,29 @@ Solver::search(int nof_conflicts,
       if (learnt_clause.size() == 1) level[var(learnt_clause[0])] = 0;    // (this is ugly (but needed for 'analyzeFinal()') -- in future versions, we will backtrack past the 'root_level' and redo the assumptions)
       varDecayActivity();
       claDecayActivity();
-      
+
     }
     else{
       // NO CONFLICT
-      
+
       if (nof_conflicts >= 0 && conflictC >= nof_conflicts){
 	// Reached bound on number of conflicts:
 	progress_estimate = progressEstimate();
 	cancelUntil(root_level);
 	return l_Undef; }
-      
+
       if (decisionLevel() == 0)
 	// Simplify the set of problem clauses:
 	simplifyDB(), assert(ok);
-      
+
       if (nof_learnts >= 0 && learnts.size()-nAssigns() >= nof_learnts)
 	// Reduce the set of learnt clauses:
 	reduceDB();
-      
+
       // New variable decision:
       stats.decisions++;
       Var next = order.select(params.random_var_freq);
-      
+
       if (next == var_Undef){
 	// Model found:
 	model.growTo(nVars());
@@ -932,7 +932,7 @@ Solver::search(int nof_conflicts,
 	cancelUntil(root_level);
 	return l_True;
       }
-      
+
       check(assume(~Lit(next)));
     }
   }
@@ -978,7 +978,7 @@ Solver::claRescaleActivity()
 /*_________________________________________________________________________________________________
 |
 |  solve : (assumps : const vec<Lit>&)  ->  [bool]
-|  
+|
 |  Description:
 |    Top-level solve. If using assumptions (non-empty 'assumps' vector), you must call
 |    'simplifyDB()' first to see that no top-level conflict is present (which would put the solver
@@ -1003,15 +1003,15 @@ Solver::solve(const vec<Lit>& assumps)
       cout << "  " << *clause << endl;
     }
   }
-  
+
   simplifyDB();
   if (!ok) return false;
-  
+
   SearchParams    params(default_params);
   double  nof_conflicts = 100;
   double  nof_learnts   = nClauses() / 3;
   lbool   status        = l_Undef;
-  
+
   // Perform assumptions:
   root_level = assumps.size();
   for (int i = 0; i < assumps.size(); i++){
@@ -1051,7 +1051,7 @@ Solver::solve(const vec<Lit>& assumps)
     }
   }
   assert(root_level == decisionLevel());
-  
+
   // Search:
   if (verbosity >= 1){
     reportf("==================================[MINISAT]===================================\n");
@@ -1059,7 +1059,7 @@ Solver::solve(const vec<Lit>& assumps)
     reportf("|           | Clauses Literals |   Limit Clauses Literals  Lit/Cl |          |\n");
     reportf("==============================================================================\n");
   }
-  
+
   while (status == l_Undef){
     if (verbosity >= 1) {
       reportf("| %9d | %7d %8d | %7d %7d %8d %7.1f | %6.3f %% |\n",
@@ -1071,7 +1071,7 @@ Solver::solve(const vec<Lit>& assumps)
   }
   if (verbosity >= 1)
     reportf("==============================================================================\n");
-  
+
   cancelUntil(0);
 
   if ( debug & debug_solve ) {

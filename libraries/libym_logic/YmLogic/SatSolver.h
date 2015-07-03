@@ -110,10 +110,6 @@ public:
   solve(const vector<Literal>& assumptions,
 	vector<Bool3>& model);
 
-  /// @brief 学習節の整理を行なう．
-  void
-  reduce_learnt_clause();
-
   /// @brief 学習節をすべて削除する．
   void
   forget_learnt_clause();

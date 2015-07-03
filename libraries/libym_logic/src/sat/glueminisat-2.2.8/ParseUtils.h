@@ -1,4 +1,4 @@
-﻿/************************************************************************************[ParseUtils.h]
+/************************************************************************************[ParseUtils.h]
 Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
 Copyright (c) 2007-2010, Niklas Sorensson
 
@@ -18,8 +18,8 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **************************************************************************************************/
 
-#ifndef Minisat_ParseUtils_h
-#define Minisat_ParseUtils_h
+#ifndef Glueminisat_ParseUtils_h
+#define Glueminisat_ParseUtils_h
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -28,14 +28,14 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include <zlib.h>
 #endif
 
-namespace Minisat {
-#if 0
+namespace Glueminisat {
+
 //-------------------------------------------------------------------------------------------------
 // A simple buffered character stream class:
 
 static const int buffer_size = 1048576;
 
-
+#if 0
 class StreamBuffer {
     gzFile        in;
     unsigned char buf[buffer_size];
@@ -58,6 +58,7 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 // End-of-file detection functions for StreamBuffer and char*:
+
 
 static inline bool isEof(StreamBuffer& in) { return *in == EOF;  }
 static inline bool isEof(const char*   in) { return *in == '\0'; }

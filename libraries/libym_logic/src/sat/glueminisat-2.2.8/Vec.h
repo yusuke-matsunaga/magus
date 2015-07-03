@@ -1,4 +1,4 @@
-﻿/*******************************************************************************************[Vec.h]
+/*******************************************************************************************[Vec.h]
 Copyright (c) 2003-2007, Niklas Een, Niklas Sorensson
 Copyright (c) 2007-2010, Niklas Sorensson
 
@@ -18,8 +18,8 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **************************************************************************************************/
 
-#ifndef Minisat_Vec_h
-#define Minisat_Vec_h
+#ifndef Glueminisat_Vec_h
+#define Glueminisat_Vec_h
 
 #include <assert.h>
 #include <new>
@@ -27,7 +27,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "IntTypes.h"
 #include "XAlloc.h"
 
-namespace Minisat {
+namespace Glueminisat {
 
 //=================================================================================================
 // Automatically resizable arrays
@@ -85,6 +85,9 @@ public:
     // Vector interface:
     const T& operator [] (int index) const { return data[index]; }
     T&       operator [] (int index)       { return data[index]; }
+    // For DEBUG
+    //const T& operator [] (int index) const { assert(0 <= index && index < size()); return data[index]; }
+    //T&       operator [] (int index)       { assert(0 <= index && index < size()); return data[index]; }
 
     // Duplicatation (preferred instead):
     void copyTo(vec<T>& copy) const { copy.clear(); copy.growTo(sz); for (int i = 0; i < sz; i++) copy[i] = data[i]; }
@@ -96,8 +99,7 @@ template<class T>
 void vec<T>::capacity(int min_cap) {
     if (cap >= min_cap) return;
     int add = imax((min_cap - cap + 1) & ~1, ((cap >> 1) + 2) & ~1);   // NOTE: grow by approximately 3/2
-    if ( (add > (INT_MAX - cap)) ||
-	 (((data = (T*)::realloc(data, (cap += add) * sizeof(T))) == NULL) && (errno == ENOMEM)) )
+    if (add > INT_MAX - cap || (((data = (T*)::realloc(data, (cap += add) * sizeof(T))) == NULL) && errno == ENOMEM))
         throw OutOfMemoryException();
  }
 

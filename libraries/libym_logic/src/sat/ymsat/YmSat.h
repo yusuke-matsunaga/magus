@@ -25,66 +25,6 @@ BEGIN_NAMESPACE_YM_SAT
 class SatAnalyzer;
 
 //////////////////////////////////////////////////////////////////////
-/// @class Params YmSat.h "YmSat.h"
-/// @brief YmSat の挙動を制御するパラメータ
-//////////////////////////////////////////////////////////////////////
-struct Params
-{
-  /// @brief 変数の decay 値
-  double mVarDecay;
-
-  /// @brief 変数選択用の閾値
-  double mVarFreq;
-
-  /// @brief 学習節の decay 値
-  double mClauseDecay;
-
-  /// @brief phase-cache ヒューリスティックを使うとき true
-  bool mPhaseCache;
-
-  /// @brief watcher list の多い極性を選ぶヒューリスティックを使うとき true
-  bool mWlPosi;
-
-  /// @brief watcher list の少ない極性を選ぶヒューリスティックを使うとき true
-  bool mWlNega;
-
-  /// @brief LBD ヒューリスティックを使うとき true
-  bool mUseLbd;
-
-  /// @brief コンストラクタ
-  Params() :
-    mVarDecay(1.0),
-    mVarFreq(0.0),
-    mClauseDecay(1.0),
-    mPhaseCache(true),
-    mWlPosi(false),
-    mWlNega(false),
-    mUseLbd(false)
-  {
-  }
-
-  /// @brief 値を指定したコンストラクタ
-  Params(double var_decay,
-	 double var_freq,
-	 double clause_decay,
-	 bool phase_cache,
-	 bool wl_posi,
-	 bool wl_nega,
-	 bool use_lbd) :
-    mVarDecay(var_decay),
-    mVarFreq(var_freq),
-    mClauseDecay(clause_decay),
-    mPhaseCache(phase_cache),
-    mWlPosi(wl_posi),
-    mWlNega(!wl_posi && wl_nega),
-    mUseLbd(use_lbd)
-  {
-  }
-
-};
-
-
-//////////////////////////////////////////////////////////////////////
 /// @class YmSat YmSat.h "YmSat.h"
 /// @brief SatSolver の実装クラス
 //////////////////////////////////////////////////////////////////////
@@ -92,6 +32,43 @@ class YmSat :
   public SatSolverImpl
 {
   friend class SatAnalyzer;
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  /// @class YmSat::Params YmSat.h "YmSat.h"
+  /// @brief YmSat の挙動を制御するパラメータ
+  //////////////////////////////////////////////////////////////////////
+  struct Params
+  {
+    /// @brief 変数の decay 値
+    double mVarDecay;
+
+    /// @brief 学習節の decay 値
+    double mClauseDecay;
+
+    /// @brief LBD ヒューリスティックを使うとき true
+    bool mUseLbd;
+
+    /// @brief コンストラクタ
+    Params() :
+      mVarDecay(1.0),
+      mClauseDecay(1.0),
+      mUseLbd(false)
+    {
+    }
+
+    /// @brief 値を指定したコンストラクタ
+    Params(double var_decay,
+	   double clause_decay,
+	   bool use_lbd) :
+      mVarDecay(var_decay),
+      mClauseDecay(clause_decay),
+      mUseLbd(use_lbd)
+    {
+    }
+
+  };
+
 
 public:
 
@@ -183,11 +160,6 @@ public:
   solve(const vector<Literal>& assumptions,
 	vector<Bool3>& model);
 
-  /// @brief 学習節の整理を行なう．
-  virtual
-  void
-  reduce_learnt_clause();
-
   /// @brief 学習節をすべて削除する．
   virtual
   void
@@ -245,13 +217,134 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 探索を行う本体の関数
-  /// @param[in] confl_limit 矛盾の制限値
+  /// @retval kB3True 充足した．
+  /// @retval kB3False 充足できないことがわかった．
+  /// @retval kB3X 矛盾の生起回数が mConflictLimit を超えた．
   ///
-  /// 矛盾の生起回数が confl_limit を越えたら kB3X を返す．
+  /// 矛盾の結果新たな学習節が追加される場合もあるし，
+  /// 内部で reduce_learnt_clause() を呼んでいるので学習節が
+  /// 削減される場合もある．
   Bool3
-  search(ymuint confl_limit);
+  search();
+
+  /// @brief search() 用の条件パラメータの初期化を行う．
+  virtual
+  void
+  init_control_parameters() = 0;
+
+  /// @brief リスタート時に制御パラメータの更新を行う．
+  /// @param[in] restart リスタート回数
+  virtual
+  void
+  update_on_restart(ymuint restart) = 0;
+
+  /// @brief コンフリクト時に制御パラメータの更新を行う．
+  virtual
+  void
+  update_on_conflict() = 0;
+
+  /// @brief 次の割り当てを選ぶ．
+  /// @note 割り当てられる変数がない場合には kLiteralX を返す．
+  virtual
+  Literal
+  next_decision() = 0;
+
+  /// @brief 学習節の整理を行なう．
+  ///
+  /// 実際には条件が成り立った時のみ整理する．
+  virtual
+  void
+  reduce_learnt_clause() = 0;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 矛盾回数の制限値を設定する．
+  /// @param[in] limit 設定する値
+  void
+  set_conflict_limit(ymuint64 limit);
+
+  /// @brief 学習節の制限値を設定する．
+  /// @param[in] limit 設定する値
+  void
+  set_learnt_limit(ymuint64 limit);
+
+  /// @brief 変数ヒープを得る．
+  VarHeap&
+  var_heap();
+
+  /// @brief 学習節のリストを返す．
+  vector<SatClause*>&
+  learnt_clause_list();
+
+  /// @brief 節を削除する．
+  /// @param[in] clause 削除する節
+  void
+  delete_clause(SatClause* clause);
+
+  /// @brief 学習節のアクティビティ増加量を返す．
+  double
+  clause_bump() const;
+
+  /// @brief watcher list を得る．
+  /// @param[in] lit リテラル
+  WatcherList&
+  watcher_list(Literal lit);
+
+  /// @brief 変数1の評価を行う．
+  /// @param[in] id 変数番号
+  Bool3
+  eval(VarId id) const;
+
+  /// @brief literal の評価を行う．
+  /// @param[in] l リテラル
+  Bool3
+  eval(Literal l) const;
+
+  /// @brief 変数の直前の値を返す．
+  Bool3
+  old_val(VarId id) const;
+
+  /// @brief 現在の decision level を返す．
+  int
+  decision_level() const;
+
+  /// @brief 変数の decision level を返す．
+  /// @param[in] varid 変数番号
+  int
+  decision_level(VarId varid) const;
+
+  /// @brief LBD を計算する．
+  /// @param[in] clause 対象の節
+  ymuint
+  calc_lbd(const SatClause* clause);
+
+  /// @brief 変数の割り当て理由を返す．
+  /// @param[in] varid 変数番号
+  SatReason
+  reason(VarId varid) const;
+
+  /// @brief 学習節が使われているか調べる．
+  /// @param[in] clause 対象の節
+  bool
+  is_locked(SatClause* clause) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 低レベルの下請け関数
+  //
+  // 実装により実行効率に差は出るが，結果には影響がないもの
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 割当てキューに基づいて implication を行う．
+  /// @return 矛盾が生じたら矛盾の原因を返す．
+  ///
+  /// 矛盾が生じていなかったら kNullSatReason を返す．
+  /// 矛盾の原因とは実際には充足していない節である．
   SatReason
   implication();
 
@@ -259,11 +352,6 @@ private:
   /// @param[in] level バックトラックするレベル
   void
   backtrack(int level);
-
-  /// @brief 次の割り当てを選ぶ．
-  /// @note 割り当てられる変数がない場合には kLiteralX を返す．
-  Literal
-  next_decision();
 
   /// @brief 値の割当てか可能かチェックする．
   /// @param[in] lit 割り当てるリテラル
@@ -282,17 +370,18 @@ private:
 	 SatReason reason = SatReason());
 
   /// @brief CNF を簡単化する．
+  ///
+  /// 具体的には implication() を行って充足している節を取り除く．
+  /// もちろん decision_level が 0 の時しか実行できない．
   void
   reduce_CNF();
 
   /// @brief 充足している節を取り除く
   /// @param[in] clause_list 節のリスト
+  ///
+  /// reduce_CNF() の中で用いられる．
   void
   sweep_clause(vector<SatClause*>& clause_list);
-
-  /// @brief 使われていない学習節を削除する．
-  void
-  cut_down();
 
   /// @brief add_clause() の下請け関数
   /// @param[in] lit_num リテラル数
@@ -320,16 +409,6 @@ private:
   new_clause(ymuint lit_num,
 	     bool learnt = false);
 
-  /// @brief 節を削除する．
-  /// @param[in] clause 削除する節
-  void
-  delete_clause(SatClause* clause);
-
-  /// @brief watcher list を得る．
-  /// @param[in] lit リテラル
-  WatcherList&
-  watcher_list(Literal lit);
-
   /// @brief Watcher を追加する．
   /// @param[in] watch_lit リテラル
   /// @param[in] reason 理由
@@ -348,40 +427,6 @@ private:
   /// @param[in] watch_lit リテラル
   void
   del_satisfied_watcher(Literal watch_lit);
-
-  /// @brief 変数1の評価を行う．
-  /// @param[in] id 変数番号
-  Bool3
-  eval(VarId id) const;
-
-  /// @brief literal の評価を行う．
-  /// @param[in] l リテラル
-  Bool3
-  eval(Literal l) const;
-
-  /// @brief 現在の decision level を返す．
-  int
-  decision_level() const;
-
-  /// @brief 変数の decision level を返す．
-  /// @param[in] varid 変数番号
-  int
-  decision_level(VarId varid) const;
-
-  /// @brief LBD を計算する．
-  /// @param[in] clause 対象の節
-  ymuint
-  calc_lbd(const SatClause* clause);
-
-  /// @brief 変数の割り当て理由を返す．
-  /// @param[in] varid 変数番号
-  SatReason
-  reason(VarId varid) const;
-
-  /// @brief 学習節が使われているか調べる．
-  /// @param[in] clause 対象の節
-  bool
-  is_locked(SatClause* clause) const;
 
   /// @brief 変数のアクティビティを増加させる．
   /// @param[in] var 変数番号
@@ -424,23 +469,23 @@ private:
   // SatClause のメモリ領域確保用のアロケータ
   FragAlloc mAlloc;
 
-  // 制約節の配列
+  // 制約節のリスト
   // ただし二項節は含まない．
-  vector<SatClause*> mConstrClause;
+  vector<SatClause*> mConstrClauseList;
 
-  // 二項制約節の配列
+  // 二項制約節のリスト
   // この節は実際には使われない．
-  vector<SatClause*> mConstrBinClause;
+  vector<SatClause*> mConstrBinClauseList;
 
-  // 全ての制約節の配列
+  // 全ての制約節のリスト
   // この節は実際には使われない．
-  vector<SatClause*> mAllConstrClause;
+  vector<SatClause*> mAllConstrClauseList;
 
   // 制約節の総リテラル数 (二項制約節も含む)
   ymuint64 mConstrLitNum;
 
-  // 学習節の配列
-  vector<SatClause*> mLearntClause;
+  // 学習節のリスト
+  vector<SatClause*> mLearntClauseList;
 
   // 二項学習節の数
   ymuint64 mLearntBinNum;
@@ -511,9 +556,6 @@ private:
   // 学習節のアクティビティの減衰量
   double mClauseDecay;
 
-  // 変数選択用乱数発生器
-  RandGen mRandGen;
-
   // mTimer を使うとき true にするフラグ
   bool mTimerOn;
 
@@ -541,7 +583,7 @@ private:
   // 学習節の制限
   ymuint64 mLearntLimit;
 
-  // mConflistLimit の最大値
+  // トータルのコンフリクト数の制限
   ymuint64 mMaxConflict;
 
   // メッセージハンドラのリスト
@@ -596,6 +638,48 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
+
+// @brief 矛盾回数の制限値を設定する．
+// @param[in] limit 設定する値
+inline
+void
+YmSat::set_conflict_limit(ymuint64 limit)
+{
+  mConflictLimit = limit;
+}
+
+// @brief 学習節の制限値を設定する．
+// @param[in] limit 設定する値
+inline
+void
+YmSat::set_learnt_limit(ymuint64 limit)
+{
+  mLearntLimit = limit;
+}
+
+// @brief 変数ヒープを得る．
+inline
+VarHeap&
+YmSat::var_heap()
+{
+  return mVarHeap;
+}
+
+// @brief 学習節のリストを返す．
+inline
+vector<SatClause*>&
+YmSat::learnt_clause_list()
+{
+  return mLearntClauseList;
+}
+
+// @brief 学習節のアクティビティ増加量を返す．
+inline
+double
+YmSat::clause_bump() const
+{
+  return mClauseBump;
+}
 
 // watcher list を得る．
 inline
@@ -655,6 +739,15 @@ YmSat::eval(Literal l) const
   ymuint inv = index & 1U;
   int d = 1 - (inv * 2);
   return static_cast<Bool3>((static_cast<int>(x) - 1) * d);
+}
+
+// @brief 変数の直前の値を返す．
+inline
+Bool3
+YmSat::old_val(VarId id) const
+{
+  ASSERT_COND( id.val() < mVarNum );
+  return conv_to_Bool3((mVal[id.val()] >> 2) & 3U);
 }
 
 // 値の割当てか可能かチェックする．

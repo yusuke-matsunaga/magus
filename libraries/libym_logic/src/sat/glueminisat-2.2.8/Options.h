@@ -1,4 +1,4 @@
-﻿/***************************************************************************************[Options.h]
+/***************************************************************************************[Options.h]
 Copyright (c) 2008-2010, Niklas Sorensson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -17,20 +17,19 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **************************************************************************************************/
 
-#ifndef Minisat_Options_h
-#define Minisat_Options_h
+#ifndef Glueminisat_Options_h
+#define Glueminisat_Options_h
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <limits.h>
 
 #include "IntTypes.h"
 #include "Vec.h"
 #include "ParseUtils.h"
 
-namespace Minisat {
+namespace Glueminisat {
 
 //==================================================================================================
 // Top-level option parse/help functions:
@@ -61,7 +60,7 @@ class Option
     struct OptionLt {
         bool operator()(const Option* x, const Option* y) {
             int test1 = strcmp(x->category, y->category);
-            return (test1 < 0) || ((test1 == 0) && (strcmp(x->type_name, y->type_name) < 0));
+            return test1 < 0 || (test1 == 0 && strcmp(x->type_name, y->type_name) < 0);
         }
     };
 
@@ -95,9 +94,9 @@ class Option
 
 
 struct IntRange {
-  int begin;
-  int end;
-  IntRange(int b, int e) : begin(b), end(e) {}
+    int begin;
+    int end;
+    IntRange(int b, int e) : begin(b), end(e) {}
 };
 
 struct Int64Range {
@@ -178,6 +177,21 @@ class DoubleOption : public Option
 //==================================================================================================
 // Int options:
 
+#ifndef INT32_MIN
+#define INT32_MIN 0x80000000
+#endif
+
+#ifndef INT32_MAX
+#define INT32_MAX 0x7FFFFFFF
+#endif
+
+#ifndef INT64_MIN
+#define INT64_MIN 0x8000000000000000L
+#endif
+
+#ifndef INT64_MAX
+#define INT64_MAX 0x7FFFFFFFFFFFFFFFL
+#endif
 
 class IntOption : public Option
 {
@@ -186,12 +200,9 @@ class IntOption : public Option
     int32_t  value;
 
  public:
-  IntOption(const char* c,
-	    const char* n,
-	    const char* d,
-	    int32_t def = int32_t(),
-	    IntRange r = IntRange(0x80000000L, 0x7FFFFFFFL/*INT32_MIN, INT32_MAX*/))
-    : Option(n, d, c, "<int32>"), range(r), value(def) {}
+  IntOption(const char* c, const char* n, const char* d, int32_t def = int32_t(),
+	    IntRange r = IntRange(INT32_MIN, INT32_MAX))
+        : Option(n, d, c, "<int32>"), range(r), value(def) {}
 
     operator   int32_t   (void) const { return value; }
     operator   int32_t&  (void)       { return value; }
@@ -222,13 +233,13 @@ class IntOption : public Option
 
     virtual void help (bool verbose = false){
         fprintf(stderr, "  -%-12s = %-8s [", name, type_name);
-        if ( range.begin == static_cast<int>(0x80000000L) /*INT32_MIN*/)
+        if (range.begin == INT32_MIN)
             fprintf(stderr, "imin");
         else
             fprintf(stderr, "%4d", range.begin);
 
         fprintf(stderr, " .. ");
-        if (range.end == 0x7FFFFFFFL /*INT32_MAX*/)
+        if (range.end == INT32_MAX)
             fprintf(stderr, "imax");
         else
             fprintf(stderr, "%4d", range.end);
@@ -242,7 +253,6 @@ class IntOption : public Option
 };
 
 
-#if 0
 // Leave this out for visual C++ until Microsoft implements C99 and gets support for strtoll.
 #ifndef _MSC_VER
 
@@ -303,7 +313,6 @@ class Int64Option : public Option
         }
     }
 };
-#endif
 #endif
 
 //==================================================================================================

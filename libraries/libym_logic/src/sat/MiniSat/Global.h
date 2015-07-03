@@ -27,23 +27,19 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include <climits>
 #include <cfloat>
 #include <new>
-
+#include "YmTools.h"
 
 //=================================================================================================
 // Basic Types & Minor Things:
 
 
-#ifdef _MSC_VER
-typedef INT64              int64;
-typedef UINT64             uint64;
-typedef INT_PTR            intp;
-typedef UINT_PTR           uintp;
+typedef ymint64 int64;
+typedef ymuint64 uint64;
+typedef ymint* intp;
+typedef ymuint* uintp;
+#if defined(WIN32)
 #define I64_fmt "I64d"
 #else
-typedef long long          int64;
-typedef unsigned long long uint64;
-typedef __PTRDIFF_TYPE__   intp;
-typedef unsigned __PTRDIFF_TYPE__ uintp;
 #define I64_fmt "lld"
 #endif
 typedef unsigned char uchar;

@@ -46,11 +46,11 @@ SaBase::make_minimal(vector<Literal>& lit_list)
 
   // lit_list に含まれているリテラルのレベルのビットマップ
   // ただし 64 のモジュロをとっている．
-  ymuint64 lmask = 0UL;
+  ymuint64 lmask = 0ULL;
   for (ymuint i = 0; i < nl; ++ i) {
     Literal p = lit_list[i];
     int level = decision_level(p.varid());
-    lmask |= (1UL << (level & 63));
+    lmask |= (1ULL << (level & 63));
   }
 
   ymuint wpos = 0;
@@ -96,7 +96,7 @@ SaBase::check_recur(VarId varid,
       return true;
     }
 
-    if ( ((1UL << (decision_level(varid) & 63)) & lmask) == 0UL ) {
+    if ( ((1ULL << (decision_level(varid) & 63)) & lmask) == 0ULL ) {
       // varid の割り当てレベルと同じレベルの割り当ては lit_list に含まれていない．
       // ということはこのまま再帰を続けても，lit_list の他のリテラルには
       // 到達不可能であることがわかる．

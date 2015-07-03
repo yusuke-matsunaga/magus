@@ -129,7 +129,6 @@ set (sat_SOURCES
   src/sat/SatSolver.cc
   src/sat/SatStats.cc
 
-  src/sat/MiniSat/Main.C
   src/sat/MiniSat/SatSolverMiniSat.cc
   src/sat/MiniSat/Solver.C
 
@@ -137,6 +136,11 @@ set (sat_SOURCES
   src/sat/MiniSat2/SatSolverMiniSat2.cc
   src/sat/MiniSat2/Solver.cc
   src/sat/MiniSat2/System.cc
+
+  src/sat/glueminisat-2.2.8/SatSolverGlueMiniSat2.cc
+  src/sat/glueminisat-2.2.8/Options.cc
+  src/sat/glueminisat-2.2.8/Solver.cc
+  src/sat/glueminisat-2.2.8/System.cc
 
   src/sat/dimacs/DimacsParser.cc
   src/sat/dimacs/DimacsScanner.cc
@@ -152,6 +156,7 @@ set (sat_SOURCES
   src/sat/ymsat/VarHeap.cc
   src/sat/ymsat/YmSat_base.cc
   src/sat/ymsat/YmSat_solve.cc
+  src/sat/ymsat/YmSatMS2.cc
   )
 
 set (smt_SOURCES

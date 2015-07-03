@@ -119,13 +119,6 @@ SatSolverMiniSat::solve(const vector<Literal>& assumptions,
   return kB3False;
 }
 
-// @brief 学習節の整理を行なう．
-void
-SatSolverMiniSat::reduce_learnt_clause()
-{
-  // 未実装
-}
-
 // @brief 学習節をすべて削除する．
 void
 SatSolverMiniSat::forget_learnt_clause()

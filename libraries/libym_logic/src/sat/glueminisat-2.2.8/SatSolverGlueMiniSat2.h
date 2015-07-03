@@ -1,8 +1,8 @@
-﻿#ifndef SATSOLVERMINISAT2_H
-#define SATSOLVERMINISAT2_H
+﻿#ifndef SATSOLVERGLUEMINISAT2_H
+#define SATSOLVERGLUEMINISAT2_H
 
-/// @file SatSolverMiniSat2.h
-/// @brief SatSolverMiniSat2 のヘッダファイル
+/// @file SatSolverGlueMiniSat2.h
+/// @brief SatSolverGlueMiniSat2 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
@@ -16,21 +16,21 @@
 BEGIN_NAMESPACE_YM_SAT
 
 //////////////////////////////////////////////////////////////////////
-/// @class SatSolverMiniSat2 SatSolverMiniSat2.h "SatSolverMiniSat2.h"
-/// @brief MiniSat を SatSolverImpl のインターフェイスに合わせるためのラッパ
+/// @class SatSolverGlueMiniSat2 SatSolverGlueMiniSat2.h "SatSolverGlueMiniSat2.h"
+/// @brief GlueMiniSat を SatSolverImpl のインターフェイスに合わせるためのラッパ
 //////////////////////////////////////////////////////////////////////
-class SatSolverMiniSat2 :
+class SatSolverGlueMiniSat2 :
   public SatSolverImpl
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] option オプション文字列
-  SatSolverMiniSat2(const string& option);
+  SatSolverGlueMiniSat2(const string& option);
 
   /// @brief デストラクタ
   virtual
-  ~SatSolverMiniSat2();
+  ~SatSolverGlueMiniSat2();
 
 
 public:
@@ -151,10 +151,10 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  Minisat::Solver mSolver;
+  Glueminisat::Solver mSolver;
 
 };
 
 END_NAMESPACE_YM_SAT
 
-#endif // SATSOLVERMINISAT_H
+#endif // SATSOLVERGLUEMINISAT_H

@@ -16,13 +16,8 @@
 
 BEGIN_NAMESPACE_YM_SAT
 
-#if 0
 const
-Params kDefaultParams(0.95, 0.02, 0.999, true, false, false, false);
-#else
-const
-Params kDefaultParams(0.95, 0.00, 0.999, true, false, false, false);
-#endif
+YmSat::Params kDefaultParams(0.95, 0.999, false);
 
 //////////////////////////////////////////////////////////////////////
 // YmSat
@@ -69,13 +64,7 @@ YmSat::YmSat(const string& option) :
 
   mTmpBinClause = new_clause(2);
 
-  mRestart = 0;
-
   mTimerOn = false;
-
-  if ( option == "no_phase_cache" ) {
-    mParams.mPhaseCache = false;
-  }
 }
 
 // @brief デストラクタ
@@ -244,7 +233,7 @@ YmSat::get_stats(SatStats& stats) const
   stats.mVarNum = mVarNum;
   stats.mConstrClauseNum = clause_num();
   stats.mConstrLitNum = mConstrLitNum;
-  stats.mLearntClauseNum = mLearntClause.size() + mLearntBinNum;
+  stats.mLearntClauseNum = mLearntClauseList.size() + mLearntBinNum;
   stats.mLearntLitNum = mLearntLitNum;
   stats.mConflictNum = mConflictNum;
   stats.mDecisionNum = mDecisionNum;
@@ -265,7 +254,7 @@ YmSat::variable_num() const
 ymuint
 YmSat::clause_num() const
 {
-  return mConstrClause.size() + mConstrBinClause.size();
+  return mConstrClauseList.size() + mConstrBinClauseList.size();
 }
 
 // @brief 制約節のリテラルの総数を得る．
@@ -443,19 +432,19 @@ YmSat::add_clause_sub(ymuint lit_num)
     cout << "add_clause: " << *clause << endl;
   }
 
-  mAllConstrClause.push_back(clause);
+  mAllConstrClauseList.push_back(clause);
 
   if ( lit_num == 2 ) {
     // 二項節の watcher は相方のリテラルなので clause は使われない
     // ただし，デバッグ，検証用に別のリストに入れておく．
-    mConstrBinClause.push_back(clause);
+    mConstrBinClauseList.push_back(clause);
 
     // watcher-list の設定
     add_watcher(~l0, SatReason(l1));
     add_watcher(~l1, SatReason(l0));
   }
   else {
-    mConstrClause.push_back(clause);
+    mConstrClauseList.push_back(clause);
 
     // watcher-list の設定
     add_watcher(~l0, SatReason(clause));
@@ -541,7 +530,7 @@ YmSat::add_learnt_clause(const vector<Literal>& learnt_lits)
       clause->set_lbd(lbd);
     }
 
-    mLearntClause.push_back(clause);
+    mLearntClauseList.push_back(clause);
 
     reason = SatReason(clause);
 
@@ -654,12 +643,11 @@ YmSat::del_satisfied_watcher(Literal watch_lit)
   WatcherList& wlist = watcher_list(watch_lit);
   ymuint n = wlist.num();
   ymuint wpos = 0;
-  for (ymuint rpos; rpos < n; ++ rpos) {
+  for (ymuint rpos = 0; rpos < n; ++ rpos) {
     Watcher w = wlist.elem(rpos);
     if ( w.is_literal() ) {
       Literal l = w.literal();
       Bool3 val = eval(l);
-      ASSERT_COND( val != kB3False );
       if ( val == kB3True ) {
 	// この watcher は削除する．
 	continue;
@@ -740,9 +728,8 @@ void
 YmSat::write_DIMACS(ostream& s) const
 {
   s << "p cnf " << variable_num() << " " << clause_num() << endl;
-#if 0
-  for (ymuint i = 0; i < mConstrBinClause.size(); ++ i) {
-    SatClause* clause = mConstrBinClause[i];
+  for (ymuint i = 0; i < mAllConstrClauseList.size(); ++ i) {
+    SatClause* clause = mAllConstrClauseList[i];
     ymuint nl = clause->lit_num();
     for (ymuint j = 0; j < nl; ++ j) {
       Literal lit = clause->lit(j);
@@ -757,40 +744,6 @@ YmSat::write_DIMACS(ostream& s) const
     }
     s << " 0" << endl;
   }
-  for (ymuint i = 0; i < mConstrClause.size(); ++ i) {
-    SatClause* clause = mConstrClause[i];
-    ymuint nl = clause->lit_num();
-    for (ymuint j = 0; j < nl; ++ j) {
-      Literal lit = clause->lit(j);
-      VarId var = lit.varid();
-      ymint idx = var.val() + 1;
-      if ( lit.is_negative() ) {
-	s << " -" << idx;
-      }
-      else {
-	s << " " << idx;
-      }
-    }
-    s << " 0" << endl;
-  }
-#else
-  for (ymuint i = 0; i < mAllConstrClause.size(); ++ i) {
-    SatClause* clause = mAllConstrClause[i];
-    ymuint nl = clause->lit_num();
-    for (ymuint j = 0; j < nl; ++ j) {
-      Literal lit = clause->lit(j);
-      VarId var = lit.varid();
-      ymint idx = var.val() + 1;
-      if ( lit.is_negative() ) {
-	s << " -" << idx;
-      }
-      else {
-	s << " " << idx;
-      }
-    }
-    s << " 0" << endl;
-  }
-#endif
 }
 
 END_NAMESPACE_YM_SAT
