@@ -55,10 +55,9 @@ include (FindPythonLibs)
 
 include (FindQt4)
 find_package(Qt4 4.8.0 REQUIRED QtCore QtGui QtXml)
-include(${QT_USE_FILE})
+#include(${QT_USE_FILE})
 
 set( CMAKE_INCLUDE_CURRENT_DIR ON )
-set( CMAKE_AUTOMOC ON )
 find_package(Qt5Widgets)
 find_package(OpenGL)
 
@@ -128,6 +127,8 @@ elseif ( INT_SIZE EQUAL 2 )
   set( UINT16_TYPE "unsigned int" )
 else ()
   # エラー
+  message ( FATAL_ERROR
+    "No valid type for 16-bit integer" )
 endif ()
 
 if ( SHORT_SIZE EQUAL 4 )
@@ -141,6 +142,8 @@ elseif ( LONG_SIZE EQUAL 4 )
   set( UINT32_TYPE "unsigned long" )
 else ()
   # エラー
+  message ( FATAL_ERROR
+    "No valid type for 32-bit integer" )
 endif ()
 
 if ( INT_SIZE EQUAL 8 )
@@ -154,6 +157,8 @@ elseif ( LLONG_SIZE EQUAL 8 )
   set( UINT64_TYPE "unsigned long long" )
 else ()
   # エラー
+  message ( FATAL_ERROR
+    "No valid type for 64-bit integer" )
 endif ()
 
 if ( INT_SIZE EQUAL VOIDP_SIZE )
@@ -164,6 +169,8 @@ elseif ( LLONG_SIZE EQUAL VOIDP_SIZE )
   set( PTRINT_TYPE "long long" )
 else ()
   # エラー
+  message ( FATAL_ERROR
+    "No valid type for pointer size integer" )
 endif ()
 
 
