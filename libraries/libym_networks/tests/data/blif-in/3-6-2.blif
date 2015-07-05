@@ -1,5 +1,0 @@
-# error 3-6-2
-# .gate without pin assignments
-.model test1
-.gate inv4x
-.end

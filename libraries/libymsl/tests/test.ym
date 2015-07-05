@@ -1,3 +1,0 @@
-import module_A;
-
-module_A.a = 1;

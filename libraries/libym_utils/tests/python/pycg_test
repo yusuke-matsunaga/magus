@@ -1,5 +1,0 @@
-import utils
-cg = utils.CombiGen(5, 2)
-while not cg.is_end() :
-    print cg.get()
-    cg.next()
