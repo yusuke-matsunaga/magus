@@ -65,3 +65,19 @@ add_library(ym_algo
   ${graph_SOURCES}
   ${mincov_SOURCES}
   )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install(
+  TARGETS ym_algo
+  DESTINATION lib
+  EXPORT ymtools-targets
+  )
+
+install(
+  DIRECTORY YmAlgo
+  DESTINATION include
+  )

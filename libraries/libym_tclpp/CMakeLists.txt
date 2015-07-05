@@ -27,3 +27,19 @@ add_library(ym_tclpp
 target_link_libraries(ym_tclpp
   ${TCL_LIBRARY}
   )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install(
+  TARGETS ym_tclpp
+  DESTINATION lib
+  EXPORT ymtools-targets
+  )
+
+install(
+  DIRECTORY YmTclpp
+  DESTINATION include
+  )

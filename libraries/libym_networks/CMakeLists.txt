@@ -195,3 +195,19 @@ target_link_libraries ( ym_networks
   ym_logic
   ym_utils
   )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install(
+  TARGETS ym_networks
+  DESTINATION lib
+  EXPORT ymtools-targets
+  )
+
+install(
+  DIRECTORY YmNetworks
+  DESTINATION include
+  )

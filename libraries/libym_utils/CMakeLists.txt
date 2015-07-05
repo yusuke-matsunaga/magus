@@ -150,6 +150,7 @@ set (textproc_SOURCES
   src/textproc/StrPool.cc
   )
 
+
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
@@ -203,4 +204,20 @@ add_executable(Grammer_test
 
 target_link_libraries(Grammer_test
   ym_utils
+  )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install(
+  TARGETS ym_utils
+  DESTINATION lib
+  EXPORT ymtools-targets
+  )
+
+install(
+  DIRECTORY YmUtils
+  DESTINATION include
   )

@@ -114,3 +114,19 @@ add_library(ym_cell
   ${libcomp_SOURCES}
   ${mislib_SOURCES}
   )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install(
+  TARGETS ym_cell
+  DESTINATION lib
+  EXPORT ymtools-targets
+  )
+
+install(
+  DIRECTORY YmCell
+  DESTINATION include
+  )

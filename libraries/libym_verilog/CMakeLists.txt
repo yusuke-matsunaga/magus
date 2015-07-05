@@ -199,3 +199,19 @@ add_library ( ym_verilog
   ${elaborator_SOURCES}
   ${parser_SOURCES}
   )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install(
+  TARGETS ym_verilog
+  DESTINATION lib
+  EXPORT ymtools-targets
+  )
+
+install(
+  DIRECTORY YmVerilog
+  DESTINATION include
+  )

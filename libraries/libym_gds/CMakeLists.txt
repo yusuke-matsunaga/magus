@@ -61,3 +61,19 @@ add_executable(gdsencode
 target_link_libraries(gdsencode
   ym_gds
   )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install(
+  TARGETS ym_gds
+  DESTINATION lib
+  EXPORT ymtools-targets
+  )
+
+install(
+  DIRECTORY YmGds
+  DESTINATION include
+  )

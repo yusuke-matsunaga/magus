@@ -10,6 +10,7 @@ cmake_minimum_required (VERSION 3.0)
 project (YmTools)
 set (YMTOOLS_VERSION_MAJOR 1)
 set (YMTOOLS_VERSION_MINOR 0)
+set (YMTOOLS_VERSION "${YMTOOLS_VERSION_MAJOR}.${YMTOOLS_VERSION_MINOR}")
 
 # 名前空間
 set (YMTOOLS_NAMESPACE "nsYm")
@@ -27,12 +28,11 @@ set (YMTOOLS_NAMESPACE "nsYm")
 
 option (OPT_GPERFTOOLS "use google-perftools" OFF)
 
-option (BUILD_MAGUS "build magus" ON)
-option (BUILD_SATPG "build satpg" ON)
-option (BUILD_IGF "build igf" OFF)
+option (BUILD_MAGUS    "build magus" ON)
+option (BUILD_SATPG    "build satpg" ON)
+option (BUILD_IGF      "build igf" OFF)
 option (BUILD_BNET2AIG "build bnet2aig" OFF)
-option (BUILD_MAKEBDD "build makebdd" OFF)
-option (BUILD_NLINK "build nlink" ON)
+option (BUILD_MAKEBDD  "build makebdd" OFF)
 
 
 # ===================================================================
@@ -79,8 +79,6 @@ include (FindCurses)
 include (FindPOPT)
 
 include (FindReadline)
-
-include (FindGperftools)
 
 
 # ===================================================================
@@ -183,9 +181,6 @@ add_subdirectory (libraries/libym_logic)
 add_subdirectory (libraries/libym_cell)
 add_subdirectory (libraries/libym_verilog)
 add_subdirectory (libraries/libym_networks)
-add_subdirectory (libraries/libym_ymsh)
-add_subdirectory (libraries/libym_gds)
-add_subdirectory (libraries/libymsl)
 
 if (TCL_FOUND)
   add_subdirectory (libraries/libym_tclpp)
@@ -211,28 +206,21 @@ if (BUILD_MAGUS)
   add_subdirectory (programs/magus)
 endif (BUILD_MAGUS)
 
-if (BUILD_NLINK)
-  add_subdirectory (programs/nlink)
-endif (BUILD_NLINK)
-
 
 # ===================================================================
-# YmTools.h を生成するプログラム
+# YmTools.h の生成
 # ===================================================================
+
 configure_file(
   "${PROJECT_SOURCE_DIR}/etc/YmTools.h.in"
   "${PROJECT_BINARY_DIR}/YmTools.h"
-  )
-
-install (
-  FILES "${PROJECT_BINARY_DIR}/YmTools.h"
-  DESTINATION include
   )
 
 
 # ===================================================================
 # doxygen 起動用のコマンド
 # ===================================================================
+
 if (DOXYGEN_FOUND)
   configure_file (
     "${PROJECT_SOURCE_DIR}/etc/Doxyfile.in"
@@ -246,3 +234,41 @@ if (DOXYGEN_FOUND)
     COMMENT "generating doxygen documents"
     )
 endif (DOXYGEN_FOUND)
+
+
+# ===================================================================
+# パッケージコンフィグレーションファイルの生成
+# ===================================================================
+
+configure_file(
+  ${PROJECT_SOURCE_DIR}/etc/YmToolsConfig.cmake.in
+  ${PROJECT_BINARY_DIR}/YmToolsConfig.cmake
+  @ONLY
+  )
+
+configure_file(
+  ${PROJECT_SOURCE_DIR}/etc/YmToolsConfig-version.cmake.in
+  ${PROJECT_BINARY_DIR}/YmToolsConfig-version.cmake
+  @ONLY
+  )
+
+
+# ===================================================================
+# インストールターゲット
+# ===================================================================
+
+install (
+  FILES "${PROJECT_BINARY_DIR}/YmTools.h"
+  DESTINATION include
+  )
+
+install (
+  EXPORT ymtools-targets
+  DESTINATION lib/ymtools-${YMTOOLS_VERSION}
+  )
+
+install (FILES
+  ${PROJECT_BINARY_DIR}/YmToolsConfig.cmake
+  ${PROJECT_BINARY_DIR}/YmToolsConfig-version.cmake
+  DESTINATION lib/ymtools-${YMTOOLS_VERSION}
+  )
