@@ -5,6 +5,7 @@
 include_directories (
   include
   ${TCL_INCLUDE_PATH}
+  ${YmTclpp_INCLUDE_DIRS}
   )
 
 
@@ -107,6 +108,7 @@ set (magus_SOURCES
   tclAppInit.cc
   )
 
+
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
@@ -134,5 +136,14 @@ target_link_libraries(magus_tclsh
   ym_logic
   ym_tclpp
   ym_utils
-  ${TCL_LIBRARIES}
+  )
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install (
+  TARGETS magus_tclsh
+  DESTINATION bin
   )
