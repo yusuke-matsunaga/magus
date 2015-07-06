@@ -48,6 +48,10 @@ endif (OPT_GPERFTOOLS)
 
 find_package(YmTools REQUIRED)
 
+if (TCL_FOUND)
+  find_package(YmTclpp)
+endif (TCL_FOUND)
+
 
 # ===================================================================
 # インクルードパスの設定
@@ -66,6 +70,6 @@ add_subdirectory (src/cequiv)
 add_subdirectory (src/seal)
 add_subdirectory (src/techmap)
 
-if (TCL_FOUND)
+if (YmTclpp_FOUND)
   add_subdirectory (src/magus_tclsh)
-endif (TCL_FOUND)
+endif (YmTclpp_FOUND)
