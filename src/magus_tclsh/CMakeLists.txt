@@ -110,9 +110,9 @@ set (magus_SOURCES
 
 
 # ===================================================================
-#  ターゲットの設定
+#  release ターゲットの設定
 # ===================================================================
-add_executable(magus_tclsh
+add_executable (magus_tclsh
   ${magus_SOURCES}
   ${bdn_SOURCES}
   ${bnet_SOURCES}
@@ -126,7 +126,15 @@ add_executable(magus_tclsh
   ${techmap_SOURCES}
   )
 
-target_link_libraries(magus_tclsh
+target_compile_options (magus_tclsh
+  PRIVATE "-O3"
+  )
+
+target_compile_definitions (magus_tclsh
+  PRIVATE "-DNDEBUG"
+  )
+
+target_link_libraries (magus_tclsh
   magus_cequiv
   magus_seal
   magus_techmap
@@ -140,10 +148,82 @@ target_link_libraries(magus_tclsh
 
 
 # ===================================================================
+#  release with debug info ターゲットの設定
+# ===================================================================
+add_executable (magus_tclsh_p
+  ${magus_SOURCES}
+  ${bdn_SOURCES}
+  ${bnet_SOURCES}
+  ${core_SOURCES}
+  ${equiv_SOURCES}
+  ${lutmap_SOURCES}
+  ${misc_SOURCES}
+  ${mvn_SOURCES}
+  ${seal_SOURCES}
+  ${simplify_SOURCES}
+  ${techmap_SOURCES}
+  )
+
+target_compile_options (magus_tclsh_p
+  PRIVATE "-O2" "-g"
+  )
+
+target_compile_definitions (magus_tclsh_p
+  PRIVATE "-DNDEBUG"
+  )
+
+target_link_libraries (magus_tclsh_p
+  magus_cequiv_p
+  magus_seal_p
+  magus_techmap_p
+  ym_networks_p
+  ym_cell_p
+  ym_verilog_p
+  ym_logic_p
+  ym_tclpp_p
+  ym_utils_p
+  )
+
+
+# ===================================================================
+#  debug ターゲットの設定
+# ===================================================================
+add_executable (magus_tclsh_d
+  ${magus_SOURCES}
+  ${bdn_SOURCES}
+  ${bnet_SOURCES}
+  ${core_SOURCES}
+  ${equiv_SOURCES}
+  ${lutmap_SOURCES}
+  ${misc_SOURCES}
+  ${mvn_SOURCES}
+  ${seal_SOURCES}
+  ${simplify_SOURCES}
+  ${techmap_SOURCES}
+  )
+
+target_compile_options (magus_tclsh_d
+  PRIVATE "-g"
+  )
+
+target_link_libraries (magus_tclsh_d
+  magus_cequiv_d
+  magus_seal_d
+  magus_techmap_d
+  ym_networks_d
+  ym_cell_d
+  ym_verilog_d
+  ym_logic_d
+  ym_tclpp_d
+  ym_utils_d
+  )
+
+
+# ===================================================================
 #  インストールターゲットの設定
 # ===================================================================
 
 install (
-  TARGETS magus_tclsh
+  TARGETS magus_tclsh magus_tclsh_p magus_tclsh_d
   DESTINATION bin
   )

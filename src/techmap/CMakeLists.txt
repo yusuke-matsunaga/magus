@@ -44,10 +44,56 @@ set (sbjgraph_SOURCES
 
 
 # ===================================================================
-#  ターゲットの設定
+#  release ターゲットの設定
 # ===================================================================
-add_library(magus_techmap STATIC
+
+add_library (magus_techmap
+  STATIC
   ${cellmap_SOURCES}
   ${lutmap_SOURCES}
   ${sbjgraph_SOURCES}
+  )
+
+target_compile_options (magus_techmap
+  PRIVATE "-O3"
+  )
+
+target_compile_definitions (magus_techmap
+  PRIVATE "-DNDEBUG"
+  )
+
+
+# ===================================================================
+#  release with debug info ターゲットの設定
+# ===================================================================
+
+add_library (magus_techmap_p
+  STATIC
+  ${cellmap_SOURCES}
+  ${lutmap_SOURCES}
+  ${sbjgraph_SOURCES}
+  )
+
+target_compile_options (magus_techmap_p
+  PRIVATE "-O2" "-g"
+  )
+
+target_compile_definitions (magus_techmap_p
+  PRIVATE "-DNDEBUG"
+  )
+
+
+# ===================================================================
+#  debug ターゲットの設定
+# ===================================================================
+
+add_library (magus_techmap_d
+  STATIC
+  ${cellmap_SOURCES}
+  ${lutmap_SOURCES}
+  ${sbjgraph_SOURCES}
+  )
+
+target_compile_options (magus_techmap_d
+  PRIVATE "-g"
   )

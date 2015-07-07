@@ -29,6 +29,50 @@ set (SOURCES
 
 
 # ===================================================================
-#  ターゲットの設定
+#  release ターゲットの設定
 # ===================================================================
-add_library(magus_seal STATIC ${SOURCES})
+
+add_library (magus_seal
+  STATIC
+  ${SOURCES}
+  )
+
+target_compile_options (magus_seal
+  PRIVATE "-O3"
+  )
+
+target_compile_definitions (magus_seal
+  PRIVATE "-DNDEBUG"
+  )
+
+
+# ===================================================================
+#  release with debug info ターゲットの設定
+# ===================================================================
+
+add_library (magus_seal_p
+  STATIC
+  ${SOURCES}
+  )
+
+target_compile_options (magus_seal_p
+  PRIVATE "-O2" "-g"
+  )
+
+target_compile_definitions (magus_seal_p
+  PRIVATE "-DNDEBUG"
+  )
+
+
+# ===================================================================
+#  debug ターゲットの設定
+# ===================================================================
+
+add_library (magus_seal_d
+  STATIC
+  ${SOURCES}
+  )
+
+target_compile_options (magus_seal_d
+  PRIVATE "-g"
+  )
