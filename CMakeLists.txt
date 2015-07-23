@@ -53,6 +53,8 @@ if (TCL_FOUND)
   find_package(YmTclpp)
 endif (TCL_FOUND)
 
+include (ym_add_library)
+
 
 # ===================================================================
 # インクルードパスの設定
