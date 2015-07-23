@@ -1,0 +1,11 @@
+#! /bin/sh
+
+# コマンドの定義
+# 必要に応じてここを変える．
+MAKE="make"
+CMAKE="cmake"
+
+SRC_DIR=__YM_SRC_DIRECTORY__
+INSTALL_DIR=__YM_INSTALL_DIRECTORY__
+
+${CMAKE} -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} ${SRC_DIR}

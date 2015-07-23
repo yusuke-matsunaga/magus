@@ -16,7 +16,6 @@ set (YM_MAGUS_VERSION ${YM_MAGUS_VERSION_MAJOR}.${YM_MAGUS_VERSION_MINOR})
 # ===================================================================
 # オプション
 # ===================================================================
-option (OPT_GPERFTOOLS "use google-perftools" OFF)
 
 
 # ===================================================================
@@ -24,16 +23,20 @@ option (OPT_GPERFTOOLS "use google-perftools" OFF)
 # ===================================================================
 include (CTest)
 
+enable_testing()
+
 
 # ===================================================================
 # パッケージの検査
 # ===================================================================
-list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list (APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 include (FindDoxygen)
 
 include (FindPythonInterp)
 include (FindPythonLibs)
+
+include (ym_add_library)
 
 set( CMAKE_INCLUDE_CURRENT_DIR ON )
 set( CMAKE_AUTOMOC ON )
@@ -42,9 +45,7 @@ find_package(OpenGL)
 
 find_package(TCL)
 
-if ( OPT_GPERFTOOLS )
-  find_package(Gperftools)
-endif (OPT_GPERFTOOLS)
+find_package(Gperftools)
 
 find_package(YmTools REQUIRED)
 

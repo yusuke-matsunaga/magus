@@ -12,31 +12,51 @@
 basedir=`dirname $0`
 srcdir=`cd $basedir; pwd`
 
-if test "x$1" = "x"; then
-    echo "USAGE mk_builddir.sh <compiledir>"
-    exit 1
-fi
+case $# in
+    2)
+    ;;
+
+    *)
+	echo "USAGE mk_builddir.sh <compiledir> <installdir>"
+	exit 1;;
+esac
 
 # ビルド用のディレクトリ名
 builddir=$1
 
-echo "Making compile directory $builddir for source tree $srcdir ..."
+# インストール先のディレクトリ名
+installdir=$2
 
-# なければ作る．
-test -d $builddir || mkdir -p $builddir
-
-# その下にサブディレクトリを作る．
-for subdir in release debug profile; do
-    path="$builddir/$subdir"
-    test -d $path || mkdir -p $path
+echo "****"
+echo "source  directory: $srcdir"
+echo "build   directory: $builddir"
+echo "install directory: $installdir"
+echo "****"
+echo -n "continue ? (yes/no)"
+while read confirmation; do
+    case $confirmation in
+	"yes")
+	    break;;
+	"no")
+	    exit 0;;
+	*)
+	    echo "please answer 'yes' or 'no'"
+	    echo -n "continue ? (yes/no)"
+	    ;;
+    esac
 done
 
-# mk ファイルを作る．
-sed -e s!__YM_SRC_DIRECTORY__!$srcdir! \
-    $srcdir/etc/mk.in > $builddir/mk
-chmod +x $builddir/mk
+# ビルドディレクトリはなければ作る．
+test -d $builddir || mkdir -p $builddir
 
-# mk boot を実行する．
-(cd $builddir && ./mk boot)
+# do_cmake ファイルを作る．
+do_cmake="do_cmake.sh"
+sed -e s!__YM_SRC_DIRECTORY__!$srcdir! \
+    -e s!__YM_INSTALL_DIRECTORY__!$installdir! \
+    $srcdir/etc/${do_cmake}.in > $builddir/${do_cmake}
+chmod +x $builddir/${do_cmake}
+
+# do_cmake.sh を実行する．
+(cd $builddir && ./${do_cmake})
 
 echo "  done"
