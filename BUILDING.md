@@ -17,8 +17,8 @@ magus は ymtools と同様に cmake を用いて Makefile の生成を行いま
 
  1. [ビルドに必要なツールのインストール](#1-ビルドに必要なツールのインストール)
  2. [cmake の実行](#2-cmake-の実行)
- 3. [mk_builddir.sh](#3-mk_builddir.sh)
- 4. [do_cmake.sh](#4-do_cmake.sh)
+ 3. [mk_builddir.sh](#3-mk_builddirsh)
+ 4. [do_cmake.sh](#4-do_cmakesh)
  5. [make の実行](#5-make-の実行)
  6. [make test の実行](#6-make-test-の実行)
  7. [make install の実行](#7-make-install-の実行)
@@ -55,8 +55,8 @@ magus のビルドに必要なツールは以下のとおりです．
  たぶん gcc-4.7 以降でも動くと思います．
 
 - YmTools, YmTclpp
-  それぞれ [ymtools](https://github.com/yusuke-matsunaga/ymtools.git)，
-  [ymtclpp](https://github.com/yusuke-matsunaga/ymtclpp.git)
+  それぞれ [https://github.com/yusuke-matsunaga/ymtools.git](https://github.com/yusuke-matsunaga/ymtools.git)，
+  [https://github.com/yusuke-matsunaga/ymtclpp.git](https://github.com/yusuke-matsunaga/ymtclpp.git)
   に有ります．
   それぞれ最新の安定バージョンを用いれば不整合は起きないと思います．
 
