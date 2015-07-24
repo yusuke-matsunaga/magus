@@ -1,15 +1,31 @@
 #! /bin/sh
+#
+# do_cmake.sh
+#
+# cmake の実行するスクリプト
+#
+# Copyright (C) 2015 Yusuke Matsunaga (松永 裕介)
+# All rights reserved
 
 # コマンドの定義
-# 必要に応じてここを変える．
-CMAKE="cmake"
+# 環境変数 CMAKE をセットしておけばその値が使われる．
+# そうでなければデフォルトの cmake が使われる．
+echo ${CMAKE:="cmake"} > /dev/null
 
-SRC_DIR=__YM_SRC_DIRECTORY__
-INSTALL_DIR=__YM_INSTALL_DIRECTORY__
-YMTOOLS_DIR=__YM_YMTOOLS_DIRECTORY__
-YMTCLPP_DIR=__YM_YMTCLPP_DIRECTORY__
+# YmToolsConfig.cmake のあるディレクトリ
+ymtools_dir="___YMTOOLS_DIR___"
 
-${CMAKE} -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
-	 -DYmTools_DIR:PATH=${YMTOOLS_DIR} \
-	 -DYmTclpp_DIR:PATH=${YMTCLPP_DIR} \
-	 ${SRC_DIR}
+# YmTclppConfig.cmake のあるディレクトリ
+ymtclpp_dir="___YMTCLPP_DIR___"
+
+# オプション文字列の生成
+options=""
+if [ "x$ymtools_dir" != x ]; then
+    options="$options -DYmTools_DIR:PATH=$ymtools_dir"
+fi
+if [ "x$ymtclpp_dir" != x ]; then
+    options="$options -DYmTclpp_DIR:PATH=$ymtclpp_dir"
+fi
+
+# cmake の実行
+${CMAKE} -DCMAKE_INSTALL_PREFIX=___INSTALL_DIR___ $options ___SRC_DIR___
