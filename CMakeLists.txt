@@ -19,14 +19,6 @@ set (YM_MAGUS_VERSION ${YM_MAGUS_VERSION_MAJOR}.${YM_MAGUS_VERSION_MINOR})
 
 
 # ===================================================================
-# CTest モジュールの読み込み
-# ===================================================================
-include (CTest)
-
-enable_testing()
-
-
-# ===================================================================
 # パッケージの検査
 # ===================================================================
 list (APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -53,6 +45,24 @@ if (TCL_FOUND)
 endif (TCL_FOUND)
 
 include (ym_add_library)
+
+
+# ===================================================================
+# google-test は内蔵のものを使う．
+# ===================================================================
+add_subdirectory (gtest-1.7.0)
+set (GTEST_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/gtest-1.7.0/include")
+set (GTEST_BOTH_LIBRARIES
+  "${PROJECT_BINARY_DIR}/gtest-1.7.0/libgtest.a"
+  "${PROJECT_BINARY_DIR}/gtest-1.7.0/libgtest_main.a")
+
+
+# ===================================================================
+# CTest モジュールの読み込み
+# ===================================================================
+include (CTest)
+
+enable_testing()
 
 
 # ===================================================================
