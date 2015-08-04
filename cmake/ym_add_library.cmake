@@ -36,10 +36,9 @@ function (ym_add_library)
     )
 
   # release with debug info モードのターゲット
-  # 常に static にする．
   set (_target_name_p ${_target_name}_p)
   add_library (${_target_name_p}
-    STATIC
+    ${_option}
     ${_sources}
     )
 
@@ -52,9 +51,10 @@ function (ym_add_library)
     )
 
   # debug モードのターゲット
+  # 常に static にする．
   set (_target_name_d ${_target_name}_d)
   add_library (${_target_name_d}
-    ${_option}
+    STATIC
     ${_sources}
     )
 
