@@ -7,12 +7,25 @@ function (ym_add_library)
     endif ()
     list (GET ARGV ${pos} argv)
     if ( ${pos} EQUAL 0 )
-      set (_target_name ${argv})
+      # ターゲット名の設定
+      # - 最適化モード
+      # - プロファイルモード (_p)
+      # - デバッグモード (_d)
+      # の3つがある．
+      set (_target_name "${argv}")
+      set (_target_name_p "${argv}_p")
+      set (_target_name_d "${argv}_d")
     elseif ( ${pos} EQUAL 1 )
       if ( ${argv} STREQUAL "SHARED" )
 	set (_option "SHARED")
+	# debug モードでは常にスタティック
+	set (_dbg_option "STATIC")
       elseif ( ${argv} STREQUAL "STATIC" )
 	set (_option "STATIC")
+	set (_dbg_option "STATIC")
+      elseif ( ${argv} STREQUAL "OBJECT" )
+	set (_option "OBJECT")
+	set (_dbg_option "OBJECT")
       else ()
 	list (APPEND _sources ${argv})
       endif ()
@@ -36,7 +49,6 @@ function (ym_add_library)
     )
 
   # release with debug info モードのターゲット
-  set (_target_name_p ${_target_name}_p)
   add_library (${_target_name_p}
     ${_option}
     ${_sources}
@@ -52,9 +64,8 @@ function (ym_add_library)
 
   # debug モードのターゲット
   # 常に static にする．
-  set (_target_name_d ${_target_name}_d)
   add_library (${_target_name_d}
-    STATIC
+    ${_dbg_option}
     ${_sources}
     )
 
