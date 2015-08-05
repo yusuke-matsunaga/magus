@@ -21,18 +21,20 @@ set (YM_MAGUS_VERSION ${YM_MAGUS_VERSION_MAJOR}.${YM_MAGUS_VERSION_MINOR})
 # ===================================================================
 # パッケージの検査
 # ===================================================================
-list (APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+list ( APPEND CMAKE_MODULE_PATH
+  "${PROJECT_SOURCE_DIR}/ym-common/cmake"
+  )
 
 include (FindDoxygen)
 
-include (FindPythonInterp)
-include (FindPythonLibs)
+#include (FindPythonInterp)
+#include (FindPythonLibs)
 
 include (ym_add_library)
 
-set( CMAKE_INCLUDE_CURRENT_DIR ON )
-find_package(Qt5Widgets)
-find_package(OpenGL)
+#set( CMAKE_INCLUDE_CURRENT_DIR ON )
+#find_package(Qt5Widgets)
+#find_package(OpenGL)
 
 find_package(TCL)
 
