@@ -55,12 +55,13 @@ if [ "x$ymtclppdir" != x ]; then
     echo "ymtclpp directory: $ymtclppdir"
 fi
 echo "****"
-echo -n "continue ? (yes/no)"
+echo -n "continue with above configuration ? (yes/no): "
 while read confirmation; do
     case $confirmation in
 	"yes")
 	    break;;
 	"no")
+	    echo "Setup canceled."
 	    exit 0;;
 	*)
 	    echo "please answer 'yes' or 'no'"
@@ -81,8 +82,5 @@ $SED -e s!___SRC_DIR___!$srcdir! \
      $srcdir/etc/${do_cmake}.in > $builddir/$do_cmake
 chmod +x $builddir/$do_cmake
 
-# do_cmake.sh を実行する．
-echo "running cmake"
-(cd $builddir && ./$do_cmake)
-
-echo "  done"
+echo "Build directory setup completed."
+echo "Move to '$builddir', and execute './do_cmake.sh'"
