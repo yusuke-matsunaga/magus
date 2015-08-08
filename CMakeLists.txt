@@ -82,5 +82,5 @@ add_subdirectory (src/seal)
 add_subdirectory (src/techmap)
 
 if (YmTclpp_FOUND)
-  add_subdirectory (src/magus_tclsh)
+  add_subdirectory (magus_tclsh)
 endif (YmTclpp_FOUND)

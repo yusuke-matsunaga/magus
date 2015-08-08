@@ -184,6 +184,12 @@ target_link_libraries (magus_tclsh_p
   ym_utils_p
   )
 
+if ( GPERFTOOLS_FOUND )
+  target_link_libraries ( magus_tclsh_p
+    ${GPERFTOOLS_LIBRARIES}
+    )
+endif ()
+
 
 # ===================================================================
 #  debug ターゲットの設定
