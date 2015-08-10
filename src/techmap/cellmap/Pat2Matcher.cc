@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_CELLMAP
 // @param[in] pat_mgr パタンを管理するクラス
 Pat2Matcher::Pat2Matcher(const CellLibrary& cell_library) :
   mLibrary(cell_library),
-  mSbjMap(mLibrary.pg2_node_num(), NULL),
+  mSbjMap(mLibrary.pg2_node_num(), nullptr),
   mInvMap(mLibrary.pg2_node_num(), false),
   mLeafNodeArray(mLibrary.pg2_max_input()),
   mLeafInvArray(mLibrary.pg2_max_input())
@@ -138,7 +138,7 @@ Pat2Matcher::operator()(const BdnNode* sbj_root,
   for (vector<ymuint>::iterator p = mClearQueue.begin();
        p != mClearQueue.end(); ++ p) {
     ymuint id = *p;
-    mSbjMap[id] = NULL;
+    mSbjMap[id] = nullptr;
     mInvMap[id] = false;
   }
   mClearQueue.clear();
@@ -234,7 +234,7 @@ Pat2Matcher::bind(const BdnNode* sbj_node,
 		  ymuint pat_id,
 		  bool inv)
 {
-  if ( mSbjMap[pat_id] != NULL ) {
+  if ( mSbjMap[pat_id] != nullptr ) {
     if ( mSbjMap[pat_id] != sbj_node ) {
       // パタンノード(pat_id)が既に他のノードにバインドしていた．
       return false;

@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_SBJ
 SbjNode::SbjNode() :
   mId(0),
   mFlags(0U),
-  mFanins(NULL),
+  mFanins(nullptr),
   mMark(0)
 {
 }
@@ -221,7 +221,7 @@ SbjGraph::copy(const SbjGraph& src,
        p != output_list.end(); ++ p) {
     const SbjNode* src_onode = *p;
     const SbjNode* src_inode = src_onode->fanin(0);
-    SbjNode* dst_inode = NULL;
+    SbjNode* dst_inode = nullptr;
     if ( src_inode ) {
       dst_inode = nodemap[src_inode->id()];
     }
@@ -262,21 +262,21 @@ SbjGraph::clear()
   for (SbjNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
     SbjNode* node = *p;
-    connect(NULL, node, 0);
+    connect(nullptr, node, 0);
   }
   for (SbjNodeList::iterator p = mDffList.begin();
        p != mDffList.end(); ++ p) {
     SbjNode* node = *p;
-    connect(NULL, node, 0);
-    connect(NULL, node, 1);
-    connect(NULL, node, 2);
-    connect(NULL, node, 3);
+    connect(nullptr, node, 0);
+    connect(nullptr, node, 1);
+    connect(nullptr, node, 2);
+    connect(nullptr, node, 3);
   }
   for (SbjNodeList::iterator p = mLnodeList.begin();
        p != mLnodeList.end(); ++ p) {
     SbjNode* node = *p;
-    connect(NULL, node, 0);
-    connect(NULL, node, 1);
+    connect(nullptr, node, 0);
+    connect(nullptr, node, 1);
   }
 
   for (SbjNodeList::iterator p = mInputList.begin();
@@ -365,7 +365,7 @@ SbjGraph::port(const SbjNode* node) const
     return mOutputPortArray[node->subid()].mPort;
   }
   else {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -497,7 +497,7 @@ rsort_sub(const SbjNode* node,
   ymuint ni = node->is_logic() ? 2 : 1;
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = node->fanin(i);
-    if ( inode == NULL || mark[inode->id()] || !inode->is_logic() ) continue;
+    if ( inode == nullptr || mark[inode->id()] || !inode->is_logic() ) continue;
     const SbjEdgeList& fo_list = inode->fanout_list();
     bool ready = true;
     for (SbjEdgeList::const_iterator p = fo_list.begin();
@@ -901,8 +901,8 @@ SbjGraph::delete_logic(SbjNode* node)
 {
   ASSERT_COND(node->is_logic() );
   ASSERT_COND(node->fanout_num() == 0 );
-  connect(NULL, node, 0);
-  connect(NULL, node, 1);
+  connect(nullptr, node, 0);
+  connect(nullptr, node, 1);
 
   mLnodeList.erase(node);
   delete_node(node, 2);
@@ -925,7 +925,7 @@ SbjGraph::delete_dff(SbjNode* node)
 SbjNode*
 SbjGraph::new_node(ymuint ni)
 {
-  SbjNode* node = NULL;
+  SbjNode* node = nullptr;
 
   // 空いているIDを探してノード配列へ登録
   int id = mItvlMgr.avail_num();
@@ -959,7 +959,7 @@ SbjGraph::delete_node(SbjNode* node,
 {
   // new_node の逆の処理を行なう．
   mAlloc2.put_memory(sizeof(SbjEdge) * ni, node->mFanins);
-  node->mFanins = NULL;
+  node->mFanins = nullptr;
   mItvlMgr.add(static_cast<int>(node->mId));
 }
 

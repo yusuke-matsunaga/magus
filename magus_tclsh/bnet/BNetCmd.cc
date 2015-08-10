@@ -34,7 +34,7 @@ BNetCmd::~BNetCmd()
 }
 
 // @brief カレントネットワークの取得
-// @note カレントネットワークが BNetwork でない場合には NULL を返す．
+// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
 BNetwork*
 BNetCmd::cur_network() const
 {

@@ -72,7 +72,7 @@ protected:
   /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
   /// @note また，名前が不適切な場合にもエラーとなる．
   /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
-  /// NULL を返す．
+  /// nullptr を返す．
   NetHandle*
   new_bnethandle(const string& name) const;
 
@@ -82,7 +82,7 @@ protected:
   /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
   /// @note また，名前が不適切な場合にもエラーとなる．
   /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
-  /// NULL を返す．
+  /// nullptr を返す．
   NetHandle*
   new_bdnhandle(const string& name) const;
 
@@ -92,7 +92,7 @@ protected:
   /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
   /// @note また，名前が不適切な場合にもエラーとなる．
   /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
-  /// NULL を返す．
+  /// nullptr を返す．
   NetHandle*
   new_mvnhandle(const string& name) const;
 
@@ -110,7 +110,7 @@ protected:
   /// @note 名前が不適切な場合やその名前のネットワークが存在しない場合には
   /// エラーとなる．
   /// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセット
-  /// して NULL を返す．
+  /// して nullptr を返す．
   NetHandle*
   find_nethandle(const string& name) const;
 

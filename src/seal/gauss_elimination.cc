@@ -212,7 +212,7 @@ gaussian_elimination(const SMatrix& src_matrix,
     // c 番めの係数が最大の行を選ぶ．
     double max = 0.0;
     ymuint max_r = 0;
-    SmCell* max_cell = NULL;
+    SmCell* max_cell = nullptr;
     cur_rows.clear();
     for (ymuint r = 0; r < nv; ++ r) {
       if ( fixed[r] ) continue;

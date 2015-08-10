@@ -489,16 +489,16 @@ make_name(const string& base,
 	  const BNetwork* network)
 {
   string name0 = base + ext;
-  if ( network->find_node(name0) == NULL &&
-       network->find_ponode(name0) == NULL ) {
+  if ( network->find_node(name0) == nullptr &&
+       network->find_ponode(name0) == nullptr ) {
     return name0;
   }
   for (size_t i = 0; i < 999; ++ i) {
     ostringstream buf;
     buf << name0 << i;
     string name1 = buf.str();
-    if ( network->find_node(name1) == NULL &&
-	 network->find_ponode(name1) == NULL ) {
+    if ( network->find_node(name1) == nullptr &&
+	 network->find_ponode(name1) == nullptr ) {
       return name1;
     }
   }
@@ -534,7 +534,7 @@ ConvCombiCmd::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
     BNode* input = manip.new_input(in_name);
-    if ( input == NULL ) {
+    if ( input == nullptr ) {
       TclObj msg;
       msg << "Unexpected error: new_input(" << in_name << ") failed";
       set_result(msg);
@@ -555,7 +555,7 @@ ConvCombiCmd::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
     BNode* output = manip.new_output(out_name);
-    if ( output == NULL ) {
+    if ( output == nullptr ) {
       TclObj msg;
       msg << "Unexpected error: new_input(" << out_name << ") failed";
       set_result(msg);

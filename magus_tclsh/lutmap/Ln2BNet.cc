@@ -69,7 +69,7 @@ Ln2BNet::operator()(const LnGraph& src_network,
     ymuint ni = src_node->fanin_num();
     vector<int> tv;
     src_node->tv(tv);
-    BNode* dst_node = NULL;
+    BNode* dst_node = nullptr;
     if ( ni == 0 ) {
       dst_node = manip.make_const(tv[0]);
     }

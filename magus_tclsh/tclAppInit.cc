@@ -143,8 +143,7 @@ Tcl_AppInit(Tcl_Interp* interp)
   if (Tcltest_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }
-  Tcl_StaticPackage(interp, "Tcltest", Tcltest_Init,
-		    (Tcl_PackageInitProc *) NULL);
+  Tcl_StaticPackage(interp, "Tcltest", Tcltest_Init, nullptr);
   if (TclObjTest_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }

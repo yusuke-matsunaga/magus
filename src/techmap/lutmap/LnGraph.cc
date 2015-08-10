@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_LUTMAP
 LnNode::LnNode() :
   mFlags(0),
   mNi(0),
-  mFanins(NULL),
+  mFanins(nullptr),
   mLevel(0)
 {
 }
@@ -187,7 +187,7 @@ LnGraph::copy(const LnGraph& src,
        p != output_list.end(); ++ p) {
     LnNode* src_onode = *p;
     LnNode* src_inode = src_onode->fanin(0);
-    LnNode* dst_inode = NULL;
+    LnNode* dst_inode = nullptr;
     if ( src_inode ) {
       dst_inode = nodemap[src_inode->id()];
     }
@@ -221,7 +221,7 @@ LnGraph::port(const LnNode* node) const
     return mOutputPortArray[node->subid()].mPort;
   }
   else {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -528,7 +528,7 @@ LnGraph::set_dff_rst(LnNode* node,
 LnNode*
 LnGraph::new_node(ymuint ni)
 {
-  LnNode* node = NULL;
+  LnNode* node = nullptr;
 
   // 空いているIDを探してノード配列へ登録
   int id = mItvlMgr.avail_num();
@@ -551,7 +551,7 @@ LnGraph::new_node(ymuint ni)
     }
   }
   else {
-    node->mFanins = NULL;
+    node->mFanins = nullptr;
   }
   node->mId = uid;
 
@@ -576,21 +576,21 @@ LnGraph::clear()
   for (LnNodeList::iterator p = mOutputList.begin();
        p != mOutputList.end(); ++ p) {
     LnNode* node = *p;
-    connect(NULL, node, 0);
+    connect(nullptr, node, 0);
   }
   for (LnNodeList::iterator p = mLutList.begin();
        p != mLutList.end(); ++ p) {
     LnNode* node = *p;
     ymuint ni = node->fanin_num();
     for (ymuint i = 0; i < ni; ++ i) {
-      connect(NULL, node, i);
+      connect(nullptr, node, i);
     }
   }
   for (LnNodeList::iterator p = mDffList.begin();
        p != mDffList.end(); ++ p) {
     LnNode* node = *p;
     for (ymuint i = 0; i < 4; ++ i) {
-      connect(NULL, node, i);
+      connect(nullptr, node, i);
     }
   }
 
@@ -667,7 +667,7 @@ LnGraph::delete_lut(LnNode* node)
   ASSERT_COND(node->fanout_num() == 0 );
   ymuint ni = node->fanin_num();
   for (ymuint i = 0; i < ni; ++ i) {
-    connect(NULL, node, i);
+    connect(nullptr, node, i);
   }
 
   mLutList.erase(node);
@@ -682,7 +682,7 @@ LnGraph::delete_dff(LnNode* node)
 {
   ASSERT_COND(node->is_dff() );
   ASSERT_COND(node->fanout_num() == 0 );
-  connect(NULL, node, 0);
+  connect(nullptr, node, 0);
 
   mDffList.erase(node);
   delete_node(node);

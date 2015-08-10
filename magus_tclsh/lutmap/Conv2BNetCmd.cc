@@ -40,11 +40,11 @@ Conv2BNetCmd::~Conv2BNetCmd()
 int
 Conv2BNetCmd::cmd_proc(TclObjVector& objv)
 {
-  NetHandle* neth = NULL;
+  NetHandle* neth = nullptr;
 
   if ( mPoptDstNetwork->is_specified() ) {
     neth = find_or_new_nethandle(mPoptDstNetwork->val(), NetHandle::kMagBNet);
-    if ( neth == NULL ) {
+    if ( neth == nullptr ) {
       // 見付からなかった
       // エラーメッセージは find_network() の中でセットされている．
       return TCL_ERROR;
@@ -57,7 +57,7 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
   }
 
   try {
-    if ( neth == NULL ) {
+    if ( neth == nullptr ) {
       neth = cur_nethandle();
     }
     BNetwork& dst_network = *neth->_bnetwork();

@@ -76,7 +76,7 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  if ( cur_cell_library() == NULL ) {
+  if ( cur_cell_library() == nullptr ) {
     TclObj emsg;
     emsg << "Cell Library is not set.";
     set_result(emsg);

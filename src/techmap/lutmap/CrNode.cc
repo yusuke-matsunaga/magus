@@ -21,8 +21,8 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 // @brief コンストラクタ
 CrNode::CrNode() :
-  mNode(NULL),
-  mCurCut(NULL),
+  mNode(nullptr),
+  mCurCut(nullptr),
   mFlags(0U),
   mCurGain(0),
   mHeapIndex(-1),

@@ -2,7 +2,7 @@
 /// @file libym_cec/FraigNode.cc
 /// @brief FraigNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-/// 
+///
 /// $Id: FraigNode.cc 2203 2009-04-16 05:04:40Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
@@ -125,16 +125,16 @@ ymuint32 FraigNode::mPrimes[] = {
 // @brief コンストラクタ
 FraigNode::FraigNode() :
   mFlags(0),
-  mPat(NULL),
+  mPat(nullptr),
   mHash(0),
   mRepNode(this),
-  mEqLink(NULL),
-  mEqTail(NULL)
+  mEqLink(nullptr),
+  mEqTail(nullptr)
 {
-  mFanins[0] = NULL;
-  mFanins[1] = NULL;
+  mFanins[0] = nullptr;
+  mFanins[1] = nullptr;
 }
-  
+
 // @brief デストラクタ
 FraigNode::~FraigNode()
 {
@@ -162,7 +162,7 @@ FraigNode::set_fanin(FraigHandle handle1,
     mFlags &= ~(1U << kSftP1);
   }
 }
-  
+
 // @brief パタンをセットする．
 // @param[in] start 開始位置
 // @param[in] end 終了位置

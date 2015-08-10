@@ -268,9 +268,9 @@ private:
 template <typename AreaT>
 inline
 ADCost<AreaT>::ADCost() :
-  mCut(NULL),
+  mCut(nullptr),
   mDepth(0),
-  mLink(NULL)
+  mLink(nullptr)
 {
 }
 
@@ -317,7 +317,7 @@ ADCost<AreaT>::area() const
 template <typename AreaT>
 inline
 ADCostIterator<AreaT>::ADCostIterator() :
-  mPtr(NULL)
+  mPtr(nullptr)
 {
 }
 
@@ -355,7 +355,7 @@ inline
 bool
 ADCostIterator<AreaT>::is_end() const
 {
-  return mPtr == NULL;
+  return mPtr == nullptr;
 }
 
 // @brief ポインタを指定したコンストラクタ
@@ -375,9 +375,9 @@ ADCostIterator<AreaT>::ADCostIterator(ADCost<AreaT>* ptr) :
 template <typename AreaT>
 inline
 ADCostMgr<AreaT>::ADCostMgr() :
-  mTopPage(NULL),
+  mTopPage(nullptr),
   mNextPos(0),
-  mAvail(NULL)
+  mAvail(nullptr)
 {
 }
 
@@ -402,10 +402,10 @@ ADCostMgr<AreaT>::alloc_cost()
   if ( mAvail ) {
     ADCost<AreaT>* cost = mAvail;
     mAvail = cost->mLink;
-    cost->mLink = NULL;
+    cost->mLink = nullptr;
     return cost;
   }
-  if ( mTopPage == NULL || mNextPos >= kChunkSize ) {
+  if ( mTopPage == nullptr || mNextPos >= kChunkSize ) {
     Page* page = new Page;
     page->mLink = mTopPage;
     mTopPage = page;
@@ -491,7 +491,7 @@ ADCostList<AreaT>::insert(const Cut* cut,
       if ( cur->mArea >= area ) {
 	// cur は不要
 	ADCost<AreaT>* next = cur->mLink;
-	cur->mLink = NULL;
+	cur->mLink = nullptr;
 	prev->mLink = next;
 	mMgr->delete_cost(cur);
       }
@@ -528,7 +528,7 @@ ADCostList<AreaT>::insert(const Cut* cut,
       }
     }
   }
-  if ( cur == NULL ) {
+  if ( cur == nullptr ) {
     cur = mMgr->alloc_cost();
     cur->mCut = cut;
     cur->mDepth = depth;

@@ -393,7 +393,7 @@ SbjDumper::dump_verilog(ostream& s,
     bool sinv = node->fanin_set_inv();
     const SbjNode* rnode = node->fanin_rst();
     bool rinv = node->fanin_rst_inv();
-    ASSERT_COND( cnode != NULL );
+    ASSERT_COND( cnode != nullptr );
     s << "  always @ ( ";
     if ( cinv ) {
       s << "negedge";

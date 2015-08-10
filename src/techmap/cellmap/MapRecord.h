@@ -116,7 +116,7 @@ private:
   struct DffInfo
   {
     DffInfo() :
-      mCell(NULL)
+      mCell(nullptr)
     {
     }
 
@@ -133,7 +133,7 @@ private:
   {
     LatchInfo()
     {
-      mCell = NULL;
+      mCell = nullptr;
     }
 
     // セル
@@ -149,8 +149,8 @@ private:
   {
     NodeInfo()
     {
-      mCell = NULL;
-      mMapNode = NULL;
+      mCell = nullptr;
+      mMapNode = nullptr;
     }
 
     // マッチ
@@ -168,7 +168,7 @@ private:
   struct MapReq
   {
     // コンストラクタ
-    MapReq(const BdnNode* node = NULL,
+    MapReq(const BdnNode* node = nullptr,
 	   bool inv = false) :
       mNode(node),
       mInv(inv)

@@ -55,9 +55,9 @@ NodeInfo::cmd_proc(TclObjVector& objv)
   }
 
   // ノードを取り出す．
-  string node_str = objv[2].get_string(NULL);
+  string node_str = objv[2].get_string(nullptr);
   BNode* node = cur_network()->find_node(node_str);
-  if ( node == NULL ) {
+  if ( node == nullptr ) {
     TclObj emsg;
     emsg << node_str << " : does not exist";
     set_result(emsg);
@@ -108,7 +108,7 @@ NodeInfo::cmd_proc(TclObjVector& objv)
 #if defined(USE_LIBCELL)
   else if (attr == "mapped_cell") {
     const hf_CUcell* cell = node->Cell();
-    if (cell != NULL) {
+    if (cell != nullptr) {
       result = Cell2TclObj(cell);
     }
     else {

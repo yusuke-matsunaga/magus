@@ -62,7 +62,7 @@ bool
 MagCmd::check_network_name(const string& name) const
 {
   NetHandle* neth = mMagMgr->find_nethandle(name);
-  return (neth != NULL) ? true : false;
+  return (neth != nullptr) ? true : false;
 }
 
 // @brief name という名の新たなネットワークエントリを作成して登録する．
@@ -70,13 +70,13 @@ MagCmd::check_network_name(const string& name) const
 // @note 同名のネットワークが既に存在していた場合にはエラーとなる．
 // @note また，名前が不適切な場合にもエラーとなる．
 // @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
-// NULL を返す．
+// nullptr を返す．
 NetHandle*
 MagCmd::new_bnethandle(const string& name) const
 {
   ostringstream buf;
   NetHandle* neth = mMagMgr->new_bnethandle(name, &buf);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     set_result(buf.str());
   }
   return neth;
@@ -88,13 +88,13 @@ MagCmd::new_bnethandle(const string& name) const
 // @note 同名のネットワークが既に存在していた場合にはエラーとなる．
 // @note また，名前が不適切な場合にもエラーとなる．
 // @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
-// NULL を返す．
+// nullptr を返す．
 NetHandle*
 MagCmd::new_bdnhandle(const string& name) const
 {
   ostringstream buf;
   NetHandle* neth = mMagMgr->new_bdnhandle(name, &buf);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     set_result(buf.str());
   }
   return neth;
@@ -106,13 +106,13 @@ MagCmd::new_bdnhandle(const string& name) const
 // @note 同名のネットワークが既に存在していた場合にはエラーとなる．
 // @note また，名前が不適切な場合にもエラーとなる．
 // @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
-// NULL を返す．
+// nullptr を返す．
 NetHandle*
 MagCmd::new_mvnhandle(const string& name) const
 {
   ostringstream buf;
   NetHandle* neth = mMagMgr->new_mvnhandle(name, &buf);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     set_result(buf.str());
   }
   return neth;
@@ -143,7 +143,7 @@ MagCmd::find_nethandle(const string& name) const
 {
   ostringstream buf;
   NetHandle* neth = mMagMgr->find_nethandle(name, &buf);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     set_result(buf.str());
   }
   return neth;
@@ -232,7 +232,7 @@ NetHandle*
 MagCmd::cur_nethandle() const
 {
   NetHandle* neth = mMagMgr->cur_nethandle();
-  ASSERT_COND(neth != NULL );
+  ASSERT_COND(neth != nullptr );
   return neth;
 }
 
@@ -248,7 +248,7 @@ MagCmd::check_node_name(const string& name) const
   }
 
   BNode* node = cur_network()->find_node(name);
-  if ( node != NULL ) {
+  if ( node != nullptr ) {
     // 指定された名前のノードが既に存在している．
     TclObj emsg;
     emsg << name << " : Already exists.";
@@ -263,9 +263,9 @@ MagCmd::check_node_name(const string& name) const
 BNode*
 MagCmd::find_node(TclObj& obj)
 {
-  string node_str = obj.get_string(NULL);
+  string node_str = obj.get_string(nullptr);
   BNode* node = cur_network()->find_node(node_str);
-  if ( node == NULL ) {
+  if ( node == nullptr ) {
     // ノード名が不正
     TclObj emsg;
     emsg << node_str << " : does not exist";

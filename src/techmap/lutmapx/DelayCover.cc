@@ -99,7 +99,7 @@ DelayCover::record_cuts(const BdnMgr& sbjgraph,
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
     NodeInfo& t = mNodeInfo[node->id()];
-    t.mCostList.insert(NULL, 0, 0.0);
+    t.mCostList.insert(nullptr, 0, 0.0);
     t.mMinDepth = 0;
   }
 
@@ -120,7 +120,7 @@ DelayCover::record_cuts(const BdnMgr& sbjgraph,
        p != output_list.end(); ++ p) {
     const BdnNode* onode = *p;
     const BdnNode* node = onode->output_fanin();
-    if ( node == NULL) continue;
+    if ( node == nullptr) continue;
     if ( node->is_logic() ) {
       onode_list.push_back(node);
     }
@@ -258,7 +258,7 @@ DelayCover::select(const BdnNode* node,
     // このノードは必要ではない．
     return;
   }
-  const Cut* cut = NULL;
+  const Cut* cut = nullptr;
   for (ADCostIterator<double> p = t.mCostList.begin();
        !p.is_end(); ++ p) {
     ADCost<double>* cost = *p;

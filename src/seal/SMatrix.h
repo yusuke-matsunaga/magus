@@ -105,7 +105,7 @@ public:
   /// @brief 要素を取り出す．
   /// @param[in] row 行番号
   /// @param[in] col 列番号
-  /// @note 要素がない場合には NULL を返す．
+  /// @note 要素がない場合には nullptr を返す．
   SmCell*
   find_elem(ymuint row,
 	    ymuint col) const;

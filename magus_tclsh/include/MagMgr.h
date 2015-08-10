@@ -54,10 +54,10 @@ public:
   /// @return 作成したネットハンドル
   /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
   /// @note また，名前が不適切な場合にもエラーとなる．
-  /// @note エラーが起きた場合には NULL を返す．
+  /// @note エラーが起きた場合には nullptr を返す．
   NetHandle*
   new_bnethandle(const string& name,
-		 ostream* err_out = NULL);
+		 ostream* err_out = nullptr);
 
   /// @brief 新たな BdNetwork を作成して登録する．
   /// @param[in] name 名前
@@ -65,10 +65,10 @@ public:
   /// @return 作成したネットハンドル
   /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
   /// @note また，名前が不適切な場合にもエラーとなる．
-  /// @note エラーが起きた場合には NULL を返す．
+  /// @note エラーが起きた場合には nullptr を返す．
   NetHandle*
   new_bdnhandle(const string& name,
-		ostream* err_out = NULL);
+		ostream* err_out = nullptr);
 
   /// @brief 新たな MvNetwork を作成して登録する．
   /// @param[in] name 名前
@@ -76,20 +76,20 @@ public:
   /// @return 作成したネットハンドル
   /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
   /// @note また，名前が不適切な場合にもエラーとなる．
-  /// @note エラーが起きた場合には NULL を返す．
+  /// @note エラーが起きた場合には nullptr を返す．
   NetHandle*
   new_mvnhandle(const string& name,
-		ostream* err_out = NULL);
+		ostream* err_out = nullptr);
 
   /// @brief ネットワークの検索
   /// @param[in] name 名前
   /// @param[in] err_out エラー出力
   /// @return name という名のネットワークを返す．
   /// @note 名前が不適切な場合やその名前のネットワークが存在しない場合
-  /// にはエラーとなり，NULL を返す．
+  /// にはエラーとなり，nullptr を返す．
   NetHandle*
   find_nethandle(const string& name,
-		 ostream* err_out = NULL);
+		 ostream* err_out = nullptr);
 
   /// @brief ネットワークの削除
   /// @param[in] name 名前
@@ -98,7 +98,7 @@ public:
   /// @note 名前が不適切な場合や存在しない場合にはエラーとなり，false を返す．
   bool
   delete_nethandle(const string& name,
-		   ostream* err_out = NULL);
+		   ostream* err_out = nullptr);
 
   /// @brief カレントネットワークの変更
   /// @param[in] name ネットワーク名
@@ -108,7 +108,7 @@ public:
   /// @note 名前が不適切な場合や存在しない場合にはエラーとなり，false を返す．
   bool
   change_cur_nethandle(const string& name,
-		       ostream* err_out = NULL);
+		       ostream* err_out = nullptr);
 
   /// @brief 操作対象のネットワークを新たに指定する．
   /// @param[in] name ネットワーク名
@@ -118,14 +118,14 @@ public:
   /// @note 古いネットワークはスタックにつまれる．
   bool
   push_cur_nethandle(const string& name,
-		     ostream* err_out = NULL);
+		     ostream* err_out = nullptr);
 
   /// @brief スタックにつまれたネットワークの復帰
   /// @param[in] err_out エラー出力
   /// @return 正常終了したら true を返す．
   /// @note スタックが空の場合にはエラーとなり，false を返す．
   bool
-  pop_cur_nethandle(ostream* err_out = NULL);
+  pop_cur_nethandle(ostream* err_out = nullptr);
 
   /// @brief カレントネットワークの取得
   /// @note この関数はエラーとなることはない．
@@ -156,7 +156,7 @@ private:
   /// 場合にはエラーとなり，false を返す．
   bool
   reg_nethandle(NetHandle* handle,
-		ostream* err_out = NULL);
+		ostream* err_out = nullptr);
 
   /// @brief ネットワークを検索する．
   /// @param[in] name 名前

@@ -67,7 +67,7 @@ DumpPatCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  const CellLibrary* library = NULL;
+  const CellLibrary* library = nullptr;
   if ( mislib ) {
     CellMislibReader reader;
     library = reader.read(src_filename);
@@ -77,7 +77,7 @@ DumpPatCmd::cmd_proc(TclObjVector& objv)
     library = reader.read(src_filename);
   }
 
-  if ( library == NULL ) {
+  if ( library == nullptr ) {
     TclObj emsg;
     emsg << "Error occured in reading " << src_filename;
     set_result(emsg);

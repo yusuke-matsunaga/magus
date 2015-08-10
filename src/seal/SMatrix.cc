@@ -32,7 +32,7 @@ SMatrix::SMatrix(ymuint size) :
     mConstArray[i] = 0.0;
   }
   mCellNum = 0;
-  
+
 #ifdef SANITY_CHECK
   mShadowArray = new double[mSize * mSize];
   for (ymuint i = 0; i < mSize * mSize; ++ i) {
@@ -85,7 +85,7 @@ SMatrix::~SMatrix()
 // @brief 要素を取り出す．
 // @param[in] row 行番号
 // @param[in] col 列番号
-// @note 要素がない場合には NULL を返す．
+// @note 要素がない場合には nullptr を返す．
 SmCell*
 SMatrix::find_elem(ymuint row,
 		   ymuint col) const
@@ -97,10 +97,10 @@ SMatrix::find_elem(ymuint row,
       return cur;
     }
     else if ( c > col ) {
-      return NULL;
+      return nullptr;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 // @brief 要素の値を設定する．

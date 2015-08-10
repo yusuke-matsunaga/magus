@@ -85,7 +85,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   for (BdnNodeList::const_iterator p = input_list.begin();
        p != input_list.end(); ++ p) {
     const BdnNode* node = *p;
-    maprec.set_cut(node, NULL);
+    maprec.set_cut(node, nullptr);
     mBestCost[node->id()] = 0.0;
   }
 
@@ -97,7 +97,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
     const BdnNode* node = *p;
 
     double min_cost = DBL_MAX;
-    const Cut* best_cut = NULL;
+    const Cut* best_cut = nullptr;
     const CutList& cut_list = mCutHolder.cut_list(node);
     for (CutListIterator p = cut_list.begin();
 	 p != cut_list.end(); ++ p) {
@@ -140,7 +140,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
       }
     }
     ASSERT_COND(min_cost < DBL_MAX );
-    ASSERT_COND( best_cut != NULL );
+    ASSERT_COND( best_cut != nullptr );
     maprec.set_cut(node, best_cut);
     mBestCost[node->id()] = min_cost;
   }

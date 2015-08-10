@@ -30,10 +30,10 @@ NetCmd::NetCmd(MagMgr* mgr,
 	       bool new_bdn_enable,
 	       bool new_mvn_enable) :
   MagCmd(mgr),
-  mPoptNtwk(NULL),
-  mPoptNewBNet(NULL),
-  mPoptNewBdn(NULL),
-  mPoptNewMvn(NULL),
+  mPoptNtwk(nullptr),
+  mPoptNewBNet(nullptr),
+  mPoptNewBdn(nullptr),
+  mPoptNewMvn(nullptr),
   mNetworkSpecified(false)
 {
   mPoptNtwk = new TclPoptObj(this, "network",
@@ -98,17 +98,17 @@ NetCmd::before_cmd_proc(TclObjVector& objv)
     name = mPoptNtwk->val();
     ntwk_flag = true;
   }
-  else if ( mPoptNewBNet != NULL && mPoptNewBNet->is_specified() ) {
+  else if ( mPoptNewBNet != nullptr && mPoptNewBNet->is_specified() ) {
     bnet_flag = true;
     name = mPoptNewBNet->val();
     ntwk_flag = true;
   }
-  else if ( mPoptNewBdn != NULL && mPoptNewBdn->is_specified() ) {
+  else if ( mPoptNewBdn != nullptr && mPoptNewBdn->is_specified() ) {
     bdn_flag = true;
     name = mPoptNewBdn->val();
     ntwk_flag = true;
   }
-  else if ( mPoptNewMvn != NULL && mPoptNewMvn->is_specified() ) {
+  else if ( mPoptNewMvn != nullptr && mPoptNewMvn->is_specified() ) {
     mvn_flag = true;
     name = mPoptNewMvn->val();
     ntwk_flag = true;

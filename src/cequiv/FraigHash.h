@@ -138,7 +138,7 @@ void
 FraigHash::clear()
 {
   for (ymuint i = 0; i < mHashSize; ++ i) {
-    mHashTable[i] = NULL;
+    mHashTable[i] = nullptr;
   }
   mNum = 0;
 }

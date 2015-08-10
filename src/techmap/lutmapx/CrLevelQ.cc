@@ -91,7 +91,7 @@ CrLevelQ::getmin()
     }
     ASSERT_NOT_REACHED;
   }
-  return NULL;
+  return nullptr;
 }
 
 // @brief 最大レベルの要素を取り出す．
@@ -111,7 +111,7 @@ CrLevelQ::getmax()
     }
     ASSERT_NOT_REACHED;
   }
-  return NULL;
+  return nullptr;
 }
 
 END_NAMESPACE_YM_LUTMAP

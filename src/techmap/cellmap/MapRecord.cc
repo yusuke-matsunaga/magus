@@ -199,19 +199,19 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     bool ext_inv = p->mInv;
     const BdnNode* node = onode->fanin(0);
     bool inv = onode->output_fanin_inv() ^ ext_inv;
-    CmnNode* mapnode = NULL;
+    CmnNode* mapnode = nullptr;
     if ( node ) {
       mapnode = back_trace(node, inv);
     }
     else {
       if ( inv ) {
 	// 定数1ノードを作る．
-	ASSERT_COND( const1_cell != NULL );
+	ASSERT_COND( const1_cell != nullptr );
 	mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), const1_cell);
       }
       else {
 	// 定数0ノードを作る．
-	ASSERT_COND( const0_cell != NULL );
+	ASSERT_COND( const0_cell != nullptr );
 	mapnode = mMapGraph->new_logic(vector<CmnNode*>(0), const0_cell);
       }
     }
@@ -232,13 +232,13 @@ MapRecord::gen_port(const BdnPort* sbj_port)
     const BdnNode* sbj_input = sbj_port->input(j);
     if ( sbj_input ) {
       CmnNode* input = dst_port->_input(j);
-      ASSERT_COND( input != NULL );
+      ASSERT_COND( input != nullptr );
       get_node_info(sbj_input, false).mMapNode = input;
     }
     const BdnNode* sbj_output = sbj_port->output(j);
     if ( sbj_output ) {
       CmnNode* output = dst_port->_output(j);
-      ASSERT_COND( output != NULL );
+      ASSERT_COND( output != nullptr );
       get_node_info(sbj_output, false).mMapNode = output;
       add_mapreq(sbj_output, false);
     }
@@ -251,11 +251,11 @@ MapRecord::gen_dff(const BdnDff* sbj_dff)
 {
   const DffInfo& dff_info0 = get_dff_info(sbj_dff, false);
   const DffInfo& dff_info1 = get_dff_info(sbj_dff, true);
-  const Cell* cell = NULL;
+  const Cell* cell = nullptr;
   CellFFInfo pin_info;
   bool inv = false;
-  if ( dff_info0.mCell == NULL ) {
-    if ( dff_info1.mCell == NULL ) {
+  if ( dff_info0.mCell == nullptr ) {
+    if ( dff_info1.mCell == nullptr ) {
       ASSERT_NOT_REACHED;
     }
     cell = dff_info1.mCell;
@@ -267,7 +267,7 @@ MapRecord::gen_dff(const BdnDff* sbj_dff)
     pin_info = dff_info0.mPinInfo;
   }
   const CmnDffCell* dff_cell = mMapGraph->dff_cell(cell);
-  if ( dff_cell == NULL ) {
+  if ( dff_cell == nullptr ) {
     dff_cell = mMapGraph->reg_dff_cell(cell, pin_info);
 
   }
@@ -275,10 +275,10 @@ MapRecord::gen_dff(const BdnDff* sbj_dff)
 
   const BdnNode* sbj_output = sbj_dff->output();
   CmnNode* output1 = dff->_output1();
-  ASSERT_COND( output1 != NULL );
+  ASSERT_COND( output1 != nullptr );
   get_node_info(sbj_output, inv).mMapNode = output1;
   CmnNode* output2 = dff->_output2();
-  ASSERT_COND( output2 != NULL );
+  ASSERT_COND( output2 != nullptr );
   get_node_info(sbj_output, !inv).mMapNode = output2;
 
   const BdnNode* sbj_input = sbj_dff->input();
@@ -296,10 +296,10 @@ MapRecord::gen_dff(const BdnDff* sbj_dff)
   if ( clear_sense != 0 ) {
     const BdnNode* sbj_clear = inv ? sbj_dff->preset() : sbj_dff->clear();
     CmnNode* clear = dff->_clear();
-    ASSERT_COND( clear != NULL );
+    ASSERT_COND( clear != nullptr );
     get_node_info(sbj_clear, false).mMapNode = clear;
     bool clear_inv = (clear_sense == 2);
-    // sbj_clear->output_fanin() == NULL の時もうまくいく．
+    // sbj_clear->output_fanin() == nullptr の時もうまくいく．
     add_mapreq(sbj_clear, clear_inv);
   }
 
@@ -307,10 +307,10 @@ MapRecord::gen_dff(const BdnDff* sbj_dff)
   if ( preset_sense != 0 ) {
     const BdnNode* sbj_preset = inv ? sbj_dff->clear() : sbj_dff->preset();
     CmnNode* preset = dff->_preset();
-    ASSERT_COND( preset != NULL );
+    ASSERT_COND( preset != nullptr );
     get_node_info(sbj_preset, false).mMapNode = preset;
     bool preset_inv = (preset_sense == 2);
-    // sbj_preset->output_fanin() == NULL の時もうまくいく．
+    // sbj_preset->output_fanin() == nullptr の時もうまくいく．
     add_mapreq(sbj_preset, preset_inv);
   }
 }
@@ -342,7 +342,7 @@ MapRecord::back_trace(const BdnNode* node,
     return mapnode;
   }
 
-  ASSERT_COND( node_info.mCell != NULL );
+  ASSERT_COND( node_info.mCell != nullptr );
 
   // node を根とするマッチを取り出す．
   const Match& match = node_info.mMatch;

@@ -45,7 +45,7 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カレントネットワークの取得
-  /// @note カレントネットワークが BNetwork でない場合には NULL を返す．
+  /// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
   BNetwork*
   cur_network() const;
 

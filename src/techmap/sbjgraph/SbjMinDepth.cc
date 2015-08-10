@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_YM_SBJ
 // @brief コンストラクタ
 SmdNode::SmdNode() :
   mFanoutNum(0),
-  mFanoutArray(NULL)
+  mFanoutArray(nullptr)
 {
 }
 
@@ -126,7 +126,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
   }
   for (ymuint i = 0; i < n; ++ i) {
     const SbjNode* sbjnode = sbjgraph.node(i);
-    if ( sbjnode == NULL ) continue;
+    if ( sbjnode == nullptr ) continue;
     SmdNode* node = &mNodeArray[sbjnode->id()];
     const SbjEdgeList& fanout_list = sbjnode->fanout_list();
     ymuint nfo = 0;
@@ -148,7 +148,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
       if ( sbjfonode->is_ppo() ) continue;
       SmdNode* fonode = &mNodeArray[sbjfonode->id()];
       ASSERT_COND( fonode->id() == sbjfonode->id() );
-      SmdEdge* edge = NULL;
+      SmdEdge* edge = nullptr;
       if ( sbjedge->pos() == 0 ) {
 	edge = fonode->fanin0_edge();
       }

@@ -113,7 +113,7 @@ BNetInfo::cmd_proc(TclObjVector& objv)
     else if ( attr == "library_name" ) {
 #if defined(USE_LIBCELL)
       const hf_CCellMgr* cell_mgr = network->CellMgr();
-      if (cell_mgr == NULL) {
+      if (cell_mgr == nullptr) {
 	result = "not mapped";
       }
       else {
@@ -193,7 +193,7 @@ BNetAllInfo::cmd_proc(TclObjVector& objv)
   // ライブラリ名
 #if defined(USE_LIBCELL)
   const hf_CCellMgr* cell_mgr = network->CellMgr();
-  if (cell_mgr == NULL) {
+  if (cell_mgr == nullptr) {
     set_var(base, "library_name", "not mapped", 0);
   }
   else {

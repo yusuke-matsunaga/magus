@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 // 空のコンストラクタ
 Cut::Cut() :
-  mLink(NULL)
+  mLink(nullptr)
 {
 }
 
@@ -36,7 +36,7 @@ calc_expr_for_node(const BdnNode* node,
 		   const HashMap<ymuint, Expr>& logmap)
 {
   Expr ans;
-  if ( node == NULL ) {
+  if ( node == nullptr ) {
     ans =  Expr::make_zero();
   }
   else {
@@ -69,7 +69,7 @@ END_NONAMESPACE
 Expr
 Cut::expr() const
 {
-  if ( root() == NULL ) {
+  if ( root() == nullptr ) {
     return Expr::make_zero();
   }
 
@@ -86,7 +86,7 @@ Cut::expr() const
 void
 Cut::dump(ostream& s) const
 {
-  if ( root() == NULL ) {
+  if ( root() == nullptr ) {
     s << "null cut" << endl;
   }
   else {

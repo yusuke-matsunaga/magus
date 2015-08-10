@@ -102,7 +102,7 @@ private:
   struct FFInfo
   {
     FFInfo() :
-      mCell(NULL)
+      mCell(nullptr)
     {
     }
 

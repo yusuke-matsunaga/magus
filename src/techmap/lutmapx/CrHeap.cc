@@ -52,7 +52,7 @@ CrNode*
 CrHeap::get()
 {
   if ( mNum == 0 ) {
-    return NULL;
+    return nullptr;
   }
 
   CrNode* node = get(0);

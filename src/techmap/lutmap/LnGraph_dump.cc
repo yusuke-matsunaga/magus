@@ -309,7 +309,7 @@ dump_verilog(ostream& s,
     const LnNode* node = *p;
     const LnEdge* e = node->fanin_edge(0);
     const LnNode* inode = e->from();
-    ASSERT_COND( inode != NULL );
+    ASSERT_COND( inode != nullptr );
     s << "  assign " << node_name(node)
       << " = " << node_name(inode) << ";" << endl;
   }

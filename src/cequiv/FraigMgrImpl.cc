@@ -133,7 +133,7 @@ operator<<(ostream& s,
 FraigHash::FraigHash() :
   mNum(0),
   mHashSize(0),
-  mHashTable(NULL)
+  mHashTable(nullptr)
 {
   alloc_table(1024);
 }
@@ -159,7 +159,7 @@ FraigHash::alloc_table(ymuint req_size)
 
   mHashTable = new FraigNode*[mHashSize];
   for (ymuint i = 0; i < mHashSize; ++ i) {
-    mHashTable[i] = NULL;
+    mHashTable[i] = nullptr;
   }
 
   mNum = 0;
@@ -207,14 +207,14 @@ FraigMgrImpl::~FraigMgrImpl()
 FraigHandle
 FraigMgrImpl::make_zero()
 {
-  return FraigHandle(NULL, false);
+  return FraigHandle(nullptr, false);
 }
 
 // @brief 定数1関数をつくる．
 FraigHandle
 FraigMgrImpl::make_one()
 {
-  return FraigHandle(NULL, true);
+  return FraigHandle(nullptr, true);
 }
 
 // @brief 外部入力を作る．
@@ -318,7 +318,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       // 定数0の可能性があるか調べる．
       Bool3 stat = check_const(node, false);
       if ( stat == kB3True ) {
-	node->set_rep(NULL, false);
+	node->set_rep(nullptr, false);
 	return make_zero();
       }
       if ( stat == kB3False ) {
@@ -332,7 +332,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       // 定数1の可能性があるか調べる．
       Bool3 stat = check_const(node, true);
       if ( stat == kB3True ) {
-	node->set_rep(NULL, true);
+	node->set_rep(nullptr, true);
 	return make_one();
       }
       if ( stat == kB3False ) {
@@ -505,7 +505,7 @@ FraigMgrImpl::set_loop_limit(ymuint val)
 void
 FraigMgrImpl::init_pat(FraigNode* node)
 {
-  ASSERT_COND(node->mPat == NULL );
+  ASSERT_COND(node->mPat == nullptr );
   node->mPat = new ymuint32[mPatSize];
 }
 
@@ -692,7 +692,7 @@ FraigMgrImpl::check_condition(Literal lit1)
   Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver(NULL, "minisat");
+  SatSolver solver(nullptr, "minisat");
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
@@ -743,7 +743,7 @@ FraigMgrImpl::check_condition(Literal lit1,
   Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver(NULL, "minisat");
+  SatSolver solver(nullptr, "minisat");
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
@@ -804,9 +804,9 @@ FraigMgrImpl::dump_eqgroup(ostream& s) const
 {
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     SweepNode* snode = &mNodeArray[i];
-    if ( snode->mAigNode == NULL ) continue;
+    if ( snode->mAigNode == nullptr ) continue;
     if ( snode->rep_node() != snode ) continue;
-    if ( snode->next_eqnode() == NULL &&
+    if ( snode->next_eqnode() == nullptr &&
 	 snode->check_1mark() &&
 	 snode->check_0mark() ) continue;
     if ( !snode->check_1mark() ) {

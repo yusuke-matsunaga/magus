@@ -33,7 +33,7 @@ BdnCmd::~BdnCmd()
 }
 
 // @brief カレントネットワークの取得
-// @note カレントネットワークが BNetwork でない場合には NULL を返す．
+// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
 BdnMgr*
 BdnCmd::cur_network() const
 {

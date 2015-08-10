@@ -67,7 +67,7 @@ NodeCmd::parse_args(TclObjVector& objv)
   mNodeType = kINT;
   mNodeOrder = kNRM;
   mNodeCond = true;
-  mBaseNode = NULL;
+  mBaseNode = nullptr;
 
   if ( mPoptGlob->is_specified() ) {
     mMatchMode = kGLOB;
@@ -143,7 +143,7 @@ NodeCmd::set_nodes_from_args(TclObjVector& objv)
   for (size_t i = 1; i < objc; ++ i) {
     string node_str = objv[i];
     BNode* node = network->find_node(node_str);
-    if ( node == NULL ) {
+    if ( node == nullptr ) {
       // ノード名が不正
       TclObj emsg;
       emsg << node_str << " : does not exist";

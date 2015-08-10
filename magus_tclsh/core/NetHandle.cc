@@ -35,42 +35,42 @@ NetHandle::~NetHandle()
 const BNetwork*
 NetHandle::bnetwork() const
 {
-  return NULL;
+  return nullptr;
 }
 
 // @brief BNetwork を得る．
 BNetwork*
 NetHandle::_bnetwork()
 {
-  return NULL;
+  return nullptr;
 }
 
 // @brief BdnMgr を得る．
 const BdnMgr*
 NetHandle::bdn() const
 {
-  return NULL;
+  return nullptr;
 }
 
 // @brief BdnMgr を得る．
 BdnMgr*
 NetHandle::_bdn()
 {
-  return NULL;
+  return nullptr;
 }
 
 // @brief MvNetwork を得る．
 const MvnMgr*
 NetHandle::mvn() const
 {
-  return NULL;
+  return nullptr;
 }
 
 // @brief MvNetwork を得る．
 MvnMgr*
 NetHandle::_mvn()
 {
-  return NULL;
+  return nullptr;
 }
 
 END_NAMESPACE_MAGUS

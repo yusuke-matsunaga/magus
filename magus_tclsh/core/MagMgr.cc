@@ -25,15 +25,15 @@ string MagMgr::kCurNetwork("_network");
 MagMgr::MagMgr() :
   mAlloc(sizeof(Cell), 1024),
   mNetHandleHashSize(0),
-  mNetHandleHash(NULL),
+  mNetHandleHash(nullptr),
   mNetHandleHashNum(0)
 {
   alloc_table(16);
 
-  mCellLibrary = NULL;
+  mCellLibrary = nullptr;
 
-  // カレントネットワークは NULL
-  mCurNet = NULL;
+  // カレントネットワークは nullptr
+  mCurNet = nullptr;
 }
 
 // デストラクタ
@@ -108,7 +108,7 @@ MagMgr::check_name(const string& name,
 // @return 作成したネットハンドル
 // @note 同名のネットワークが既に存在していた場合にはエラーとなる．
 // @note また，名前が不適切な場合にもエラーとなる．
-// @note エラーが起きた場合には NULL を返す．
+// @note エラーが起きた場合には nullptr を返す．
 NetHandle*
 MagMgr::new_bnethandle(const string& name,
 		       ostream* err_out)
@@ -117,7 +117,7 @@ MagMgr::new_bnethandle(const string& name,
   bool stat = reg_nethandle(neth, err_out);
   if ( !stat ) {
     delete neth;
-    neth = NULL;
+    neth = nullptr;
   }
   return neth;
 }
@@ -128,7 +128,7 @@ MagMgr::new_bnethandle(const string& name,
 // @return 作成したネットハンドル
 // @note 同名のネットワークが既に存在していた場合にはエラーとなる．
 // @note また，名前が不適切な場合にもエラーとなる．
-// @note エラーが起きた場合には NULL を返す．
+// @note エラーが起きた場合には nullptr を返す．
 NetHandle*
 MagMgr::new_bdnhandle(const string& name,
 		      ostream* err_out)
@@ -137,7 +137,7 @@ MagMgr::new_bdnhandle(const string& name,
   bool stat = reg_nethandle(neth, err_out);
   if ( !stat ) {
     delete neth;
-    neth = NULL;
+    neth = nullptr;
   }
   return neth;
 }
@@ -148,7 +148,7 @@ MagMgr::new_bdnhandle(const string& name,
 // @return 作成したネットハンドル
 // @note 同名のネットワークが既に存在していた場合にはエラーとなる．
 // @note また，名前が不適切な場合にもエラーとなる．
-// @note エラーが起きた場合には NULL を返す．
+// @note エラーが起きた場合には nullptr を返す．
 NetHandle*
 MagMgr::new_mvnhandle(const string& name,
 		      ostream* err_out)
@@ -157,7 +157,7 @@ MagMgr::new_mvnhandle(const string& name,
   bool stat = reg_nethandle(neth, err_out);
   if ( !stat ) {
     delete neth;
-    neth = NULL;
+    neth = nullptr;
   }
   return neth;
 }
@@ -167,7 +167,7 @@ MagMgr::new_mvnhandle(const string& name,
 // @param[in] err_out エラー出力
 // @return name という名のネットワークを返す．
 // @note 名前が不適切な場合やその名前のネットワークが存在しない場合
-// にはエラーとなり，NULL を返す．
+// にはエラーとなり，nullptr を返す．
 NetHandle*
 MagMgr::find_nethandle(const string& name,
 		       ostream* err_out)
@@ -179,7 +179,7 @@ MagMgr::find_nethandle(const string& name,
 
   // そうでなければハッシュを探す．
   NetHandle* neth = _find_nethandle(name);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     // 存在していなければエラー
     if ( err_out ) {
       *err_out << name << " : No such network.";
@@ -198,7 +198,7 @@ MagMgr::delete_nethandle(const string& name,
 			 ostream* err_out)
 {
   NetHandle* neth = _find_nethandle(name);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     // 存在していなければエラー
     if ( err_out ) {
       *err_out << name << " : No such network.";
@@ -244,7 +244,7 @@ MagMgr::change_cur_nethandle(const string& name,
 			     ostream* err_out)
 {
   NetHandle* neth = find_nethandle(name, err_out);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     // エラー，たぶん名前が不正
     return false;
   }
@@ -263,12 +263,12 @@ MagMgr::push_cur_nethandle(const string& name,
 			   ostream* err_out)
 {
   NetHandle* neth = find_nethandle(name, err_out);
-  if ( neth == NULL ) {
+  if ( neth == nullptr ) {
     // エラー，たぶん名前が不正
     return false;
   }
 
-  if ( mCurNet != NULL ) {
+  if ( mCurNet != nullptr ) {
     // 昔のカレントネットワークをスタックに追加する．
     mNetStack.push_back(mCurNet);
   }
@@ -312,7 +312,7 @@ MagMgr::pop_cur_nethandle(ostream* ostream)
 NetHandle*
 MagMgr::cur_nethandle() const
 {
-  ASSERT_COND( mCurNet != NULL );
+  ASSERT_COND( mCurNet != nullptr );
   return mCurNet;
 }
 
@@ -368,7 +368,7 @@ MagMgr::reg_nethandle(NetHandle* handle,
   }
 
   // ハッシュを調べる．
-  if ( name == kCurNetwork || _find_nethandle(name) != NULL ) {
+  if ( name == kCurNetwork || _find_nethandle(name) != nullptr ) {
     // 同名のネットワークが存在していた．
     if ( err_out ) {
       *err_out << name << " : Already exists.";
@@ -402,7 +402,7 @@ MagMgr::_find_nethandle(const string& name)
       return cell->mHandle;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 // @brief ネットワークを削除する．
@@ -443,7 +443,7 @@ MagMgr::alloc_table(ymuint req_size)
   if ( old_size < mNetHandleHashSize ) {
     mNetHandleHash = new Cell*[mNetHandleHashSize];
     for (ymuint i = 0; i < mNetHandleHashSize; ++ i) {
-      mNetHandleHash[i] = NULL;
+      mNetHandleHash[i] = nullptr;
     }
     mNetHandleHashNextLimit = static_cast<ymuint>(mNetHandleHashSize * 1.8);
 

@@ -28,7 +28,7 @@ Match::Match(ymuint nl) :
     mLeafArray = new const BdnNode*[nl];
   }
   else {
-    mLeafArray = NULL;
+    mLeafArray = nullptr;
   }
 }
 
@@ -44,7 +44,7 @@ Match::Match(const Match& src) :
     }
   }
   else {
-    mLeafArray = NULL;
+    mLeafArray = nullptr;
   }
 }
 

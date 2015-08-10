@@ -85,7 +85,7 @@ EquivCmdBase::prologue(TclObjVector& objv)
   else {
     TclObj obj = var("magus::default", "equiv_verbose_level",
 		     TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG);
-    if ( obj.ptr() == NULL ) {
+    if ( obj.ptr() == nullptr ) {
       return TCL_ERROR;
     }
     int stat = int_conv(obj, mLogLevel);
@@ -107,7 +107,7 @@ EquivCmdBase::prologue(TclObjVector& objv)
   else {
     TclObj obj = var("magus::default", "equiv_assoc_mode",
 		     TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG);
-    if ( obj.ptr() == NULL ) {
+    if ( obj.ptr() == nullptr ) {
       return TCL_ERROR;
     }
     string val = obj;
@@ -136,7 +136,7 @@ EquivCmdBase::prologue(TclObjVector& objv)
   else {
     TclObj obj = var("magus::default", "equiv_time_limit",
 		     TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG);
-    if ( obj.ptr() == NULL ) {
+    if ( obj.ptr() == nullptr ) {
       return TCL_ERROR;
     }
     string val = obj;
@@ -153,7 +153,7 @@ EquivCmdBase::prologue(TclObjVector& objv)
     mSatType = "ymsat";
   }
 
-  mSatOut = NULL;
+  mSatOut = nullptr;
   if ( mPoptSatlog->is_specified() ) {
     mSatType = "satlog";
     string satlog_file = mPoptSatlog->val();
@@ -178,8 +178,8 @@ EquivCmdBase::prologue(TclObjVector& objv)
   }
 
   NetHandle* neth1 = find_nethandle(objv[1]);
-  NetHandle* neth2 = NULL;
-  if ( neth1 == NULL ) {
+  NetHandle* neth2 = nullptr;
+  if ( neth1 == nullptr ) {
     // 見付からなかった．
     // エラーメッセージはセットされている．
     return TCL_ERROR;
@@ -191,7 +191,7 @@ EquivCmdBase::prologue(TclObjVector& objv)
   }
   else {
     neth2 = find_nethandle(objv[2]);
-    if ( neth2 == NULL ) {
+    if ( neth2 == nullptr ) {
       // 見付からなかった．
       // エラーメッセージはセットされている．
       return TCL_ERROR;
@@ -382,15 +382,15 @@ EquivCmdBase::assoc_by_name(const BdnMgr& network1,
 	  if ( iov1[k] & 1 ) {
 	    const BdnNode* node1 = port1->input(k);
 	    const BdnNode* node2 = port2->input(k);
-	    ASSERT_COND( node1 != NULL );
-	    ASSERT_COND( node2 != NULL );
+	    ASSERT_COND( node1 != nullptr );
+	    ASSERT_COND( node2 != nullptr );
 	    iassoc.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	  if ( iov1[k] & 2 ) {
 	    const BdnNode* node1 = port1->output(k);
 	    const BdnNode* node2 = port2->output(k);
-	    ASSERT_COND( node1 != NULL );
-	    ASSERT_COND( node2 != NULL );
+	    ASSERT_COND( node1 != nullptr );
+	    ASSERT_COND( node2 != nullptr );
 	    oassoc.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	}

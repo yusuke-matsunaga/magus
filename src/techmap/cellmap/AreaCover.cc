@@ -71,11 +71,11 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
   record_cuts(sbjgraph, cell_library, maprec);
 
   // maprec の情報から mapnetwork を生成する．
-  const Cell* c0_cell = NULL;
+  const Cell* c0_cell = nullptr;
   if ( cell_library.const0_func()->cell_num() > 0 ) {
     c0_cell = cell_library.const0_func()->cell(0);
   }
-  const Cell* c1_cell = NULL;
+  const Cell* c1_cell = nullptr;
   if ( cell_library.const1_func()->cell_num() > 0 ) {
     c1_cell = cell_library.const1_func()->cell(0);
   }
@@ -103,7 +103,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       has_preset = true;
     }
 
-    const Cell* min_cell = NULL;
+    const Cell* min_cell = nullptr;
     CellFFInfo min_pin_info;
     CellArea min_area = CellArea::infty();
     const CellClass* ff_class = cell_library.simple_ff_class(has_clear, has_preset);
@@ -123,12 +123,12 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 	}
       }
     }
-    if ( min_cell != NULL ) {
+    if ( min_cell != nullptr ) {
       ff_info.mCell = min_cell;
       ff_info.mPinInfo = min_pin_info;
     }
     else {
-      ff_info.mCell = NULL;
+      ff_info.mCell = nullptr;
     }
   }
 
@@ -153,11 +153,11 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
       xsig |= 1U;
     }
     FFInfo& ff_info1 = mFFInfo[sig];
-    if ( ff_info1.mCell != NULL ) {
+    if ( ff_info1.mCell != nullptr ) {
       maprec.set_dff_match(dff, false, ff_info1.mCell, ff_info1.mPinInfo);
     }
     FFInfo& ff_info2 = mFFInfo[xsig];
-    if ( ff_info2.mCell != NULL ) {
+    if ( ff_info2.mCell != nullptr ) {
       maprec.set_dff_match(dff, true, ff_info2.mCell, ff_info2.mPinInfo);
     }
   }
@@ -333,7 +333,7 @@ AreaCover::add_inv(const BdnNode* node,
   double& cur_cost = cost(node, inv);
   double alt_cost = cost(node, !inv);
   ymuint nc = inv_func->cell_num();
-  const Cell* inv_cell = NULL;
+  const Cell* inv_cell = nullptr;
   double min_cost = DBL_MAX;
   for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
     const Cell* cell = inv_func->cell(c_pos);

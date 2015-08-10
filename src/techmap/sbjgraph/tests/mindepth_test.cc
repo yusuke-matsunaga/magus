@@ -21,7 +21,7 @@
 
 BEGIN_NONAMESPACE
 
-const char* argv0 = NULL;
+const char* argv0 = nullptr;
 
 void
 usage()

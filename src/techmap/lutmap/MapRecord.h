@@ -116,9 +116,9 @@ private:
   {
     NodeInfo()
     {
-      mCut = NULL;
-      mMapNode[0] = NULL;
-      mMapNode[1] = NULL;
+      mCut = nullptr;
+      mMapNode[0] = nullptr;
+      mMapNode[1] = nullptr;
       mMapCount[0] = 0;
       mMapCount[1] = 0;
       mDepth = 0;

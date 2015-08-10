@@ -49,7 +49,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
   ymuint n = sbjgraph.max_node_id();
   mNodeArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
-    mNodeArray[i] = NULL;
+    mNodeArray[i] = nullptr;
   }
   mHasLevelConstr = (slack >= 0);
   ymuint max_size = sbjgraph.level();
@@ -77,7 +77,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
     const BdnNode* onode = *p;
     const BdnNode* sbjnode = onode->output_fanin();
     if ( sbjnode && !sbjnode->is_input() ) {
-      back_trace(sbjnode, maprec, NULL);
+      back_trace(sbjnode, maprec, nullptr);
     }
   }
 
@@ -92,7 +92,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
 	 p != snode_list.end(); ++ p) {
       const BdnNode* node = *p;
       CrNode* crnode = mNodeArray[node->id()];
-      if ( crnode == NULL ) continue;
+      if ( crnode == nullptr ) continue;
 
       root_list.push_back(crnode);
 
@@ -125,7 +125,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
 	ymuint ni = cut1->input_num();
 	for (ymuint i = 0; i < ni; ++ i) {
 	  CrNode* inode = cut_input(cut1, i);
-	  if ( inode == NULL ) {
+	  if ( inode == nullptr ) {
 	    ok = false;
 	    break;
 	  }
@@ -186,7 +186,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
 	   p != snode_list.rend(); ++ p) {
 	const BdnNode* node = *p;
 	CrNode* crnode = mNodeArray[node->id()];
-	if ( crnode == NULL || crnode->is_output() ) continue;
+	if ( crnode == nullptr || crnode->is_output() ) continue;
 	if ( find_subst2(crnode, subst_list) ) {
 	  update(crnode, subst_list);
 	  changed = true;
@@ -199,7 +199,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
 #else
     for ( ; ; ) {
       CrNode* node = mHeap.get();
-      if ( node == NULL ) {
+      if ( node == nullptr ) {
 	break;
       }
       if ( node->gain() == 0 ) continue;
@@ -212,7 +212,7 @@ CutResub::operator()(const BdnMgr& sbjgraph,
   else {
     for ( ; ; ) {
       CrNode* node = mHeap.get();
-      if ( node == NULL ) {
+      if ( node == nullptr ) {
 	break;
       }
       if ( node->gain() == 0) continue;
@@ -242,12 +242,12 @@ CutResub::back_trace(const BdnNode* sbjnode,
 		     CrNode* from)
 {
   CrNode* node = mNodeArray[sbjnode->id()];
-  if ( node == NULL ) {
+  if ( node == nullptr ) {
     node = alloc_node();
     mNodeArray[sbjnode->id()] = node;
     node->set_sbjnode(sbjnode);
     const Cut* cut = maprec.get_cut(sbjnode);
-    ASSERT_COND(cut != NULL );
+    ASSERT_COND(cut != nullptr );
     node->set_cut(cut);
 
     // ファンインのノードのカットを選ぶ．
@@ -339,7 +339,7 @@ CutResub::find_subst(CrNode* node,
       bool ok = true;
       for (ymuint i = 0; i < ni; ++ i) {
 	CrNode* inode = cut_input(cut, i);
-	if ( inode == NULL || inode == node ) {
+	if ( inode == nullptr || inode == node ) {
 	  ok = false;
 	  break;
 	}
@@ -395,7 +395,7 @@ CutResub::find_subst2(CrNode* node,
   for(vector<CrNode*>::const_iterator p = tmp_list.begin();
       p != tmp_list.end(); ++ p) {
     CrNode* fo = *p;
-    const Cut* best_cut = NULL;
+    const Cut* best_cut = nullptr;
     ymuint best_level = 0;
     const vector<const Cut*>& cut_list = fo->mAltCutList;
     for (vector<const Cut*>::const_iterator p = cut_list.begin();
@@ -406,7 +406,7 @@ CutResub::find_subst2(CrNode* node,
       ymuint level = 0;
       for (ymuint i = 0; i < ni; ++ i) {
 	CrNode* inode = cut_input(cut, i);
-	if ( inode == NULL || inode == node ) {
+	if ( inode == nullptr || inode == node ) {
 	  ok = false;
 	  break;
 	}
@@ -421,7 +421,7 @@ CutResub::find_subst2(CrNode* node,
 	continue;
       }
 
-      if ( best_cut == NULL || best_level > level ) {
+      if ( best_cut == nullptr || best_level > level ) {
 	best_cut = cut;
 	best_level = level;
       }
@@ -520,7 +520,7 @@ CutResub::update(CrNode* node,
 	mDeletedNodes.push_back(inode);
       }
     }
-    mNodeArray[crnode->sbjnode()->id()] = NULL;
+    mNodeArray[crnode->sbjnode()->id()] = nullptr;
     mHeap.remove(crnode);
     free_node(crnode);
   }

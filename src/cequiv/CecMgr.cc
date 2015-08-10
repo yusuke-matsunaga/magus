@@ -130,7 +130,7 @@ operator<<(ostream& s,
 CecHash::CecHash() :
   mNum(0),
   mHashSize(0),
-  mHashTable(NULL)
+  mHashTable(nullptr)
 {
   alloc_table(1024);
 }
@@ -156,7 +156,7 @@ CecHash::alloc_table(ymuint req_size)
 
   mHashTable = new CecNode*[mHashSize];
   for (ymuint i = 0; i < mHashSize; ++ i) {
-    mHashTable[i] = NULL;
+    mHashTable[i] = nullptr;
   }
 
   mNum = 0;
@@ -198,14 +198,14 @@ CecMgr::~CecMgr()
 CecHandle
 CecMgr::make_zero()
 {
-  return CecHandle(NULL, false);
+  return CecHandle(nullptr, false);
 }
 
 // @brief 定数1関数をつくる．
 CecHandle
 CecMgr::make_one()
 {
-  return CecHandle(NULL, true);
+  return CecHandle(nullptr, true);
 }
 
 // @brief 外部入力を作る．
@@ -500,7 +500,7 @@ CecMgr::check_condition(Literal lit1)
   Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver(NULL, "minisat");
+  SatSolver solver(nullptr, "minisat");
   for (vector<CecNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     CecNode* node = *p;
@@ -551,7 +551,7 @@ CecMgr::check_condition(Literal lit1,
   Bool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver(NULL, "minisat");
+  SatSolver solver(nullptr, "minisat");
   for (vector<CecNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     CecNode* node = *p;
@@ -612,9 +612,9 @@ CecMgr::dump_eqgroup(ostream& s) const
 {
   for (ymuint i = 0; i < mNodeNum; ++ i) {
     SweepNode* snode = &mNodeArray[i];
-    if ( snode->mAigNode == NULL ) continue;
+    if ( snode->mAigNode == nullptr ) continue;
     if ( snode->rep_node() != snode ) continue;
-    if ( snode->next_eqnode() == NULL &&
+    if ( snode->next_eqnode() == nullptr &&
 	 snode->check_1mark() &&
 	 snode->check_0mark() ) continue;
     if ( !snode->check_1mark() ) {

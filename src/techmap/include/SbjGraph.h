@@ -41,7 +41,7 @@ public:
 
   /// @brief 入力側のノードを得る．
   /// @retval 入力側のノード 通常の枝の場合
-  /// @retval NULL 定数0に接続している枝の場合
+  /// @retval nullptr 定数0に接続している枝の場合
   const SbjNode*
   from() const;
 
@@ -52,7 +52,7 @@ public:
 
   /// @brief 入力側のノードを得る．
   /// @retval 入力側のノード 通常の枝の場合
-  /// @retval NULL 定数0に接続している枝の場合
+  /// @retval nullptr 定数0に接続している枝の場合
   SbjNode*
   from();
 
@@ -235,7 +235,7 @@ public:
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番めのファンインのノード
-  /// @note 該当するファンインがなければ NULL を返す．
+  /// @note 該当するファンインがなければ nullptr を返す．
   const SbjNode*
   fanin(ymuint pos) const;
 
@@ -247,7 +247,7 @@ public:
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番目の入力の枝
-  /// @note 該当するファンインの枝がなければ NULL を返す．
+  /// @note 該当するファンインの枝がなければ nullptr を返す．
   const SbjEdge*
   fanin_edge(ymuint pos) const;
 
@@ -311,14 +311,14 @@ private:
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番めのファンインのノード
-  /// @note 該当するファンインがなければ NULL を返す．
+  /// @note 該当するファンインがなければ nullptr を返す．
   SbjNode*
   fanin(ymuint pos);
 
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番目の入力の枝
-  /// @note 該当するファンインの枝がなければ NULL を返す．
+  /// @note 該当するファンインの枝がなければ nullptr を返す．
   SbjEdge*
   fanin_edge(ymuint pos);
 
@@ -449,7 +449,7 @@ public:
   /// @param[in] node ノード
   /// @param[in] inv 極性
   explicit
-  SbjHandle(SbjNode* node = NULL,
+  SbjHandle(SbjNode* node = nullptr,
 	    bool inv = false);
 
   /// @brief デストラクタ
@@ -697,7 +697,7 @@ public:
   /// @brief ID 番号によるノードの取得
   /// @param[in] id ID 番号 ( 0 <= id < max_node_id() )
   /// @return ID 番号が id のノードを返す．
-  /// @note 該当するノードが無い場合には NULL を返す．
+  /// @note 該当するノードが無い場合には nullptr を返す．
   const SbjNode*
   node(ymuint id) const;
 
@@ -852,7 +852,7 @@ public:
   /// @param[in] inv 極性
   /// @return 作成したノードを返す．
   SbjNode*
-  new_dff(SbjNode* inode = NULL,
+  new_dff(SbjNode* inode = nullptr,
 	  bool inv = false);
 
   /// @brief 出力ノードの内容を変更する
@@ -1075,8 +1075,8 @@ private:
 // コンストラクタ
 inline
 SbjEdge::SbjEdge() :
-  mFrom(NULL),
-  mTo(NULL),
+  mFrom(nullptr),
+  mTo(nullptr),
   mIpos(0U)
 {
 }
@@ -1688,7 +1688,7 @@ SbjGraph::max_node_id() const
 }
 
 // ID 番号が id のノードを取り出す．
-// 該当するノードが無い場合には NULL を返す．
+// 該当するノードが無い場合には nullptr を返す．
 inline
 const SbjNode*
 SbjGraph::node(ymuint id) const

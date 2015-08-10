@@ -46,7 +46,7 @@ public:
 
   /// @brief 入力側のノードを得る．(const 版)
   /// @retval 入力側のノード 通常の枝の場合
-  /// @retval NULL 定数0に接続している枝の場合
+  /// @retval nullptr 定数0に接続している枝の場合
   const LnNode*
   from() const;
 
@@ -57,7 +57,7 @@ public:
 
   /// @brief 入力側のノードを得る．
   /// @retval 入力側のノード 通常の枝の場合
-  /// @retval NULL 定数0に接続している枝の場合
+  /// @retval nullptr 定数0に接続している枝の場合
   LnNode*
   from();
 
@@ -215,28 +215,28 @@ public:
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号 ( 0 <= pos < fanin_num() )
   /// @return pos 番めのファンインのノード
-  /// @note 該当するファンインがなければ NULL を返す．
+  /// @note 該当するファンインがなければ nullptr を返す．
   const LnNode*
   fanin(ymuint pos) const;
 
   /// @brief ファンインのノードを得る．
   /// @param[in] pos 入力番号
   /// @return pos 番めのファンインのノード
-  /// @note 該当するファンインがなければ NULL を返す．
+  /// @note 該当するファンインがなければ nullptr を返す．
   LnNode*
   fanin(ymuint pos);
 
   /// @brief ファンインの枝を得る．(const 版)
   /// @param[in] pos 入力番号
   /// @return pos 番目の入力の枝
-  /// @note 該当するファンインの枝がなければ NULL を返す．
+  /// @note 該当するファンインの枝がなければ nullptr を返す．
   const LnEdge*
   fanin_edge(ymuint pos) const;
 
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号
   /// @return pos 番目の入力の枝
-  /// @note 該当するファンインの枝がなければ NULL を返す．
+  /// @note 該当するファンインの枝がなければ nullptr を返す．
   LnEdge*
   fanin_edge(ymuint pos);
 
@@ -503,7 +503,7 @@ public:
   /// @brief ID 番号によるノードの取得
   /// @param[in] id ID 番号
   /// @return ID 番号が id のノードを返す．
-  /// @note 該当するノードが無い場合には NULL を返す．
+  /// @note 該当するノードが無い場合には nullptr を返す．
   const LnNode*
   node(ymuint id) const;
 
@@ -794,8 +794,8 @@ dump_verilog(ostream& s,
 // コンストラクタ
 inline
 LnEdge::LnEdge() :
-  mFrom(NULL),
-  mTo(NULL),
+  mFrom(nullptr),
+  mTo(nullptr),
   mIpos(0)
 {
 }
@@ -1146,7 +1146,7 @@ LnGraph::max_node_id() const
 }
 
 // ID 番号が id のノードを取り出す．
-// 該当するノードが無い場合には NULL を返す．
+// 該当するノードが無い場合には nullptr を返す．
 inline
 const LnNode*
 LnGraph::node(ymuint id) const

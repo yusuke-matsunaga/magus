@@ -228,7 +228,7 @@ Cut::input(ymuint pos) const
 // @brief コンストラクタ
 inline
 CutListIterator::CutListIterator() :
-  mCut(NULL)
+  mCut(nullptr)
 {
 }
 
@@ -285,8 +285,8 @@ operator!=(CutListIterator a,
 // @brief コンストラクタ
 inline
 CutList::CutList() :
-  mTop(NULL),
-  mTail(NULL),
+  mTop(nullptr),
+  mTail(nullptr),
   mNum(0)
 {
 }
@@ -302,8 +302,8 @@ inline
 void
 CutList::clear()
 {
-  mTop = NULL;
-  mTail = NULL;
+  mTop = nullptr;
+  mTail = nullptr;
   mNum = 0;
 }
 
@@ -321,7 +321,7 @@ CutList::push_back(Cut* cut)
   }
   ++ mNum;
   // 念のため
-  cut->mLink = NULL;
+  cut->mLink = nullptr;
 }
 
 // @brief 先頭を表す反復子を返す．
@@ -337,7 +337,7 @@ inline
 CutListIterator
 CutList::end() const
 {
-  return CutListIterator(NULL);
+  return CutListIterator(nullptr);
 }
 
 // @brief 要素数を返す．
@@ -353,7 +353,7 @@ inline
 bool
 CutList::empty() const
 {
-  return mTop == NULL;
+  return mTop == nullptr;
 }
 
 END_NAMESPACE_YM_LUTMAP

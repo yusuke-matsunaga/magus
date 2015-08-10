@@ -40,7 +40,7 @@ RestoreLibrary::read_library(const string& filename)
     TclObj emsg;
     emsg << "Could not open " << filename;
     set_result(emsg);
-    return NULL;
+    return nullptr;
   }
 
   CellLibrary* library = CellLibrary::new_obj();

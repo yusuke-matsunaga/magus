@@ -32,7 +32,7 @@ MvnCmd::~MvnCmd()
 }
 
 // @brief カレントネットワークの取得
-// @note カレントネットワークが MvNetwork でない場合には NULL を返す．
+// @note カレントネットワークが MvNetwork でない場合には nullptr を返す．
 MvnMgr*
 MvnCmd::cur_network() const
 {

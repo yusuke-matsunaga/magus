@@ -25,7 +25,7 @@ Dfs::Dfs(ymuint num) :
     node->mId = i;
     node->mVisited = false;
     node->mOnStack = false;
-    node->mLink = NULL;
+    node->mLink = nullptr;
   }
   mRepNodes.reserve(num);
   mStack.reserve(num);
@@ -80,7 +80,7 @@ Dfs::scc()
     DfsNode* node = &mNodeArray[i];
     node->mVisited = false;
     node->mOnStack = false;
-    node->mLink = NULL;
+    node->mLink = nullptr;
   }
   for (ymuint i = 0; i < mNum; ++ i) {
     DfsNode* node = &mNodeArray[i];
@@ -127,7 +127,7 @@ Dfs::dfs(DfsNode* node)
     }
   }
   if ( node->mLowlink == node->mDefnumber ) {
-    for (DfsNode* last = NULL; last != node; ) {
+    for (DfsNode* last = nullptr; last != node; ) {
       DfsNode* node1 = mStack.back();
       mStack.pop_back();
       node1->mOnStack = false;
@@ -154,7 +154,7 @@ DfsHeap::DfsHeap(ymuint size_hint)
 DfsHeap::~DfsHeap()
 {
 }
-  
+
 // @brief 要素が空の時 true を返す．
 bool
 DfsHeap::empty() const
@@ -188,7 +188,7 @@ DfsHeap::get_min()
     return node;
   }
   else {
-    return NULL;
+    return nullptr;
   }
 }
 

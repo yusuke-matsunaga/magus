@@ -19,8 +19,8 @@ BEGIN_NAMESPACE_YM_LUTMAP
 // コンストラクタ
 CutHolder::CutHolder()
 {
-  mCutList = NULL;
-  mCurChunk = NULL;
+  mCutList = nullptr;
+  mCurChunk = nullptr;
   mLast = 0;
 }
 
@@ -39,7 +39,7 @@ CutHolder::clear()
        p != mChunk.end(); ++ p) {
     delete [] *p;
   }
-  mCurChunk = NULL;
+  mCurChunk = nullptr;
   mLast = 0;
   mChunk.clear();
 }
@@ -100,7 +100,7 @@ CutHolder::alloc_cut(ymuint ni)
 {
   ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const BdnNode*);
   ASSERT_COND(size < kPageSize );
-  if ( mCurChunk == NULL || mLast + size > kPageSize ) {
+  if ( mCurChunk == nullptr || mLast + size > kPageSize ) {
     mCurChunk = new char[kPageSize];
     mLast = 0;
     mChunk.push_back(mCurChunk);

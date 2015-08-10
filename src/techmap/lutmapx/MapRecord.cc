@@ -111,7 +111,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     const BdnNode* onode = *p;
     const BdnNode* node = onode->output_fanin();
     bool inv = onode->output_fanin_inv();
-    LnNode* mapnode = NULL;
+    LnNode* mapnode = nullptr;
     if ( node ) {
       mapnode = back_trace(node, inv, mapgraph);
       int depth1 = mNodeInfo[node->id()].mDepth;
@@ -142,7 +142,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     {
       const BdnNode* node = onode->fanin_data();
       bool inv = onode->fanin_data_inv();
-      LnNode* mapnode = NULL;
+      LnNode* mapnode = nullptr;
       if ( node ) {
 	mapnode = back_trace(node, inv, mapgraph);
 	int depth1 = mNodeInfo[node->id()].mDepth;
@@ -166,7 +166,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     {
       const BdnNode* node = onode->fanin_clock();
       bool inv = onode->fanin_clock_inv();
-      LnNode* mapnode = NULL;
+      LnNode* mapnode = nullptr;
       if ( node ) {
 	mapnode = back_trace(node, inv, mapgraph);
 	int depth1 = mNodeInfo[node->id()].mDepth;
@@ -180,7 +180,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     {
       const BdnNode* node = onode->fanin_set();
       bool inv = onode->fanin_set_inv();
-      LnNode* mapnode = NULL;
+      LnNode* mapnode = nullptr;
       if ( node ) {
 	mapnode = back_trace(node, inv, mapgraph);
 	int depth1 = mNodeInfo[node->id()].mDepth;
@@ -194,7 +194,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     {
       const BdnNode* node = onode->fanin_rst();
       bool inv = onode->fanin_rst_inv();
-      LnNode* mapnode = NULL;
+      LnNode* mapnode = nullptr;
       if ( node ) {
 	mapnode = back_trace(node, inv, mapgraph);
 	int depth1 = mNodeInfo[node->id()].mDepth;
@@ -215,16 +215,16 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
     ymuint nb = sbjport->bit_width();
     vector<LnNode*> tmp(nb);
     for (ymuint j = 0; j < nb; ++ j) {
-      LnNode* node = NULL;
+      LnNode* node = nullptr;
       const BdnNode* input = sbjport->input(j);
       const BdnNode* output = sbjport->output(j);
       if ( input ) {
 	node = mNodeInfo[input->id()].mMapNode[0];
-	ASSERT_COND( node != NULL );
+	ASSERT_COND( node != nullptr );
       }
       else if ( output ) {
 	node = mNodeInfo[output->id()].mMapNode[0];
-	ASSERT_COND( node != NULL );
+	ASSERT_COND( node != nullptr );
       }
       tmp[j] = node;
     }
@@ -392,7 +392,7 @@ MapRecord::estimate(const BdnMgr& sbjgraph)
     const BdnNode* onode = *p;
     const BdnNode* node = onode->output_fanin();
     if ( node && node->is_logic() ) {
-      if ( mNodeInfo[node->id()].mCut == NULL ) {
+      if ( mNodeInfo[node->id()].mCut == nullptr ) {
 	lut_num = -1;
 	break;
       }

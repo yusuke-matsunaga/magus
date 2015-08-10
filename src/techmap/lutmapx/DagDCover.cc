@@ -46,7 +46,7 @@ DagDCoverFactory::operator()(const string& args)
     return new WeightDCover(3);
   }
   ASSERT_NOT_REACHED;
-  return NULL;
+  return nullptr;
 }
 
 END_NAMESPACE_YM_LUTMAP

@@ -235,11 +235,11 @@ inline
 CecNode::CecNode() :
   mFlags(0),
   mRepNode(this),
-  mEqLink(NULL),
-  mEqTail(NULL)
+  mEqLink(nullptr),
+  mEqTail(nullptr)
 {
-  mFanins[0] = NULL;
-  mFanins[1] = NULL;
+  mFanins[0] = nullptr;
+  mFanins[1] = nullptr;
 }
 
 // @brief デストラクタ
@@ -396,7 +396,7 @@ inline
 bool
 CecNode::check_rep() const
 {
-  return mRepNode == this && mEqLink != NULL;
+  return mRepNode == this && mEqLink != nullptr;
 }
 
 // @brief 代表ノードを返す．
@@ -451,7 +451,7 @@ CecNode::add_eqnode(CecNode* node)
   mEqTail->mEqLink = node;
   mEqTail = node;
   node->mRepNode = this;
-  node->mEqLink = NULL;
+  node->mEqLink = nullptr;
 }
 
 // @brief 極性反転の印をつける．

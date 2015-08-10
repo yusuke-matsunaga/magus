@@ -58,7 +58,7 @@ ReadLibrary::cmd_proc(TclObjVector& objv)
 
   // 実際の読み込みを行う．
   const CellLibrary* lib = read_library(ex_file_name);
-  if ( lib == NULL ) {
+  if ( lib == nullptr ) {
     TclObj emsg = mh.msg_obj();
     emsg << "Error occurred in reading " << objv[1];
     set_result(emsg);

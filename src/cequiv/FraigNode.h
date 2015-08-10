@@ -467,7 +467,7 @@ inline
 bool
 FraigNode::check_rep() const
 {
-  return mRepNode == this && mEqLink != NULL;
+  return mRepNode == this && mEqLink != nullptr;
 }
 
 // @brief 代表ノードを返す．
@@ -522,7 +522,7 @@ FraigNode::add_eqnode(FraigNode* node)
   mEqTail->mEqLink = node;
   mEqTail = node;
   node->mRepNode = this;
-  node->mEqLink = NULL;
+  node->mEqLink = nullptr;
 }
 
 // @brief 0 の値を取ったことを記録する．
