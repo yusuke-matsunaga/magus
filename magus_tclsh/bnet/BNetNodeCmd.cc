@@ -380,20 +380,22 @@ NodeCmd::foreach_node(const TclObj& cond)
     BNode* node = *p;
 
     // 条件コマンドを実行する．
-    bool b;
-    int code = expr_bool(cond, b);
-    if ( code == TCL_ERROR ) {
-      // 結果がエラー？ 話にならない．
-      result = TCL_ERROR;
-      break;
-    }
-    if ( b == false ) {
-      // 判定結果が偽なら NodeProc() は実行しない．
-      continue;
+    if ( cond.is_validptr() ) {
+      bool b = true;
+      int code = expr_bool(cond, b);
+      if ( code == TCL_ERROR ) {
+	// 結果がエラー？ 話にならない．
+	result = TCL_ERROR;
+	break;
+      }
+      if ( b == false ) {
+	// 判定結果が偽なら NodeProc() は実行しない．
+	continue;
+      }
     }
 
     // 本当の処理関数を呼び出す．
-    code = node_proc(node);
+    int code = node_proc(node);
     if ( code == TCL_ERROR ) {
       // 異常終了
       result = TCL_ERROR;

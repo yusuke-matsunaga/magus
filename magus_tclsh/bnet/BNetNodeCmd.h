@@ -143,7 +143,7 @@ private:
   // cond が与えられたときは実行時にノード毎に評価して
   // 真の時のみ NodeProc() を呼び出す．
   int
-  foreach_node(const TclObj& cond = nullptr);
+  foreach_node(const TclObj& cond = TclObj());
 
   // 一つのノードに対する処理
   // 処理結果を返す．
