@@ -346,6 +346,7 @@ MapRecord::back_trace(const BdnNode* node,
 
   ymuint np = 1 << ni;
   vector<int> tv(np);
+#if 0
   Expr expr = cut->expr();
   if ( inv ) {
     expr = ~expr;
@@ -353,6 +354,24 @@ MapRecord::back_trace(const BdnNode* node,
 
   // 論理式から真理値表を作る．
   make_tv(ni, expr, tv);
+#else
+  // カットの実現している関数の真理値表を得る．
+  cut->make_tv(inv, tv);
+
+  { // make_tv() の検証用のコード
+    Expr expr = cut->expr();
+    if ( inv ) {
+      expr = ~expr;
+    }
+
+    // 論理式から真理値表を作る．
+    vector<int> tv2(np);
+    make_tv(ni, expr, tv2);
+    for (ymuint i = 0; i < np; ++ i) {
+      ASSERT_COND( tv[i] == tv2[i] );
+    }
+  }
+#endif
 
   // 新しいノードを作り mNodeMap に登録する．
   mapnode = mapnetwork.new_lut(mTmpFanins, tv);

@@ -56,6 +56,15 @@ public:
   Expr
   expr() const;
 
+  /// @brief 論理関数を表す真理値表を得る．
+  /// @param[in] inv 出力を反転する時 true にするフラグ
+  /// @param[out] tv 結果の真理値表を格納するベクタ
+  ///
+  /// tv のサイズは 2^{input_num()} を仮定している．
+  void
+  make_tv(bool inv,
+	  vector<int>& tv) const;
+
   /// @brief デバッグ用の表示ルーティン
   /// @param[in] s 出力先のストリーム
   void

@@ -82,6 +82,126 @@ Cut::expr() const
   return calc_expr_for_node(root(), logmap);
 }
 
+BEGIN_NONAMESPACE
+
+// valmap に終端のノード番号をキーとしてビットベクタ値を登録する．
+// その時の node の値を計算する．
+ymuint64
+eval_node(const BdnNode* node,
+	  HashMap<ymuint, ymuint64>& valmap)
+{
+  ymuint64 ans;
+  if ( node == nullptr ) {
+    ans =  0ULL;
+  }
+  else {
+    if ( !valmap.find(node->id(), ans) ) {
+      ASSERT_COND( node->is_logic() );
+
+      ymuint64 val0 = eval_node(node->fanin0(), valmap);
+      ymuint64 val1 = eval_node(node->fanin1(), valmap);
+
+      if ( node->fanin0_inv() ) {
+	val0 ^= 0xFFFFFFFFFFFFFFFFULL;
+      }
+      if ( node->fanin1_inv() ) {
+	val1 ^= 0xFFFFFFFFFFFFFFFFULL;
+      }
+      if ( node->is_xor() ) {
+	ans = val0 ^ val1;
+      }
+      else {
+	ans = val0 & val1;
+      }
+      valmap.add(node->id(), ans);
+    }
+  }
+  return ans;
+}
+
+// カットの表している論理関数を評価する．
+ymuint64
+eval_cut(const Cut* cut,
+	 const vector<ymuint64>& vals)
+{
+  ymuint ni = cut->input_num();
+  ASSERT_COND( ni == vals.size() );
+  HashMap<ymuint, ymuint64> valmap;
+  for (ymuint i = 0; i < ni; ++ i) {
+    const BdnNode* inode = cut->input(i);
+    valmap.add(inode->id(), vals[i]);
+  }
+  return eval_node(cut->root(), valmap);
+}
+
+END_NONAMESPACE
+
+// @brief 論理関数を表す真理値表を得る．
+// @param[in] inv 出力を反転する時 true にするフラグ
+// @param[out] tv 結果の真理値表を格納するベクタ
+//
+// tv のサイズは 2^{input_num()} を仮定している．
+void
+Cut::make_tv(bool inv,
+	     vector<int>& tv) const
+{
+  ymuint ni = input_num();
+  ymuint np = 1 << ni;
+  ASSERT_COND( tv.size() == np );
+
+  // 1 の値と 0 の値
+  // inv == true の時には逆にする．
+  int v1 = inv ? 0 : 1;
+  int v0 = inv ? 1 : 0;
+
+  // 真理値表の各変数の値を表すビットベクタ
+  // 6入力以上の場合には1語に収まらないので複数回にわけて処理する．
+  vector<ymuint64> vals(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    vals[i] = 0ULL;
+  }
+
+  ymuint64 s = 1ULL;
+  ymuint p0 = 0;
+  for (ymuint p = 0; p < np; ++ p) {
+    for (ymuint i = 0; i < ni; ++ i) {
+      if ( p & (1U << i) ) {
+	vals[i] |= s;
+      }
+    }
+    s <<= 1;
+    if ( s == 0ULL ) {
+      // 64 パタン目
+      ymuint64 tmp = eval_cut(this, vals);
+      for (ymuint p1 = p0; p1 < p; ++ p1) {
+	if ( tmp & (1ULL << (p1 - p0)) ) {
+	  tv[p1] = v1;
+	}
+	else {
+	  tv[p1] = v0;
+	}
+      }
+      s = 1ULL;
+      p0 = p + 1;
+      for (ymuint i = 0; i < ni; ++ i) {
+	vals[i] = 0ULL;
+      }
+    }
+  }
+  if ( s != 1ULL ) {
+    // 処理されていない残りがあった．
+    ymuint64 tmp = eval_cut(this, vals);
+    for (ymuint p1 = p0; p1 < np; ++ p1) {
+      if ( tmp & (1ULL << (p1 - p0)) ) {
+	tv[p1] = v1;
+      }
+      else {
+	tv[p1] = v0;
+      }
+    }
+  }
+}
+
 // デバッグ用の表示関数
 void
 Cut::dump(ostream& s) const
