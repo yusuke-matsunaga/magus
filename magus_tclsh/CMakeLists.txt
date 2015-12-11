@@ -138,7 +138,7 @@ target_link_libraries (magus_tclsh
   magus_cequiv
   magus_seal
   magus_lutmap
-  magus_techmap
+  magus_cellmap
   ym_networks
   ym_cell
   ym_verilog
@@ -177,7 +177,7 @@ target_link_libraries (magus_tclsh_p
   magus_cequiv_p
   magus_seal_p
   magus_lutmap_p
-  magus_techmap_p
+  magus_cellmap_p
   ym_networks_p
   ym_cell_p
   ym_verilog_p
@@ -218,7 +218,7 @@ target_link_libraries (magus_tclsh_d
   magus_cequiv_d
   magus_seal_d
   magus_lutmap_d
-  magus_techmap_d
+  magus_cellmap_d
   ym_networks_d
   ym_cell_d
   ym_verilog_d

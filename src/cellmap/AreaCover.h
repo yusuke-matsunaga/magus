@@ -1,11 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_CELLMAP_AREACOVER_H
-#define LIBYM_TECHMAP_CELLMAP_AREACOVER_H
+﻿#ifndef MAGUS_CELLMAP_AREACOVER_H
+#define MAGUS_CELLMAP_AREACOVER_H
 
-/// @file libym_techmap/cellmap/AreaCover.h
+/// @file cellmap/AreaCover.h
 /// @brief AreaCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -146,4 +146,4 @@ AreaCover::cost(const BdnNode* node,
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // LIBYM_TECHMAP_CELLMAP_AREACOVER_H
+#endif // MAGUS_CELLMAP_AREACOVER_H

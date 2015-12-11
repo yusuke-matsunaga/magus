@@ -1,5 +1,5 @@
-﻿#ifndef PATMATCHER_H
-#define PATMATCHER_H
+﻿#ifndef MAGUS_CELLMAP_PATMATCHER_H
+#define MAGUS_CELLMAP_PATMATCHER_H
 
 /// @file PatMatcher.h
 /// @brief PatMatcher のヘッダファイル
@@ -138,4 +138,4 @@ PatMatcher::leaf_inv(ymuint pos) const
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // PATMATCHER_H
+#endif // MAGUS_CELLMAP_PATMATCHER_H

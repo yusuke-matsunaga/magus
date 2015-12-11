@@ -1,5 +1,5 @@
-﻿#ifndef PAT2MATCHER_H
-#define PAT2MATCHER_H
+﻿#ifndef MAGUS_CELLMAP_PAT2MATCHER_H
+#define MAGUS_CELLMAP_PAT2MATCHER_H
 
 /// @file Pat2Matcher.h
 /// @brief Pat2Matcher のヘッダファイル
@@ -136,4 +136,4 @@ Pat2Matcher::leaf_inv(ymuint pos) const
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // PAT2MATCHER_H
+#endif // MAGUS_CELLMAP_PAT2MATCHER_H

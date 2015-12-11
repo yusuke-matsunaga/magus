@@ -1,11 +1,11 @@
-﻿#ifndef MAPRECORD_H
-#define MAPRECORD_H
+﻿#ifndef MAGUS_CELLMAP_MAPRECORD_H
+#define MAGUS_CELLMAP_MAPRECORD_H
 
 /// @file MapRecord.h
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -259,4 +259,4 @@ private:
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // MAPRECORD_H
+#endif // MAGUS_CELLMAP_MAPRECORD_H

@@ -1,11 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_CELLMAP_MATCH_H
-#define LIBYM_TECHMAP_CELLMAP_MATCH_H
+﻿#ifndef MAGUS_CELLMAP_MATCH_H
+#define MAGUS_CELLMAP_MATCH_H
 
-/// @file libym_techmap/cellmap/Match.h
+/// @file cellmap/Match.h
 /// @brief Match のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -156,4 +156,4 @@ Match::leaf_inv(ymuint pos) const
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // LIBYM_TECHMAP_CELLMAP_MATCH_H
+#endif // MAGUS_CELLMAP_MATCH_H
