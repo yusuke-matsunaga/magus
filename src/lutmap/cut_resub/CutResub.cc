@@ -15,6 +15,8 @@
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
+#include "CrNode.h"
+
 
 //#define DEBUG_UPDATE
 

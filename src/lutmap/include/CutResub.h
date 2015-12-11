@@ -1,13 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_CUTRESUB_H
-#define LIBYM_TECHMAP_LUTMAP_CUTRESUB_H
+﻿#ifndef MAGUS_LUTMAP_CUTRESUB_H
+#define MAGUS_LUTMAP_CUTRESUB_H
 
-/// @file libym_techmap/lutmap/CutResub.h
+/// @file lutmap/CutResub.h
 /// @brief CutResub のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CutResub.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,7 +13,6 @@
 #include "YmNetworks/bdn.h"
 
 #include "YmUtils/SimpleAlloc.h"
-#include "CrNode.h"
 #include "CrHeap.h"
 #include "CrLevelQ.h"
 
@@ -24,6 +21,7 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 class Cut;
 class CutHolder;
+class CrNode;
 class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
@@ -181,4 +179,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LIBYM_TECHMAP_LUTMAP_CUTRESUB_H
+#endif // MAGUS_LUTMAP_CUTRESUB_H

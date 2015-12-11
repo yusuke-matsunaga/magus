@@ -1,13 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_CRHEAP_H
-#define LIBYM_TECHMAP_LUTMAP_CRHEAP_H
+﻿#ifndef MAGUS_LUTMAP_CRHEAP_H
+#define MAGUS_LUTMAP_CRHEAP_H
 
-/// @file libym_techmap/lutmap/CrHeap.h
+/// @file lutmap/CrHeap.h
 /// @brief CrHeap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CrHeap.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -93,4 +91,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LIBYM_TECHMAP_LUTMAP_CRHEAP_H
+#endif // MAGUS_LUTMAP_CRHEAP_H

@@ -1,13 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_MAPRECORD_H
-#define LIBYM_TECHMAP_LUTMAP_MAPRECORD_H
+﻿#ifndef MAGUS_LUTMAP_MAPRECORD_H
+#define MAGUS_LUTMAP_MAPRECORD_H
 
-/// @file libym_techmap/lutmap/MapRecord.h
+/// @file lutmap/MapRecord.h
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MapRecord.h 1293 2008-02-21 02:25:52Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -159,4 +157,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LIBYM_TECHMAP_LUTMAP_MAPRECORD_H
+#endif // MAGUS_LUTMAP_MAPRECORD_H

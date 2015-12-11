@@ -2,85 +2,17 @@
 /// @file libym_techmap/lutmap/Cut.cc
 /// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: Cut.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+//
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "Cut.h"
 #include "YmNetworks/BdnNode.h"
+#include "YmUtils/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-// 空のコンストラクタ
-Cut::Cut() :
-  mLink(nullptr)
-{
-}
-
-// @brief デストラクタ
-Cut::~Cut()
-{
-}
-
-
-BEGIN_NONAMESPACE
-
-// inputs に登録されているノードを終端と見なしたときの node の表す論理式
-// を返す．
-Expr
-calc_expr_for_node(const BdnNode* node,
-		   const HashMap<ymuint, Expr>& logmap)
-{
-  Expr ans;
-  if ( node == nullptr ) {
-    ans =  Expr::make_zero();
-  }
-  else {
-    if ( !logmap.find(node->id(), ans) ) {
-      ASSERT_COND( node->is_logic() );
-
-      Expr cexp0 = calc_expr_for_node(node->fanin0(), logmap);
-      Expr cexp1 = calc_expr_for_node(node->fanin1(), logmap);
-
-      if ( node->fanin0_inv() ) {
-	cexp0 = ~cexp0;
-      }
-      if ( node->fanin1_inv() ) {
-	cexp1 = ~cexp1;
-      }
-      if ( node->is_xor() ) {
-	ans = cexp0 ^ cexp1;
-      }
-      else {
-	ans = cexp0 & cexp1;
-      }
-    }
-  }
-  return ans;
-}
-
-END_NONAMESPACE
-
-// @brief 内容を表す論理式を得る．
-Expr
-Cut::expr() const
-{
-  if ( root() == nullptr ) {
-    return Expr::make_zero();
-  }
-
-  HashMap<ymuint, Expr> logmap;
-  for (ymuint i = 0; i < input_num(); i ++) {
-    const BdnNode* node = mInputs[i];
-    ymuint id = node->id();
-    logmap.add(id, Expr::make_posiliteral(VarId(i)));
-  }
-  return calc_expr_for_node(root(), logmap);
-}
 
 BEGIN_NONAMESPACE
 
@@ -90,32 +22,40 @@ ymuint64
 eval_node(const BdnNode* node,
 	  HashMap<ymuint, ymuint64>& valmap)
 {
-  ymuint64 ans;
   if ( node == nullptr ) {
-    ans =  0ULL;
+    return 0ULL;
   }
-  else {
-    if ( !valmap.find(node->id(), ans) ) {
-      ASSERT_COND( node->is_logic() );
 
-      ymuint64 val0 = eval_node(node->fanin0(), valmap);
-      ymuint64 val1 = eval_node(node->fanin1(), valmap);
+  // まずすでに評価済みかどうか調べる．
+  // 葉のノードの場合もここに登録されている．
+  ymuint64 ans;
+  if ( !valmap.find(node->id(), ans) ) {
+    // 未登録の場合は必ず論理ノード
+    ASSERT_COND( node->is_logic() );
 
-      if ( node->fanin0_inv() ) {
-	val0 ^= 0xFFFFFFFFFFFFFFFFULL;
-      }
-      if ( node->fanin1_inv() ) {
-	val1 ^= 0xFFFFFFFFFFFFFFFFULL;
-      }
-      if ( node->is_xor() ) {
-	ans = val0 ^ val1;
-      }
-      else {
-	ans = val0 & val1;
-      }
-      valmap.add(node->id(), ans);
+    // 子供の値を評価する．
+    ymuint64 val0 = eval_node(node->fanin0(), valmap);
+    if ( node->fanin0_inv() ) {
+      val0 ^= 0xFFFFFFFFFFFFFFFFULL;
     }
+
+    ymuint64 val1 = eval_node(node->fanin1(), valmap);
+    if ( node->fanin1_inv() ) {
+      val1 ^= 0xFFFFFFFFFFFFFFFFULL;
+    }
+
+    // 自分の値を計算する．
+    if ( node->is_xor() ) {
+      ans = val0 ^ val1;
+    }
+    else {
+      ans = val0 & val1;
+    }
+
+    // 登録しておく．
+    valmap.add(node->id(), ans);
   }
+
   return ans;
 }
 
@@ -135,6 +75,29 @@ eval_cut(const Cut* cut,
 }
 
 END_NONAMESPACE
+
+// @brief 論理シミュレーションを行う．
+// @param[in] vals 葉のノードの値
+// @return 値のノードの値を返す．
+//
+// vals[i] が input(i) の葉の値に対応する．
+// 値は64ビットのビットベクタで表す．
+ymuint64
+Cut::eval(const vector<ymuint64>& vals) const
+{
+  ymuint ni = input_num();
+  ASSERT_COND( ni == vals.size() );
+
+  // ノードの ID 番号をキーにして値を保持するハッシュ表
+  HashMap<ymuint, ymuint64> valmap;
+  // 葉のノードの値を登録する．
+  for (ymuint i = 0; i < ni; ++ i) {
+    valmap.add(input(i)->id(), vals[i]);
+  }
+
+  // 評価を行う．
+  return eval_node(root(), valmap);
+}
 
 // @brief 論理関数を表す真理値表を得る．
 // @param[in] inv 出力を反転する時 true にするフラグ
@@ -203,8 +166,9 @@ Cut::make_tv(bool inv,
 }
 
 // デバッグ用の表示関数
+// @param[in] s 出力先のストリーム
 void
-Cut::dump(ostream& s) const
+Cut::print(ostream& s) const
 {
   if ( root() == nullptr ) {
     s << "null cut" << endl;
@@ -217,8 +181,6 @@ Cut::dump(ostream& s) const
       s << comma << "Node[" << node->id() << "]";
       comma = ", ";
     }
-    s << " : ";
-    s << expr();
     s << endl;
   }
 }

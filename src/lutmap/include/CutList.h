@@ -1,95 +1,19 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_CUT_H
-#define LIBYM_TECHMAP_LUTMAP_CUT_H
+﻿#ifndef MAGUS_LUTMAP_CUTLIST_H
+#define MAGUS_LUTMAP_CUTLIST_H
 
-/// @file libym_techmap/lutmap/Cut.h
-/// @brief Cut のヘッダファイル
+/// @file lutmap/CutList.h
+/// @brief CutList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Cut.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
 #include "YmNetworks/bdn.h"
-#include "YmLogic/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
-
-//////////////////////////////////////////////////////////////////////
-/// @class Cut Cut.h "Cut.h"
-/// @brief カットを表すクラス
-//////////////////////////////////////////////////////////////////////
-class Cut
-{
-  friend class CutHolder;
-  friend class CutList;
-  friend class CutListIterator;
-
-private:
-
-  /// @brief 空のコンストラクタ
-  /// @note 内容は正しくない．
-  Cut();
-
-  /// @brief デストラクタ
-  ~Cut();
-
-
-public:
-
-  /// @brief 根のノードを得る．
-  const BdnNode*
-  root() const;
-
-  /// @brief 入力のサイズを得る．
-  ymuint
-  input_num() const;
-
-  /// @brief pos 番目の入力を得る．
-  const BdnNode*
-  input(ymuint pos) const;
-
-  /// @brief 内容を表す論理式を得る．
-  Expr
-  expr() const;
-
-  /// @brief 論理関数を表す真理値表を得る．
-  /// @param[in] inv 出力を反転する時 true にするフラグ
-  /// @param[out] tv 結果の真理値表を格納するベクタ
-  ///
-  /// tv のサイズは 2^{input_num()} を仮定している．
-  void
-  make_tv(bool inv,
-	  vector<int>& tv) const;
-
-  /// @brief デバッグ用の表示ルーティン
-  /// @param[in] s 出力先のストリーム
-  void
-  dump(ostream& s) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 根のノード
-  const BdnNode* mRoot;
-
-  // 次のカットを指すポインタ
-  Cut* mLink;
-
-  // 入力数
-  ymuint32 mNi;
-
-  // 入力のノード配列
-  const BdnNode* mInputs[1];
-
-};
-
 
 //////////////////////////////////////////////////////////////////////
 /// @class CutListIterator Cut.h "Cut.h"
@@ -98,9 +22,16 @@ private:
 class CutListIterator
 {
   friend class CutList;
+
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 通常のコンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
 
   /// @brief コンストラクタ
+  ///
+  /// 内容は不定
   CutListIterator();
 
   /// @brief デストラクタ
@@ -108,12 +39,18 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // CutList が用いるコンストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を指定したコンストラクタ
   CutListIterator(Cut* cut);
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief カットを得る．
   const Cut*
@@ -154,8 +91,13 @@ operator!=(CutListIterator a,
 class CutList
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
+  ///
+  /// 空のリストとして初期化される．
   CutList();
 
   /// @brief デストラクタ
@@ -163,12 +105,16 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容をクリアする．
   void
   clear();
 
   /// @brief カットを末尾に追加する．
+  /// @param[in] cut 対象のカット
   void
   push_back(Cut* cut);
 
@@ -209,30 +155,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// 根のノードを得る．
-inline
-const BdnNode*
-Cut::root() const
-{
-  return mRoot;
-}
-
-// 入力のサイズを得る．
-inline
-ymuint
-Cut::input_num() const
-{
-  return mNi;
-}
-
-// pos 番目の入力を得る．
-inline
-const BdnNode*
-Cut::input(ymuint pos) const
-{
-  return mInputs[pos];
-}
 
 // @brief コンストラクタ
 inline
@@ -367,4 +289,4 @@ CutList::empty() const
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LIBYM_TECHMAP_LUTMAP_CUT_H
+#endif // MAGUS_LUTMAP_CUTLIST_H

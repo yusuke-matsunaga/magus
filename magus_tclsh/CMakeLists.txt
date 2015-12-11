@@ -137,6 +137,7 @@ target_compile_definitions (magus_tclsh
 target_link_libraries (magus_tclsh
   magus_cequiv
   magus_seal
+  magus_lutmap
   magus_techmap
   ym_networks
   ym_cell
@@ -175,6 +176,7 @@ target_compile_definitions (magus_tclsh_p
 target_link_libraries (magus_tclsh_p
   magus_cequiv_p
   magus_seal_p
+  magus_lutmap_p
   magus_techmap_p
   ym_networks_p
   ym_cell_p
@@ -215,6 +217,7 @@ target_compile_options (magus_tclsh_d
 target_link_libraries (magus_tclsh_d
   magus_cequiv_d
   magus_seal_d
+  magus_lutmap_d
   magus_techmap_d
   ym_networks_d
   ym_cell_d

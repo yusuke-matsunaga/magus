@@ -3,14 +3,13 @@
 /// @brief CutHolder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CutHolder.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "CutHolder.h"
 #include "Cut.h"
+#include "CutList.h"
 #include "YmNetworks/BdnMgr.h"
 
 

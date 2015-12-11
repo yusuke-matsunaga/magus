@@ -83,6 +83,7 @@ include_directories (
 # ===================================================================
 add_subdirectory (src/cequiv)
 add_subdirectory (src/seal)
+add_subdirectory (src/lutmap)
 add_subdirectory (src/techmap)
 
 if (YmTclpp_FOUND)

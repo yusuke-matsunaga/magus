@@ -235,6 +235,7 @@ MapRecord::gen_mapgraph(const BdnMgr& sbjgraph,
   depth = max_depth;
 }
 
+#if 0
 BEGIN_NONAMESPACE
 
 // 論理式から真理値表を作る．
@@ -291,6 +292,7 @@ make_tv(ymuint ni,
 }
 
 END_NONAMESPACE
+#endif
 
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
@@ -358,6 +360,7 @@ MapRecord::back_trace(const BdnNode* node,
   // カットの実現している関数の真理値表を得る．
   cut->make_tv(inv, tv);
 
+#if 0
   { // make_tv() の検証用のコード
     Expr expr = cut->expr();
     if ( inv ) {
@@ -371,6 +374,7 @@ MapRecord::back_trace(const BdnNode* node,
       ASSERT_COND( tv[i] == tv2[i] );
     }
   }
+#endif
 #endif
 
   // 新しいノードを作り mNodeMap に登録する．
