@@ -1,9 +1,9 @@
 ﻿
-/// @file libym_techmap/lutmap/LutMap.cc
+/// @file lutmap/LutMap.cc
 /// @brief LutMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 

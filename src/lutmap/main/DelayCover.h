@@ -1,13 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_DELAYCOVER_H
-#define LIBYM_TECHMAP_LUTMAP_DELAYCOVER_H
+﻿#ifndef MAGUS_LUTMAP_DELAYCOVER_H
+#define MAGUS_LUTMAP_DELAYCOVER_H
 
-/// @file libym_techmap/lutmap/DelayCover.h
+/// @file lutmap/DelayCover.h
 /// @brief DelayCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DelayCover.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,6 +25,9 @@ BEGIN_NAMESPACE_YM_LUTMAP
 class DelayCover
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
   DelayCover();
@@ -36,6 +37,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 遅延最小化マッピングを行う．
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -91,7 +95,11 @@ private:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられるデータ構造
+  //////////////////////////////////////////////////////////////////////
 
+  // ノードごとの作業領域
   struct NodeInfo
   {
 
@@ -138,4 +146,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LIBYM_TECHMAP_LUTMAP_DELAYCOVER_H
+#endif // MAGUS_LUTMAP_DELAYCOVER_H

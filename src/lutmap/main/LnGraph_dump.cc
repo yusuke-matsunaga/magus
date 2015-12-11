@@ -1,11 +1,9 @@
 ﻿
-/// @file libym_techmap/lutmap/LnGraph_dump.cc
+/// @file lutmap/LnGraph_dump.cc
 /// @brief LnGraph 用の dump() の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LutNetwork.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 

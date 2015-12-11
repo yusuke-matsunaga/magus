@@ -1,13 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_AREACOVER_H
-#define LIBYM_TECHMAP_LUTMAP_AREACOVER_H
+﻿#ifndef MAGUS_LUTMAP_AREACOVER_H
+#define MAGUS_LUTMAP_AREACOVER_H
 
-/// @file libym_techmap/AreaCover.h
+/// @file lutmap/AreaCover.h
 /// @brief DAG covering のヒューリスティック
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: WeightCover.h 1077 2007-12-03 10:18:47Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -27,6 +25,9 @@ class MapRecord;
 class AreaCover
 {
 public:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ/デストラクタ
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
   AreaCover();
@@ -36,6 +37,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 面積最小化マッピングを行う．
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -102,4 +106,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LIBYM_TECHMAP_LUTMAP_AREACOVER_H
+#endif // MAGUS_LUTMAP_AREACOVER_H

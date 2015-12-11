@@ -1,11 +1,9 @@
 ﻿
-/// @file magus/lutmap/DagDCover.cc
+/// @file lutmap/DagDCover.cc
 /// @brief DagDCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DagDCover.cc 1293 2008-02-21 02:25:52Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 

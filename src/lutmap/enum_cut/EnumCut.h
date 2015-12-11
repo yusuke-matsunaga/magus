@@ -1,13 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_ENUMCUT_H
-#define LIBYM_TECHMAP_LUTMAP_ENUMCUT_H
+﻿#ifndef MAGUS_LUTMAP_ENUMCUT_H
+#define MAGUS_LUTMAP_ENUMCUT_H
 
-/// @file libym_techmap/lutmap/EnumCut.h
+/// @file lutmap/EnumCut.h
 /// @brief EnumCut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EnumCut.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 

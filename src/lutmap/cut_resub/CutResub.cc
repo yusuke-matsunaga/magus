@@ -1,11 +1,9 @@
 ﻿
-/// @file libym_techmap/lutmap/CutResub.cc
+/// @file lutmap/CutResub.cc
 /// @brief CutResub の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: CutResub.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 

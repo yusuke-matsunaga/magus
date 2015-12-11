@@ -1,11 +1,9 @@
 ﻿
-/// @file libym_techmap/lutmap/DelayCover.cc
+/// @file lutmap/DelayCover.cc
 /// @brief DelayCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DelayCover.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 

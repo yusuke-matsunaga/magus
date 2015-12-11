@@ -1,13 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_LUTMAP_ADCOST_H
-#define LIBYM_TECHMAP_LUTMAP_ADCOST_H
+﻿#ifndef MAGUS_LUTMAP_ADCOST_H
+#define MAGUS_LUTMAP_ADCOST_H
 
-/// @file libym_techmap/lutmap/ADCost.h
+/// @file lutmap/ADCost.h
 /// @brief ADCost のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: ADCost.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "lutmap_nsdef.h"
@@ -539,4 +537,4 @@ ADCostList<AreaT>::insert(const Cut* cut,
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LIBYM_TECHMAP_LUTMAP_ADCOST_H
+#endif // MAGUS_LUTMAP_ADCOST_H
