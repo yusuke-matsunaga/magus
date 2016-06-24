@@ -5,15 +5,12 @@
 /// @brief NetHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NetHandle.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "magus_nsdef.h"
-#include "YmNetworks/bnet.h"
-#include "YmNetworks/bdn.h"
-#include "YmNetworks/mvn.h"
+#include "magus.h"
+#include "ym/bnet.h"
+#include "ym/mvn.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -32,11 +29,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief NetHandle の表す型
-  enum tType {
-    /// @brief BNetwork
-    kMagBNet,
-    /// @brief BdnMgr
-    kMagBdn,
+  enum Type {
+    /// @brief BnNetwork
+    kMagBn,
     /// @brief MvNetwork
     kMagMvn
   };
@@ -65,28 +60,18 @@ public:
 
   /// @brief 型を返す．
   virtual
-  tType
+  Type
   type() const = 0;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
-  const BNetwork*
+  const BnNetwork*
   bnetwork() const;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
-  BNetwork*
+  BnNetwork*
   _bnetwork();
-
-  /// @brief BdnMgr を得る．
-  virtual
-  const BdnMgr*
-  bdn() const;
-
-  /// @brief BdnMgr を得る．
-  virtual
-  BdnMgr*
-  _bdn();
 
   /// @brief MvNetwork を得る．
   virtual

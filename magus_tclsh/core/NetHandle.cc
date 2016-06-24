@@ -3,8 +3,6 @@
 /// @brief NetHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NetHandle.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -31,30 +29,16 @@ NetHandle::~NetHandle()
 {
 }
 
-// @brief BNetwork を得る．
-const BNetwork*
+// @brief BnNetwork を得る．
+const BnNetwork*
 NetHandle::bnetwork() const
 {
   return nullptr;
 }
 
-// @brief BNetwork を得る．
-BNetwork*
+// @brief BnNetwork を得る．
+BnNetwork*
 NetHandle::_bnetwork()
-{
-  return nullptr;
-}
-
-// @brief BdnMgr を得る．
-const BdnMgr*
-NetHandle::bdn() const
-{
-  return nullptr;
-}
-
-// @brief BdnMgr を得る．
-BdnMgr*
-NetHandle::_bdn()
 {
   return nullptr;
 }

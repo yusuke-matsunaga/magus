@@ -10,7 +10,6 @@
 
 
 #include "MagCmd.h"
-#include "YmNetworks/CmnMgr.h"
 
 
 /// @brief techmap 用の名前空間の開始
@@ -36,8 +35,7 @@ class TechmapCmd :
 public:
 
   /// @brief コンストラクタ
-  TechmapCmd(MagMgr* mgr,
-	     CmnMgr& cmnmgr);
+  TechmapCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
@@ -46,9 +44,9 @@ public:
 
 protected:
 
-  /// @brief セルネットワークを得る．
-  CmnMgr&
-  cmnmgr();
+  /// @brief 結果を納めるネットワーク
+  BnNetwork&
+  dst_network();
 
 
 private:
@@ -56,8 +54,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // セルネットワーク
-  CmnMgr& mCmnMgr;
+  // dst_network オプションの解析用オブジェクト
+  TclPoptStr* mPoptDstNetwork;
 
 };
 

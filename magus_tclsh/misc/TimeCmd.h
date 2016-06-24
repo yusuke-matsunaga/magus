@@ -14,9 +14,10 @@
 // 実はこのパッケージは Magus には依存していないので汎用である．
 
 
-#include "magus_nsdef.h"
-#include "YmTclpp/TclCmd.h"
-#include "YmUtils/StopWatch.h"
+#include "magus.h"
+
+#include "ym/TclCmd.h"
+#include "ym/StopWatch.h"
 
 
 BEGIN_NAMESPACE_MAGUS

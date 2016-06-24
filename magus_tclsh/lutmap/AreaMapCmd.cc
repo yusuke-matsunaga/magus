@@ -10,16 +10,11 @@
 
 
 #include "AreaMapCmd.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 #include "LutMap.h"
 
-#include "YmNetworks/BNetBdnConv.h"
-
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/BdnMgr.h"
-#include "YmNetworks/MvnBdnConv.h"
-#include "YmNetworks/MvnBdnMap.h"
+#include "ym/MvnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -87,33 +82,27 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
 
   LutMap lutmap;
 
-  ymuint lut_num;
-  ymuint depth;
+  int lut_num;
+  int depth;
 
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
-  case NetHandle::kMagBNet:
+  case NetHandle::kMagBn:
     {
-      BNetBdnConv conv;
-
-      BdnMgr tmp_network;
-      conv(*neth->bnetwork(), tmp_network);
-      lutmap.area_map(tmp_network, limit, mode, lutnetwork(), lut_num, depth);
+      lutmap.area_map(*neth->bnetwork(), limit, mode, *neth->_bnetwork(), lut_num, depth);
     }
-    break;
-
-  case NetHandle::kMagBdn:
-    lutmap.area_map(*neth->bdn(), limit, mode, lutnetwork(), lut_num, depth);
     break;
 
   case NetHandle::kMagMvn:
     {
       const MvnMgr& mvn = *neth->mvn();
-      MvnBdnConv conv;
-      BdnMgr tmp_network;
-      MvnBdnMap mvnode_map(mvn.max_node_id());
+#if 0
+      MvnBnetConv conv;
+      BnNetwork tmp_network;
+      MvnBnMap mvnode_map(mvn.max_node_id());
       conv(mvn, tmp_network, mvnode_map);
       lutmap.area_map(tmp_network, limit, mode, lutnetwork(), lut_num, depth);
+#endif
     }
     break;
   }

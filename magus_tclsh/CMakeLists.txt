@@ -3,32 +3,23 @@
 # インクルードパスの設定
 # ===================================================================
 include_directories (
+  ${PROJECT_SOURCE_DIR}/magus_core/include
   include
   ${TCL_INCLUDE_PATH}
-  ${YmTclpp_INCLUDE_DIRS}
   )
 
 
 # ===================================================================
 #  ソースファイルの設定
 # ===================================================================
-set (bdn_SOURCES
-  bdn/BdnCmd.cc
-  )
-
 set (bnet_SOURCES
   bnet/BNetCmd.cc
-  bnet/BNetElimCmd.cc
   bnet/BNetInfoCmd.cc
-  bnet/BNetIoCmd.cc
-  bnet/BNetNdCmd.cc
-  bnet/BNetNodeCmd.cc
   bnet/bnet_init.cc
   )
 
 set (core_SOURCES
   core/BNetHandle.cc
-  core/BdnHandle.cc
   core/ChgNetwork.cc
   core/ClrNetwork.cc
   core/CopyNetwork.cc
@@ -43,7 +34,6 @@ set (core_SOURCES
   core/NetCmd.cc
   core/NetHandle.cc
   core/NewBNetwork.cc
-  core/NewBdn.cc
   core/NewMvn.cc
   core/PopNetwork.cc
   core/PushNetwork.cc
@@ -62,12 +52,13 @@ set (equiv_SOURCES
   equiv/EquivCmd.cc
   )
 
-set (lutmap_SOURCES
+set ( lutmap_SOURCES
   lutmap/AreaMapCmd.cc
+  lutmap/AreaMap2Cmd.cc
+  lutmap/AreaMap3Cmd.cc
   lutmap/Conv2BNetCmd.cc
   lutmap/DelayMapCmd.cc
   lutmap/DumpLutCmd.cc
-  lutmap/Ln2BNet.cc
   lutmap/LutmapCmd.cc
   lutmap/WriteVqmCmd.cc
   )
@@ -99,7 +90,6 @@ set (simplify_SOURCES
 
 set (techmap_SOURCES
   techmap/AreaMapCmd.cc
-  techmap/DumpCnCmd.cc
   techmap/TechmapCmd.cc
   )
 
@@ -114,16 +104,31 @@ set (magus_SOURCES
 # ===================================================================
 add_executable (magus_tclsh
   ${magus_SOURCES}
-  ${bdn_SOURCES}
   ${bnet_SOURCES}
   ${core_SOURCES}
   ${equiv_SOURCES}
   ${lutmap_SOURCES}
   ${misc_SOURCES}
   ${mvn_SOURCES}
-  ${seal_SOURCES}
+#  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
+  $<TARGET_OBJECTS:magus_equiv_a>
+  $<TARGET_OBJECTS:magus_sbjgraph_a>
+#  $<TARGET_OBJECTS:magus_seal_a>
+  $<TARGET_OBJECTS:magus_lutmap_a>
+  $<TARGET_OBJECTS:magus_cellmap_a>
+  $<TARGET_OBJECTS:magus_sbjgraph_a>
+  $<TARGET_OBJECTS:ym_base_a>
+  $<TARGET_OBJECTS:ym_logic_a>
+  $<TARGET_OBJECTS:ym_cell_a>
+  $<TARGET_OBJECTS:ym_bnet_a>
+  $<TARGET_OBJECTS:ym_sat_a>
+  $<TARGET_OBJECTS:ym_combopt_a>
+  $<TARGET_OBJECTS:ym_mvn_a>
+  $<TARGET_OBJECTS:ym_sat_a>
+  $<TARGET_OBJECTS:ym_verilog_a>
+  $<TARGET_OBJECTS:ym_tclpp_a>
   )
 
 target_compile_options (magus_tclsh
@@ -135,17 +140,15 @@ target_compile_definitions (magus_tclsh
   )
 
 target_link_libraries (magus_tclsh
-  magus_cequiv
-  magus_seal
-  magus_lutmap
-  magus_cellmap
-  ym_networks
-  ym_cell
-  ym_verilog
-  ym_logic
-  ym_tclpp
-  ym_utils
+  ${YM_LIB_DEPENDS}
+  ${TCL_LIBRARY}
   )
+
+if ( GPERFTOOLS_FOUND )
+  target_link_libraries ( magus_tclsh
+    ${GPERFTOOLS_LIBRARIES}
+    )
+endif ()
 
 
 # ===================================================================
@@ -153,16 +156,32 @@ target_link_libraries (magus_tclsh
 # ===================================================================
 add_executable (magus_tclsh_p
   ${magus_SOURCES}
-  ${bdn_SOURCES}
+#  ${bdn_SOURCES}
   ${bnet_SOURCES}
   ${core_SOURCES}
   ${equiv_SOURCES}
   ${lutmap_SOURCES}
   ${misc_SOURCES}
   ${mvn_SOURCES}
-  ${seal_SOURCES}
+#  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
+  $<TARGET_OBJECTS:magus_equiv_p>
+  $<TARGET_OBJECTS:magus_sbjgraph_p>
+#  $<TARGET_OBJECTS:magus_seal_p>
+  $<TARGET_OBJECTS:magus_lutmap_p>
+  $<TARGET_OBJECTS:magus_cellmap_p>
+  $<TARGET_OBJECTS:magus_sbjgraph_p>
+  $<TARGET_OBJECTS:ym_base_p>
+  $<TARGET_OBJECTS:ym_logic_p>
+  $<TARGET_OBJECTS:ym_cell_p>
+  $<TARGET_OBJECTS:ym_bnet_p>
+  $<TARGET_OBJECTS:ym_sat_p>
+  $<TARGET_OBJECTS:ym_combopt_p>
+  $<TARGET_OBJECTS:ym_mvn_p>
+  $<TARGET_OBJECTS:ym_sat_p>
+  $<TARGET_OBJECTS:ym_verilog_p>
+  $<TARGET_OBJECTS:ym_tclpp_p>
   )
 
 target_compile_options (magus_tclsh_p
@@ -174,16 +193,8 @@ target_compile_definitions (magus_tclsh_p
   )
 
 target_link_libraries (magus_tclsh_p
-  magus_cequiv_p
-  magus_seal_p
-  magus_lutmap_p
-  magus_cellmap_p
-  ym_networks_p
-  ym_cell_p
-  ym_verilog_p
-  ym_logic_p
-  ym_tclpp_p
-  ym_utils_p
+  ${YM_LIB_DEPENDS}
+  ${TCL_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
@@ -198,16 +209,32 @@ endif ()
 # ===================================================================
 add_executable (magus_tclsh_d
   ${magus_SOURCES}
-  ${bdn_SOURCES}
+#  ${bdn_SOURCES}
   ${bnet_SOURCES}
   ${core_SOURCES}
   ${equiv_SOURCES}
   ${lutmap_SOURCES}
   ${misc_SOURCES}
   ${mvn_SOURCES}
-  ${seal_SOURCES}
+#  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
+  $<TARGET_OBJECTS:magus_equiv_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_d>
+#  $<TARGET_OBJECTS:magus_seal_d>
+  $<TARGET_OBJECTS:magus_lutmap_d>
+  $<TARGET_OBJECTS:magus_cellmap_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_d>
+  $<TARGET_OBJECTS:ym_base_ad>
+  $<TARGET_OBJECTS:ym_logic_ad>
+  $<TARGET_OBJECTS:ym_cell_ad>
+  $<TARGET_OBJECTS:ym_bnet_ad>
+  $<TARGET_OBJECTS:ym_sat_ad>
+  $<TARGET_OBJECTS:ym_combopt_ad>
+  $<TARGET_OBJECTS:ym_mvn_ad>
+  $<TARGET_OBJECTS:ym_sat_ad>
+  $<TARGET_OBJECTS:ym_verilog_ad>
+  $<TARGET_OBJECTS:ym_tclpp_ad>
   )
 
 target_compile_options (magus_tclsh_d
@@ -215,17 +242,15 @@ target_compile_options (magus_tclsh_d
   )
 
 target_link_libraries (magus_tclsh_d
-  magus_cequiv_d
-  magus_seal_d
-  magus_lutmap_d
-  magus_cellmap_d
-  ym_networks_d
-  ym_cell_d
-  ym_verilog_d
-  ym_logic_d
-  ym_tclpp_d
-  ym_utils_d
+  ${YM_LIB_DEPENDS}
+  ${TCL_LIBRARY}
   )
+
+if ( GPERFTOOLS_FOUND )
+  target_link_libraries ( magus_tclsh_d
+    ${GPERFTOOLS_LIBRARIES}
+    )
+endif ()
 
 
 # ===================================================================

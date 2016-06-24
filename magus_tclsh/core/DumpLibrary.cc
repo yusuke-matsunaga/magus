@@ -8,8 +8,8 @@
 
 
 #include "DumpLibrary.h"
-#include "YmCell/CellLibrary.h"
-#include "YmUtils/FileODO.h"
+#include "ym/ClibCellLibrary.h"
+#include "ym/FileODO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -53,7 +53,7 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  cur_cell_library()->dump(bo);
+  cur_cell_library().dump(bo);
 
   return TCL_OK;
 }

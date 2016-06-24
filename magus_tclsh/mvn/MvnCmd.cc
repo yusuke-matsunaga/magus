@@ -3,14 +3,12 @@
 /// @brief MvnCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MvnCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "MvnCmd.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -22,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 // @brief コンストラクタ
 MvnCmd::MvnCmd(MagMgr* mgr,
 	       bool new_mvn_enable) :
-  NetCmd(mgr, false, false, new_mvn_enable)
+  NetCmd(mgr, false, new_mvn_enable)
 {
 }
 

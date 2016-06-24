@@ -1,18 +1,17 @@
-﻿#ifndef MAGUS_EQUIV_EQUIVCMD_H
-#define MAGUS_EQUIV_EQUIVCMD_H
+﻿#ifndef EQUIVCMD_H
+#define EQUIVCMD_H
 
-/// @file magus/equiv/EquivCmd.h
+/// @file EquivCmd.h
 /// @brief EquivCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EquivCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "MagCmd.h"
 #include "NetHandle.h"
-#include "YmNetworks/BdnMgr.h"
+#include "ym/BnNetwork.h"
+#include "ym/SatSolverType.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -52,40 +51,39 @@ protected:
   int
   time_limit() const;
 
-  /// @brief 使用する SAT-Solver の種類を表す文字列を返す．
-  string
+  /// @brief 使用する SAT-Solver の種類を表すオブジェクト
+  SatSolverType
   sat_type() const;
 
-  /// @brief 使用する SAT-Solver に渡すオプション文字列を返す．
-  string
-  sat_option() const;
-
-  /// @brief SAT-Solver のログ出力用ストリームを返す．
-  ostream*
-  sat_out() const;
-
   /// @brief ネットワーク1を返す．
-  const BdnMgr&
+  const BnNetwork&
   network1() const;
 
+  /// @brief ネットワーク1の入力リストを返す．
+  const vector<int>&
+  input1_list() const;
+
+  /// @brief ネットワーク1の出力リストを返す．
+  const vector<int>&
+  output1_list() const;
+
   /// @brief ネットワーク2を返す．
-  const BdnMgr&
+  const BnNetwork&
   network2() const;
 
-  /// @brief 入力の対応関係を返す．
-  const vector<pair<ymuint32, ymuint32> >&
-  input_match() const;
+  /// @brief ネットワーク2の入力リストを返す．
+  const vector<int>&
+  input2_list() const;
 
-  /// @brief 出力の対応関係を返す．
-  const vector<pair<ymuint32, ymuint32> >&
-  output_match() const;
+  /// @brief ネットワーク2の出力リストを返す．
+  const vector<int>&
+  output2_list() const;
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
-
 
   /// @brief 時間を指定した文字列から時間を取り出す．
   /// @return エラーが起きたら TCL_ERROR を返す．
@@ -95,25 +93,19 @@ private:
 
   /// @brief 順番で対応をとり，ID番号のペアのリストを作る．
   void
-  assoc_by_order(const BdnMgr& network1,
-		 const BdnMgr& network2,
-		 vector<pair<ymuint32, ymuint32> >& iassoc,
-		 vector<pair<ymuint32, ymuint32> >& oassoc);
+  assoc_by_order();
 
   /// @brief 名前で対応をとり, ID番号のペアのリストを作る．
   /// @return エラーが起きたら TCL_ERROR を返す．
   bool
-  assoc_by_name(const BdnMgr& network1,
-		const BdnMgr& network2,
-		vector<pair<ymuint32, ymuint32> >& iassoc,
-		vector<pair<ymuint32, ymuint32> >& oassoc);
+  assoc_by_name();
 
   /// @brief 対象のネットワークを BDN に変換する．
   /// @param[in] net_handle ネットワークハンドル
   /// @param[out] dst_network 変換したネットワークを格納する変数
   void
-  conv_to_bdn(const NetHandle* net_handle,
-	      BdnMgr& dst_network);
+  conv_to_bnet(const NetHandle* net_handle,
+	       BnNetwork& dst_network);
 
 
 private:
@@ -149,28 +141,28 @@ private:
   int mTimeLimit;
 
   // SAT-Solver のタイプ
-  string mSatType;
-
-  // SAT-Solver のオプション
-  string mSatOption;
-
-  // SAT-Solver のログ出力用ストリーム
-  ostream* mSatOut;
+  SatSolverType mSatType;
 
   // SAT-Solver のログをファイルに出力する時のストリーム
   ofstream mSatLogFile;
 
   // 検証対象のネットワーク1
-  BdnMgr mNetwork1;
+  BnNetwork mNetwork1;
+
+  // ネットワーク1の入力リスト
+  vector<int> mInput1List;
+
+  // ネットワーク1の出力リスト
+  vector<int> mOutput1List;
 
   // 検証対象のネットワーク2
-  BdnMgr mNetwork2;
+  BnNetwork mNetwork2;
 
-  // 入力の対応関係
-  vector<pair<ymuint32, ymuint32> > mInputMatch;
+  // ネットワーク2の入力リスト
+  vector<int> mInput2List;
 
-  // 出力の対応関係
-  vector<pair<ymuint32, ymuint32> > mOutputMatch;
+  // ネットワーク2の出力リスト
+  vector<int> mOutput2List;
 
 };
 
@@ -275,57 +267,58 @@ EquivCmdBase::time_limit() const
 
 // @brief 使用する SAT-Solver の種類を表す文字列を返す．
 inline
-string
+SatSolverType
 EquivCmdBase::sat_type() const
 {
   return mSatType;
 }
 
-// @brief 使用する SAT-Solver に渡すオプション文字列を返す．
-string
-EquivCmdBase::sat_option() const
-{
-  return mSatOption;
-}
-
-// @brief SAT-Solver のログ出力用ストリームを返す．
-inline
-ostream*
-EquivCmdBase::sat_out() const
-{
-  return mSatOut;
-}
-
 // @brief 検証対象のネットワーク1を返す．
 inline
-const BdnMgr&
+const BnNetwork&
 EquivCmdBase::network1() const
 {
   return mNetwork1;
 }
 
+// @brief ネットワーク1の入力リストを返す．
+inline
+const vector<int>&
+EquivCmdBase::input1_list() const
+{
+  return mInput1List;
+}
+
+// @brief ネットワーク1の出力リストを返す．
+inline
+const vector<int>&
+EquivCmdBase::output1_list() const
+{
+  return mOutput1List;
+}
+
 // @brief 検証対象のネットワーク2を返す．
 inline
-const BdnMgr&
+const BnNetwork&
 EquivCmdBase::network2() const
 {
   return mNetwork2;
 }
 
-// @brief 入力の対応関係を返す．
+// @brief ネットワーク2の入力リストを返す．
 inline
-const vector<pair<ymuint32, ymuint32> >&
-EquivCmdBase::input_match() const
+const vector<int>&
+EquivCmdBase::input2_list() const
 {
-  return mInputMatch;
+  return mInput2List;
 }
 
-// @brief 出力の対応関係を返す．
+// @brief ネットワーク2の出力リストを返す．
 inline
-const vector<pair<ymuint32, ymuint32> >&
-EquivCmdBase::output_match() const
+const vector<int>&
+EquivCmdBase::output2_list() const
 {
-  return mOutputMatch;
+  return mOutput2List;
 }
 
 END_NAMESPACE_MAGUS

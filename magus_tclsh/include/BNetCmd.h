@@ -2,18 +2,15 @@
 #define MAGUS_MAGBNETCMD_H
 
 /// @file BNetCmd.h
-/// @brief MagCmd のヘッダファイル
-///
+/// @brief BNetCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// $Id: MagCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "NetCmd.h"
-#include "YmNetworks/bnet.h"
+#include "ym/bnet.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -46,7 +43,7 @@ protected:
 
   /// @brief カレントネットワークの取得
   /// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
-  BNetwork*
+  BnNetwork*
   cur_network() const;
 
 

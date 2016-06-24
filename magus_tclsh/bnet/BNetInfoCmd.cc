@@ -10,7 +10,7 @@
 
 
 #include "BNetInfoCmd.h"
-#include "YmNetworks/BNetwork.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -25,8 +25,8 @@ BNetInfo::BNetInfo(MagMgr* mgr) :
 {
   const char* usage =
     "<ATTR> ?<value>?\n"
-    "\t<ATTR> is model_name, input_num, output_num, logic_node_num,\n"
-    "\t\tlatch_node_num, lit_num, sop_lit_num, library_name, varname_rule";
+    "\t<ATTR> is model_name, input_num, output_num, logic_num,\n"
+    "\t\tdff_num, and library_name";
   set_usage_string(usage);
 }
 
@@ -48,48 +48,12 @@ BNetInfo::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  BNetwork* network = cur_network();
+  BnNetwork* network = cur_network();
 
   string attr = objv[1];
   TclObj result;
   if ( attr == "model_name" ) {
-    if ( objc == 3 ) {
-      // 値の設定
-      string name = objv[2];
-      network->set_model_name(name);
-      result = objv[2];
-    }
-    else {
-      result = network->model_name();
-    }
-  }
-  else if ( attr == "varname_rule" ) {
-    if ( objc == 3 ) {
-      // 値の設定
-      TclObjVector elems;
-      int code = list_conv(objv[2], elems);
-      if ( code == TCL_ERROR ) {
-	return TCL_ERROR;
-      }
-      if ( elems.size() != 2 ) {
-	TclObj emsg;
-	emsg << objv[2] << " : illegal format for varname_rule";
-	set_result(emsg);
-	return TCL_ERROR;
-      }
-      string prefix = elems[0];
-      string suffix = elems[1];
-      network->change_name_rule(prefix, suffix);
-      result = objv[2];
-    }
-    else {
-      string argv[2];
-      network->name_rule(argv[0], argv[1]);
-      TclObjVector objv(2);
-      objv[0] = argv[0];
-      objv[1] = argv[1];
-      result.set_list(objv);
-    }
+    result = network->name();
   }
   else {
     if ( attr == "input_num" ) {
@@ -98,17 +62,11 @@ BNetInfo::cmd_proc(TclObjVector& objv)
     else if ( attr == "output_num" ) {
       result = network->output_num();
     }
-    else if ( attr == "logic_node_num" ) {
-      result = network->logic_node_num();
+    else if ( attr == "logic_num" ) {
+      result = network->logic_num();
     }
-    else if ( attr == "latch_node_num" ) {
-      result = network->latch_node_num();
-    }
-    else if ( attr == "lit_num" ) {
-      result = network->litnum();
-    }
-    else if ( attr == "sop_lit_num" ) {
-      result = network->sop_litnum();
+    else if ( attr == "dffnum" ) {
+      result = network->dff_num();
     }
     else if ( attr == "library_name" ) {
 #if defined(USE_LIBCELL)
@@ -137,7 +95,7 @@ BNetInfo::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
   }
-  set_result(result);
+ set_result(result);
 
   return TCL_OK;
 }
@@ -174,22 +132,18 @@ BNetAllInfo::cmd_proc(TclObjVector& objv)
 
   TclObj base = objv[1];
 
-  BNetwork* network = cur_network();
+  BnNetwork* network = cur_network();
 
   // モデル名
-  set_var(base, "model_name", network->model_name(), 0);
+  set_var(base, "model_name", network->name(), 0);
   // 入力数
   set_var(base, "input_num", network->input_num(), 0);
   // 出力数
   set_var(base, "output_num", network->output_num(), 0);
   // 中間変数の数
-  set_var(base, "logic_node_num", network->logic_node_num(), 0);
+  set_var(base, "logic_num", network->logic_num(), 0);
   // FF の数
-  set_var(base, "latch_node_num", network->latch_node_num(), 0);
-  // リテラル数
-  set_var(base, "lit_num", network->litnum(), 0);
-  // SOPリテラル数
-  set_var(base, "sop_lit_num", network->sop_litnum(), 0);
+  set_var(base, "dff_num", network->dff_num(), 0);
   // ライブラリ名
 #if defined(USE_LIBCELL)
   const hf_CCellMgr* cell_mgr = network->CellMgr();
@@ -226,15 +180,13 @@ BNetPrintStats::~BNetPrintStats()
 int
 BNetPrintStats::cmd_proc(TclObjVector& objv)
 {
-  BNetwork* network = cur_network();
+  BnNetwork* network = cur_network();
   TclObj msg;
-  msg << network->model_name()
+  msg << network->name()
       << "\tpi=" << TclObj(network->input_num())
       << "\tpo=" << TclObj(network->output_num())
-      << "\tnodes=" << TclObj(network->logic_node_num())
-      << "\tlatches=0\n"
-      << "lits(sop)=" << TclObj(network->sop_litnum())
-      << "\tlits(fac)=" << TclObj(network->litnum());
+      << "\tnodes=" << TclObj(network->logic_num())
+      << "\tlatches=" << TclObj(network->dff_num());
   set_result(msg);
 
   return TCL_OK;

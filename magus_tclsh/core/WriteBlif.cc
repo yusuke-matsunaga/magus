@@ -1,18 +1,13 @@
 ﻿
-/// @file src/core/WriteBlif.cc
+/// @file WriteBlif.cc
 /// @brief WriteBlif の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "WriteBlif.h"
-
-#include "YmNetworks/BNetBlifWriter.h"
-#include "YmNetworks/BdnBlifWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -23,7 +18,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 WriteBlif::WriteBlif(MagMgr* mgr) :
-  NetCmd(mgr, false, false, false)
+  NetCmd(mgr, false, false)
 {
   set_usage_string("?<filename>?");
 }
@@ -62,19 +57,12 @@ WriteBlif::cmd_proc(TclObjVector& objv)
 
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
-  case NetHandle::kMagBNet:
+  case NetHandle::kMagBn:
     {
+#if 0
       BNetBlifWriter writer;
       writer.dump(*osp, *neth->bnetwork());
-      // この関数はfailしない．
-      stat = TCL_OK;
-    }
-    break;
-
-  case NetHandle::kMagBdn:
-    {
-      BdnBlifWriter writer;
-      writer(*osp, *neth->bdn());
+#endif
       // この関数はfailしない．
       stat = TCL_OK;
     }

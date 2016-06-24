@@ -10,8 +10,9 @@
 #include "ReadLibrary.h"
 
 #include "MagMgr.h"
-#include "YmUtils/MsgMgr.h"
-#include "YmTclpp/TclObjMsgHandler.h"
+#include "ym/ClibCellLibrary.h"
+#include "ym/MsgMgr.h"
+#include "ym/TclObjMsgHandler.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -54,18 +55,17 @@ ReadLibrary::cmd_proc(TclObjVector& objv)
   }
 
   TclObjMsgHandler mh;
-  MsgMgr::reg_handler(&mh);
+  MsgMgr::attach_handler(&mh);
 
   // 実際の読み込みを行う．
-  const CellLibrary* lib = read_library(ex_file_name);
-  if ( lib == nullptr ) {
+  ClibCellLibrary& lib = mgr()->cur_cell_library();
+  bool stat2 = read_library(ex_file_name, lib);
+  if ( !stat2 ) {
     TclObj emsg = mh.msg_obj();
     emsg << "Error occurred in reading " << objv[1];
     set_result(emsg);
     return TCL_ERROR;
   }
-
-  mgr()->set_cur_cell_library(lib);
 
   // 正常終了
   return TCL_OK;

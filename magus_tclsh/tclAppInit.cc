@@ -14,7 +14,7 @@
  * RCS: @(#) $Id: tclAppInit.cc 2274 2009-06-10 07:45:29Z matsunaga $
  */
 
-#include "magus_nsdef.h"
+#include "magus.h"
 
 #define ERRORCODE_HACK 1
 

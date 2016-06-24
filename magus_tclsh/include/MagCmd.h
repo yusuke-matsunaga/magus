@@ -6,16 +6,14 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "magus_nsdef.h"
+#include "magus.h"
 
-#include "YmTclpp/TclCmd.h"
-#include "YmCell/cell_nsdef.h"
+#include "ym/TclCmd.h"
+#include "ym/clib.h"
 #include "NetHandle.h"
 
 
@@ -50,7 +48,7 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カレントセルライブラリの取得
-  const CellLibrary*
+  const ClibCellLibrary&
   cur_cell_library();
 
 
@@ -121,7 +119,7 @@ protected:
   /// @note 要するに無ければ作る．
   NetHandle*
   find_or_new_nethandle(const string& name,
-			NetHandle::tType type) const;
+			NetHandle::Type type) const;
 
 
 

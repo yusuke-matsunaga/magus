@@ -11,7 +11,6 @@
 
 #include "LrwCmd.h"
 #include "NetHandle.h"
-#include "YmNetworks/BNetManip.h"
 
 
 BEGIN_NAMESPACE_MAGUS_SIMPLIFY
@@ -35,8 +34,7 @@ LrwCmd::~LrwCmd()
 int
 LrwCmd::cmd_proc(TclObjVector& objv)
 {
-  BNetwork& network = *cur_nethandle()->_bnetwork();
-  BNetManip manip(&network);
+  BnNetwork& network = *cur_nethandle()->_bnetwork();
 
   return TCL_OK;
 }

@@ -12,7 +12,7 @@
 
 
 #include "MagCmd.h"
-#include "LnGraph.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -25,7 +25,7 @@ struct LutmapData
 {
 
   // LUTネットワーク
-  LnGraph mLutNetwork;
+  BnNetwork mLutNetwork;
 
 };
 
@@ -51,7 +51,7 @@ public:
 protected:
 
   /// @brief LutNetwork を得る．
-  LnGraph&
+  BnNetwork&
   lutnetwork();
 
 

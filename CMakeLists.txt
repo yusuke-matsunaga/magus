@@ -4,17 +4,23 @@
 cmake_minimum_required (VERSION 3.0)
 
 
-# C++11 の指定
-set (CMAKE_CXX_STANDARD 11)
+# C++14 の指定
+set (CMAKE_CXX_STANDARD 14)
 
 
 # ===================================================================
 # プロジェクト名，バージョンの設定
 # ===================================================================
 project (ym-magus)
-set (YM_MAGUS_VERSION_MAJOR 1)
-set (YM_MAGUS_VERSION_MINOR 0)
-set (YM_MAGUS_VERSION ${YM_MAGUS_VERSION_MAJOR}.${YM_MAGUS_VERSION_MINOR})
+set (VERSION_MAJOR 1)
+set (VERSION_MINOR 0)
+set (VERSION ${VERSION_MAJOR}.${VERSION_MINOR})
+
+# 名前空間
+set (MAGUS_NSNAME "nsMagus")
+
+# ライブラリのインストールディレクトリ
+set ( YM_INSTALL_LIBDIR "lib/magus" )
 
 
 # ===================================================================
@@ -31,32 +37,23 @@ list ( APPEND CMAKE_MODULE_PATH
 
 include (FindDoxygen)
 
-#include (FindPythonInterp)
-#include (FindPythonLibs)
+# Python のバージョン指定
+set( Python_ADDITIONAL_VERSIONS 3.7 3.6 3.5 3.4 3.3 3.2 3.1 )
+include( FindPythonInterp )
+include( FindPythonLibs )
 
-include (ym_add_library)
-
-#set( CMAKE_INCLUDE_CURRENT_DIR ON )
-#find_package(Qt5Widgets)
-#find_package(OpenGL)
-
-find_package(TCL)
+include( UseCython )
 
 find_package(Gperftools)
 
-find_package(YmTools REQUIRED)
+include (YmUtils)
 
-if (TCL_FOUND)
-  find_package(YmTclpp)
-endif (TCL_FOUND)
-
-include (ym_add_library)
+ym_init ("")
 
 
 # ===================================================================
 # google-test は内蔵のものを使う．
 # ===================================================================
-include ( ym_use_gtest )
 ym_use_gtest ()
 
 
@@ -69,23 +66,51 @@ enable_testing()
 
 
 # ===================================================================
+# ヘッダファイルの生成
+# ===================================================================
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/etc/version_config.h.in"
+  "${PROJECT_BINARY_DIR}/version_config.h"
+  )
+
+
+# ===================================================================
 # インクルードパスの設定
 # ===================================================================
 include_directories (
-  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/ym-base/include
+  ${PROJECT_SOURCE_DIR}/ym-bnet/include
+  ${PROJECT_SOURCE_DIR}/ym-cell/include
+  ${PROJECT_SOURCE_DIR}/ym-combopt/include
+  ${PROJECT_SOURCE_DIR}/ym-common/include
+  ${PROJECT_SOURCE_DIR}/ym-logic/include
+  ${PROJECT_SOURCE_DIR}/ym-mvn/include
+  ${PROJECT_SOURCE_DIR}/ym-sat/include
+  ${PROJECT_SOURCE_DIR}/ym-tclpp/include
+  ${PROJECT_SOURCE_DIR}/ym-verilog/include
   ${PROJECT_BINARY_DIR}
-  ${YmTools_INCLUDE_DIRS}
   )
 
 
 # ===================================================================
 # サブディレクトリの設定
 # ===================================================================
-add_subdirectory (src/cequiv)
-add_subdirectory (src/seal)
-add_subdirectory (src/lutmap)
-add_subdirectory (src/cellmap)
 
-if (YmTclpp_FOUND)
-  add_subdirectory (magus_tclsh)
-endif (YmTclpp_FOUND)
+add_subdirectory ( ym-common )
+add_subdirectory ( ym-base )
+add_subdirectory ( ym-combopt )
+add_subdirectory ( ym-logic )
+add_subdirectory ( ym-cell )
+add_subdirectory ( ym-bnet )
+add_subdirectory ( ym-mvn )
+add_subdirectory ( ym-sat )
+add_subdirectory ( ym-tclpp )
+add_subdirectory ( ym-verilog )
+
+add_subdirectory ( magus_core )
+add_subdirectory (magus_tclsh)
+
+if (DOXYGEN_FOUND)
+  add_subdirectory( doxygen-src )
+endif (DOXYGEN_FOUND)

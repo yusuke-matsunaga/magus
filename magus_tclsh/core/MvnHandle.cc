@@ -1,5 +1,5 @@
 ﻿
-/// @file src/logbase/MvnHandle.cc
+/// @file MvnHandle.cc
 /// @brief MvnHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -8,7 +8,6 @@
 
 
 #include "MvnHandle.h"
-#include "YmNetworks/MvnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -30,7 +29,7 @@ MvnHandle::~MvnHandle()
 }
 
 // @brief 型を返す．
-NetHandle::tType
+NetHandle::Type
 MvnHandle::type() const
 {
   return kMagMvn;
@@ -66,10 +65,7 @@ MvnHandle::copy(const NetHandle* src,
 		 bool allow_conv)
 {
   switch ( src->type() ) {
-  case kMagBNet:
-    return false;
-
-  case kMagBdn:
+  case kMagBn:
     return false;
 
   case kMagMvn:

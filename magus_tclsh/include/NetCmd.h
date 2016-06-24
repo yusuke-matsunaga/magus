@@ -6,8 +6,6 @@
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
@@ -30,11 +28,9 @@ public:
   /// @brief コンストラクタ
   /// @param[in] mgr Magus の管理オブジェクト
   /// @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
-  /// @param[in] new_bdn_enable -new_bdn オプションを使用するとき true
   /// @param[in] new_mvn_enable -new_mvn オプションを使用するとき true
   NetCmd(MagMgr* mgr,
 	 bool new_bnet_enable = true,
-	 bool new_bdn_enable = true,
 	 bool new_mvn_enable = true);
 
   /// @brief デストラクタ
@@ -50,10 +46,6 @@ protected:
   /// @brief new_bnet オプション用の解析オブジェクトを得る．
   TclPoptObj*
   popt_new_bnet();
-
-  /// @brief new_bdn オプション用の解析オブジェクトを得る．
-  TclPoptObj*
-  popt_new_bdn();
 
   /// @brief new_mvn オプション用の解析オブジェクトを得る．
   TclPoptObj*
@@ -96,9 +88,6 @@ private:
 
   // new_bnet オプションを解析するオブジェクト
   TclPoptObj* mPoptNewBNet;
-
-  // new_bdn オプションを解析するオブジェクト
-  TclPoptObj* mPoptNewBdn;
 
   // new_mvn オプションを解析するオブジェクト
   TclPoptObj* mPoptNewMvn;

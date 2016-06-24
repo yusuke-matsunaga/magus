@@ -5,14 +5,15 @@
 /// @brief MagMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "magus_nsdef.h"
-#include "YmCell/cell_nsdef.h"
-#include "YmUtils/UnitAlloc.h"
-#include "YmUtils/ItvlMgr.h"
+#include "magus.h"
+#include "ym/clib.h"
+#include "ym/ClibCellLibrary.h"
+#include "ym/UnitAlloc.h"
+#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -38,17 +39,11 @@ public:
 
 public:
 
-  /// @brief カレントセルライブラリの設定
-  /// @param[in] library 設定するセルライブラリ
-  /// @note 以前のライブラリは破棄される．
-  void
-  set_cur_cell_library(const CellLibrary* library);
-
   /// @brief カレントセルライブラリの取得
-  const CellLibrary*
+  ClibCellLibrary&
   cur_cell_library();
 
-  /// @brief 新たな BNetwork を作成して登録する．
+  /// @brief 新たな BnNetwork を作成して登録する．
   /// @param[in] name 名前
   /// @param[in] err_out エラー出力
   /// @return 作成したネットハンドル
@@ -58,17 +53,6 @@ public:
   NetHandle*
   new_bnethandle(const string& name,
 		 ostream* err_out = nullptr);
-
-  /// @brief 新たな BdNetwork を作成して登録する．
-  /// @param[in] name 名前
-  /// @param[in] err_out エラー出力
-  /// @return 作成したネットハンドル
-  /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
-  /// @note また，名前が不適切な場合にもエラーとなる．
-  /// @note エラーが起きた場合には nullptr を返す．
-  NetHandle*
-  new_bdnhandle(const string& name,
-		ostream* err_out = nullptr);
 
   /// @brief 新たな MvNetwork を作成して登録する．
   /// @param[in] name 名前
@@ -210,7 +194,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // セルライブラリ
-  const CellLibrary* mCellLibrary;
+  ClibCellLibrary mCellLibrary;
 
   // NetHandle 用のアロケータ
   UnitAlloc mAlloc;

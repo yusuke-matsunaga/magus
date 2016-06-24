@@ -1,7 +1,7 @@
-﻿#ifndef SRC_LOGBASE_BNETHANDLE_H
-#define SRC_LOGBASE_BNETHANDLE_H
+﻿#ifndef BNETHANDLE_H
+#define BNETHANDLE_H
 
-/// @file src/logbase/BNetHandle.h
+/// @file BNetHandle.h
 /// @brief BNetHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,14 +10,14 @@
 
 
 #include "NetHandle.h"
-#include "YmNetworks/BNetwork.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetHandle BNetHandle.h "BNetHandle.h"
-/// @brief BNetwork を持つネットハンドル
+/// @brief BnNetwork を持つネットハンドル
 //////////////////////////////////////////////////////////////////////
 class BNetHandle :
   public NetHandle
@@ -37,17 +37,17 @@ public:
 
   /// @brief 型を返す．
   virtual
-  tType
+  Type
   type() const;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
-  const BNetwork*
+  const BnNetwork*
   bnetwork() const;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
-  BNetwork*
+  BnNetwork*
   _bnetwork();
 
   /// @brief ネットワークをクリアする．
@@ -71,10 +71,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ネットワークの実体
-  BNetwork mNetwork;
+  BnNetwork mNetwork;
 
 };
 
 END_NAMESPACE_MAGUS
 
-#endif // SRC_LOGBASE_BNETHANDLE_H
+#endif // BNETHANDLE_H

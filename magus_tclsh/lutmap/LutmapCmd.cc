@@ -11,8 +11,11 @@
 
 #include "LutmapCmd.h"
 #include "AreaMapCmd.h"
+#include "AreaMap2Cmd.h"
+#include "AreaMap3Cmd.h"
 #include "DelayMapCmd.h"
-#include "LnGraph.h"
+
+#include "AreaMap2Cmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -35,7 +38,7 @@ LutmapCmd::~LutmapCmd()
 }
 
 // @brief LutNetwork を得る．
-LnGraph&
+BnNetwork&
 LutmapCmd::lutnetwork()
 {
   return mData->mLutNetwork;
@@ -50,6 +53,10 @@ lutmap_init(Tcl_Interp* interp,
 
   TclCmdBinder2<AreaMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 						       "magus::lutmap::area_map");
+  TclCmdBinder2<AreaMap2Cmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
+							"magus::lutmap::area_map2");
+  TclCmdBinder2<AreaMap3Cmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
+							"magus::lutmap::area_map3");
   TclCmdBinder2<DelayMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::delay_map");
   TclCmdBinder2<DumpLutCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
@@ -59,12 +66,12 @@ lutmap_init(Tcl_Interp* interp,
   TclCmdBinder2<WriteVqmCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::write_vqm");
 
-
   const char* init =
     "namespace eval tclreadline {\n"
     "namespace eval magus {\n"
     "namespace eval lutmap {\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
+    "proc complete(area_map2) { text start end line pos mod } { return \"\" }\n"
     "proc complete(delay_map) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_lutnetwork) { text start end line pos mod } { return \"\" }\n"
     "proc complete(conv2bnet) { text start end line pos mod } { return \"\" }\n"

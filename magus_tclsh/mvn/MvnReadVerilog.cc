@@ -10,12 +10,13 @@
 
 
 #include "MvnReadVerilog.h"
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/MvnVerilogReader.h"
-#include "YmNetworks/MvnVlMap.h"
+#include "ym/MvnMgr.h"
+#include "ym/MvnVerilogReader.h"
+#include "ym/MvnVlMap.h"
 
-#include "YmUtils/MsgMgr.h"
-#include "YmUtils/MsgHandler.h"
+#include "ym/MsgMgr.h"
+#include "ym/StreamMsgHandler.h"
+#include "ym/MsgType.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -40,10 +41,10 @@ int
 MvnReadVerilog::cmd_proc(TclObjVector& objv)
 {
   StreamMsgHandler mh(&cerr);
-  mh.set_mask(kMaskAll);
-  mh.delete_mask(kMsgInfo);
-  mh.delete_mask(kMsgDebug);
-  MsgMgr::reg_handler(&mh);
+  mh.set_mask(kMsgMaskAll);
+  mh.delete_mask(MsgType::Info);
+  mh.delete_mask(MsgType::Debug);
+  MsgMgr::attach_handler(&mh);
 
   MvnVerilogReader reader;
 

@@ -3,14 +3,12 @@
 /// @brief MagBNetCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagBNetCmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
 /// Copyright (C) 2005-2010 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BNetCmd.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -24,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 // @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
 BNetCmd::BNetCmd(MagMgr* mgr,
 		 bool new_bnet_enable) :
-  NetCmd(mgr, new_bnet_enable, false, false)
+  NetCmd(mgr, new_bnet_enable, false)
 {
 }
 
@@ -34,8 +32,8 @@ BNetCmd::~BNetCmd()
 }
 
 // @brief カレントネットワークの取得
-// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
-BNetwork*
+// @note カレントネットワークが BnNetwork でない場合には nullptr を返す．
+BnNetwork*
 BNetCmd::cur_network() const
 {
   return cur_nethandle()->_bnetwork();
@@ -50,9 +48,9 @@ int
 BNetCmd::before_cmd_proc(TclObjVector& objv)
 {
   if ( NetCmd::before_cmd_proc(objv) == TCL_OK ) {
-    if ( cur_nethandle()->type() != NetHandle::kMagBNet ) {
+    if ( cur_nethandle()->type() != NetHandle::kMagBn ) {
       TclObj emsg;
-      emsg << "Network type mismatch. BNetwork type assumed.";
+      emsg << "Network type mismatch. BnNetwork type assumed.";
       set_result(emsg);
       return TCL_ERROR;
     }

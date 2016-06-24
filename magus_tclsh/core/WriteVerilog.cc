@@ -3,17 +3,13 @@
 /// @brief WriteVerilog の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "WriteVerilog.h"
 
-#include "YmNetworks/BNetVerilogWriter.h"
-#include "YmNetworks/BdnVerilogWriter.h"
-#include "YmNetworks/MvnVerilogWriter.h"
+#include "ym/MvnVerilogWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -24,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 WriteVerilog::WriteVerilog(MagMgr* mgr) :
-  NetCmd(mgr, false, false, false)
+  NetCmd(mgr, false, false)
 {
   set_usage_string("?<filename>?");
 }
@@ -63,21 +59,13 @@ WriteVerilog::cmd_proc(TclObjVector& objv)
 
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
-  case NetHandle::kMagBNet:
+  case NetHandle::kMagBn:
     {
       // BNetwork の場合
+#if 0
       BNetVerilogWriter writer;
       writer.dump(*osp, *neth->bnetwork());
-      // この関数はfailしない．
-      stat = TCL_OK;
-    }
-    break;
-
-  case NetHandle::kMagBdn:
-    {
-      // Bdn の場合
-      BdnVerilogWriter writer;
-      writer(*osp, *neth->bdn());
+#endif
       // この関数はfailしない．
       stat = TCL_OK;
     }

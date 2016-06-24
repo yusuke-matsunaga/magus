@@ -11,7 +11,7 @@
 
 #include "ListNetwork.h"
 #include "MagMgr.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS

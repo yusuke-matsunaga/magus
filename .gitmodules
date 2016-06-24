@@ -1,3 +1,30 @@
 [submodule "ym-common"]
 	path = ym-common
 	url = git@github.com:yusuke-matsunaga/ym-common.git
+[submodule "ym-logic"]
+	path = ym-logic
+	url = git@github.com:yusuke-matsunaga/ym-logic.git
+[submodule "ym-cell"]
+	path = ym-cell
+	url = git@github.com:yusuke-matsunaga/ym-cell
+[submodule "ym-verilog"]
+	path = ym-verilog
+	url = git@github.com:yusuke-matsunaga/ym-verilog
+[submodule "ym-tclpp"]
+	path = ym-tclpp
+	url = git@github.com:yusuke-matsunaga/ym-tclpp
+[submodule "ym-bnet"]
+	path = ym-bnet
+	url = git@github.com:yusuke-matsunaga/ym-bnet.git
+[submodule "ym-sat"]
+	path = ym-sat
+	url = git@github.com:yusuke-matsunaga/ym-sat
+[submodule "ym-mvn"]
+	path = ym-mvn
+	url = git@github.com:yusuke-matsunaga/ym-mvn.git
+[submodule "ym-base"]
+	path = ym-base
+	url = git@github.com:yusuke-matsunaga/ym-base.git
+[submodule "ym-combopt"]
+	path = ym-combopt
+	url = git@github.com:yusuke-matsunaga/ym-combopt.git

@@ -1,11 +1,9 @@
 ﻿
-/// @file magus/src/logbase/logbase_init.cc
-/// @brief コアパッケージの初期化を行う．
+/// @file bnet_init.cc
+/// @brief bnet パッケージの初期化を行う．
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GateObj.cc 347 2007-01-16 02:37:45Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -13,9 +11,6 @@
 
 #include "MagMgr.h"
 #include "BNetInfoCmd.h"
-#include "BNetIoCmd.h"
-#include "BNetElimCmd.h"
-#include "BNetNdCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -34,29 +29,22 @@ bnet_init(Tcl_Interp* interp,
   TclCmdBinder1<BNetAllInfo, MagMgr*>::reg(interp, mgr, "magus::network_allinfo");
   TclCmdBinder1<BNetPrintStats, MagMgr*>::reg(interp, mgr, "magus::print_stats");
 
-  // ネットワークのファイル入出力コマンド
-#if 0
-  TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr, "magus::read_blif");
-  TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr, "magus::read_iscas89");
-#endif
-  TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
-
   // ネットワーク上での処理コマンド(その2)
-  TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
-  TclCmdBinder1<SimplifyCmd, MagMgr*>::reg(interp, mgr, "magus::simplify");
-  TclCmdBinder1<SweepCmd, MagMgr*>::reg(interp, mgr,      "magus::sweep");
-  TclCmdBinder1<CleanCmd, MagMgr*>::reg(interp, mgr,      "magus::clean_up");
-  TclCmdBinder1<DecompCmd, MagMgr*>::reg(interp, mgr,     "magus::decomp");
-  TclCmdBinder1<GateDecompCmd, MagMgr*>::reg(interp, mgr, "magus::gate_decomp");
-  TclCmdBinder1<SopDecompCmd, MagMgr*>::reg(interp, mgr,  "magus::sop_decomp");
-  TclCmdBinder1<ConvCombiCmd, MagMgr*>::reg(interp, mgr,  "magus::conv_combi");
+  //TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
+  //TclCmdBinder1<SimplifyCmd, MagMgr*>::reg(interp, mgr, "magus::simplify");
+  //TclCmdBinder1<SweepCmd, MagMgr*>::reg(interp, mgr,      "magus::sweep");
+  //TclCmdBinder1<CleanCmd, MagMgr*>::reg(interp, mgr,      "magus::clean_up");
+  //TclCmdBinder1<DecompCmd, MagMgr*>::reg(interp, mgr,     "magus::decomp");
+  //TclCmdBinder1<GateDecompCmd, MagMgr*>::reg(interp, mgr, "magus::gate_decomp");
+  //TclCmdBinder1<SopDecompCmd, MagMgr*>::reg(interp, mgr,  "magus::sop_decomp");
+  //TclCmdBinder1<ConvCombiCmd, MagMgr*>::reg(interp, mgr,  "magus::conv_combi");
 
   // ノードに対するコマンド
-  TclCmdBinder1<NodeInfo, MagMgr*>::reg(interp, mgr,   "magus::node_info");
-  TclCmdBinder1<ListNode, MagMgr*>::reg(interp, mgr,   "magus::list_node");
-  TclCmdBinder1<ElimNode, MagMgr*>::reg(interp, mgr,   "magus::eliminate_node");
-  TclCmdBinder1<DelNode, MagMgr*>::reg(interp, mgr,    "magus::delete_node");
-  TclCmdBinder1<SimplifyNode, MagMgr*>::reg(interp, mgr, "magus::simplify_node");
+  //TclCmdBinder1<NodeInfo, MagMgr*>::reg(interp, mgr,   "magus::node_info");
+  //TclCmdBinder1<ListNode, MagMgr*>::reg(interp, mgr,   "magus::list_node");
+  //TclCmdBinder1<ElimNode, MagMgr*>::reg(interp, mgr,   "magus::eliminate_node");
+  //TclCmdBinder1<DelNode, MagMgr*>::reg(interp, mgr,    "magus::delete_node");
+  //TclCmdBinder1<SimplifyNode, MagMgr*>::reg(interp, mgr, "magus::simplify_node");
 
 
   //////////////////////////////////////////////////////////////////////
@@ -89,10 +77,6 @@ bnet_init(Tcl_Interp* interp,
     "proc complete(network_allinfo) { t s e l p m } { return \"\" }\n"
     "proc complete(print_stats) { t s e l p m } { return \"\" }\n"
 #if 0
-    "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
-    "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
-#endif
-    "proc complete(write_equ) { t s e l p m } { return \"\" }\n"
     "proc complete(eliminate) { t s e l p m } { return \"\" }\n"
     "proc complete(sweep) { t s e l p m } { return \"\" }\n"
     "proc complete(clean_up) { t s e l p m } { return \"\" }\n"
@@ -103,6 +87,7 @@ bnet_init(Tcl_Interp* interp,
     "proc complete(list_node) { t s e l p m } { return \"\" }\n"
     "proc complete(eliminate_node) { t s e l p m } { return \"\" }\n"
     "proc complete(delete_node) { t s e l p m } { return \"\" }\n"
+#endif
     "}\n"
     "}\n";
   if ( Tcl_Eval(interp, completer) == TCL_ERROR ) {

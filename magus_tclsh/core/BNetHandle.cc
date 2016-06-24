@@ -1,15 +1,13 @@
 ﻿
-/// @file src/logbase/BNetHandle.cc
+/// @file BNetHandle.cc
 /// @brief BNetHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "BNetHandle.h"
-#include "YmNetworks/BNetwork.h"
-#include "YmNetworks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -31,21 +29,21 @@ BNetHandle::~BNetHandle()
 }
 
 // @brief 型を返す．
-NetHandle::tType
+NetHandle::Type
 BNetHandle::type() const
 {
-  return kMagBNet;
+  return kMagBn;
 }
 
-// @brief BNetwork を得る．
-const BNetwork*
+// @brief BnNetwork を得る．
+const BnNetwork*
 BNetHandle::bnetwork() const
 {
   return &mNetwork;
 }
 
-// @brief BNetwork を得る．
-BNetwork*
+// @brief BnNetwork を得る．
+BnNetwork*
 BNetHandle::_bnetwork()
 {
   return &mNetwork;
@@ -67,13 +65,9 @@ BNetHandle::copy(const NetHandle* src,
 		 bool allow_conv)
 {
   switch ( src->type() ) {
-  case kMagBNet:
-    mNetwork = *(src->bnetwork());
+  case kMagBn:
+    mNetwork.copy(*(src->bnetwork()));
     break;
-
-  case kMagBdn:
-#warning "TODO: 本当は Bdn から BNetwork に変換する．"
-    return false;
 
   case kMagMvn:
     return false;

@@ -1,13 +1,11 @@
-﻿#ifndef SRC_LOGBASE_MVNREADVERILOG_H
-#define SRC_LOGBASE_MVNREADVERILOG_H
+﻿#ifndef MVNREADVERILOG_H
+#define MVNREADVERILOG_H
 
-/// @file src/logbase/MvnReadVerilog.h
+/// @file MvnReadVerilog.h
 /// @brief MvnReadVerilog のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: Lutmap.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -44,4 +42,4 @@ protected:
 
 END_NAMESPACE_MAGUS
 
-#endif // SRC_LOGBASE_MVNREADVERILOG_H
+#endif // MVNREADVERILOG_H

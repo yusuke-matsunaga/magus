@@ -8,15 +8,13 @@
 
 
 #include "AreaMapCmd.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 #include "CellMap.h"
 
-#include "YmNetworks/BNetBdnConv.h"
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/BdnMgr.h"
-#include "YmNetworks/MvnBdnConv.h"
-#include "YmNetworks/MvnBdnMap.h"
+#include "ym/MvnMgr.h"
+#include "ym/BnNetwork.h"
+#include "ym/ClibCellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -26,9 +24,8 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-AreaMapCmd::AreaMapCmd(MagMgr* mgr,
-		       CmnMgr& cmnmgr) :
-  TechmapCmd(mgr, cmnmgr)
+AreaMapCmd::AreaMapCmd(MagMgr* mgr) :
+  TechmapCmd(mgr)
 {
   mPoptMethod = new TclPoptStr(this, "method",
 			       "specify covering method",
@@ -76,7 +73,7 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  if ( cur_cell_library() == nullptr ) {
+  if ( cur_cell_library().cell_num() == 0 ) {
     TclObj emsg;
     emsg << "Cell Library is not set.";
     set_result(emsg);
@@ -86,23 +83,17 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
   NetHandle* neth = cur_nethandle();
   CellMap mapper;
   switch ( neth->type() ) {
-  case NetHandle::kMagBNet:
+  case NetHandle::kMagBn:
     {
-      BNetBdnConv conv;
-
-      BdnMgr tmp_network;
-      conv(*neth->bnetwork(), tmp_network);
-
-      mapper.area_map(*cur_cell_library(), tmp_network, 0, cmnmgr());
+      BnNetwork dst_network;
+      mapper.area_map(cur_cell_library(), *neth->bnetwork(), 0, dst_network);
+      neth->_bnetwork()->copy(dst_network);
     }
-    break;
-
-  case NetHandle::kMagBdn:
-    mapper.area_map(*cur_cell_library(), *neth->bdn(), 0, cmnmgr());
     break;
 
   case NetHandle::kMagMvn:
     {
+#if 0
       const MvnMgr& mvn = *neth->mvn();
       MvnBdnConv conv;
       BdnMgr tmp_network;
@@ -110,6 +101,7 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
       conv(mvn, tmp_network, mvnode_map);
 
       mapper.area_map(*cur_cell_library(), tmp_network, 0, cmnmgr());
+#endif
     }
     break;
   }

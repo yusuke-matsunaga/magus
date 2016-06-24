@@ -9,8 +9,6 @@
 
 #include "TechmapCmd.h"
 #include "AreaMapCmd.h"
-#include "DumpCnCmd.h"
-#include "YmNetworks/CmnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -20,23 +18,14 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-TechmapCmd::TechmapCmd(MagMgr* mgr,
-		       CmnMgr& cmnmgr) :
-  MagCmd(mgr),
-  mCmnMgr(cmnmgr)
+TechmapCmd::TechmapCmd(MagMgr* mgr) :
+  MagCmd(mgr)
 {
 }
 
 // @brief デストラクタ
 TechmapCmd::~TechmapCmd()
 {
-}
-
-// @brief セルネットワークを得る．
-CmnMgr&
-TechmapCmd::cmnmgr()
-{
-  return mCmnMgr;
 }
 
 END_NAMESPACE_MAGUS_TECHMAP
@@ -49,13 +38,7 @@ techmap_init(Tcl_Interp* interp,
 {
   using namespace nsTechmap;
 
-  CmnMgr* cmnmgr = new CmnMgr;
-
-  TclCmdBinder2<AreaMapCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
-						       "magus::techmap::area_map");
-  TclCmdBinder2<DumpCnCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
-						       "magus::techmap::dump_cngraph");
-
+  TclCmdBinder1<AreaMapCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::area_map");
 
   const char* init =
     "namespace eval tclreadline {\n"
@@ -64,7 +47,6 @@ techmap_init(Tcl_Interp* interp,
     "proc complete(load_pat) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_pat) { text start end line pos mod } { return \"\" }\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
-    "proc complete(dump_cngraph) { text start end line pos mod } { return \"\" }\n"
     "}\n"
     "}\n"
     "}\n";

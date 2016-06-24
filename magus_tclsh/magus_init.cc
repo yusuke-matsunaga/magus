@@ -43,10 +43,6 @@ int
 techmap_init(Tcl_Interp* interp,
 	     MagMgr* mgr);
 
-int
-seal_init(Tcl_Interp* interp,
-	  MagMgr* mgr);
-
 #if defined(USE_TEST_PACKAGE)
 int
 test_init(Tcl_Interp* interp,
@@ -103,10 +99,6 @@ magus_init(Tcl_Interp* interp)
     return TCL_ERROR;
   }
 
-  if ( seal_init(interp, mgr) == TCL_ERROR ) {
-    return TCL_ERROR;
-  }
-
 #if defined(USE_TEST_PACKAGE)
   if ( test_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
@@ -142,12 +134,10 @@ magus_init(Tcl_Interp* interp)
   }
 #endif
 
-  const char* MAGUS_VERSION = "1.0";
-
   //////////////////////////////////////////////////////////////////////
   // パッケージ宣言
   //////////////////////////////////////////////////////////////////////
-  if ( Tcl_PkgProvide(interp, "Magus", MAGUS_VERSION) != TCL_OK ) {
+  if ( Tcl_PkgProvide(interp, "Magus", MAGUS_VERSION_STR) != TCL_OK ) {
     return TCL_ERROR;
   }
 
