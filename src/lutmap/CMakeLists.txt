@@ -39,8 +39,7 @@ set ( cut_resub_SOURCES
 #  ターゲットの設定
 # ===================================================================
 
-ym_add_library (magus_lutmap
-  STATIC
+ym_add_object_library (magus_lutmap
   ${main_SOURCES}
   ${enum_cut_SOURCES}
   ${cut_resub_SOURCES}

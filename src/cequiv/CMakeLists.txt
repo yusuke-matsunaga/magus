@@ -25,7 +25,6 @@ set (SOURCES
 # ターゲットの設定
 # ===================================================================
 
-ym_add_library (magus_cequiv
-  STATIC
+ym_add_object_library (magus_cequiv
   ${SOURCES}
   )

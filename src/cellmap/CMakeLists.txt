@@ -24,7 +24,6 @@ set (cellmap_SOURCES
 #  ターゲットの設定
 # ===================================================================
 
-ym_add_library (magus_cellmap
-  STATIC
+ym_add_object_library (magus_cellmap
   ${cellmap_SOURCES}
   )

@@ -32,7 +32,6 @@ set (SOURCES
 # ターゲットの設定
 # ===================================================================
 
-ym_add_library (magus_seal
-  STATIC
+ym_add_object_library (magus_seal
   ${SOURCES}
   )

@@ -1,0 +1,17 @@
+﻿
+
+//////////////////////////////////////////////////////////////////////
+// バージョン変数の設定
+//////////////////////////////////////////////////////////////////////
+
+/// @brief プロジェクトの major バージョン
+#define MAGUS_VERSION_MAJIR @YM_MAGUS_VERSION_MAJOR@
+
+/// @brief プロジェクトの minor バージョン
+#define MAGUS_VERSION_MINOR @YM_MAGUS_VERSION_MINOR@
+
+/// @brief プロジェクトのバージョン
+#define MAGUS_VERSION @YM_MAGUS_VERSION@
+
+/// @brief プロジェクトの名前空間
+#define MAGUS_NAMESPACE @YM_MAGUS_NAMESPACE@

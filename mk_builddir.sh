@@ -17,23 +17,23 @@ basedir=`dirname $0`
 srcdir=`cd $basedir; pwd`
 
 # オプション解析用のループ
-while [ $# -ge 4 ] ; do
-    case $1 in
-	"--ymtools_dir")
-	    ymtoolsdir=$2
-	    shift; shift;;
-
-	"--ymtclpp_dir")
-	    ymtclppdir=$2
-	    shift; shift;;
-
-	*) ;;
-    esac
-done
+#while [ $# -ge 4 ] ; do
+#    case $1 in
+#	"--ymtools_dir")
+#	    ymtoolsdir=$2
+#	    shift; shift;;
+#
+#	"--ymtclpp_dir")
+#	    ymtclppdir=$2
+#	    shift; shift;;
+#
+#	*) ;;
+#    esac
+#done
 
 # 引数の数が異なっていたら usage を表示して終わる．
 if [ $# -ne 2 ]; then
-    echo "USAGE mk_builddir.sh [--ymtools_dir <ymtools-dir>] [--ymtclpp_dir <ymtclpp-dir>] <compiledir> <installdir>"
+    echo "USAGE mk_builddir.sh <compiledir> <installdir>"
     exit 1
 fi
 
@@ -48,12 +48,6 @@ echo "****"
 echo "source  directory: $srcdir"
 echo "build   directory: $builddir"
 echo "install directory: $installdir"
-if [ "x$ymtoolsdir" != x ]; then
-    echo "ymtools directory: $ymtoolsdir"
-fi
-if [ "x$ymtclppdir" != x ]; then
-    echo "ymtclpp directory: $ymtclppdir"
-fi
 echo "****"
 echo -n "continue with above configuration ? (yes/no): "
 while read confirmation; do
@@ -73,14 +67,12 @@ done
 # ビルドディレクトリはなければ作る．
 test -d $builddir || mkdir -p $builddir
 
-# do_cmake.sh ファイルを作る．
-do_cmake="do_cmake.sh"
+# boot.sh ファイルを作る．
+boot="boot.sh"
 $SED -e s!___SRC_DIR___!$srcdir! \
      -e s!___INSTALL_DIR___!$installdir! \
-     -e s!___YMTOOLS_DIR___!$ymtoolsdir! \
-     -e s!___YMTCLPP_DIR___!$ymtclppdir! \
-     $srcdir/etc/${do_cmake}.in > $builddir/$do_cmake
-chmod +x $builddir/$do_cmake
+     $srcdir/etc/${boot}.in > $builddir/$boot
+chmod +x $builddir/$boot
 
 echo "Build directory setup completed."
-echo "Move to '$builddir', and execute './do_cmake.sh'"
+echo "Move to '$builddir', and execute './$boot'"

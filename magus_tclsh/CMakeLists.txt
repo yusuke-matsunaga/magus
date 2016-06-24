@@ -5,7 +5,6 @@
 include_directories (
   include
   ${TCL_INCLUDE_PATH}
-  ${YmTclpp_INCLUDE_DIRS}
   )
 
 
@@ -124,6 +123,20 @@ add_executable (magus_tclsh
   ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
+  $<TARGET_OBJECTS:magus_cequiv_a>
+  $<TARGET_OBJECTS:magus_seal_a>
+  $<TARGET_OBJECTS:magus_lutmap_a>
+  $<TARGET_OBJECTS:magus_cellmap_a>
+  $<TARGET_OBJECTS:ym_common_a>
+  $<TARGET_OBJECTS:ym_logic_a>
+  $<TARGET_OBJECTS:ym_cell_a>
+  $<TARGET_OBJECTS:ym_bnet_a>
+  $<TARGET_OBJECTS:ym_sat_a>
+  $<TARGET_OBJECTS:ym_mincov_a>
+  $<TARGET_OBJECTS:ym_mvn_a>
+  $<TARGET_OBJECTS:ym_sat_a>
+  $<TARGET_OBJECTS:ym_udgraph_a>
+  $<TARGET_OBJECTS:ym_verilog_a>
   )
 
 target_compile_options (magus_tclsh
@@ -135,16 +148,8 @@ target_compile_definitions (magus_tclsh
   )
 
 target_link_libraries (magus_tclsh
-  magus_cequiv
-  magus_seal
-  magus_lutmap
-  magus_cellmap
-  ym_networks
-  ym_cell
-  ym_verilog
-  ym_logic
-  ym_tclpp
-  ym_utils
+  ${YM_LIB_DEPENDS}
+  ${TCL_LIBRARY}
   )
 
 
@@ -163,6 +168,20 @@ add_executable (magus_tclsh_p
   ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
+  $<TARGET_OBJECTS:magus_cequiv_p>
+  $<TARGET_OBJECTS:magus_seal_p>
+  $<TARGET_OBJECTS:magus_lutmap_p>
+  $<TARGET_OBJECTS:magus_cellmap_p>
+  $<TARGET_OBJECTS:ym_common_p>
+  $<TARGET_OBJECTS:ym_logic_p>
+  $<TARGET_OBJECTS:ym_cell_p>
+  $<TARGET_OBJECTS:ym_bnet_p>
+  $<TARGET_OBJECTS:ym_sat_p>
+  $<TARGET_OBJECTS:ym_mincov_p>
+  $<TARGET_OBJECTS:ym_mvn_p>
+  $<TARGET_OBJECTS:ym_sat_p>
+  $<TARGET_OBJECTS:ym_udgraph_p>
+  $<TARGET_OBJECTS:ym_verilog_p>
   )
 
 target_compile_options (magus_tclsh_p
@@ -174,16 +193,8 @@ target_compile_definitions (magus_tclsh_p
   )
 
 target_link_libraries (magus_tclsh_p
-  magus_cequiv_p
-  magus_seal_p
-  magus_lutmap_p
-  magus_cellmap_p
-  ym_networks_p
-  ym_cell_p
-  ym_verilog_p
-  ym_logic_p
-  ym_tclpp_p
-  ym_utils_p
+  ${YM_LIB_DEPENDS}
+  ${TCL_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
@@ -208,6 +219,20 @@ add_executable (magus_tclsh_d
   ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
+  $<TARGET_OBJECTS:magus_cequiv_d>
+  $<TARGET_OBJECTS:magus_seal_d>
+  $<TARGET_OBJECTS:magus_lutmap_d>
+  $<TARGET_OBJECTS:magus_cellmap_d>
+  $<TARGET_OBJECTS:ym_common_d>
+  $<TARGET_OBJECTS:ym_logic_d>
+  $<TARGET_OBJECTS:ym_cell_d>
+  $<TARGET_OBJECTS:ym_bnet_d>
+  $<TARGET_OBJECTS:ym_sat_d>
+  $<TARGET_OBJECTS:ym_mincov_d>
+  $<TARGET_OBJECTS:ym_mvn_d>
+  $<TARGET_OBJECTS:ym_sat_d>
+  $<TARGET_OBJECTS:ym_udgraph_d>
+  $<TARGET_OBJECTS:ym_verilog_d>
   )
 
 target_compile_options (magus_tclsh_d
@@ -215,16 +240,8 @@ target_compile_options (magus_tclsh_d
   )
 
 target_link_libraries (magus_tclsh_d
-  magus_cequiv_d
-  magus_seal_d
-  magus_lutmap_d
-  magus_cellmap_d
-  ym_networks_d
-  ym_cell_d
-  ym_verilog_d
-  ym_logic_d
-  ym_tclpp_d
-  ym_utils_d
+  ${YM_LIB_DEPENDS}
+  ${TCL_LIBRARY}
   )
 
 

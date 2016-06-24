@@ -30,7 +30,6 @@ set (sbjgraph_SOURCES
 #  ターゲットの設定
 # ===================================================================
 
-ym_add_library (magus_techmap
-  STATIC
+ym_add_object_library (magus_techmap
   ${cellmap_SOURCES}
   )
