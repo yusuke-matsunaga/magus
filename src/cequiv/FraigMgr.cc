@@ -216,11 +216,11 @@ FraigMgr::make_cofactor(FraigHandle edge,
 }
 
 // @brief 2つのハンドルが等価かどうか調べる．
-Bool3
+SatBool3
 FraigMgr::check_equiv(FraigHandle aig1,
 		      FraigHandle aig2)
 {
-  Bool3 stat = mImpl->check_equiv(aig1, aig2);
+  SatBool3 stat = mImpl->check_equiv(aig1, aig2);
   return stat;
 }
 

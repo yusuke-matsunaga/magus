@@ -9,8 +9,8 @@
 
 #include "CecMgr.h"
 #include "CecNode.h"
-#include "YmUtils/StopWatch.h"
-#include "YmLogic/SatStats.h"
+#include "ym/StopWatch.h"
+#include "ym/SatStats.h"
 
 
 #if defined(YM_DEBUG)
@@ -38,7 +38,7 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief ノードの通し番号を得る．
-VarId
+SatVarId
 CecHandle::varid() const
 {
   CecNode* n = node();
@@ -46,7 +46,7 @@ CecHandle::varid() const
     return n->varid();
   }
   else {
-    return kVarIdIllegal;
+    return kSatVarIdIllegal;
   }
 }
 
@@ -280,14 +280,14 @@ CecMgr::make_and(CecHandle handle1,
 
   // 入出力の関係を表す CNF を作る．
   {
-    VarId id = node->varid();
-    VarId id0 = handle1.varid();
-    VarId id1 = handle2.varid();
+    SatVarId id = node->varid();
+    SatVarId id0 = handle1.varid();
+    SatVarId id1 = handle2.varid();
     bool inv0 = handle1.inv();
     bool inv1 = handle2.inv();
-    Literal lito(id, false);
-    Literal lit1(id0, inv0);
-    Literal lit2(id1, inv1);
+    SatLiteral lito(id, false);
+    SatLiteral lit1(id0, inv0);
+    SatLiteral lit2(id1, inv1);
     mSolver.add_clause(~lit1, ~lit2, lito);
     mSolver.add_clause( lit1, ~lito);
     mSolver.add_clause( lit2, ~lito);
@@ -297,7 +297,7 @@ CecMgr::make_and(CecHandle handle1,
 }
 
 // @brief 2つのハンドルが等価かどうか調べる．
-Bool3
+SatBool3
 CecMgr::check_equiv(CecHandle aig1,
 		    CecHandle aig2)
 {
@@ -319,30 +319,30 @@ CecMgr::check_equiv(CecHandle aig1,
 
   if ( aig1.is_zero () ) {
     // 上のチェックで aig2 は定数でないことは明らか
-    Bool3 stat = check_const(node2, inv2);
+    SatBool3 stat = check_const(node2, inv2);
     return stat;
   }
 
   if ( aig1.is_one() ) {
     // 上のチェックで aig2 は定数でないことは明らか
-    Bool3 stat = check_const(node2, !inv2);
+    SatBool3 stat = check_const(node2, !inv2);
     return stat;
   }
 
   if ( aig2.is_zero() ) {
     // 上のチェックで aig1 は定数でないことは明らか
-    Bool3 stat = check_const(node1, inv1);
+    SatBool3 stat = check_const(node1, inv1);
     return stat;
   }
 
   if ( aig2.is_one() ) {
     // 上のチェックで aig1 は定数でないことは明らか
-    Bool3 stat = check_const(node1, !inv1);
+    SatBool3 stat = check_const(node1, !inv1);
     return stat;
   }
 
   bool inv = inv1 ^ inv2;
-  Bool3 stat = check_equiv(node1, node2, inv);
+  SatBool3 stat = check_equiv(node1, node2, inv);
   return stat;
 }
 
@@ -374,11 +374,11 @@ CecMgr::new_node()
 }
 
 // node が定数かどうか調べる．
-Bool3
+SatBool3
 CecMgr::check_const(CecNode* node,
 		    bool inv)
 {
-  VarId id = node->varid();
+  SatVarId id = node->varid();
 
   if ( debug ) {
     cout << "CHECK CONST";
@@ -396,13 +396,13 @@ CecMgr::check_const(CecNode* node,
   StopWatch sw;
   sw.start();
 
-  Literal lit(id, inv);
+  SatLiteral lit(id, inv);
 
   // この関数の戻り値
-  Bool3 code = kB3X;
+  SatBool3 code = kB3X;
 
   // lit = 1 が成り立つか調べる
-  Bool3 stat = check_condition(lit);
+  SatBool3 stat = check_condition(lit);
   if ( stat == kB3False ) {
     // 成り立たないということは lit = 0
     mSolver.add_clause(~lit);
@@ -429,13 +429,13 @@ CecMgr::check_const(CecNode* node,
 }
 
 // node1 と node2 機能的に等価かどうか調べる．
-Bool3
+SatBool3
 CecMgr::check_equiv(CecNode* node1,
 		    CecNode* node2,
 		    bool inv)
 {
-  VarId id1 = node1->varid();
-  VarId id2 = node2->varid();
+  SatVarId id1 = node1->varid();
+  SatVarId id2 = node2->varid();
 
   if ( debug ) {
     cout << "CHECK EQUIV  "
@@ -450,16 +450,16 @@ CecMgr::check_equiv(CecNode* node1,
   StopWatch sw;
   sw.start();
 
-  Literal lit1(id1, false);
-  Literal lit2(id2, inv);
+  SatLiteral lit1(id1, false);
+  SatLiteral lit2(id2, inv);
 
   // この関数の戻り値
-  Bool3 code = kB3X;
+  SatBool3 code = kB3X;
 
   // 等価でない条件
   // - lit1 = 0 かつ lit2 = 1 が成り立つ
   // - lit0 = 1 かつ lit2 = 0 が成り立つ
-  Bool3 stat = check_condition(~lit1,  lit2);
+  SatBool3 stat = check_condition(~lit1,  lit2);
   if ( stat == kB3False ) {
     stat = check_condition( lit1, ~lit2);
     if ( stat == kB3False ) {
@@ -492,30 +492,30 @@ CecMgr::check_equiv(CecNode* node1,
 }
 
 // lit1 が成り立つか調べる．
-Bool3
-CecMgr::check_condition(Literal lit1)
+SatBool3
+CecMgr::check_condition(SatLiteral lit1)
 {
-  vector<Literal> assumptions(1);
+  vector<SatLiteral> assumptions(1);
   assumptions[0] = lit1;
-  Bool3 ans1 = mSolver.solve(assumptions, mModel);
+  SatBool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
   SatSolver solver(nullptr, "minisat");
   for (vector<CecNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     CecNode* node = *p;
-    VarId id = solver.new_var();
+    SatVarId id = solver.new_var();
     ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
-      Literal lito(id, false);
-      Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
-      Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
+      SatLiteral lito(id, false);
+      SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
+      SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause( lit1, ~lito);
       solver.add_clause( lit2, ~lito);
     }
   }
-  Bool3 ans2 = solver.solve(assumptions, mModel);
+  SatBool3 ans2 = solver.solve(assumptions, mModel);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition(" << lit1 << ")" << endl;
@@ -526,10 +526,10 @@ CecMgr::check_condition(Literal lit1)
 	 p != mAllNodes.end(); ++ p) {
       CecNode* node = *p;
       if ( node->is_and() ) {
-	VarId id = node->varid();
-	Literal lito(id, false);
-	Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
-	Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
+	SatVarId id = node->varid();
+	SatLiteral lito(id, false);
+	SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
+	SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
@@ -541,32 +541,32 @@ CecMgr::check_condition(Literal lit1)
 }
 
 // lit1 & lit2 が成り立つか調べる．
-Bool3
-CecMgr::check_condition(Literal lit1,
-			Literal lit2)
+SatBool3
+CecMgr::check_condition(SatLiteral lit1,
+			SatLiteral lit2)
 {
-  vector<Literal> assumptions(2);
+  vector<SatLiteral> assumptions(2);
   assumptions[0] = lit1;
   assumptions[1] = lit2;
-  Bool3 ans1 = mSolver.solve(assumptions, mModel);
+  SatBool3 ans1 = mSolver.solve(assumptions, mModel);
 
 #if defined(VERIFY_SATSOLVER)
   SatSolver solver(nullptr, "minisat");
   for (vector<CecNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     CecNode* node = *p;
-    VarId id = solver.new_var();
+    SatVarId id = solver.new_var();
     ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
-      Literal lito(id, false);
-      Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
-      Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
+      SatLiteral lito(id, false);
+      SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
+      SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause(lit1, ~lito);
       solver.add_clause(lit2, ~lito);
     }
   }
-  Bool3 ans2 = solver.solve(assumptions, mModel);
+  SatBool3 ans2 = solver.solve(assumptions, mModel);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition("
@@ -578,10 +578,10 @@ CecMgr::check_condition(Literal lit1,
 	 p != mAllNodes.end(); ++ p) {
       CecNode* node = *p;
       if ( node->is_and() ) {
-	VarId id = node->varid();
-	Literal lito(id, false);
-	Literal lit1(node->fanin0()->varid(), node->fanin0_inv());
-	Literal lit2(node->fanin1()->varid(), node->fanin1_inv());
+	SatVarId id = node->varid();
+	SatLiteral lito(id, false);
+	SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
+	SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
@@ -594,15 +594,15 @@ CecMgr::check_condition(Literal lit1,
 
 // @brief CecHandle に対応するリテラルを返す．
 // @note 定数の場合の返り値は未定
-Literal
+SatLiteral
 CecMgr::fraig2literal(CecHandle aig)
 {
   if ( aig.is_const() ) {
-    return Literal(VarId(0), false);
+    return SatLiteral(SatVarId(0), false);
   }
-  VarId id = aig.node()->varid();
+  SatVarId id = aig.node()->varid();
   bool inv = aig.inv();
-  return Literal(id, inv);
+  return SatLiteral(id, inv);
 }
 
 #if 0
@@ -678,7 +678,7 @@ CecMgr::SatStat::SatStat()
 }
 
 void
-CecMgr::SatStat::set_result(Bool3 code,
+CecMgr::SatStat::set_result(SatBool3 code,
 			    double t)
 {
   ++ mTotalCount;

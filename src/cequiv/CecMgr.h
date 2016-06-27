@@ -12,8 +12,8 @@
 #include "cec_nsdef.h"
 #include "CecHandle.h"
 #include "CecHash.h"
-#include "YmUtils/SimpleAlloc.h"
-#include "YmLogic/SatSolver.h"
+#include "ym/SimpleAlloc.h"
+#include "ym/SatSolver.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -90,7 +90,7 @@ public:
 	  CecHandle handle2);
 
   /// @brief 2つのハンドルが等価かどうか調べる．
-  Bool3
+  SatBool3
   check_equiv(CecHandle aig1,
 	      CecHandle aig2);
 
@@ -125,30 +125,30 @@ private:
   /// @brief ノードが定数と等価かどうか調べる．
   /// @param[in] node 対象のノード
   /// @param[in] inv false で 0, true で 1 を表す．
-  Bool3
+  SatBool3
   check_const(CecNode* node,
 	      bool inv);
 
   /// @brief 2つのノードが等価かどうか調べる．
   /// @param[in] node1, node2 対象のノード
   /// @param[in] inv false で同相，true で逆相を表す．
-  Bool3
+  SatBool3
   check_equiv(CecNode* node1,
 	      CecNode* node2,
 	      bool inv);
 
   /// @brief lit1 が成り立つか調べる．
-  Bool3
-  check_condition(Literal lit1);
+  SatBool3
+  check_condition(SatLiteral lit1);
 
   /// @brief lit1 & lit2 が成り立つか調べる．
-  Bool3
-  check_condition(Literal lit1,
-		  Literal lit2);
+  SatBool3
+  check_condition(SatLiteral lit1,
+		  SatLiteral lit2);
 
   /// @brief CecHandle に対応するリテラルを返す．
   /// @note 定数の場合の返り値は未定
-  Literal
+  SatLiteral
   fraig2literal(CecHandle aig);
 
   /// @brief 等価候補グループの情報を出力する．
@@ -211,7 +211,7 @@ private:
     //      = kB3False 検証失敗
     //      = kB3X     アボート
     void
-    set_result(Bool3 code,
+    set_result(SatBool3 code,
 	       double t);
 
     // 内容をダンプする．
@@ -242,7 +242,7 @@ private:
   SatSolver mSolver;
 
   // SAT 用の割り当て格納配列
-  vector<Bool3> mModel;
+  vector<SatBool3> mModel;
 
   // sat_sweep 中のシミュレーション回数
   ymuint32 mSimCount;

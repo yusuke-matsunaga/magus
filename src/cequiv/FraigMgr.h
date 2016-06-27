@@ -11,8 +11,8 @@
 
 #include "cec_nsdef.h"
 #include "FraigHandle.h"
-#include "YmLogic/Expr.h"
-#include "YmLogic/Bool3.h"
+#include "ym/Expr.h"
+#include "ym/SatBool3.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -121,7 +121,7 @@ public:
 public:
 
   /// @brief 2つのハンドルが等価かどうか調べる．
-  Bool3
+  SatBool3
   check_equiv(FraigHandle aig1,
 	      FraigHandle aig2);
 

@@ -8,9 +8,8 @@
 
 
 #include "cec_nsdef.h"
-#include "YmNetworks/BdnMgr.h"
-#include "YmNetworks/BdnPort.h"
-#include "YmNetworks/BdnNode.h"
+#include "ym/BnNetwork.h"
+#include "ym/BnNode.h"
 #include "FraigMgr.h"
 
 
@@ -19,58 +18,113 @@ BEGIN_NAMESPACE_YM_CEC
 extern
 void
 make_miter(BdnMgr& bdn_mgr,
-	   const BdnMgr& src_network1,
-	   const BdnMgr& src_network2,
-	   const vector<pair<ymuint32, ymuint32> >& iassoc,
-	   const vector<pair<ymuint32, ymuint32> >& oassoc,
+	   const BnNetwork& src_network1,
+	   const BnNetwork& src_network2,
+	   const vector<pair<ymuint, ymuint> >& iassoc,
+	   const vector<pair<ymuint, ymuint> >& oassoc,
 	   vector<pair<BdnNodeHandle, BdnNodeHandle> >& comp_pairs);
 
 BEGIN_NONAMESPACE
 
 int debug = 0;
 
+// @brief 他入力
 
-// @brief handle の TFI を作る．
+// @brief node に対応する Fraig を作る．
+// @param[in] network 元の Boolean Network
+// @param[in] node_id 変換対象のノード番号
+// @param[in] fraig_mgr FrAIG マネージャ
+// @param[in] map BnNode の ID 番号をキーにして FraigHandle を記録した配列
 FraigHandle
-make_tficone(BdnNodeHandle handle,
+make_tficone(const BnNetwork& network,
+	     ymuint node_id,
 	     FraigMgr& fraig_mgr,
 	     vector<FraigHandle>& map)
 {
-  if ( handle.is_zero() ) {
+  const BnNode* node = network.node(node_id);
+  const BnFuncType* func_type = node->func_type();
+  if ( func_type->type() == BnFuncType::kFt_C0 ) {
+    // 定数0の場合
     return fraig_mgr.make_zero();
   }
-  if ( handle.is_one() ) {
+  if ( func_type->type() == BnFuncType::kFt_C1 ) {
+    // 定数1の場合
     return fraig_mgr.make_one();
   }
 
-  BdnNode* node = handle.node();
   if ( map[node->id()] == FraigHandle() ) {
+    // マップに未登録だった
+    // 必ず logic タイプのはず．
     ASSERT_COND(node->is_logic() );
-    BdnNode* node0 = node->fanin0();
-    bool inv0 = node->fanin0_inv();
-    BdnNodeHandle ih0(node0, inv0);
-    FraigHandle fh0 = make_tficone(ih0, fraig_mgr, map);
-    BdnNode* node1 = node->fanin1();
-    bool inv1 = node->fanin1_inv();
-    BdnNodeHandle ih1(node1, inv1);
-    FraigHandle fh1 = make_tficone(ih1, fraig_mgr, map);
-    if ( node->is_and() ) {
-      FraigHandle fh = fraig_mgr.make_and(fh0, fh1);
-      map[node->id()] = fh;
+
+    // ファンインに対応する FraigHandle を求める．
+    ymuint ni = node->fanin_num();
+    vector<FraigHandle> fanin_handles(ni);
+    for (ymuint i = 0; i < ni; ++ i) {
+      ymuint inode_id = node->fanin_id(i);
+      FraigHandle ih = make_tficone(network, inode_id, fraig_mgr, map);
+      fanin_handles[i] = ih;
     }
-    else if ( node->is_xor() ) {
-      FraigHandle fh2 = fraig_mgr.make_and(fh0, ~fh1);
-      FraigHandle fh3 = fraig_mgr.make_and(~fh0, fh1);
-      FraigHandle fh = fraig_mgr.make_or(fh2, fh3);
-      map[node->id()] = fh;
+
+    // 個々の関数タイプに従って FrAIG を生成する．
+    switch ( func_type->type() ) {
+    case BnFuncType::kFt_C0:
+    case BnFuncType::kFt_C1:
+      ASSERT_NOT_REACHED;
+      break;
+
+    case BnFuncType::kFt_BUFF:
+      map[node->id()] = fanin_handles[0];
+      break;
+
+    case BnFuncType::kFt_NOT:
+      map[node->id()] = ~fanin_handles[0];
+      break;
+
+    case BnFuncType::kFt_AND:
+      map[node->id()] = fraig_mgr.make_and(fanin_handles);
+      break;
+
+    case BnFuncType::kFt_NAND:
+      map[node->id()] = ~fraig_mgr.make_and(fanin_handles);
+      break;
+
+    case BnFuncType::kFt_OR:
+      map[node->id()] = fraig_mgr.make_or(fanin_handles);
+      break;
+
+    case BnFuncType::kFt_NOR:
+      map[node->id()] = ~fraig_mgr.make_or(fanin_handles);
+      break;
+
+    case BnFuncType::kFt_XOR:
+      map[node->id()] = fraig_mgr.make_xor(fanin_handles);
+      break;
+
+    case BnFuncType::kFt_XNOR:
+      map[node->id()] = ~fraig_mgr.make_xor(fanin_handles);
+      break;
+
+    case BnFuncType::kFt_CELL:
+      {
+	const Cell* cell = func_type->cell();
+      }
+      break;
+
+    case BnFuncType::kFt_EXPR:
+      map[node->id()] = fraig_mgr.make_logic(func_type->expr(), fanin_handles);
+      break;
+
+    case BnFuncType::kFt_TV:
+      {
+	TvFunc tv = func_type->truth_vector();
+      }
+      break;
+
     }
   }
-  if ( handle.inv() ) {
-    return ~map[node->id()];
-  }
-  else {
-    return map[node->id()];
-  }
+
+  return map[node->id()];
 }
 
 END_NONAMESPACE
@@ -78,10 +132,10 @@ END_NONAMESPACE
 
 // 新しい関数
 void
-check_ceq(const BdnMgr& src_network1,
-	  const BdnMgr& src_network2,
-	  const vector<pair<ymuint32, ymuint32> >& iassoc,
-	  const vector<pair<ymuint32, ymuint32> >& oassoc,
+check_ceq(const BnNetwork& src_network1,
+	  const BnNetwork& src_network2,
+	  const vector<pair<ymuint, ymuint> >& iassoc,
+	  const vector<pair<ymuint, ymuint> >& oassoc,
 	  ymint log_level,
 	  ostream* log_out,
 	  const string& sat_type,

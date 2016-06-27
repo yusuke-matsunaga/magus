@@ -11,7 +11,6 @@
 
 #include "cec_nsdef.h"
 #include "FraigHandle.h"
-#include "YmUtils/RandGen.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -39,7 +38,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief CNF 上の変数番号を返す．
-  VarId
+  SatVarId
   varid() const;
 
 
@@ -225,7 +224,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // CNF 上の変数番号
-  VarId mVarId;
+  SatVarId mVarId;
 
   // ファンインのノード
   FraigNode* mFanins[2];
@@ -311,7 +310,7 @@ private:
 
 // @brief CNF 上の変数番号を返す．
 inline
-VarId
+SatVarId
 FraigNode::varid() const
 {
   return mVarId;

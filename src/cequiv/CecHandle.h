@@ -10,9 +10,9 @@
 
 
 #include "cec_nsdef.h"
-#include "YmLogic/VarId.h"
-#include "YmUtils/HashFunc.h"
-#include "YmUtils/HashSet.h"
+#include "ym/SatVarId.h"
+#include "ym/HashFunc.h"
+#include "ym/HashSet.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -67,7 +67,7 @@ public:
   node() const;
 
   /// @brief ノードの通し番号を得る．
-  VarId
+  SatVarId
   varid() const;
 
   /// @brief 極性を得る．
