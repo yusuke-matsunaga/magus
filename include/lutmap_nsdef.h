@@ -11,9 +11,7 @@
 /// All rights reserved.
 
 
-#include "YmTools.h"
-
-#include "YmUtils/DlList.h"
+#include "ym_config.h"
 
 
 /// @brief lutmap 用の名前空間の開始
@@ -36,9 +34,6 @@ class LnPort;
 class LnEdge;
 class LnNode;
 
-typedef DlList<LnEdge> LnEdgeList;
-typedef DlList<LnNode> LnNodeList;
-
 END_NAMESPACE_YM_LUTMAP
 
 BEGIN_NAMESPACE_YM
@@ -49,9 +44,6 @@ using nsLutmap::LnGraph;
 using nsLutmap::LnPort;
 using nsLutmap::LnEdge;
 using nsLutmap::LnNode;
-
-using nsLutmap::LnEdgeList;
-using nsLutmap::LnNodeList;
 
 END_NAMESPACE_YM
 

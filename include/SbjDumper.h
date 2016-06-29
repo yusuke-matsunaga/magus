@@ -1,11 +1,11 @@
-﻿#ifndef YM_TECHMAP_SBJDUMPER_H
-#define YM_TECHMAP_SBJDUMPER_H
+﻿#ifndef SBJDUMPER_H
+#define SBJDUMPER_H
 
-/// @file ym_techmap/SbjDumper.h
+/// @file SbjDumper.h
 /// @brief SbjDumper のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -15,7 +15,7 @@
 BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjDumper SbjDumper.h "ym_techmap/SbjDumper.h"
+/// @class SbjDumper SbjDumper.h "SbjDumper.h"
 /// @brief SbjGraph の内容を出力するためのクラス
 /// @note 実はクラスにする必要はない．
 //////////////////////////////////////////////////////////////////////
@@ -60,4 +60,4 @@ public:
 
 END_NAMESPACE_YM_SBJ
 
-#endif // YM_TECHMAP_SBJDUMPER_H
+#endif // SBJDUMPER_H

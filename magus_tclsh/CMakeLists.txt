@@ -120,11 +120,11 @@ add_executable (magus_tclsh
   ${lutmap_SOURCES}
   ${misc_SOURCES}
   ${mvn_SOURCES}
-  ${seal_SOURCES}
+#  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_a>
-  $<TARGET_OBJECTS:magus_seal_a>
+#  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
   $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:ym_common_a>
@@ -165,11 +165,11 @@ add_executable (magus_tclsh_p
   ${lutmap_SOURCES}
   ${misc_SOURCES}
   ${mvn_SOURCES}
-  ${seal_SOURCES}
+#  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_p>
-  $<TARGET_OBJECTS:magus_seal_p>
+#  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
   $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:ym_common_p>
@@ -216,11 +216,11 @@ add_executable (magus_tclsh_d
   ${lutmap_SOURCES}
   ${misc_SOURCES}
   ${mvn_SOURCES}
-  ${seal_SOURCES}
+#  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_d>
-  $<TARGET_OBJECTS:magus_seal_d>
+#  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
   $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:ym_common_d>

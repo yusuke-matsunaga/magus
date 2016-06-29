@@ -116,6 +116,64 @@ FraigMgr::make_and(FraigHandle edge1,
   return ans;
 }
 
+// @brief 複数のノードの AND を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+// @param[in] start_pos 開始位置
+// @param[in] end_pos 終了位置
+// @param[in] iinv 入力の反転フラグ
+//
+// edge_list[start_pos] から edge_list[end_pos - 1] までの
+// ハンドルの AND を取る．
+// なので常に end_pos > start_pos が成り立つと仮定する．
+FraigHandle
+FraigMgr::_make_and(const vector<FraigHandle>& edge_list,
+		    ymuint start_pos,
+		    ymuint end_pos,
+		    bool iinv)
+{
+  ASSERT_COND( start_pos < end_pos );
+
+  ymuint n = end_pos - start_pos;
+  if ( n == 1 ) {
+    FraigHandle h = edge_list[start_pos];
+    if ( iinv ) {
+      h = ~h;
+    }
+    return h;
+  }
+  // n >= 2
+  ymuint mid_pos = start_pos + (n + 1) / 2;
+  FraigHandle h0 = _make_and(edge_list, start_pos, mid_pos, iinv);
+  FraigHandle h1 = _make_and(edge_list, mid_pos, end_pos, iinv);
+  return make_and(h0, h1);
+}
+
+// @brief 複数のノードの XOR を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+// @param[in] start_pos 開始位置
+// @param[in] end_pos 終了位置
+//
+// edge_list[start_pos] から edge_list[end_pos - 1] までの
+// ハンドルの XOR を取る．
+// なので常に end_pos > start_pos が成り立つと仮定する．
+FraigHandle
+FraigMgr::_make_xor(const vector<FraigHandle>& edge_list,
+		    ymuint start_pos,
+		    ymuint end_pos)
+{
+  ASSERT_COND( start_pos < end_pos );
+
+  ymuint n = end_pos - start_pos;
+  if ( n == 1 ) {
+    return edge_list[start_pos];
+  }
+  // n >= 2
+  ymuint mid_pos = start_pos + (n + 1) / 2;
+  FraigHandle h0 = _make_xor(edge_list, start_pos, mid_pos);
+  FraigHandle h1 = _make_xor(edge_list, mid_pos, end_pos);
+  return make_xor(h0, h1);
+}
+
 // @brief 論理式に対応するノード(木)をつくる．
 // @param[in] expr 対象の論理式
 // @param[in] inputs 入力に対応する AIG ハンドル
@@ -143,31 +201,29 @@ FraigMgr::make_logic(const Expr& expr,
   }
   if ( expr.is_and() ) {
     ymuint n = expr.child_num();
-    FraigHandle ans = make_logic(expr.child(0), inputs);
-    for (ymuint i = 1; i < n; ++ i) {
-      FraigHandle tmp = make_logic(expr.child(i), inputs);
-      ans = make_and(ans, tmp);
+    vector<FraigHandle> edge_list(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      edge_list[i] = make_logic(expr.child(i), inputs);
     }
-    return ans;
+    return _make_and(edge_list, 0, n, false);
   }
   if ( expr.is_or() ) {
     ymuint n = expr.child_num();
-    FraigHandle ans = make_logic(expr.child(0), inputs);
-    for (ymuint i = 1; i < n; ++ i) {
-      FraigHandle tmp = make_logic(expr.child(i), inputs);
-      ans = make_or(ans, tmp);
+    vector<FraigHandle> edge_list(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      edge_list[i] = make_logic(expr.child(i), inputs);
     }
-    return ans;
+    return ~_make_and(edge_list, 0, n, true);
   }
   if ( expr.is_xor() ) {
     ymuint n = expr.child_num();
-    FraigHandle ans = make_logic(expr.child(0), inputs);
-    for (ymuint i = 1; i < n; ++ i) {
-      FraigHandle tmp = make_logic(expr.child(i), inputs);
-      ans = make_xor(ans, tmp);
+    vector<FraigHandle> edge_list(n);
+    for (ymuint i = 0; i < n; ++ i) {
+      edge_list[i] = make_logic(expr.child(i), inputs);
     }
-    return ans;
+    return _make_xor(edge_list, 0, n);
   }
+
   ASSERT_NOT_REACHED;
   return make_zero();
 }

@@ -11,13 +11,11 @@ include_directories (
 # ===================================================================
 
 set (SOURCES
-  CecMgr.cc
   FraigMgr.cc
   FraigMgrImpl.cc
   FraigNode.cc
+  Bn2FraigConv.cc
   check_ceq.cc
-  check_ceq2.cc
-  make_miter.cc
   )
 
 

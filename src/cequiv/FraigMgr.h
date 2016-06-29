@@ -89,17 +89,32 @@ public:
   make_and(FraigHandle edge1,
 	   FraigHandle edge2);
 
+  /// @brief 複数のノードの AND を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  FraigHandle
+  make_and(const vector<FraigHandle>& edge_list);
+
   /// @brief 2つのノードの OR を取る．
   /// @param[in] edge1, edge2 入力の AIG ハンドル
   FraigHandle
   make_or(FraigHandle edge1,
 	  FraigHandle edge2);
 
+  /// @brief 複数のノードの OR を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  FraigHandle
+  make_or(const vector<FraigHandle>& edge_list);
+
   /// @brief 2つのノードの XOR を取る．
   /// @param[in] edge1, edge2 入力の AIG ハンドル
   FraigHandle
   make_xor(FraigHandle edge1,
 	   FraigHandle edge2);
+
+  /// @brief 複数のノードの XOR を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  FraigHandle
+  make_xor(const vector<FraigHandle>& edge_list);
 
   /// @brief 論理式に対応するノード(木)をつくる．
   /// @param[in] expr 対象の論理式
@@ -119,6 +134,9 @@ public:
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 検証用の関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 2つのハンドルが等価かどうか調べる．
   SatBool3
@@ -145,6 +163,40 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 複数のノードの AND を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  /// @param[in] start_pos 開始位置
+  /// @param[in] end_pos 終了位置
+  /// @param[in] iinv 入力の反転フラグ
+  ///
+  /// edge_list[start_pos] から edge_list[end_pos - 1] までの
+  /// ハンドルの AND を取る．
+  /// なので常に end_pos > start_pos が成り立つと仮定する．
+  FraigHandle
+  _make_and(const vector<FraigHandle>& edge_list,
+	    ymuint start_pos,
+	    ymuint end_pos,
+	    bool iinv);
+
+  /// @brief 複数のノードの XOR を取る．
+  /// @param[in] edge_list 入力の AIG ハンドルのリスト
+  /// @param[in] start_pos 開始位置
+  /// @param[in] end_pos 終了位置
+  ///
+  /// edge_list[start_pos] から edge_list[end_pos - 1] までの
+  /// ハンドルの XOR を取る．
+  /// なので常に end_pos > start_pos が成り立つと仮定する．
+  FraigHandle
+  _make_xor(const vector<FraigHandle>& edge_list,
+	    ymuint start_pos,
+	    ymuint end_pos);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -158,6 +210,17 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief 複数のノードの AND を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+FraigHandle
+FraigMgr::make_and(const vector<FraigHandle>& edge_list)
+{
+  ymuint n = edge_list.size();
+  ASSERT_COND( n > 0 );
+  return _make_and(edge_list, 0, n, false);
+}
+
 // @brief 2つのノードの OR を取る．
 // @param[in] edge1, edge2 入力の AIG ハンドル
 inline
@@ -166,6 +229,17 @@ FraigMgr::make_or(FraigHandle edge1,
 		  FraigHandle edge2)
 {
   return ~make_and(~edge1, ~edge2);
+}
+
+// @brief 複数のノードの OR を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+FraigHandle
+FraigMgr::make_or(const vector<FraigHandle>& edge_list)
+{
+  ymuint n = edge_list.size();
+  ASSERT_COND( n > 0 );
+  return ~_make_and(edge_list, 0, n, true);
 }
 
 // @brief 2つのノードの XOR を取る．
@@ -178,6 +252,17 @@ FraigMgr::make_xor(FraigHandle edge1,
   FraigHandle tmp1 = make_and(edge1, ~edge2);
   FraigHandle tmp2 = make_and(~edge1, edge2);
   return make_or(tmp1, tmp2);
+}
+
+// @brief 複数のノードの XOR を取る．
+// @param[in] edge_list 入力の AIG ハンドルのリスト
+inline
+FraigHandle
+FraigMgr::make_xor(const vector<FraigHandle>& edge_list)
+{
+  ymuint n = edge_list.size();
+  ASSERT_COND( n > 0 );
+  return _make_xor(edge_list, 0, n);
 }
 
 END_NAMESPACE_YM_CEC

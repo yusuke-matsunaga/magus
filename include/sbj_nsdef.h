@@ -1,18 +1,15 @@
-﻿#ifndef YM_TECHMAP_SBJ_NSDEF_H
-#define YM_TECHMAP_SBJ_NSDEF_H
+﻿#ifndef SBJ_NSDEF_H
+#define SBJ_NSDEF_H
 
-/// @file ym_techmap/sbj_nsdef.h
+/// @file sbj_nsdef.h
 /// @brief sbj パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: lutmap.h 555 2007-04-08 07:20:30Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmTools.h"
-#include "YmUtils/DlList.h"
+#include "ym_config.h"
 
 
 /// @brief sbj 用の名前空間の開始
@@ -35,9 +32,6 @@ class SbjNode;
 class SbjHandle;
 class SbjDumper;
 
-typedef DlList<SbjEdge> SbjEdgeList;
-typedef DlList<SbjNode> SbjNodeList;
-
 END_NAMESPACE_YM_SBJ
 
 BEGIN_NAMESPACE_YM
@@ -49,9 +43,6 @@ using nsSbj::SbjNode;
 using nsSbj::SbjHandle;
 using nsSbj::SbjDumper;
 
-using nsSbj::SbjEdgeList;
-using nsSbj::SbjNodeList;
-
 END_NAMESPACE_YM
 
-#endif // YM_SBJ_SBJ_NSDEF_H
+#endif // SBJ_NSDEF_H

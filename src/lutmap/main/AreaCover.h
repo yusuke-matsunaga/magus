@@ -10,7 +10,7 @@
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "ym/ym_bnet.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 

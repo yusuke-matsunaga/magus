@@ -1,28 +1,25 @@
-﻿#ifndef YM_TECHMAP_SBJGRAPH_H
-#define YM_TECHMAP_SBJGRAPH_H
+﻿#ifndef SBJGRAPH_H
+#define SBJGRAPH_H
 
-/// @file ym_techmap/SbjGraph.h
+/// @file SbjGraph.h
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SbjGraph.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "sbj_nsdef.h"
 
-#include "YmUtils/SimpleAlloc.h"
-#include "YmUtils/FragAlloc.h"
-#include "YmUtils/DlList.h"
-#include "YmUtils/ItvlMgr.h"
+#include "ym/SimpleAlloc.h"
+#include "ym/FragAlloc.h"
+#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjEdge SbjGraph.h "ym_techmap/SbjGraph.h"
+/// @class SbjEdge SbjGraph.h "SbjGraph.h"
 /// @brief サブジェクトグラフの枝を表すクラス
 ///
 /// - 入力側のノード
@@ -31,8 +28,7 @@ BEGIN_NAMESPACE_YM_SBJ
 /// の情報を持つ．
 /// @sa SbjNode SbjGraph
 //////////////////////////////////////////////////////////////////////
-class SbjEdge :
-  public DlElem
+class SbjEdge
 {
   friend class SbjNode;
   friend class SbjGraph;
@@ -110,7 +106,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjNode SbjGraph.h "ym_techmap/SbjGraph.h"
+/// @class SbjNode SbjGraph.h "SbjGraph.h"
 /// @brief サブジェクトグラフを構成するプリミティブノードを表すクラス
 ///
 /// ノードの種類は
@@ -124,8 +120,7 @@ private:
 /// ただし，XOR タイプの場合には入力は反転させない．
 /// @sa SbjEdge SbjGraph
 //////////////////////////////////////////////////////////////////////
-class SbjNode :
-  public DlElem
+class SbjNode
 {
   friend class SbjGraph;
 
@@ -593,7 +588,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjGraph SbjGraph.h "ym_techmap/SbjGraph.h"
+/// @class SbjGraph SbjGraph.h "SbjGraph.h"
 /// @brief サブジェクトグラフを表すクラス
 ///
 /// 入力ノード，出力ノード，論理ノード，DFFノードを分けてリストで持つ
@@ -1778,4 +1773,4 @@ SbjGraph::dff_list() const
 
 END_NAMESPACE_YM_SBJ
 
-#endif // YM_TECHMAP_SBJGRAPH_H
+#endif // SBJGRAPH_H
