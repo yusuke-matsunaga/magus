@@ -1,16 +1,16 @@
-﻿#ifndef MAGUS_LUTMAP_CUT_H
-#define MAGUS_LUTMAP_CUT_H
+﻿#ifndef CUT_H
+#define CUT_H
 
-/// @file lutmap/Cut.h
+/// @file Cut.h
 /// @brief Cut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -55,7 +55,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 根のノードを得る．
-  const BdnNode*
+  const SbjNode*
   root() const;
 
   /// @brief 入力のサイズを得る．
@@ -63,7 +63,7 @@ public:
   input_num() const;
 
   /// @brief pos 番目の入力を得る．
-  const BdnNode*
+  const SbjNode*
   input(ymuint pos) const;
 
   /// @brief 論理シミュレーションを行う．
@@ -98,7 +98,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 根のノード
-  const BdnNode* mRoot;
+  const SbjNode* mRoot;
 
   // 次のカットを指すポインタ
   Cut* mLink;
@@ -107,7 +107,7 @@ private:
   ymuint32 mNi;
 
   // 入力のノード配列
-  const BdnNode* mInputs[1];
+  const SbjNode* mInputs[1];
 
 };
 
@@ -131,7 +131,7 @@ Cut::~Cut()
 
 // 根のノードを得る．
 inline
-const BdnNode*
+const SbjNode*
 Cut::root() const
 {
   return mRoot;
@@ -147,7 +147,7 @@ Cut::input_num() const
 
 // pos 番目の入力を得る．
 inline
-const BdnNode*
+const SbjNode*
 Cut::input(ymuint pos) const
 {
   return mInputs[pos];
@@ -155,4 +155,4 @@ Cut::input(ymuint pos) const
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CUT_H
+#endif // CUT_H

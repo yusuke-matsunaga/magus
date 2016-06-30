@@ -1,18 +1,18 @@
-﻿#ifndef MAGUS_LUTMAP_CUTRESUB_H
-#define MAGUS_LUTMAP_CUTRESUB_H
+﻿#ifndef CUTRESUB_H
+#define CUTRESUB_H
 
-/// @file lutmap/CutResub.h
+/// @file CutResub.h
 /// @brief CutResub のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "SbjGraph.h"
 
-#include "YmUtils/SimpleAlloc.h"
+#include "ym/SimpleAlloc.h"
 #include "CrHeap.h"
 #include "CrLevelQ.h"
 
@@ -47,7 +47,7 @@ public:
   /// @param[in] cut_holder サブジェクトグラフ上のカット集合
   /// @param[inout] maprec マッピング結果
   void
-  operator()(const BdnMgr& sbjgraph,
+  operator()(const SbjGraph& sbjgraph,
 	     const CutHolder& cut_holder,
 	     MapRecord& maprec,
 	     int slack = -1);
@@ -60,7 +60,7 @@ private:
 
   // node の最適カットを選ぶ．
   void
-  back_trace(const BdnNode* node,
+  back_trace(const SbjNode* node,
 	     MapRecord& maprec,
 	     CrNode* from);
 
@@ -179,4 +179,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CUTRESUB_H
+#endif // CUTRESUB_H

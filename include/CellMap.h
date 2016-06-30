@@ -1,24 +1,23 @@
-﻿#ifndef YM_TECHMAP_CELLMAP_H
-#define YM_TECHMAP_CELLMAP_H
+﻿#ifndef CELLMAP_H
+#define CELLMAP_H
 
-/// @file ym_techmap/CellMap.h
+/// @file CellMap.h
 /// @brief CellMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "cellmap_nsdef.h"
-#include "YmNetworks/bdn.h"
-#include "YmNetworks/cmn.h"
-#include "YmCell/cell_nsdef.h"
+#include "ym/ym_bnet.h"
+#include "ym/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class CellMap CellMap.h "ym_techmap/CellMap.h"
+/// @class CellMap CellMap.h "CellMap.h"
 /// @brief セルライブラリ用ののテクノロジマッピングを行うクラス
 //////////////////////////////////////////////////////////////////////
 class CellMap
@@ -48,9 +47,9 @@ public:
   /// @param[out] mapnetwork マッピング結果
   void
   area_map(const CellLibrary& cell_library,
-	   const BdnMgr& sbjgraph,
+	   const BnNetwork& sbjgraph,
 	   ymuint mode,
-	   CmnMgr& mapnetwork);
+	   BnNetwork& mapnetwork);
 
 #if 0
   /// @brief 段数最小化 DAG covering のヒューリスティック関数
@@ -66,17 +65,15 @@ public:
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
   void
-  delay_map(const SbjGraph& sbjgraph,
+  delay_map(const BnNetwork& sbjgraph,
 	    ymuint limit,
 	    ymuint slack,
 	    ymuint mode,
-	    LnGraph& mapnetwork,
-	    ymuint& lut_num,
-	    ymuint& depth);
+	    BnNetwork& mapnetwork);
 #endif
 
 };
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // YM_TECHMAP_CELLMAP_H
+#endif // CELLMAP_H

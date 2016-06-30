@@ -1,23 +1,19 @@
 ﻿
-/// @file libym_techmap/tests/bliftest.cc
+/// @file bliftest.cc
 /// @brief blif ファイルの読み込みのテスト
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: bliftest.cc 1978 2009-02-06 12:29:16Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmNetworks/BNetwork.h"
-#include "YmNetworks/BNetBlifReader.h"
-#include "YmNetworks/BNetDecomp.h"
-#include "YmNetworks/BNet2Sbj.h"
-#include "ym_sbj/SbjGraph.h"
-#include "ym_sbj/SbjDumper.h"
+#include "ym/BnNetwork.h"
+#include "ym/BNetBlifReader.h"
+#include "SbjGraph.h"
+#include "SbjDumper.h"
 
-#include "YmUtils/MsgMgr.h"
-#include "YmUtils/MsgHandler.h"
+#include "ym/MsgMgr.h"
+#include "ym/MsgHandler.h"
 
 
 BEGIN_NONAMESPACE
@@ -85,8 +81,6 @@ main(int argc,
       cerr << "Error in reading " << filename << endl;
       return 4;
     }
-
-    BNetDecomp decomp;
 
     decomp(network, 2);
 

@@ -1,5 +1,5 @@
-﻿#ifndef LIBYM_TECHMAP_SBJMINDEPTH_H
-#define LIBYM_TECHMAP_SBJMINDEPTH_H
+﻿#ifndef SBJMINDEPTH_H
+#define SBJMINDEPTH_H
 
 /// @file SbjMinDepth.h
 /// @brief SbjMinDepth のヘッダファイル
@@ -13,7 +13,7 @@
 
 #include "sbj_nsdef.h"
 #include "SbjGraph.h"
-#include "YmUtils/SimpleAlloc.h"
+#include "ym/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -111,4 +111,4 @@ private:
 
 END_NAMESPACE_YM_SBJ
 
-#endif // LIBYM_TECHMAP_SBJGRAPH_SBJMINDEPTH_H
+#endif // SBJMINDEPTH_H

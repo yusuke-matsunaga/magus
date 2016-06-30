@@ -1,16 +1,17 @@
-﻿#ifndef MAGUS_LUTMAP_AREACOVER_H
-#define MAGUS_LUTMAP_AREACOVER_H
+﻿#ifndef AREACOVER_H
+#define AREACOVER_H
 
-/// @file lutmap/AreaCover.h
-/// @brief DAG covering のヒューリスティック
+/// @file AreaCover.h
+/// @brief AreCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
 #include "ym/ym_bnet.h"
+#include "SbjGraph.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 
@@ -49,14 +50,14 @@ public:
   ///  - 1: weighted フロー, resub なし
   ///  - 2: fanout フロー, resub あり
   ///  - 3: weighted フロー, resub あり
-  /// @param[out] mapnetwork マッピング結果
+  /// @param[out] map_network マッピング結果
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
   void
-  operator()(const BdnMgr& sbjgraph,
+  operator()(const SbjGraph& sbjgraph,
 	     ymuint limit,
 	     ymuint mode,
-	     LnGraph& mapnetwork,
+	     BnNetwork& map_network,
 	     ymuint& lut_num,
 	     ymuint& depth);
 
@@ -71,13 +72,13 @@ private:
   /// @param[in] limit LUT の入力数
   /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
-  record_cuts(const BdnMgr& sbjgraph,
+  record_cuts(const SbjGraph& sbjgraph,
 	      ymuint limit,
 	      MapRecord& maprec);
 
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(const BdnNode* node,
+  calc_weight(const SbjNode* node,
 	      const Cut* cut,
 	      double cur_weight);
 
@@ -106,4 +107,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_AREACOVER_H
+#endif // AREACOVER_H

@@ -1,16 +1,16 @@
-﻿#ifndef MAGUS_LUTMAP_ENUMCUTOP_H
-#define MAGUS_LUTMAP_ENUMCUTOP_H
+﻿#ifndef ENUMCUTOP_H
+#define ENUMCUTOP_H
 
-/// @file lutmap/EnumCutOp.h
+/// @file EnumCutOp.h
 /// @brief EnumCutOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -47,7 +47,7 @@ public:
   /// @return 全 cut 数を返す．
   /// @note 内部で下の仮想関数が呼び出される．
   ymuint
-  enum_cut(const BdnMgr& sbjgraph,
+  enum_cut(const SbjGraph& sbjgraph,
 	   ymuint limit);
 
 
@@ -62,7 +62,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  all_init(const BdnMgr& sbjgraph,
+  all_init(const SbjGraph& sbjgraph,
 	   ymuint limit);
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
@@ -71,7 +71,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  node_init(const BdnNode* node,
+  node_init(const SbjNode* node,
 	    ymuint cur_pos);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
@@ -79,7 +79,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  found(const BdnNode* root);
+  found(const SbjNode* root);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
   /// @param[in] root 根のノード
@@ -88,9 +88,9 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  found(const BdnNode* root,
+  found(const SbjNode* root,
 	ymuint ni,
-	const BdnNode* inputs[]);
+	const SbjNode* inputs[]);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
@@ -99,7 +99,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  node_end(const BdnNode* node,
+  node_end(const SbjNode* node,
 	   ymuint cur_pos,
 	   ymuint ncuts);
 
@@ -107,7 +107,7 @@ private:
   /// @note デフォルトの実装ではなにもしない．
   virtual
   void
-  all_end(const BdnMgr& sbjgraph,
+  all_end(const SbjGraph& sbjgraph,
 	  ymuint limit);
 
 };

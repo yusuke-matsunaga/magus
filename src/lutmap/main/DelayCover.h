@@ -1,16 +1,17 @@
-﻿#ifndef MAGUS_LUTMAP_DELAYCOVER_H
-#define MAGUS_LUTMAP_DELAYCOVER_H
+﻿#ifndef DELAYCOVER_H
+#define DELAYCOVER_H
 
-/// @file lutmap/DelayCover.h
+/// @file DelayCover.h
 /// @brief DelayCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "ym/ym_bnet.h"
+#include "SbjGraph.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 #include "ADCost.h"
@@ -50,15 +51,15 @@ public:
   ///  - 1: weighted フロー, resub なし
   ///  - 2: fanout フロー, resub あり
   ///  - 3: weighted フロー, resub あり
-  /// @param[out] mapnetwork マッピング結果
+  /// @param[out] map_network マッピング結果
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
   void
-  operator()(const BdnMgr& sbjgraph,
+  operator()(const SbjGraph& sbjgraph,
 	     ymuint limit,
 	     ymuint slack,
 	     ymuint mode,
-	     LnGraph& mapnetwork,
+	     BnNetwork& map_network,
 	     ymuint& lut_num,
 	     ymuint& depth);
 
@@ -73,23 +74,23 @@ private:
   /// @param[in] limit LUT の入力数
   /// @param[in] slack 最小段数に対するスラック
   void
-  record_cuts(const BdnMgr& sbjgraph,
+  record_cuts(const SbjGraph& sbjgraph,
 	      ymuint limit,
 	      ymuint slack,
 	      MapRecord& maprec);
 
   // node のカットを記録する．
   void
-  record(const BdnNode* node);
+  record(const SbjNode* node);
 
   // node のカットを選択する．
   void
-  select(const BdnNode* node,
+  select(const SbjNode* node,
 	 MapRecord& maprec);
 
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(const BdnNode* node,
+  calc_weight(const SbjNode* node,
 	      const Cut* cut,
 	      double cur_weight);
 
@@ -146,4 +147,4 @@ private:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_DELAYCOVER_H
+#endif // DELAYCOVER_H

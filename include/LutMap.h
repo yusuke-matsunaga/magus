@@ -1,24 +1,22 @@
-﻿#ifndef YM_TECHMAP_LUTMAP_H
-#define YM_TECHMAP_LUTMAP_H
+﻿#ifndef LUTMAP_H
+#define LUTMAP_H
 
-/// @file ym_techmap/LutMap.h
+/// @file LutMap.h
 /// @brief LutMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: DagACover.h 1077 2007-12-03 10:18:47Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "ym/ym_bnet.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LutMap LutMap.h "ym_techmap/LutMap.h"
+/// @class LutMap LutMap.h "LutMap.h"
 /// @brief LUT用のテクノロジマッパー
 //////////////////////////////////////////////////////////////////////
 class LutMap
@@ -49,10 +47,10 @@ public:
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
   void
-  area_map(const BdnMgr& sbjgraph,
+  area_map(const BnNetwork& sbjgraph,
 	   ymuint limit,
 	   ymuint mode,
-	   LnGraph& mapnetwork,
+	   BnNetwork& mapnetwork,
 	   ymuint& lut_num,
 	   ymuint& depth);
 
@@ -69,11 +67,11 @@ public:
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
   void
-  delay_map(const BdnMgr& sbjgraph,
+  delay_map(const BnNetwork& sbjgraph,
 	    ymuint limit,
 	    ymuint slack,
 	    ymuint mode,
-	    LnGraph& mapnetwork,
+	    BnNetwork& mapnetwork,
 	    ymuint& lut_num,
 	    ymuint& depth);
 
@@ -81,4 +79,4 @@ public:
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // YM_TECHMAP_LUTMAP_H
+#endif // LUTMAP_H

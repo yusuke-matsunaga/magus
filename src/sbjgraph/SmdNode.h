@@ -1,11 +1,11 @@
-﻿#ifndef LIBYM_TECHMAP_SBJGRAPH_SMDNODE_H
-#define LIBYM_TECHMAP_SBJGRAPH_SMDNODE_H
+﻿#ifndef SMDNODE_H
+#define SMDNODE_H
 
-/// @file libym_techmap/sbjgraph/SmdNode.h
+/// @file SmdNode.h
 /// @brief SmdNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -513,4 +513,4 @@ SmdNode::set_depth(ymuint depth)
 
 END_NAMESPACE_YM_SBJ
 
-#endif // LIBYM_TECHMAP_SBJGRAPH_SMDNODE_H
+#endif // SMDNODE_H

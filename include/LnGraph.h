@@ -1,28 +1,25 @@
-﻿#ifndef YM_TECHMAP_LNGRAPH_H
-#define YM_TECHMAP_LNGRAPH_H
+﻿#ifndef LNGRAPH_H
+#define LNGRAPH_H
 
-/// @file ym_techmap/LnGraph.h
+/// @file LnGraph.h
 /// @brief LnGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: LutNetwork.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
 
-#include "YmUtils/SimpleAlloc.h"
-#include "YmUtils/FragAlloc.h"
-#include "YmUtils/DlList.h"
-#include "YmUtils/ItvlMgr.h"
+#include "ym/SimpleAlloc.h"
+#include "ym/FragAlloc.h"
+#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class LnEdge LnGraph.h "ym_techmap/LnGraph.h"
+/// @class LnEdge LnGraph.h "LnGraph.h"
 /// @brief LUTネットワークの枝を表すクラス
 ///
 /// - 入力側のノード

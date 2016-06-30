@@ -1,14 +1,14 @@
 ﻿
-/// @file lutmap/AreaCover.cc
-/// @brief DAG covering のヒューリスティック
+/// @file AreaCover.cc
+/// @brief AreCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "AreaCover.h"
-#include "YmNetworks/BdnMgr.h"
+#include "ym/BnNetwork.h"
 #include "Cut.h"
 #include "MapRecord.h"
 
@@ -37,10 +37,10 @@ AreaCover::~AreaCover()
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-AreaCover::operator()(const BdnMgr& sbjgraph,
+AreaCover::operator()(const SbjGraph& sbjgraph,
 		      ymuint limit,
 		      ymuint mode,
-		      LnGraph& mapnetwork,
+		      BnNetwork& mapnetwork,
 		      ymuint& lut_num,
 		      ymuint& depth)
 {
@@ -67,7 +67,7 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
 // @param[in] limit LUT の入力数
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const BdnMgr& sbjgraph,
+AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       ymuint limit,
 		       MapRecord& maprec)
 {
@@ -79,20 +79,19 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   maprec.init(sbjgraph);
 
   // 入力のコストを設定
-  const BdnNodeList& input_list = sbjgraph.input_list();
-  for (BdnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const BdnNode* node = *p;
+  ymuint ni = sbjgraph.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* node = sbjgraph.input(i);
     maprec.set_cut(node, nullptr);
     mBestCost[node->id()] = 0.0;
   }
 
   // 論理ノードのコストを入力側から計算
-  vector<const BdnNode*> snode_list;
+  vector<const SbjNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<const BdnNode*>::const_iterator p = snode_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    const BdnNode* node = *p;
+    const SbjNode* node = *p;
 
     double min_cost = DBL_MAX;
     const Cut* best_cut = nullptr;
@@ -104,7 +103,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
       ymuint ni = cut->input_num();
       bool ng = false;
       for (ymuint i = 0; i < ni; ++ i) {
-	const BdnNode* inode = cut->input(i);
+	const SbjNode* inode = cut->input(i);
 	if ( mBestCost[inode->id()] == DBL_MAX ) {
 	  ng = true;
 	  break;
@@ -115,7 +114,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
       if ( mMode & 1 ) {
 	// ファンアウトモード
 	for (ymuint i = 0; i < ni; ++ i) {
-	  const BdnNode* inode = cut->input(i);
+	  const SbjNode* inode = cut->input(i);
 	  mWeight[i] = 1.0 / inode->fanout_num();
 	}
       }
@@ -129,7 +128,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 
       double cur_cost = 1.0;
       for (ymuint i = 0; i < ni; ++ i) {
-	const BdnNode* inode = cut->input(i);
+	const SbjNode* inode = cut->input(i);
 	cur_cost += mBestCost[inode->id()] * mWeight[i];
       }
       if ( min_cost > cur_cost ) {
@@ -146,7 +145,7 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
 
 // node から各入力にいたる経路の重みを計算する．
 void
-AreaCover::calc_weight(const BdnNode* node,
+AreaCover::calc_weight(const SbjNode* node,
 		       const Cut* cut,
 		       double cur_weight)
 {
@@ -160,10 +159,10 @@ AreaCover::calc_weight(const BdnNode* node,
 	return;
       }
     }
-    const BdnNode* inode0 = node->fanin0();
+    const SbjNode* inode0 = node->fanin(0);
     double cur_weight0 = cur_weight / inode0->fanout_num();
     calc_weight(inode0, cut, cur_weight0);
-    node = node->fanin1();
+    node = node->fanin(1);
     cur_weight /= node->fanout_num();
   }
 }

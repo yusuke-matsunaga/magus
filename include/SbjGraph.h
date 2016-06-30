@@ -250,9 +250,10 @@ public:
   ymuint
   fanout_num() const;
 
-  /// @brief ファンアウトリストを得る．
-  const SbjEdgeList&
-  fanout_list() const;
+  /// @brief ファンアウトの枝を返す．
+  /// @param[in] pos 位置番号
+  const SbjEdge*
+  fanout_edge(ymuint pos) const;
 
   /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
@@ -384,8 +385,8 @@ private:
   // 要素数は通常2だが DFF の場合は4
   SbjEdge* mFanins;
 
-  // ファンアウトの枝のリスト
-  SbjEdgeList mFanoutList;
+  // ファンアウトの枝のポインタ配列
+  vector<SbjEdge*> mFanoutList;
 
   // 作業用のマーク
   ymuint32 mMark;
@@ -707,10 +708,6 @@ public:
   SbjNode*
   input(ymuint id) const;
 
-  /// @brief 入力ノードのリストを得る．
-  const SbjNodeList&
-  input_list() const;
-
   /// @brief 入力ノードと DFF ノードのリストを返す．
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
@@ -727,10 +724,6 @@ public:
   SbjNode*
   output(ymuint id) const;
 
-  /// @brief 出力ノードのリストを得る．
-  const SbjNodeList&
-  output_list() const;
-
   /// @brief 出力ノードと DFF ノードのリストを返す．
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
@@ -741,17 +734,19 @@ public:
   ymuint
   lnode_num() const;
 
-  /// @brief 論理ノードのリストを得る．
-  const SbjNodeList&
-  lnode_list() const;
+  /// @brief 論理ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < lnode_num() )
+  SbjNode*
+  lnode(ymuint pos) const;
 
   /// @brief DFFノード数を得る．
   ymuint
   dff_num() const;
 
-  /// @brief DFFノードのリストを得る．
-  const SbjNodeList&
-  dff_list() const;
+  /// @brief DFFノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < dff_num() )
+  SbjNode*
+  dff(ymuint pos) const;
 
   /// @brief ソートされた論理ノードのリストを得る．
   void
@@ -1029,9 +1024,6 @@ private:
   // 入力番号をキーにしたポート情報の配列
   vector<PortInfo> mInputPortArray;
 
-  // 入力ノードのリスト
-  SbjNodeList mInputList;
-
   // 出力番号をキーにした出力ノードの配列
   // 穴はあいていない．
   vector<SbjNode*> mOutputArray;
@@ -1039,14 +1031,11 @@ private:
   // 出力番号をキーにしたポート情報の配列
   vector<PortInfo> mOutputPortArray;
 
-  // 出力ノードのリスト
-  SbjNodeList mOutputList;
-
   // 論理ノードのリスト
-  SbjNodeList mLnodeList;
+  vector<SbjNode*> mLnodeList;
 
   // DFFノードのリスト
-  SbjNodeList mDffList;
+  vector<SbjNode*> mDffList;
 
   // 最大レベル
   mutable
@@ -1366,20 +1355,22 @@ SbjNode::fanin_edge(ymuint pos)
   return &mFanins[pos];
 }
 
-// ファンアウトリストを得る．
-inline
-const SbjEdgeList&
-SbjNode::fanout_list() const
-{
-  return mFanoutList;
-}
-
 // ファンアウト数を得る．
 inline
 ymuint
 SbjNode::fanout_num() const
 {
   return mFanoutList.size();
+}
+
+// @brief ファンアウトの枝を返す．
+// @param[in] pos 位置番号
+inline
+const SbjEdge*
+SbjNode::fanout_edge(ymuint pos) const
+{
+  ASSERT_COND( pos < fanout_num() );
+  return mFanoutList[pos];
 }
 
 // @brief 出力ノードにファンアウトしているとき true を返す．
@@ -1707,14 +1698,6 @@ SbjGraph::input(ymuint id) const
   return mInputArray[id];
 }
 
-// @brief 入力ノードのリストを得る．
-inline
-const SbjNodeList&
-SbjGraph::input_list() const
-{
-  return mInputList;
-}
-
 // 出力のノード数を得る．
 inline
 ymuint
@@ -1731,14 +1714,6 @@ SbjGraph::output(ymuint id) const
   return mOutputArray[id];
 }
 
-// @brief 入力ノードのリストを得る．
-inline
-const SbjNodeList&
-SbjGraph::output_list() const
-{
-  return mOutputList;
-}
-
 // 論理ノード数を得る．
 inline
 ymuint
@@ -1747,12 +1722,14 @@ SbjGraph::lnode_num() const
   return mLnodeList.size();
 }
 
-// 論理ノードのリストを得る．
+// @brief 論理ノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < lnode_num() )
 inline
-const SbjNodeList&
-SbjGraph::lnode_list() const
+SbjNode*
+SbjGraph::lnode(ymuint pos) const
 {
-  return mLnodeList;
+  ASSERT_COND( pos < lnode_num() );
+  return mLnodeList[pos];
 }
 
 // DFFノード数を得る．
@@ -1763,12 +1740,14 @@ SbjGraph::dff_num() const
   return mDffList.size();
 }
 
-// DFFノードのリストを得る．
+// @brief DFFノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < dff_num() )
 inline
-const SbjNodeList&
-SbjGraph::dff_list() const
+SbjNode*
+SbjGraph::dff(ymuint pos) const
 {
-  return mDffList;
+  ASSERT_COND( pos < dff_num() );
+  return mDffList[pos];
 }
 
 END_NAMESPACE_YM_SBJ

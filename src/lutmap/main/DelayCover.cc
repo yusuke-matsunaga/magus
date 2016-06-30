@@ -1,14 +1,14 @@
 ﻿
-/// @file lutmap/DelayCover.cc
+/// @file DelayCover.cc
 /// @brief DelayCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "DelayCover.h"
-#include "YmNetworks/BdnMgr.h"
+#include "ym/BnNetwork.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
@@ -35,15 +35,15 @@ DelayCover::~DelayCover()
 //  - 1: weighted フロー, resub なし
 //  - 2: fanout フロー, resub あり
 //  - 3: weighted フロー, resub あり
-// @param[out] mapnetwork マッピング結果
+// @param[out] map_network マッピング結果
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-DelayCover::operator()(const BdnMgr& sbjgraph,
+DelayCover::operator()(const SbjGraph& sbjgraph,
 		       ymuint limit,
 		       ymuint slack,
 		       ymuint mode,
-		       LnGraph& mapnetwork,
+		       BnNetwork& map_network,
 		       ymuint& lut_num,
 		       ymuint& depth)
 {
@@ -62,7 +62,7 @@ DelayCover::operator()(const BdnMgr& sbjgraph,
   }
 
   // 最終的なネットワークを生成する．
-  maprec.gen_mapgraph(sbjgraph, mapnetwork, lut_num, depth);
+  maprec.gen_mapgraph(sbjgraph, map_network, lut_num, depth);
 }
 
 // @brief best cut の記録を行う．
@@ -71,14 +71,11 @@ DelayCover::operator()(const BdnMgr& sbjgraph,
 // @param[in] slack 最小段数に対するスラック
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-DelayCover::record_cuts(const BdnMgr& sbjgraph,
+DelayCover::record_cuts(const SbjGraph& sbjgraph,
 			ymuint limit,
 			ymuint slack,
 			MapRecord& maprec)
 {
-  const BdnNodeList& input_list = sbjgraph.input_list();
-  const BdnNodeList& output_list = sbjgraph.output_list();
-
   ymuint n = sbjgraph.max_node_id();
 
   maprec.init(sbjgraph);
@@ -93,31 +90,31 @@ DelayCover::record_cuts(const BdnMgr& sbjgraph,
   mIcostLists.resize(limit);
 
   // 入力のコストの設定
-  for (BdnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const BdnNode* node = *p;
+  ymuint ni = sbjgraph.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* node = sbjgraph.input(i);
     NodeInfo& t = mNodeInfo[node->id()];
     t.mCostList.insert(nullptr, 0, 0.0);
     t.mMinDepth = 0;
   }
 
   // 各ノードごとにカットを記録
-  vector<const BdnNode*> snode_list;
+  vector<const SbjNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<const BdnNode*>::const_iterator p = snode_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    const BdnNode* node = *p;
+    const SbjNode* node = *p;
     record(node);
   }
 
   // 最小段数の最大値をもとめる．
-  vector<const BdnNode*> onode_list;
-  onode_list.reserve(output_list.size());
+  ymuint no = sbjgraph.output_num();
+  vector<const SbjNode*> onode_list;
+  onode_list.reserve(no);
   int min_depth = 0;
-  for (BdnNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const BdnNode* onode = *p;
-    const BdnNode* node = onode->output_fanin();
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* onode = sbjgraph.output(i);
+    const SbjNode* node = onode->fanin(0);
     if ( node == nullptr) continue;
     if ( node->is_logic() ) {
       onode_list.push_back(node);
@@ -131,23 +128,22 @@ DelayCover::record_cuts(const BdnMgr& sbjgraph,
 
   // それに slack を足したものが制約となる．
   min_depth += slack;
-  for (vector<const BdnNode*>::const_iterator p = onode_list.begin();
-       p != onode_list.end(); ++ p) {
-    const BdnNode* node = *p;
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* node = sbjgraph.output(i);
     mNodeInfo[node->id()].mReqDepth = min_depth;
   }
 
   // 要求された段数制約を満たす中でコスト最小の解を選ぶ．
-  for (vector<const BdnNode*>::reverse_iterator p = snode_list.rbegin();
+  for (vector<const SbjNode*>::reverse_iterator p = snode_list.rbegin();
        p != snode_list.rend(); ++ p) {
-    const BdnNode* node = *p;
+    const SbjNode* node = *p;
     select(node, maprec);
   }
 }
 
 // node のカットを選択する．
 void
-DelayCover::record(const BdnNode* node)
+DelayCover::record(const SbjNode* node)
 {
   int min_depth = INT_MAX;
   NodeInfo& t = mNodeInfo[node->id()];
@@ -160,7 +156,7 @@ DelayCover::record(const BdnNode* node)
     if ( mMode & 1 ) {
       // ファンアウトモード
       for (ymuint i = 0; i < ni; ++ i) {
-	const BdnNode* inode = cut->input(i);
+	const SbjNode* inode = cut->input(i);
 	mWeight[i] = 1.0 / inode->fanout_num();
       }
     }
@@ -174,7 +170,7 @@ DelayCover::record(const BdnNode* node)
 
     int max_input_depth = 0;
     for (ymuint i = 0; i < ni; ++ i) {
-      const BdnNode* inode = cut->input(i);
+      const SbjNode* inode = cut->input(i);
       NodeInfo& u = mNodeInfo[inode->id()];
       if ( max_input_depth < u.mMinDepth ) {
 	max_input_depth = u.mMinDepth;
@@ -225,7 +221,7 @@ DelayCover::record(const BdnNode* node)
 
 // node から各入力にいたる経路の重みを計算する．
 void
-DelayCover::calc_weight(const BdnNode* node,
+DelayCover::calc_weight(const SbjNode* node,
 			const Cut* cut,
 			double cur_weight)
 {
@@ -238,16 +234,16 @@ DelayCover::calc_weight(const BdnNode* node,
 	return;
       }
     }
-    const BdnNode* inode0 = node->fanin0();
+    const SbjNode* inode0 = node->fanin(0);
     calc_weight(inode0, cut, cur_weight / inode0->fanout_num());
-    node = node->fanin1();
+    node = node->fanin(1);
     cur_weight /= node->fanout_num();
   }
 }
 
 // node のカットを選択する．
 void
-DelayCover::select(const BdnNode* node,
+DelayCover::select(const SbjNode* node,
 		   MapRecord& maprec)
 {
   NodeInfo& t = mNodeInfo[node->id()];
@@ -269,7 +265,7 @@ DelayCover::select(const BdnNode* node,
   maprec.set_cut(node, cut);
   -- rd;
   for (ymuint i = 0; i < cut->input_num(); ++ i) {
-    const BdnNode* inode = cut->input(i);
+    const SbjNode* inode = cut->input(i);
     NodeInfo& u = mNodeInfo[inode->id()];
     if ( u.mReqDepth == 0 || u.mReqDepth > rd ) {
       u.mReqDepth = rd;

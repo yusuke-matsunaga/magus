@@ -1,16 +1,15 @@
-﻿#ifndef MAGUS_LUTMAP_CUTLIST_H
-#define MAGUS_LUTMAP_CUTLIST_H
+﻿#ifndef CUTLIST_H
+#define CUTLIST_H
 
-/// @file lutmap/CutList.h
+/// @file CutList.h
 /// @brief CutList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -289,4 +288,4 @@ CutList::empty() const
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CUTLIST_H
+#endif // CUTLIST_H

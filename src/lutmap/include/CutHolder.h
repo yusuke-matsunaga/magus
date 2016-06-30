@@ -1,18 +1,18 @@
-﻿#ifndef MAGUS_LUTMAP_CUTHOLDER_H
-#define MAGUS_LUTMAP_CUTHOLDER_H
+﻿#ifndef CUTHOLDER_H
+#define CUTHOLDER_H
 
-/// @file lutmap/CutHolder.h
+/// @file CutHolder.h
 /// @brief CutHolder のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "EnumCutOp.h"
 #include "Cut.h"
 #include "CutList.h"
-#include "YmNetworks/BdnNode.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -38,7 +38,7 @@ public:
 
   /// @brief node を根とするカットのリストを取り出す．
   const CutList&
-  cut_list(const BdnNode* node) const;
+  cut_list(const SbjNode* node) const;
 
   /// @brief 現在のカットを列挙したときのカットサイズを返す．
   ymuint
@@ -59,7 +59,7 @@ private:
   /// @param[in] limit カットサイズ
   virtual
   void
-  all_init(const BdnMgr& sbjgraph,
+  all_init(const SbjGraph& sbjgraph,
 	   ymuint limit);
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
@@ -67,14 +67,14 @@ private:
   /// @param[in] cur_pos node の処理順
   virtual
   void
-  node_init(const BdnNode* node,
+  node_init(const SbjNode* node,
 	    ymuint cur_pos);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
   /// @param[in] root 根のノード
   virtual
   void
-  found(const BdnNode* root);
+  found(const SbjNode* root);
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
   /// @param[in] root 根のノード
@@ -82,9 +82,9 @@ private:
   /// @param[in] inputs 入力ノードの配列
   virtual
   void
-  found(const BdnNode* root,
+  found(const SbjNode* root,
 	ymuint ni,
-	const BdnNode* inputs[]);
+	const SbjNode* inputs[]);
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
   /// @param[in] node 根のノード
@@ -92,7 +92,7 @@ private:
   /// @param[in] ncuts 列挙されたカット数
   virtual
   void
-  node_end(const BdnNode* node,
+  node_end(const SbjNode* node,
 	   ymuint cur_pos,
 	   ymuint ncuts);
 
@@ -103,7 +103,7 @@ private:
   /// 用いられたものと同じものが与えられる．
   virtual
   void
-  all_end(const BdnMgr& sbjgraph,
+  all_end(const SbjGraph& sbjgraph,
 	  ymuint limit);
 
 
@@ -144,7 +144,7 @@ private:
 // @brief node を根とするカットのリストを取り出す．
 inline
 const CutList&
-CutHolder::cut_list(const BdnNode* node) const
+CutHolder::cut_list(const SbjNode* node) const
 {
   return mCutList[node->id()];
 }
@@ -159,4 +159,4 @@ CutHolder::limit() const
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_CUTHOLDER_H
+#endif // CUTHOLDER_H

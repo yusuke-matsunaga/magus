@@ -1,11 +1,9 @@
 ﻿
-/// @file libym_techmap/SbjDumper.cc
+/// @file SbjDumper.cc
 /// @brief SbjDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SbjGraph.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -58,20 +56,18 @@ SbjDumper::dump(ostream& s,
   }
   s << endl;
 
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint ni = sbjgraph.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* node = sbjgraph.input(i);
     s << "Input#" << node->subid() << ": " << node->id_str()
       << " : " << sbjgraph.port(node)->name()
       << "[" << sbjgraph.port_pos(node) << "]"
       << endl;
   }
 
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint no = sbjgraph.output_num();
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* node = sbjgraph.output(i);
     const SbjEdge* e = node->fanin_edge(0);
     s << "Output#" << node->subid() << ": " << node->id_str()
       << " : " << sbjgraph.port(node)->name()
@@ -97,10 +93,9 @@ SbjDumper::dump(ostream& s,
     s << endl;
   }
 
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nf = sbjgraph.dff_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const SbjNode* node = sbjgraph.dff(i);
     s << "DFF(" << node->id_str() << ") :";
     s << "DATA = ";
     const SbjNode* inode = node->fanin_data();
@@ -151,10 +146,9 @@ SbjDumper::dump(ostream& s,
     s << endl;
   }
 
-  const SbjNodeList& lnode_list = sbjgraph.lnode_list();
-  for (SbjNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nl = sbjgraph.lnode_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.lnode(i);
     const char* pol0 = node->fanin_inv(0) ? "~" : "";
     const char* pol1 = node->fanin_inv(1) ? "~" : "";
     const char* op   = node->is_xor() ? "^" : "&";
@@ -174,22 +168,19 @@ SbjDumper::dump_blif(ostream& s,
 		     const SbjGraph& sbjgraph)
 {
   s << ".model " << sbjgraph.name() << endl;
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  for (SbjNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint ni = sbjgraph.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* node = sbjgraph.input(i);
     s << ".inputs " << node->id_str() << endl;
   }
 
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint no = sbjgraph.output_num();
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* node = sbjgraph.output(i);
     s << ".outputs " << node->id_str() << endl;
   }
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* node = sbjgraph.output(i);
     const SbjNode* inode = node->fanin(0);
     if ( inode == 0 ) {
       s << ".names " << node->id_str() << endl;
@@ -212,19 +203,17 @@ SbjDumper::dump_blif(ostream& s,
     s << endl;
   }
 
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nf = sbjgraph.dff_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const SbjNode* node = sbjgraph.dff(i);
     const SbjNode* inode = node->fanin(0);
     s << ".latch " << node->id_str() << " "
       << inode->id_str() << endl;
   }
 
-  const SbjNodeList& lnode_list = sbjgraph.lnode_list();
-  for (SbjNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nl = sbjgraph.lnode_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.lnode(i);
     s << ".names " << node->fanin(0)->id_str()
       << " " << node->fanin(1)->id_str()
       << " " << node->id_str() << endl;
@@ -304,47 +293,41 @@ SbjDumper::dump_verilog(ostream& s,
   }
   s << ");" << endl;
 
-  const SbjNodeList& input_list = sbjgraph.input_list();
-  const SbjNodeList& output_list = sbjgraph.output_list();
-  const SbjNodeList& lnode_list = sbjgraph.lnode_list();
-  const SbjNodeList& dff_list = sbjgraph.dff_list();
-
   // input 文
-  for (SbjNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint ni = sbjgraph.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* node = sbjgraph.input(i);
     s << "  input  " << node_name(node) << ";" << endl;
   }
   s << endl;
 
   // output 文
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint no = sbjgraph.output_num();
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* node = sbjgraph.output(i);
     s << "  output " << node_name(node) << ";" << endl;
   }
   s << endl;
 
   // reg 定義
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nf = sbjgraph.dff_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const SbjNode* node = sbjgraph.dff(i);
     s << "  reg    " << node_name(node) << ";" << endl;
   }
   s << endl;
 
   // wire 定義
-  for (SbjNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nl = sbjgraph.lnode_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.lnode(i);
     s << "  wire   " << node_name(node) << ";" << endl;
   }
   s << endl;
 
   // output 用の assign 文
-  for (SbjNodeList::const_iterator p = output_list.begin();
-       p != output_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* node = sbjgraph.output(i);
     const SbjNode* inode = node->fanin(0);
     s << "  assign " << node_name(node) << " = ";
     if ( inode == 0 ) {
@@ -366,9 +349,8 @@ SbjDumper::dump_verilog(ostream& s,
   s << endl;
 
   // 論理ノード用の assign 文
-  for (SbjNodeList::const_iterator p = lnode_list.begin();
-       p != lnode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.lnode(i);
     s << "  assign " << node_name(node) << " = ";
 
     const char* pol0 = node->fanin_inv(0) ? "~" : "";
@@ -382,9 +364,8 @@ SbjDumper::dump_verilog(ostream& s,
   s << endl;
 
   // ff 用の always 文
-  for (SbjNodeList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.lnode(i);
     const SbjNode* dnode = node->fanin_data();
     bool dinv = node->fanin_data_inv();
     const SbjNode* cnode = node->fanin_clock();

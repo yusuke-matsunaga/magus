@@ -1,13 +1,11 @@
-﻿#ifndef YM_TECHMAP_LUTMAP_NSDEF_H
-#define YM_TECHMAP_LUTMAP_NSDEF_H
+﻿#ifndef LUTMAP_NSDEF_H
+#define LUTMAP_NSDEF_H
 
-/// @file ym_techmap/lutmap_nsdef.h
+/// @file lutmap_nsdef.h
 /// @brief luttmap パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: lutmap.h 555 2007-04-08 07:20:30Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -29,22 +27,12 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 class LutMap;
 
-class LnGraph;
-class LnPort;
-class LnEdge;
-class LnNode;
-
 END_NAMESPACE_YM_LUTMAP
 
 BEGIN_NAMESPACE_YM
 
 using nsLutmap::LutMap;
 
-using nsLutmap::LnGraph;
-using nsLutmap::LnPort;
-using nsLutmap::LnEdge;
-using nsLutmap::LnNode;
-
 END_NAMESPACE_YM
 
-#endif // YM_TECHMAP_LUTMAP_NSDEF_H
+#endif // LUTMAP_NSDEF_H

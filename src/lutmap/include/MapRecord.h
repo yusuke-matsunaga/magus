@@ -1,16 +1,17 @@
-﻿#ifndef MAGUS_LUTMAP_MAPRECORD_H
-#define MAGUS_LUTMAP_MAPRECORD_H
+﻿#ifndef MAPRECORD_H
+#define MAPRECORD_H
 
-/// @file lutmap/MapRecord.h
+/// @file MapRecord.h
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "SbjGraph.h"
+#include "ym/ym_bnet.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -46,7 +47,7 @@ public:
   /// @brief @brief 作業領域を初期化する．
   /// @param[in] sbjgraph サブジェクトグラフ
   void
-  init(const BdnMgr& sbjgraph);
+  init(const SbjGraph& sbjgraph);
 
   /// @brief カットの情報だけコピーする．
   void
@@ -56,23 +57,23 @@ public:
   /// @param[in] node 該当のノード
   /// @param[in] cut 対応するカット
   void
-  set_cut(const BdnNode* node,
+  set_cut(const SbjNode* node,
 	  const Cut* cut);
 
   /// @brief カットを取り出す．
   /// @param[in] node 該当のノード
   const Cut*
-  get_cut(const BdnNode* node);
+  get_cut(const SbjNode* node);
 
-  /// @brief マッピング結果を LnGraph にセットする．
+  /// @brief マッピング結果を BnNetwork にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] dag_cover DAG covering 結果
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
   /// @param[out] lut_num LUT数
   /// @param[out] depth 最大段数
   void
-  gen_mapgraph(const BdnMgr& sbjgraph,
-	       LnGraph& mapgraph,
+  gen_mapgraph(const SbjGraph& sbjgraph,
+	       BnNetwork& mapgraph,
 	       ymuint& lut_num,
 	       ymuint& depth);
 
@@ -80,17 +81,17 @@ public:
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @return 見積もった LUT 数を返す．
   int
-  estimate(const BdnMgr& sbjgraph);
+  estimate(const SbjGraph& sbjgraph);
 
   /// @brief 直前の estimate の結果 node が fanout node なら true を返す．
   /// @param[in] node 対象のノード
   bool
-  check_fonode(const BdnNode* node);
+  check_fonode(const SbjNode* node);
 
   /// @brief 直前の estimate の結果で node のカバーされている回数を返す．
   /// @param[in] node 対象のノード
   int
-  cover_count(const BdnNode* node);
+  cover_count(const SbjNode* node);
 
 
 private:
@@ -102,30 +103,30 @@ private:
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
   /// @param[out] mapnetwork マッピング結果のネットワーク
-  LnNode*
-  back_trace(const BdnNode* node,
+  BnNode*
+  back_trace(const SbjNode* node,
 	     bool inv,
-	     LnGraph& mapnetwork);
+	     BnNetwork& mapnetwork);
 
   /// @brief estimate() で用いるバックトレース
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
   /// @return 見積もったLUT数を返す．
   int
-  back_trace2(const BdnNode* node,
+  back_trace2(const SbjNode* node,
 	      bool inv);
 
   /// @brief cut でカバーされるノードの mCovCount を一つ増やす．
   /// @param[in] node 対象のノード
   /// @param[in] cut カット
   void
-  mark_cover(const BdnNode* node,
+  mark_cover(const SbjNode* node,
 	     const Cut* cut);
 
   /// @brief mark_cover でつけた mTmpFlag を下ろす．
   /// @param[in] node 対象のノード
   void
-  clear_mark(const BdnNode* node);
+  clear_mark(const SbjNode* node);
 
 
 private:
@@ -151,7 +152,7 @@ private:
 
     // マップ結果
     // 正極性と負極性の2通りを保持する．
-    LnNode* mMapNode[2];
+    BnNode* mMapNode[2];
 
     // estimate で用いるカウンタ
     int mMapCount[2];
@@ -176,10 +177,10 @@ private:
   vector<NodeInfo> mNodeInfo;
 
   // back_trace 中に用いる作業領域
-  vector<LnNode*> mTmpFanins;
+  vector<BnNode*> mTmpFanins;
 
 };
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // MAGUS_LUTMAP_MAPRECORD_H
+#endif // MAPRECORD_H

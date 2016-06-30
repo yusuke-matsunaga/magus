@@ -1,9 +1,9 @@
 ﻿
-/// @file libym_techmap/sbjgraph/SbjMinDepth.cc
+/// @file SbjMinDepth.cc
 /// @brief SbjMinDepth の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -128,11 +128,10 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
     const SbjNode* sbjnode = sbjgraph.node(i);
     if ( sbjnode == nullptr ) continue;
     SmdNode* node = &mNodeArray[sbjnode->id()];
-    const SbjEdgeList& fanout_list = sbjnode->fanout_list();
+    ymuint nfo0 = sbjnode->fanout_num();
     ymuint nfo = 0;
-    for (SbjEdgeList::const_iterator p = fanout_list.begin();
-	 p != fanout_list.end(); ++ p) {
-      const SbjEdge* sbjedge = *p;
+    for (ymuint j = 0; j < nfo0; ++ j) {
+      const SbjEdge* sbjedge = sbjnode->fanout_edge(j);
       const SbjNode* sbjfonode = sbjedge->to();
       if ( !sbjfonode->is_ppo() ) {
 	++nfo;
@@ -141,9 +140,8 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
     void* p = mAlloc.get_memory(sizeof(SmdEdge*) * nfo);
     node->set_fanout_num(nfo, p);
     ymuint pos = 0;
-    for (SbjEdgeList::const_iterator p = fanout_list.begin();
-	 p != fanout_list.end(); ++ p, ++ pos) {
-      const SbjEdge* sbjedge = *p;
+    for (ymuint j = 0; j < nfo0; ++ j) {
+      const SbjEdge* sbjedge = sbjnode->fanout_edge(j);
       const SbjNode* sbjfonode = sbjedge->to();
       if ( sbjfonode->is_ppo() ) continue;
       SmdNode* fonode = &mNodeArray[sbjfonode->id()];
