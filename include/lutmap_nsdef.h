@@ -27,11 +27,20 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 class LutMap;
 
+class LnGraph;
+class LnPort;
+class LnEdge;
+class LnNode;
+
 END_NAMESPACE_YM_LUTMAP
 
 BEGIN_NAMESPACE_YM
 
 using nsLutmap::LutMap;
+using nsLutmap::LnGraph;
+using nsLutmap::LnPort;
+using nsLutmap::LnEdge;
+using nsLutmap::LnNode;
 
 END_NAMESPACE_YM
 

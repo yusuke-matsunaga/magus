@@ -1,7 +1,7 @@
-﻿#ifndef YM_TECHMAP_CELLMAP_NSDEF_H
-#define YM_TECHMAP_CELLMAP_NSDEF_H
+﻿#ifndef CELLMAP_NSDEF_H
+#define CELLMAP_NSDEF_H
 
-/// @file ym_techmap/cellmap_nsdef.h
+/// @file cellmap_nsdef.h
 /// @brief cellmap パッケージに共通な定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "YmTools.h"
+#include "ym_config.h"
 
 
 /// @brief cellmap 用の名前空間の開始

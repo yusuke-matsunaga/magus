@@ -50,7 +50,7 @@ public:
   area_map(const BnNetwork& sbjgraph,
 	   ymuint limit,
 	   ymuint mode,
-	   BnNetwork& mapnetwork,
+	   LnGraph& mapnetwork,
 	   ymuint& lut_num,
 	   ymuint& depth);
 
@@ -71,7 +71,7 @@ public:
 	    ymuint limit,
 	    ymuint slack,
 	    ymuint mode,
-	    BnNetwork& mapnetwork,
+	    LnGraph& mapnetwork,
 	    ymuint& lut_num,
 	    ymuint& depth);
 

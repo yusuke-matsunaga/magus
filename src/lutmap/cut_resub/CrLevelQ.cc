@@ -9,7 +9,7 @@
 
 #include "CrLevelQ.h"
 #include "CrNode.h"
-#include "YmNetworks/BdnNode.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

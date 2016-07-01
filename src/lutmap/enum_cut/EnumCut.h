@@ -10,7 +10,6 @@
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/BdnNode.h"
 #include "EnumCutOp.h"
 
 
@@ -39,7 +38,7 @@ public:
   /// @param[in] op カットが列挙される時に呼ばれるクラス
   /// @return 全 cut 数を返す．
   ymuint
-  operator()(const BdnMgr& sbjgraph,
+  operator()(const SbjGraph& sbjgraph,
 	     ymuint limit,
 	     EnumCutOp* op);
 
@@ -55,39 +54,39 @@ private:
 
   // node のカットになったノードに c1mark を付け，mMarkedNodes に入れる．
   void
-  mark_cnode(const BdnNode* node);
+  mark_cnode(const SbjNode* node);
 
   // node の TFI に c1mark を付ける．
   void
-  mark_cnode2(const BdnNode* node);
+  mark_cnode2(const SbjNode* node);
 
   // node のカットになったノードに c1mark を付け，marked_nodes に入れる．
   void
-  mark_cnode3(const BdnNode* node);
+  mark_cnode3(const SbjNode* node);
 
 #if 0
   // root_depth よりも小さな depth を持つノードを frontier stack に積む．
   void
-  get_frontier(const BdnNode* node,
+  get_frontier(const SbjNode* node,
 	       ymuint root_depth);
 
   // get_frontier で付けた印を消す．
   void
-  clear_frontier(const BdnNode* node);
+  clear_frontier(const SbjNode* node);
 #endif
 
   // cmark の付いているノードを cnode_list に入れて
   // cmark を消す．
   void
-  set_cut_node_list_recur(const BdnNode* node,
-			  vector<const BdnNode*>& cnode_list);
+  set_cut_node_list_recur(const SbjNode* node,
+			  vector<const SbjNode*>& cnode_list);
 
   // frontier stack にノードをプッシュする
   void
-  push_node(const BdnNode* node);
+  push_node(const SbjNode* node);
 
   // frontier stack からノードをポップする
-  const BdnNode*
+  const SbjNode*
   pop_node();
 
   // frontier stack が空のとき true を返す．
@@ -95,64 +94,64 @@ private:
   frontier_is_empty() const;
 
   const NodeTemp&
-  node_temp(const BdnNode* node) const;
+  node_temp(const SbjNode* node) const;
 
   NodeTemp&
-  node_temp(const BdnNode* node);
+  node_temp(const SbjNode* node);
 
   int
-  state(const BdnNode* node);
+  state(const SbjNode* node);
 
   void
-  set_state1(const BdnNode* node);
+  set_state1(const SbjNode* node);
 
   void
-  set_state2(const BdnNode* node);
+  set_state2(const SbjNode* node);
 
   void
-  clear_state(const BdnNode* node);
+  clear_state(const SbjNode* node);
 
   bool
-  cmark(const BdnNode* node);
+  cmark(const SbjNode* node);
 
   void
-  set_cmark(const BdnNode* node);
+  set_cmark(const SbjNode* node);
 
   void
-  clear_cmark(const BdnNode* node);
+  clear_cmark(const SbjNode* node);
 
   bool
-  temp1mark(const BdnNode* node);
+  temp1mark(const SbjNode* node);
 
   void
-  set_temp1mark(const BdnNode* node);
+  set_temp1mark(const SbjNode* node);
 
   bool
-  temp2mark(const BdnNode* node);
+  temp2mark(const SbjNode* node);
 
   void
-  set_temp2mark(const BdnNode* node);
+  set_temp2mark(const SbjNode* node);
 
   void
-  clear_tempmark(const BdnNode* node);
+  clear_tempmark(const SbjNode* node);
 
   bool
-  edge_mark(const BdnNode* node,
+  edge_mark(const SbjNode* node,
 	    ymuint pos);
 
   void
-  set_edge_mark(const BdnNode* node,
+  set_edge_mark(const SbjNode* node,
 		ymuint pos);
 
   void
-  clear_edge_mark(const BdnNode* node,
+  clear_edge_mark(const SbjNode* node,
 		  ymuint pos);
 
-  vector<const BdnNode*>&
-  cnode_list(const BdnNode* node);
+  vector<const SbjNode*>&
+  cnode_list(const SbjNode* node);
 
-  const vector<const BdnNode*>&
-  cnode_list(const BdnNode* node) const;
+  const vector<const SbjNode*>&
+  cnode_list(const SbjNode* node) const;
 
 
 private:
@@ -230,11 +229,11 @@ private:
     clear_edge_mark(ymuint pos);
 
     /// @brief クラスタノードのリストを返す．
-    vector<const BdnNode*>&
+    vector<const SbjNode*>&
     cnode_list();
 
     /// @brief クラスタノードのリストを返す．
-    const vector<const BdnNode*>&
+    const vector<const SbjNode*>&
     cnode_list() const;
 
 
@@ -244,7 +243,7 @@ private:
     //////////////////////////////////////////////////////////////////////
 
     // このノードを根とする全カットのフットプリント
-    vector<const BdnNode*> mCnodeList;
+    vector<const SbjNode*> mCnodeList;
 
     // 種々のマーク
     ymuint32 mMarks;
@@ -273,19 +272,19 @@ private:
   ymuint32 mNcCur;
 
   // 根のノード
-  const BdnNode* mRoot;
+  const SbjNode* mRoot;
 
   // mFrontierStack のサイズ
   ymuint32 mFsSize;
 
   // 最前線ノードのスタック
-  const BdnNode** mFrontierStack;
+  const SbjNode** mFrontierStack;
 
   // mFrontierStack の先頭を指すポインタ
-  const BdnNode** mFsPos;
+  const SbjNode** mFsPos;
 
   // 確定した境界ノードを入れるベクタ
-  const BdnNode** mInputs;
+  const SbjNode** mInputs;
 
   // mInputs の次の書き込み位置
   ymuint32 mInputPos;
@@ -300,7 +299,7 @@ private:
   vector<NodeTemp> mNodeTemp;
 
   // マークの付いたノードを入れておく配列
-  vector<const BdnNode*> mMarkedNodes;
+  vector<const SbjNode*> mMarkedNodes;
 
   // mMarkedNodes の末尾
   ymuint32 mMarkedNodesLast;
@@ -450,7 +449,7 @@ EnumCut::NodeTemp::clear_edge_mark(ymuint pos)
 
 // @brief クラスタノードのリストを返す．
 inline
-vector<const BdnNode*>&
+vector<const SbjNode*>&
 EnumCut::NodeTemp::cnode_list()
 {
   return mCnodeList;
@@ -458,7 +457,7 @@ EnumCut::NodeTemp::cnode_list()
 
 // @brief クラスタノードのリストを返す．
 inline
-const vector<const BdnNode*>&
+const vector<const SbjNode*>&
 EnumCut::NodeTemp::cnode_list() const
 {
   return mCnodeList;
@@ -466,105 +465,105 @@ EnumCut::NodeTemp::cnode_list() const
 
 inline
 const EnumCut::NodeTemp&
-EnumCut::node_temp(const BdnNode* node) const
+EnumCut::node_temp(const SbjNode* node) const
 {
   return mNodeTemp[node->id()];
 }
 
 inline
 EnumCut::NodeTemp&
-EnumCut::node_temp(const BdnNode* node)
+EnumCut::node_temp(const SbjNode* node)
 {
   return mNodeTemp[node->id()];
 }
 
 inline
 int
-EnumCut::state(const BdnNode* node)
+EnumCut::state(const SbjNode* node)
 {
   return node_temp(node).state();
 }
 
 inline
 void
-EnumCut::set_state1(const BdnNode* node)
+EnumCut::set_state1(const SbjNode* node)
 {
   node_temp(node).set_state1();
 }
 
 inline
 void
-EnumCut::set_state2(const BdnNode* node)
+EnumCut::set_state2(const SbjNode* node)
 {
   node_temp(node).set_state2();
 }
 
 inline
 void
-EnumCut::clear_state(const BdnNode* node)
+EnumCut::clear_state(const SbjNode* node)
 {
   node_temp(node).clear_state();
 }
 
 inline
 bool
-EnumCut::cmark(const BdnNode* node)
+EnumCut::cmark(const SbjNode* node)
 {
   return node_temp(node).cmark();
 }
 
 inline
 void
-EnumCut::set_cmark(const BdnNode* node)
+EnumCut::set_cmark(const SbjNode* node)
 {
   node_temp(node).set_cmark();
 }
 
 inline
 void
-EnumCut::clear_cmark(const BdnNode* node)
+EnumCut::clear_cmark(const SbjNode* node)
 {
   node_temp(node).clear_cmark();
 }
 
 inline
 bool
-EnumCut::temp1mark(const BdnNode* node)
+EnumCut::temp1mark(const SbjNode* node)
 {
   return node_temp(node).temp1mark();
 }
 
 inline
 void
-EnumCut::set_temp1mark(const BdnNode* node)
+EnumCut::set_temp1mark(const SbjNode* node)
 {
   node_temp(node).set_temp1mark();
 }
 
 inline
 bool
-EnumCut::temp2mark(const BdnNode* node)
+EnumCut::temp2mark(const SbjNode* node)
 {
   return node_temp(node).temp2mark();
 }
 
 inline
 void
-EnumCut::set_temp2mark(const BdnNode* node)
+EnumCut::set_temp2mark(const SbjNode* node)
 {
   node_temp(node).set_temp2mark();
 }
 
 inline
 void
-EnumCut::clear_tempmark(const BdnNode* node)
+EnumCut::clear_tempmark(const SbjNode* node)
 {
   node_temp(node).clear_tempmark();
 }
 
 inline
 bool
-EnumCut::edge_mark(const BdnNode* node,
+EnumCut::edge_mark(const SbjNode* node,
 		   ymuint pos)
 {
   return node_temp(node).edge_mark(pos);
@@ -572,7 +571,7 @@ EnumCut::edge_mark(const BdnNode* node,
 
 inline
 void
-EnumCut::set_edge_mark(const BdnNode* node,
+EnumCut::set_edge_mark(const SbjNode* node,
 		       ymuint pos)
 {
   node_temp(node).set_edge_mark(pos);
@@ -580,22 +579,22 @@ EnumCut::set_edge_mark(const BdnNode* node,
 
 inline
 void
-EnumCut::clear_edge_mark(const BdnNode* node,
+EnumCut::clear_edge_mark(const SbjNode* node,
 			 ymuint pos)
 {
   node_temp(node).clear_edge_mark(pos);
 }
 
 inline
-vector<const BdnNode*>&
-EnumCut::cnode_list(const BdnNode* node)
+vector<const SbjNode*>&
+EnumCut::cnode_list(const SbjNode* node)
 {
   return node_temp(node).cnode_list();
 }
 
 inline
-const vector<const BdnNode*>&
-EnumCut::cnode_list(const BdnNode* node) const
+const vector<const SbjNode*>&
+EnumCut::cnode_list(const SbjNode* node) const
 {
   return node_temp(node).cnode_list();
 }

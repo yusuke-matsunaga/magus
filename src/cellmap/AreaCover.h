@@ -1,19 +1,18 @@
-﻿#ifndef MAGUS_CELLMAP_AREACOVER_H
-#define MAGUS_CELLMAP_AREACOVER_H
+﻿#ifndef AREACOVER_H
+#define AREACOVER_H
 
 /// @file cellmap/AreaCover.h
 /// @brief AreaCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "cellmap_nsdef.h"
-#include "YmNetworks/BdnNode.h"
-#include "YmNetworks/cmn.h"
-#include "YmCell/cell_nsdef.h"
-#include "YmCell/CellFFInfo.h"
+#include "sbj_nsdef.h"
+#include "ym/ym_cell.h"
+#include "ym/CellFFInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -42,7 +41,7 @@ public:
   /// @param[in] cell_library セルを管理するオブジェクト
   /// @param[out] mapnetwork マッピング結果
   void
-  operator()(const BdnMgr& sbjgraph,
+  operator()(const SbjGraph& sbjgraph,
 	     const CellLibrary& cell_library,
 	     CmnMgr& mapnetwork);
 
@@ -57,7 +56,7 @@ private:
   /// @param[in] cell_library セルを管理するオブジェクト
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
-  ff_map(const BdnMgr& sbjgraph,
+  ff_map(const SbjGraph& sbjgraph,
 	 const CellLibrary& cell_library,
 	 MapRecord& maprec);
 
@@ -66,7 +65,7 @@ private:
   /// @param[in] cell_library セルを管理するオブジェクト
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
-  record_cuts(const BdnMgr& sbjgraph,
+  record_cuts(const SbjGraph& sbjgraph,
 	      const CellLibrary& cell_library,
 	      MapRecord& maprec);
 
@@ -76,7 +75,7 @@ private:
   /// @param[in] inv_func インバータの関数グループ
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
-  add_inv(const BdnNode* node,
+  add_inv(const SbjNode* node,
 	  bool inv,
 	  const CellGroup* inv_func,
 	  MapRecord& maprec);
@@ -85,12 +84,12 @@ private:
   /// @param[in] node 対象のノード
   /// @param[in] cur_weight
   void
-  calc_weight(const BdnNode* node,
+  calc_weight(const SbjNode* node,
 	      double cur_weight);
 
   /// @brief (node, inv) に対応するコストを取り出す．
   double&
-  cost(const BdnNode* node,
+  cost(const SbjNode* node,
        bool inv);
 
 
@@ -138,7 +137,7 @@ private:
 // @brief (node, inv) に対応する NodeInfo を取り出す．
 inline
 double&
-AreaCover::cost(const BdnNode* node,
+AreaCover::cost(const SbjNode* node,
 		bool inv)
 {
   return mCostArray[node->id() * 2 + static_cast<ymuint>(inv)];
@@ -146,4 +145,4 @@ AreaCover::cost(const BdnNode* node,
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // MAGUS_CELLMAP_AREACOVER_H
+#endif // AREACOVER_H

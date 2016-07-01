@@ -10,7 +10,7 @@
 
 
 #include "lutmap_nsdef.h"
-#include "YmNetworks/bdn.h"
+#include "sbj_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -36,12 +36,12 @@ public:
 
 public:
 
-  /// @brief 対応する BdnNode を設定する．
+  /// @brief 対応する SbjNode を設定する．
   void
-  set_sbjnode(const BdnNode* node);
+  set_sbjnode(const SbjNode* node);
 
-  /// @brief 対応する BdnNode を返す．
-  const BdnNode*
+  /// @brief 対応する SbjNode を返す．
+  const SbjNode*
   sbjnode() const;
 
   /// @brief 外部入力ノードのとき true を返す．
@@ -190,7 +190,7 @@ public:
 private:
 
   // 根のノード
-  const BdnNode* mNode;
+  const SbjNode* mNode;
 
   // このノードを根とする最適カット
   const Cut* mCurCut;
@@ -269,9 +269,9 @@ compare(CrNode* node1,
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief 対応する BdnNode を返す．
+// @brief 対応する SbjNode を返す．
 inline
-const BdnNode*
+const SbjNode*
 CrNode::sbjnode() const
 {
   return mNode;

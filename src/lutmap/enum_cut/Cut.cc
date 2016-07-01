@@ -8,8 +8,7 @@
 
 
 #include "Cut.h"
-#include "YmNetworks/BdnNode.h"
-#include "YmUtils/HashMap.h"
+#include "ym/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -19,7 +18,7 @@ BEGIN_NONAMESPACE
 // valmap に終端のノード番号をキーとしてビットベクタ値を登録する．
 // その時の node の値を計算する．
 ymuint64
-eval_node(const BdnNode* node,
+eval_node(const SbjNode* node,
 	  HashMap<ymuint, ymuint64>& valmap)
 {
   if ( node == nullptr ) {
@@ -34,13 +33,13 @@ eval_node(const BdnNode* node,
     ASSERT_COND( node->is_logic() );
 
     // 子供の値を評価する．
-    ymuint64 val0 = eval_node(node->fanin0(), valmap);
-    if ( node->fanin0_inv() ) {
+    ymuint64 val0 = eval_node(node->fanin(0), valmap);
+    if ( node->fanin_inv(0) ) {
       val0 ^= 0xFFFFFFFFFFFFFFFFULL;
     }
 
-    ymuint64 val1 = eval_node(node->fanin1(), valmap);
-    if ( node->fanin1_inv() ) {
+    ymuint64 val1 = eval_node(node->fanin(1), valmap);
+    if ( node->fanin_inv(0) ) {
       val1 ^= 0xFFFFFFFFFFFFFFFFULL;
     }
 
@@ -68,7 +67,7 @@ eval_cut(const Cut* cut,
   ASSERT_COND( ni == vals.size() );
   HashMap<ymuint, ymuint64> valmap;
   for (ymuint i = 0; i < ni; ++ i) {
-    const BdnNode* inode = cut->input(i);
+    const SbjNode* inode = cut->input(i);
     valmap.add(inode->id(), vals[i]);
   }
   return eval_node(cut->root(), valmap);
@@ -177,7 +176,7 @@ Cut::print(ostream& s) const
     s << "Node[" << root()->id() << "] : ";
     string comma = "";
     for (ymuint i = 0; i < input_num(); i ++) {
-      const BdnNode* node = mInputs[i];
+      const SbjNode* node = mInputs[i];
       s << comma << "Node[" << node->id() << "]";
       comma = ", ";
     }

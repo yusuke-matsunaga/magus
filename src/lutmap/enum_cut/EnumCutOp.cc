@@ -9,7 +9,6 @@
 
 #include "EnumCutOp.h"
 #include "EnumCut.h"
-#include "YmNetworks/BdnMgr.h"
 
 //#define DEBUG_ENUM_RECUR
 
@@ -35,7 +34,7 @@ EnumCutOp::~EnumCutOp()
 // @param[in] limit 入力数の制限
 // @return 全 cut 数を返す．
 ymuint
-EnumCutOp::enum_cut(const BdnMgr& sbjgraph,
+EnumCutOp::enum_cut(const SbjGraph& sbjgraph,
 		    ymuint limit)
 {
   EnumCut ec;
@@ -47,7 +46,7 @@ EnumCutOp::enum_cut(const BdnMgr& sbjgraph,
 // @param[in] limit カットサイズ
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::all_init(const BdnMgr& sbjgraph,
+EnumCutOp::all_init(const SbjGraph& sbjgraph,
 		    ymuint limit)
 {
 }
@@ -57,7 +56,7 @@ EnumCutOp::all_init(const BdnMgr& sbjgraph,
 // @param[in] cur_pos node の処理順
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::node_init(const BdnNode* node,
+EnumCutOp::node_init(const SbjNode* node,
 		     ymuint cur_pos)
 {
 }
@@ -66,7 +65,7 @@ EnumCutOp::node_init(const BdnNode* node,
 // @param[in] root 根のノード
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::found(const BdnNode* root)
+EnumCutOp::found(const SbjNode* root)
 {
 }
 
@@ -76,9 +75,9 @@ EnumCutOp::found(const BdnNode* root)
 // @param[in] inputs 入力ノードの配列
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::found(const BdnNode* root,
+EnumCutOp::found(const SbjNode* root,
 		 ymuint ni,
-		 const BdnNode* inputs[])
+		 const SbjNode* inputs[])
 {
 }
 
@@ -88,7 +87,7 @@ EnumCutOp::found(const BdnNode* root,
 // @param[in] ncuts 列挙されたカット数
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::node_end(const BdnNode* node,
+EnumCutOp::node_end(const SbjNode* node,
 		    ymuint cur_pos,
 		    ymuint ncuts)
 {
@@ -97,7 +96,7 @@ EnumCutOp::node_end(const BdnNode* node,
 // @brief 処理の最後に呼ばれる関数
 // @note デフォルトの実装ではなにもしない．
 void
-EnumCutOp::all_end(const BdnMgr& sbjgraph,
+EnumCutOp::all_end(const SbjGraph& sbjgraph,
 		   ymuint limit)
 {
 }

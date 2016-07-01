@@ -8,7 +8,7 @@
 
 
 #include "CrNode.h"
-#include "YmNetworks/BdnNode.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -34,9 +34,9 @@ CrNode::~CrNode()
 {
 }
 
-// @brief 対応する BdnNode を設定する．
+// @brief 対応する SbjNode を設定する．
 void
-CrNode::set_sbjnode(const BdnNode* node)
+CrNode::set_sbjnode(const SbjNode* node)
 {
   mNode = node;
   if ( node->is_input() ) {

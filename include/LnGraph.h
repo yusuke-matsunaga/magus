@@ -28,8 +28,7 @@ BEGIN_NAMESPACE_YM_LUTMAP
 /// の情報を持つ．
 /// @sa LnNode LnGraph
 //////////////////////////////////////////////////////////////////////
-class LnEdge :
-  public DlElem
+class LnEdge
 {
   friend class LnNode;
   friend class LnGraph;
@@ -126,8 +125,7 @@ private:
 /// の 4種類がある．
 /// @sa LnEdge LnGraph
 //////////////////////////////////////////////////////////////////////
-class LnNode :
-  public DlElem
+class LnNode
 {
   friend class LnGraph;
 
@@ -241,9 +239,10 @@ public:
   ymuint
   fanout_num() const;
 
-  /// @brief ファンアウトリストを得る．
-  const LnEdgeList&
-  fanout_list() const;
+  /// @brief ファンアウトの枝を得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
+  const LnEdge*
+  fanout_edge(ymuint pos) const;
 
   /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
@@ -306,7 +305,7 @@ private:
   LnEdge* mFanins;
 
   // ファンアウトの枝のリスト
-  LnEdgeList mFanoutList;
+  vector<LnEdge*> mFanoutList;
 
   // 真理値ベクタ
   vector<int> mTv;
@@ -515,15 +514,11 @@ public:
   const LnNode*
   input(ymuint id) const;
 
-  /// @brief 入力ノードのリストを得る．
-  const LnNodeList&
-  input_list() const;
-
   /// @brief 入力ノードと DFF ノードのリストを得る．
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppi_list(list<LnNode*>& node_list) const;
+  ppi_list(vector<LnNode*>& node_list) const;
 
   /// @brief 出力のノード数を得る．
   ymuint
@@ -535,36 +530,34 @@ public:
   const LnNode*
   output(ymuint id) const;
 
-  /// @brief 出力ノードのリストを得る．
-  const LnNodeList&
-  output_list() const;
-
   /// @brief 出力ノードと DFF ノードのリストを得る．
   /// @param[out] node_list ノードを格納するリスト
   /// @return 要素数を返す．
   ymuint
-  ppo_list(list<LnNode*>& node_list) const;
+  ppo_list(vector<LnNode*>& node_list) const;
 
   /// @brief LUTノード数を得る．
   ymuint
   lnode_num() const;
 
-  /// @brief LUTノードのリストを得る．
-  const LnNodeList&
-  lnode_list() const;
+  /// @brief LUTノードを得る．
+  /// @param[in] pos 位置番号( 0 <= pos < lnode_num() )
+  const LnNode*
+  lnode(ymuint pos) const;
 
   /// @brief ソートされたLUTノードのリストを得る．
   /// @param[out] node_list
   void
-  sort(vector<LnNode*>& node_list) const;
+  sort(vector<const LnNode*>& node_list) const;
 
   /// @brief DFFノード数を得る．
   ymuint
   dff_num() const;
 
-  /// @brief DFFノードのリストを得る．
-  const LnNodeList&
-  dff_list() const;
+  /// @brief DFFノードを得る．
+  /// @param[in] pos 位置番号( 0 <= pos < dff_num() )
+  const LnNode*
+  dff(ymuint pos) const;
 
   /// @brief 最大段数を求める．
   ymuint
@@ -734,9 +727,6 @@ private:
   // 入力番号をキーにしたポート情報の配列
   vector<PortInfo> mInputPortArray;
 
-  // 入力ノードのリスト
-  LnNodeList mInputList;
-
   // 出力番号をキーにした出力ノードの配列
   // 穴はあいていない．
   vector<LnNode*> mOutputArray;
@@ -744,14 +734,11 @@ private:
   // 出力番号をキーにしたポート情報の配列
   vector<PortInfo> mOutputPortArray;
 
-  // 出力ノードのリスト
-  LnNodeList mOutputList;
-
   // LUTノードのリスト
-  LnNodeList mLutList;
+  vector<LnNode*> mLutList;
 
   // DFFノードのリスト
-  LnNodeList mDffList;
+  vector<LnNode*> mDffList;
 
   // 最大レベル
   mutable
@@ -1031,20 +1018,22 @@ LnNode::fanin_edge(ymuint pos)
   return &mFanins[pos];
 }
 
-// ファンアウトリストを得る．
-inline
-const LnEdgeList&
-LnNode::fanout_list() const
-{
-  return mFanoutList;
-}
-
 // ファンアウト数を得る．
 inline
 ymuint
 LnNode::fanout_num() const
 {
   return mFanoutList.size();
+}
+
+// @brief ファンアウトの枝を得る．
+// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
+inline
+const LnEdge*
+LnNode::fanout_edge(ymuint pos) const
+{
+  ASSERT_COND( pos < fanout_num() );
+  return mFanoutList[pos];
 }
 
 // @brief 出力ノードにファンアウトしているとき true を返す．
@@ -1167,14 +1156,6 @@ LnGraph::input(ymuint id) const
   return mInputArray[id];
 }
 
-// @brief 入力ノードのリストを得る．
-inline
-const LnNodeList&
-LnGraph::input_list() const
-{
-  return mInputList;
-}
-
 // 出力のノード数を得る．
 inline
 ymuint
@@ -1191,14 +1172,6 @@ LnGraph::output(ymuint id) const
   return mOutputArray[id];
 }
 
-// @brief 入力ノードのリストを得る．
-inline
-const LnNodeList&
-LnGraph::output_list() const
-{
-  return mOutputList;
-}
-
 // LUTノード数を得る．
 inline
 ymuint
@@ -1207,12 +1180,14 @@ LnGraph::lnode_num() const
   return mLutList.size();
 }
 
-// LUTノードのリストを得る．
+// @brief LUTノードを得る．
+// @param[in] pos 位置番号( 0 <= pos < lnode_num() )
 inline
-const LnNodeList&
-LnGraph::lnode_list() const
+const LnNode*
+LnGraph::lnode(ymuint pos) const
 {
-  return mLutList;
+  ASSERT_COND( pos < lnode_num() );
+  return mLutList[pos];
 }
 
 // @brief DFFノード数を得る．
@@ -1223,12 +1198,13 @@ LnGraph::dff_num() const
   return mDffList.size();
 }
 
-// @brief DFFノードのリストを得る．
+// @brief DFFノードを得る．
+// @param[in] pos 位置番号( 0 <= pos < dff_num() )
 inline
-const LnNodeList&
-LnGraph::dff_list() const
+const LnNode*
+LnGraph::dff(ymuint pos) const
 {
-  return mDffList;
+  return mDffList[pos];
 }
 
 END_NAMESPACE_YM_LUTMAP

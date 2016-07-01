@@ -10,7 +10,6 @@
 #include "CutHolder.h"
 #include "Cut.h"
 #include "CutList.h"
-#include "YmNetworks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -45,7 +44,7 @@ CutHolder::clear()
 
 // 最初に呼ばれる関数
 void
-CutHolder::all_init(const BdnMgr& sbjgraph,
+CutHolder::all_init(const SbjGraph& sbjgraph,
 		    ymuint limit)
 {
   clear();
@@ -55,20 +54,20 @@ CutHolder::all_init(const BdnMgr& sbjgraph,
 }
 
 void
-CutHolder::node_init(const BdnNode* node,
+CutHolder::node_init(const SbjNode* node,
 		     ymuint pos)
 {
 }
 
 void
-CutHolder::found(const BdnNode* root)
+CutHolder::found(const SbjNode* root)
 {
 }
 
 void
-CutHolder::found(const BdnNode* root,
+CutHolder::found(const SbjNode* root,
 		 ymuint ni,
-		 const BdnNode* inputs[])
+		 const SbjNode* inputs[])
 {
   Cut* cut = alloc_cut(ni);
   cut->mRoot = root;
@@ -80,7 +79,7 @@ CutHolder::found(const BdnNode* root,
 }
 
 void
-CutHolder::node_end(const BdnNode* node,
+CutHolder::node_end(const SbjNode* node,
 		    ymuint pos,
 		    ymuint ncuts)
 {
@@ -88,7 +87,7 @@ CutHolder::node_end(const BdnNode* node,
 
 // 最後に呼ばれる関数
 void
-CutHolder::all_end(const BdnMgr& sbjgraph,
+CutHolder::all_end(const SbjGraph& sbjgraph,
 		   ymuint limit)
 {
 }
@@ -97,7 +96,7 @@ CutHolder::all_end(const BdnMgr& sbjgraph,
 Cut*
 CutHolder::alloc_cut(ymuint ni)
 {
-  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const BdnNode*);
+  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const SbjNode*);
   ASSERT_COND(size < kPageSize );
   if ( mCurChunk == nullptr || mLast + size > kPageSize ) {
     mCurChunk = new char[kPageSize];
