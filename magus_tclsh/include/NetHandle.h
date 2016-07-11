@@ -11,9 +11,8 @@
 /// All rights reserved.
 
 #include "magus_nsdef.h"
-#include "YmNetworks/bnet.h"
-#include "YmNetworks/bdn.h"
-#include "YmNetworks/mvn.h"
+#include "ym/ym_bnet.h"
+#include "ym/ym_mvn.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -70,23 +69,13 @@ public:
 
   /// @brief BNetwork を得る．
   virtual
-  const BNetwork*
+  const BnNetwork*
   bnetwork() const;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
-  BNetwork*
+  BnNetwork*
   _bnetwork();
-
-  /// @brief BdnMgr を得る．
-  virtual
-  const BdnMgr*
-  bdn() const;
-
-  /// @brief BdnMgr を得る．
-  virtual
-  BdnMgr*
-  _bdn();
 
   /// @brief MvNetwork を得る．
   virtual

@@ -10,10 +10,10 @@
 
 
 #include "cellmap_nsdef.h"
-#include "YmCell/cell_nsdef.h"
-#include "YmCell/CellFFInfo.h"
-#include "YmCell/CellLatchInfo.h"
-#include "YmNetworks/cmn.h"
+#include "ym/ym_cell.h"
+#include "ym/BnNetwork.h"
+#include "ym/CellFFInfo.h"
+#include "ym/CellLatchInfo.h"
 #include "Match.h"
 
 
@@ -40,7 +40,7 @@ public:
   /// @brief @brief 作業領域を初期化する．
   /// @param[in] sbjgraph サブジェクトグラフ
   void
-  init(const BdnMgr& sbjgraph);
+  init(const SbjGraph& sbjgraph);
 
   /// @brief マッチの情報だけコピーする．
   void
@@ -52,7 +52,7 @@ public:
   /// @param[in] ff_info ピンの割り当て情報
   /// @param[in] cell セル
   void
-  set_dff_match(const BdnDff* dff,
+  set_dff_match(const SbjDff* dff,
 		bool inv,
 		const Cell* cell,
 		const CellFFInfo& ff_info);
@@ -63,7 +63,7 @@ public:
   /// @param[in] latch_info ピンの割り当て情報
   /// @param[in] cell セル
   void
-  set_latch_match(const BdnLatch* latch,
+  set_latch_match(const SbjLatch* latch,
 		  bool inv,
 		  const Cell* cell,
 		  const CellLatchInfo& latch_info);
@@ -74,7 +74,7 @@ public:
   /// @param[in] match 対応するマッチ
   /// @param[in] cell セル
   void
-  set_logic_match(const BdnNode* node,
+  set_logic_match(const SbjNode* node,
 		  bool inv,
 		  const Match& match,
 		  const Cell* cell);
@@ -84,7 +84,7 @@ public:
   /// @param[in] inv 極性
   /// @param[in] cell セル
   void
-  set_inv_match(const BdnNode* node,
+  set_inv_match(const SbjNode* node,
 		bool inv,
 		const Cell* cell);
 
@@ -92,19 +92,19 @@ public:
   /// @param[in] node 該当のノード
   /// @param[in] inv 極性
   const Match&
-  get_match(const BdnNode* node,
+  get_match(const SbjNode* node,
 	    bool inv);
 
-  /// @brief マッピング結果を CmnMgr にセットする．
+  /// @brief マッピング結果を BnNetwork にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] const0_cell 定数0のセル
   /// @param[in] const1_cell 定数1のセル
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
   void
-  gen_mapgraph(const BdnMgr& sbjgraph,
+  gen_mapgraph(const SbjGraph& sbjgraph,
 	       const Cell* const0_cell,
 	       const Cell* const1_cell,
-	       CmnMgr& mapgraph);
+	       BnNetwork& mapgraph);
 
 
 private:
@@ -160,7 +160,7 @@ private:
     const Cell* mCell;
 
     // マップ結果
-    CmnNode* mMapNode;
+    BnNode* mMapNode;
 
   };
 
@@ -168,7 +168,7 @@ private:
   struct MapReq
   {
     // コンストラクタ
-    MapReq(const BdnNode* node = nullptr,
+    MapReq(const SbjNode* node = nullptr,
 	   bool inv = false) :
       mNode(node),
       mInv(inv)
@@ -176,7 +176,7 @@ private:
     }
 
     // ノード
-    const BdnNode* mNode;
+    const SbjNode* mNode;
 
     // 極性
     bool mInv;
@@ -191,41 +191,41 @@ private:
 
   /// @brief ポートの生成を行う．
   void
-  gen_port(const BdnPort* sbj_port);
+  gen_port(const SbjPort* sbj_port);
 
   /// @brief D-FF の生成を行う．
   void
-  gen_dff(const BdnDff* sbj_dff);
+  gen_dff(const SbjDff* sbj_dff);
 
   /// @brief ラッチの生成を行う．
   void
-  gen_latch(const BdnLatch* sbj_latch);
+  gen_latch(const SbjLatch* sbj_latch);
 
   /// @brief マッピング要求を追加する．
   void
-  add_mapreq(const BdnNode* node,
+  add_mapreq(const SbjNode* node,
 	     bool inv);
 
   /// @brief 最終結果を作るためのバックトレースを行う．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
   CmnNode*
-  back_trace(const BdnNode* node,
+  back_trace(const SbjNode* node,
 	     bool inv);
 
   /// @brief D-FF の割り当て情報を取り出す．
   DffInfo&
-  get_dff_info(const BdnDff* dff,
+  get_dff_info(const SbjDff* dff,
 	       bool inv);
 
   /// @brief ラッチの割り当て情報を取り出す．
   LatchInfo&
-  get_latch_info(const BdnLatch* latch,
+  get_latch_info(const SbjLatch* latch,
 		 bool inv);
 
   /// @brief NodeInfo を取り出す．
   NodeInfo&
-  get_node_info(const BdnNode* node,
+  get_node_info(const SbjNode* node,
 		bool inv);
 
 
@@ -235,7 +235,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象の CMN
-  CmnMgr* mMapGraph;
+  BnNetwork* mMapGraph;
 
   // D-FF の割り当て情報を格納した配列
   // キーは BdnDff の ID 番号
@@ -253,7 +253,7 @@ private:
   vector<MapReq> mMapReqList;
 
   // back_trace 中に用いる作業領域
-  vector<CmnNode*> mTmpFanins;
+  vector<BnNode*> mTmpFanins;
 
 };
 

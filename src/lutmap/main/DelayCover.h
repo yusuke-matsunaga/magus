@@ -59,7 +59,7 @@ public:
 	     ymuint limit,
 	     ymuint slack,
 	     ymuint mode,
-	     LnGraph& map_network,
+	     BnNetwork& map_network,
 	     ymuint& lut_num,
 	     ymuint& depth);
 

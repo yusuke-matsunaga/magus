@@ -10,8 +10,8 @@
 
 
 #include "cellmap_nsdef.h"
-#include "YmNetworks/bdn.h"
-#include "YmLogic/npn_nsdef.h"
+#include "SbjGraph.h"
+#include "ym/ym_logic.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -55,7 +55,7 @@ public:
   /// @param[in] leaf_inv 葉の極性
   void
   set_leaf(ymuint pos,
-	   const BdnNode* leaf_node,
+	   const SbjNode* leaf_node,
 	   bool leaf_inv);
 
 
@@ -70,7 +70,7 @@ public:
 
   /// @brief 葉のノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
-  const BdnNode*
+  const SbjNode*
   leaf_node(ymuint pos) const;
 
   /// @brief 葉の極性を得る．
@@ -85,13 +85,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 葉の数
-  ymuint32 mLeafNum;
+  ymuint mLeafNum;
 
   // 葉のノードの配列
-  const BdnNode** mLeafArray;
+  const SbjNode** mLeafArray;
 
   // 根と葉の極性をパックしたもの
-  ymuint32 mInvArray;
+  ymuint mInvArray;
 
 };
 
@@ -108,7 +108,7 @@ Match::resize(ymuint nl)
   if ( mLeafNum != nl ) {
     delete [] mLeafArray;
     mLeafNum = nl;
-    mLeafArray = new const BdnNode*[nl];
+    mLeafArray = new const SbjNode*[nl];
   }
   mInvArray = 0U;
 }
@@ -120,7 +120,7 @@ Match::resize(ymuint nl)
 inline
 void
 Match::set_leaf(ymuint pos,
-		const BdnNode* leaf_node,
+		const SbjNode* leaf_node,
 		bool leaf_inv)
 {
   ASSERT_COND( pos < leaf_num() );
@@ -139,7 +139,7 @@ Match::leaf_num() const
 // @brief 葉のノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
 inline
-const BdnNode*
+const SbjNode*
 Match::leaf_node(ymuint pos) const
 {
   return mLeafArray[pos];

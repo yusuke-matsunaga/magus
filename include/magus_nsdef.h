@@ -11,7 +11,8 @@
 
 /// @defgroup MagusGroup Magus 関連クラス
 
-#include "YmTools.h"
+#include "ym_config.h"
+
 
 #define BEGIN_NAMESPACE_MAGUS \
 BEGIN_NAMESPACE_YM \

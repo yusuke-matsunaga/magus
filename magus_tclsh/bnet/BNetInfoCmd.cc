@@ -10,7 +10,7 @@
 
 
 #include "BNetInfoCmd.h"
-#include "YmNetworks/BNetwork.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -48,7 +48,7 @@ BNetInfo::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  BNetwork* network = cur_network();
+  BnNetwork* network = cur_network();
 
   string attr = objv[1];
   TclObj result;

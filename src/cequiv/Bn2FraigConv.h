@@ -13,6 +13,7 @@
 #include "ym/ym_bnet.h"
 #include "FraigMgr.h"
 #include "FraigHandle.h"
+#include "ym/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -72,8 +73,8 @@ private:
   // FraigMgr
   FraigMgr mFraigMgr;
 
-  // BnNode::id() をキーとして対応する FraigHandle を記録する配列
-  vector<FraigHandle> mHandleMap;
+  // BnNode::id() をキーとして対応する FraigHandle を記録するハッシュ表
+  HashMap<ymuint, FraigHandle> mHandleMap;
 
 };
 

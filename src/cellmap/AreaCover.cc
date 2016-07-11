@@ -8,21 +8,15 @@
 
 
 #include "AreaCover.h"
-#include "YmNetworks/BdnMgr.h"
-#include "YmNetworks/BdnDff.h"
-#include "YmNetworks/CmnMgr.h"
-#include "YmCell/Cell.h"
-#include "YmCell/CellLibrary.h"
-#include "YmCell/CellPatGraph.h"
-#include "YmCell/CellClass.h"
-#include "YmCell/CellGroup.h"
+#include "ym/Cell.h"
+#include "ym/CellLibrary.h"
+#include "ym/CellPatGraph.h"
+#include "ym/CellClass.h"
+#include "ym/CellGroup.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
 
-#include "YmLogic/NpnMapM.h"
-
-#include "YmNetworks/BdnVerilogWriter.h"
-#include "YmNetworks/BdnDumper.h"
+#include "ym/NpnMapM.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -51,7 +45,7 @@ AreaCover::~AreaCover()
 // @param[in] cell_mgr セルを管理するオブジェクト
 // @param[out] mapnetwork マッピング結果
 void
-AreaCover::operator()(const BdnMgr& sbjgraph,
+AreaCover::operator()(const SbjGraph& sbjgraph,
 		      const CellLibrary& cell_library,
 		      CmnMgr& mapnetwork)
 {
@@ -87,7 +81,7 @@ AreaCover::operator()(const BdnMgr& sbjgraph,
 // @param[in] cell_mgr セルを管理するオブジェクト
 // @param[in] maprec マッピング結果を保持するオブジェクト
 void
-AreaCover::ff_map(const BdnMgr& sbjgraph,
+AreaCover::ff_map(const SbjGraph& sbjgraph,
 		  const CellLibrary& cell_library,
 		  MapRecord& maprec)
 {
@@ -168,7 +162,7 @@ AreaCover::ff_map(const BdnMgr& sbjgraph,
 // @param[in] cell_library セルを管理するオブジェクト
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const BdnMgr& sbjgraph,
+AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       const CellLibrary& cell_library,
 		       MapRecord& maprec)
 {
@@ -182,10 +176,9 @@ AreaCover::record_cuts(const BdnMgr& sbjgraph,
   const CellGroup* inv_func = cell_library.inv_func();
 
   // 入力のコストを設定
-  const BdnNodeList& input_list = sbjgraph.input_list();
-  for (BdnNodeList::const_iterator p = input_list.begin();
-       p != input_list.end(); ++ p) {
-    const BdnNode* node = *p;
+  ymuint ni = sbjgraph.input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* node = sbjgraph.input(i);
     ASSERT_COND( node->is_input() );
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);

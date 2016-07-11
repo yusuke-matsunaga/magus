@@ -100,16 +100,13 @@ Cut::eval(const vector<ymuint64>& vals) const
 
 // @brief 論理関数を表す真理値表を得る．
 // @param[in] inv 出力を反転する時 true にするフラグ
-// @param[out] tv 結果の真理値表を格納するベクタ
-//
-// tv のサイズは 2^{input_num()} を仮定している．
-void
-Cut::make_tv(bool inv,
-	     vector<int>& tv) const
+TvFunc
+Cut::make_tv(bool inv) const
 {
   ymuint ni = input_num();
   ymuint np = 1 << ni;
-  ASSERT_COND( tv.size() == np );
+
+  vector<int> tv(np);
 
   // 1 の値と 0 の値
   // inv == true の時には逆にする．
@@ -162,6 +159,8 @@ Cut::make_tv(bool inv,
       }
     }
   }
+
+  return TvFunc(ni, tv);
 }
 
 // デバッグ用の表示関数

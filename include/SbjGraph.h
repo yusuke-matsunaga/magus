@@ -11,6 +11,7 @@
 
 #include "sbj_nsdef.h"
 
+#include "ym/ym_logic.h"
 #include "ym/SimpleAlloc.h"
 #include "ym/FragAlloc.h"
 #include "ym/ItvlMgr.h"
@@ -115,9 +116,19 @@ private:
 /// - 論理ノード
 /// - DFFノード
 /// の 4種類がある．
-/// 論理ノードの場合，ノードタイプが AND と XOR の2種類があり，
+///
+/// 論理ノードの場合，常に2つのファンインを持つ．
+/// ノードの論理タイプが AND と XOR の2種類があり，
 /// さらに2つの入力の極性がある．
 /// ただし，XOR タイプの場合には入力は反転させない．
+///
+/// DFFノードの場合，以下の入力を持つ．
+/// - data: データ入力
+/// - clock: クロック
+/// - set: (非同期)セット
+/// - rst: (非同期)リセット
+/// ただし，data 以外の入力は接続していない場合もある．
+///
 /// @sa SbjEdge SbjGraph
 //////////////////////////////////////////////////////////////////////
 class SbjNode
@@ -261,35 +272,35 @@ public:
 
   /// @brief DFFノードの場合のデータ入力を得る．
   const SbjNode*
-  fanin_data() const;
+  dff_data() const;
 
   /// @brief DFFノードの場合のデータ入力の反転属性を得る．
   bool
-  fanin_data_inv() const;
+  dff_data_inv() const;
 
   /// @brief DFFノードの場合のクロック入力を得る．
   const SbjNode*
-  fanin_clock() const;
+  dff_clock() const;
 
   /// @brief DFFノードの場合のクロック入力の反転属性を得る．
   bool
-  fanin_clock_inv() const;
+  dff_clock_inv() const;
 
   /// @brief DFFノードの場合のセット入力を得る．
   const SbjNode*
-  fanin_set() const;
+  dff_set() const;
 
   /// @brief DFFノードの場合のセット入力の反転属性を得る．
   bool
-  fanin_set_inv() const;
+  dff_set_inv() const;
 
   /// @brief DFFノードの場合のリセット入力を得る．
   const SbjNode*
-  fanin_rst() const;
+  dff_rst() const;
 
   /// @brief DFFノードの場合のリセット入力の反転属性を得る．
   bool
-  fanin_rst_inv() const;
+  dff_rst_inv() const;
 
   /// @brief レベルを得る．
   ymuint
@@ -320,19 +331,19 @@ private:
 
   /// @brief DFFノードの場合のデータ入力を得る．
   SbjNode*
-  fanin_data();
+  dff_data();
 
   /// @brief DFFノードの場合のクロック入力を得る．
   SbjNode*
-  fanin_clock();
+  dff_clock();
 
   /// @brief DFFノードの場合のセット入力を得る．
   SbjNode*
-  fanin_set();
+  dff_set();
 
   /// @brief DFFノードの場合のリセット入力を得る．
   SbjNode*
-  fanin_rst();
+  dff_rst();
 
   /// @brief タイプを入力に設定する．
   void
@@ -434,7 +445,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjHandle SbjGraph.h "ym_techmap/SbjGraph.h"
+/// @class SbjHandle SbjGraph.h "SbjGraph.h"
 /// @brief ノード＋極性の情報を表すクラス
 //////////////////////////////////////////////////////////////////////
 class SbjHandle
@@ -530,7 +541,7 @@ private:
 
 
 //////////////////////////////////////////////////////////////////////
-/// @class SbjPort SbjGraph.h "ym_techmap/SbjGraph.h"
+/// @class SbjPort SbjGraph.h "SbjGraph.h"
 /// @brief ポートを表すクラス
 ///
 /// ポートは通常，名前を持ち，1つもしくは複数の入出力ノード
@@ -789,11 +800,22 @@ public:
   SbjNode*
   new_output(SbjHandle ihandle);
 
+  /// @brief 論理式から論理ノード(の木)を作る．
+  /// @param[in] expr 論理式
+  /// @param[in] ihandle_list 入力ハンドルのリスト
+  /// @return 作成したノードのハンドルを返す．
+  ///
+  /// 入力が定数の時も考慮している．
+  SbjHandle
+  new_logic(const Expr& expr,
+	    const vector<SbjHandle>& ihandle_list);
+
   /// @brief ANDノードを作る．
   /// @param[in] ihandle1 1番めの入力ハンドル
   /// @param[in] ihandle2 2番めの入力ハンドル
   /// @return 作成したノードのハンドルを返す．
-  /// @note ihandle1/ihandle2 が定数の時も考慮している．
+  ///
+  /// ihandle1/ihandle2 が定数の時も考慮している．
   SbjHandle
   new_and(SbjHandle ihandle1,
 	  SbjHandle ihandle2);
@@ -801,7 +823,8 @@ public:
   /// @brief ANDノードを作る．
   /// @param[in] ihandle_list 入力ハンドルのリスト
   /// @return 作成したノードのハンドルを返す．
-  /// @note 入力が定数の時も考慮している．
+  ///
+  /// 入力が定数の時も考慮している．
   SbjHandle
   new_and(const vector<SbjHandle>& ihandle_list);
 
@@ -809,7 +832,8 @@ public:
   /// @param[in] ihandle1 1番めの入力ハンドル
   /// @param[in] ihandle2 2番めの入力ハンドル
   /// @return 作成したノードのハンドルを返す．
-  /// @note ihandle1/ihandle2 が定数の時も考慮している．
+  ///
+  /// ihandle1/ihandle2 が定数の時も考慮している．
   SbjHandle
   new_or(SbjHandle ihandle1,
 	 SbjHandle ihandle2);
@@ -817,7 +841,8 @@ public:
   /// @brief ORノードを作る．
   /// @param[in] ihandle_list 入力ハンドルのリスト
   /// @return 作成したノードのハンドルを返す．
-  /// @note 入力が定数の時も考慮している．
+  ///
+  /// 入力が定数の時も考慮している．
   SbjHandle
   new_or(const vector<SbjHandle>& ihandle_list);
 
@@ -825,7 +850,8 @@ public:
   /// @param[in] ihandle1 1番めの入力ハンドル
   /// @param[in] ihandle2 2番めの入力ハンドル
   /// @return 作成したノードのハンドルを返す．
-  /// @note ihandle1/ihandle2 が定数の時も考慮している．
+  ///
+  /// ihandle1/ihandle2 が定数の時も考慮している．
   SbjHandle
   new_xor(SbjHandle ihandle1,
 	  SbjHandle ihandle2);
@@ -833,7 +859,8 @@ public:
   /// @brief XORノードを作る．
   /// @param[in] ihandle_list 入力ハンドルのリスト
   /// @return 作成したノードのハンドルを返す．
-  /// @note 入力が定数の時も考慮している．
+  ///
+  /// 入力が定数の時も考慮している．
   SbjHandle
   new_xor(const vector<SbjHandle>& ihandle_list);
 
@@ -913,9 +940,9 @@ private:
   /// @param[in] inode2 2番めの入力ノード
   /// @return 作成したノードを返す．
   SbjNode*
-  new_logic(ymuint fcode,
-	    SbjNode* inode1,
-	    SbjNode* inode2);
+  _new_lnode(ymuint fcode,
+	     SbjNode* inode1,
+	     SbjNode* inode2);
 
   /// @brief new_and の下請け関数
   /// @param[in] ihandle_list 入力ハンドルのリスト
@@ -1384,7 +1411,7 @@ SbjNode::pomark() const
 // @brief DFFノードの場合のデータ入力を得る．
 inline
 const SbjNode*
-SbjNode::fanin_data() const
+SbjNode::dff_data() const
 {
   return fanin(0);
 }
@@ -1392,7 +1419,7 @@ SbjNode::fanin_data() const
 // @brief DFFノードの場合のデータ入力を得る．
 inline
 SbjNode*
-SbjNode::fanin_data()
+SbjNode::dff_data()
 {
   return fanin(0);
 }
@@ -1400,7 +1427,7 @@ SbjNode::fanin_data()
 // @brief DFFノードの場合のデータ入力の反転属性を得る．
 inline
 bool
-SbjNode::fanin_data_inv() const
+SbjNode::dff_data_inv() const
 {
   return static_cast<bool>((mFlags >> kDDinvShift) & 1U);
 }
@@ -1408,7 +1435,7 @@ SbjNode::fanin_data_inv() const
 // @brief DFFノードの場合のクロック入力を得る．
 inline
 const SbjNode*
-SbjNode::fanin_clock() const
+SbjNode::dff_clock() const
 {
   return fanin(1);
 }
@@ -1416,7 +1443,7 @@ SbjNode::fanin_clock() const
 // @brief DFFノードの場合のクロック入力を得る．
 inline
 SbjNode*
-SbjNode::fanin_clock()
+SbjNode::dff_clock()
 {
   return fanin(1);
 }
@@ -1424,7 +1451,7 @@ SbjNode::fanin_clock()
 // @brief DFFノードの場合のクロック入力の反転属性を得る．
 inline
 bool
-SbjNode::fanin_clock_inv() const
+SbjNode::dff_clock_inv() const
 {
   return static_cast<bool>((mFlags >> kDCinvShift) & 1U);
 }
@@ -1432,7 +1459,7 @@ SbjNode::fanin_clock_inv() const
 // @brief DFFノードの場合のセット入力を得る．
 inline
 const SbjNode*
-SbjNode::fanin_set() const
+SbjNode::dff_set() const
 {
   return fanin(2);
 }
@@ -1440,7 +1467,7 @@ SbjNode::fanin_set() const
 // @brief DFFノードの場合のセット入力を得る．
 inline
 SbjNode*
-SbjNode::fanin_set()
+SbjNode::dff_set()
 {
   return fanin(2);
 }
@@ -1448,7 +1475,7 @@ SbjNode::fanin_set()
 // @brief DFFノードの場合のセット入力の反転属性を得る．
 inline
 bool
-SbjNode::fanin_set_inv() const
+SbjNode::dff_set_inv() const
 {
   return static_cast<bool>((mFlags >> kDSinvShift) & 1U);
 }
@@ -1456,7 +1483,7 @@ SbjNode::fanin_set_inv() const
 // @brief DFFノードの場合のリセット入力を得る．
 inline
 const SbjNode*
-SbjNode::fanin_rst() const
+SbjNode::dff_rst() const
 {
   return fanin(3);
 }
@@ -1464,7 +1491,7 @@ SbjNode::fanin_rst() const
 // @brief DFFノードの場合のリセット入力を得る．
 inline
 SbjNode*
-SbjNode::fanin_rst()
+SbjNode::dff_rst()
 {
   return fanin(3);
 }
@@ -1472,7 +1499,7 @@ SbjNode::fanin_rst()
 // @brief DFFノードの場合のリセット入力の反転属性を得る．
 inline
 bool
-SbjNode::fanin_rst_inv() const
+SbjNode::dff_rst_inv() const
 {
   return static_cast<bool>((mFlags >> kDRinvShift) & 1U);
 }

@@ -12,6 +12,7 @@ include_directories (
 # ===================================================================
 
 set ( sbj_SOURCES
+  Bn2Sbj.cc
   SbjDumper.cc
   SbjGraph.cc
   SbjMinDepth.cc

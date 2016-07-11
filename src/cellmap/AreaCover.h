@@ -10,7 +10,8 @@
 
 
 #include "cellmap_nsdef.h"
-#include "sbj_nsdef.h"
+#include "SbjGraph.h"
+#include "ym/ym_bnet.h"
 #include "ym/ym_cell.h"
 #include "ym/CellFFInfo.h"
 
@@ -43,7 +44,7 @@ public:
   void
   operator()(const SbjGraph& sbjgraph,
 	     const CellLibrary& cell_library,
-	     CmnMgr& mapnetwork);
+	     BnNetwork& mapnetwork);
 
 
 private:

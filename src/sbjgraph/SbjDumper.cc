@@ -98,17 +98,17 @@ SbjDumper::dump(ostream& s,
     const SbjNode* node = sbjgraph.dff(i);
     s << "DFF(" << node->id_str() << ") :";
     s << "DATA = ";
-    const SbjNode* inode = node->fanin_data();
+    const SbjNode* inode = node->dff_data();
     if ( inode ) {
       // 普通のノードの場合
-      if ( node->fanin_data_inv() ) {
+      if ( node->dff_data_inv() ) {
 	s << "~";
       }
       s << inode->id_str();
     }
     else {
       // 定数ノードの場合
-      if ( node->fanin_data_inv() ) {
+      if ( node->dff_data_inv() ) {
 	s << "1";
       }
       else {
@@ -116,28 +116,28 @@ SbjDumper::dump(ostream& s,
       }
     }
 
-    const SbjNode* cnode = node->fanin_clock();
+    const SbjNode* cnode = node->dff_clock();
     if ( cnode ) {
       s << ", CLOCK = ";
-      if ( node->fanin_clock_inv() ) {
+      if ( node->dff_clock_inv() ) {
 	s << "~";
       }
       s << cnode->id_str();
     }
 
-    const SbjNode* snode = node->fanin_set();
+    const SbjNode* snode = node->dff_set();
     if ( snode ) {
       s << ", SET = ";
-      if ( node->fanin_set_inv() ) {
+      if ( node->dff_set_inv() ) {
 	s << "~";
       }
       s << snode->id_str();
     }
 
-    const SbjNode* rnode = node->fanin_rst();
+    const SbjNode* rnode = node->dff_rst();
     if ( rnode ) {
       s << ", RST = ";
-      if ( node->fanin_rst_inv() ) {
+      if ( node->dff_rst_inv() ) {
 	s << "~";
       }
       s << rnode->id_str();
@@ -366,14 +366,14 @@ SbjDumper::dump_verilog(ostream& s,
   // ff 用の always 文
   for (ymuint i = 0; i < nl; ++ i) {
     const SbjNode* node = sbjgraph.lnode(i);
-    const SbjNode* dnode = node->fanin_data();
-    bool dinv = node->fanin_data_inv();
-    const SbjNode* cnode = node->fanin_clock();
-    bool cinv = node->fanin_clock_inv();
-    const SbjNode* snode = node->fanin_set();
-    bool sinv = node->fanin_set_inv();
-    const SbjNode* rnode = node->fanin_rst();
-    bool rinv = node->fanin_rst_inv();
+    const SbjNode* dnode = node->dff_data();
+    bool dinv = node->dff_data_inv();
+    const SbjNode* cnode = node->dff_clock();
+    bool cinv = node->dff_clock_inv();
+    const SbjNode* snode = node->dff_set();
+    bool sinv = node->dff_set_inv();
+    const SbjNode* rnode = node->dff_rst();
+    bool rinv = node->dff_rst_inv();
     ASSERT_COND( cnode != nullptr );
     s << "  always @ ( ";
     if ( cinv ) {

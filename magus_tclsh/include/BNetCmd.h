@@ -13,7 +13,7 @@
 
 
 #include "NetCmd.h"
-#include "YmNetworks/bnet.h"
+#include "ym/ym_bnet.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -46,7 +46,7 @@ protected:
 
   /// @brief カレントネットワークの取得
   /// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
-  BNetwork*
+  BnNetwork*
   cur_network() const;
 
 

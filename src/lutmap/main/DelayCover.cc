@@ -8,7 +8,6 @@
 
 
 #include "DelayCover.h"
-#include "LnGraph.h"
 #include "Cut.h"
 #include "CutHolder.h"
 #include "MapRecord.h"
@@ -43,7 +42,7 @@ DelayCover::operator()(const SbjGraph& sbjgraph,
 		       ymuint limit,
 		       ymuint slack,
 		       ymuint mode,
-		       LnGraph& map_network,
+		       BnNetwork& map_network,
 		       ymuint& lut_num,
 		       ymuint& depth)
 {

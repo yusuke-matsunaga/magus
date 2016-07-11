@@ -10,10 +10,9 @@
 
 
 #include "cellmap_nsdef.h"
-#include "YmNetworks/bdn.h"
-#include "YmCell/cell_nsdef.h"
 #include "Match.h"
-#include "YmUtils/HashMap.h"
+#include "ym/ym_cell.h"
+#include "ym/HashMap.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -43,14 +42,14 @@ public:
   /// @retval true マッチングが成功した
   /// @retval false マッチングが失敗した．
   bool
-  operator()(const BdnNode* sbj_root,
+  operator()(const SbjNode* sbj_root,
 	     const CellPatGraph& pat_graph,
 	     Match& match);
 
 #if 0
   /// @brief 直前のマッチングにおける入力のノードを得る．
   /// @param[in] pos 入力番号
-  const BdnNode*
+  const SbjNode*
   leaf_node(ymuint pos) const;
 
   /// @brief 直前のマッチングにおける入力の極性を得る．
@@ -73,7 +72,7 @@ private:
   /// @retval true バインドが成功した．
   /// @retval false バインドが失敗した．
   bool
-  bind(const BdnNode* sbj_node,
+  bind(const SbjNode* sbj_node,
        ymuint pat_id,
        bool inv);
 
@@ -87,7 +86,7 @@ private:
   const CellLibrary& mLibrary;
 
   // パタンノードの ID をキーとしてサブジェクトノードを入れる配列
-  vector<const BdnNode*> mSbjMap;
+  vector<const SbjNode*> mSbjMap;
 
   // サブジェクトノードの ID をキーとしてパタンノードの ID を
   // 入れる配列
@@ -101,7 +100,7 @@ private:
 
 #if 0
   // 直前のマッチングにおけるパタンの入力ノードを記録する配列
-  vector<const BdnNode*> mLeafNodeArray;
+  vector<const SbjNode*> mLeafNodeArray;
 
   // 直前のマッチングにおけるパタンの入力の極性を記録する配列
   vector<bool> mLeafInvArray;
@@ -118,7 +117,7 @@ private:
 // @brief 直前のマッチングにおける入力のノードを得る．
 // @param[in] pos 入力番号
 inline
-const BdnNode*
+const SbjNode*
 PatMatcher::leaf_node(ymuint pos) const
 {
   return mLeafNodeArray[pos];

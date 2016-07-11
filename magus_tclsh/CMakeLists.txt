@@ -17,17 +17,17 @@ set (bdn_SOURCES
 
 set (bnet_SOURCES
   bnet/BNetCmd.cc
-  bnet/BNetElimCmd.cc
+#  bnet/BNetElimCmd.cc
   bnet/BNetInfoCmd.cc
   bnet/BNetIoCmd.cc
-  bnet/BNetNdCmd.cc
-  bnet/BNetNodeCmd.cc
+#  bnet/BNetNdCmd.cc
+#  bnet/BNetNodeCmd.cc
   bnet/bnet_init.cc
   )
 
 set (core_SOURCES
   core/BNetHandle.cc
-  core/BdnHandle.cc
+#  core/BdnHandle.cc
   core/ChgNetwork.cc
   core/ClrNetwork.cc
   core/CopyNetwork.cc
@@ -113,7 +113,7 @@ set (magus_SOURCES
 # ===================================================================
 add_executable (magus_tclsh
   ${magus_SOURCES}
-  ${bdn_SOURCES}
+#  ${bdn_SOURCES}
   ${bnet_SOURCES}
   ${core_SOURCES}
   ${equiv_SOURCES}
@@ -126,7 +126,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:magus_cequiv_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
-  $<TARGET_OBJECTS:magus_cellmap_a>
+#  $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:ym_common_a>
   $<TARGET_OBJECTS:ym_logic_a>
   $<TARGET_OBJECTS:ym_cell_a>
@@ -158,7 +158,7 @@ target_link_libraries (magus_tclsh
 # ===================================================================
 add_executable (magus_tclsh_p
   ${magus_SOURCES}
-  ${bdn_SOURCES}
+#  ${bdn_SOURCES}
   ${bnet_SOURCES}
   ${core_SOURCES}
   ${equiv_SOURCES}
@@ -171,7 +171,7 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:magus_cequiv_p>
 #  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
-  $<TARGET_OBJECTS:magus_cellmap_p>
+#  $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:ym_common_p>
   $<TARGET_OBJECTS:ym_logic_p>
   $<TARGET_OBJECTS:ym_cell_p>
@@ -209,7 +209,7 @@ endif ()
 # ===================================================================
 add_executable (magus_tclsh_d
   ${magus_SOURCES}
-  ${bdn_SOURCES}
+#  ${bdn_SOURCES}
   ${bnet_SOURCES}
   ${core_SOURCES}
   ${equiv_SOURCES}
@@ -222,7 +222,7 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:magus_cequiv_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
-  $<TARGET_OBJECTS:magus_cellmap_d>
+#  $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:ym_common_d>
   $<TARGET_OBJECTS:ym_logic_d>
   $<TARGET_OBJECTS:ym_cell_d>

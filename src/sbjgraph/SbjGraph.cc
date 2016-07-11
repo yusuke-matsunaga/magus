@@ -10,6 +10,8 @@
 #include "SbjGraph.h"
 #include "SbjMinDepth.h"
 
+#include "ym/Expr.h"
+
 
 BEGIN_NAMESPACE_YM_SBJ
 
@@ -175,7 +177,7 @@ SbjGraph::copy(const SbjGraph& src,
     SbjNode* input1 = nodemap[src_inode1->id()];
     ASSERT_COND(input1 );
 
-    SbjNode* dst_node = new_logic(src_node->fcode(), input0, input1);
+    SbjNode* dst_node = _new_lnode(src_node->fcode(), input0, input1);
     dst_node->mMark = src_node->mMark;
     dst_node->mLevel = src_node->mLevel;
     nodemap[src_node->id()] = dst_node;
@@ -186,27 +188,27 @@ SbjGraph::copy(const SbjGraph& src,
     const SbjNode* src_onode = src.dff(i);
     SbjNode* dst_onode = nodemap[src_onode->id()];
 
-    const SbjNode* src_inode0 = src_onode->fanin_data();
+    const SbjNode* src_inode0 = src_onode->dff_data();
     SbjNode* dst_inode0 = nodemap[src_inode0->id()];
-    set_dff_data(dst_onode, SbjHandle(dst_inode0, src_onode->fanin_data_inv()));
+    set_dff_data(dst_onode, SbjHandle(dst_inode0, src_onode->dff_data_inv()));
 
-    const SbjNode* src_inode1 = src_onode->fanin_clock();
+    const SbjNode* src_inode1 = src_onode->dff_clock();
     if ( src_inode1 ) {
       SbjNode* dst_inode1 = nodemap[src_inode1->id()];
       set_dff_clock(dst_onode,
-		    SbjHandle(dst_inode1, src_onode->fanin_clock_inv()));
+		    SbjHandle(dst_inode1, src_onode->dff_clock_inv()));
     }
 
-    const SbjNode* src_inode2 = src_onode->fanin_set();
+    const SbjNode* src_inode2 = src_onode->dff_set();
     if ( src_inode2 ) {
       SbjNode* dst_inode2 = nodemap[src_inode2->id()];
-      set_dff_set(dst_onode, SbjHandle(dst_inode2, src_onode->fanin_set_inv()));
+      set_dff_set(dst_onode, SbjHandle(dst_inode2, src_onode->dff_set_inv()));
     }
 
-    const SbjNode* src_inode3 = src_onode->fanin_rst();
+    const SbjNode* src_inode3 = src_onode->dff_rst();
     if ( src_inode3 ) {
       SbjNode* dst_inode3 = nodemap[src_inode3->id()];
-      set_dff_rst(dst_onode, SbjHandle(dst_inode3, src_onode->fanin_rst_inv()));
+      set_dff_rst(dst_onode, SbjHandle(dst_inode3, src_onode->dff_rst_inv()));
     }
   }
 
@@ -574,33 +576,60 @@ SbjGraph::new_output(SbjHandle ihandle)
   return node;
 }
 
-// @brief 論理ノードを作る．
-// @param[in] fcode 機能コード
-// @param[in] inode1 1番めの入力ノード
-// @param[in] inode2 2番めの入力ノード
-// @return 作成したノードを返す．
-SbjNode*
-SbjGraph::new_logic(ymuint fcode,
-		    SbjNode* inode0,
-		    SbjNode* inode1)
+// @brief 論理式から論理ノード(の木)を作る．
+// @param[in] expr 論理式
+// @param[in] ihandle_list 入力ハンドルのリスト
+// @return 作成したノードのハンドルを返す．
+//
+// 入力が定数の時も考慮している．
+SbjHandle
+SbjGraph::new_logic(const Expr& expr,
+		    const vector<SbjHandle>& ihandle_list)
 {
-  SbjNode* node = new_node(2);
+  if ( expr.is_zero() ) {
+    return SbjHandle::make_zero();
+  }
+  if ( expr.is_one() ) {
+    return SbjHandle::make_one();
+  }
 
-  // 論理ノードリストに登録
-  mLnodeList.push_back(node);
+  if ( expr.is_posiliteral() ) {
+    VarId vid = expr.varid();
+    return ihandle_list[vid.val()];
+  }
+  if ( expr.is_negaliteral() ) {
+    VarId vid = expr.varid();
+    return ~ihandle_list[vid.val()];
+  }
 
-  node->set_logic(fcode);
-  connect(inode0, node, 0);
-  connect(inode1, node, 1);
+  ASSERT_COND( expr.is_op() );
 
-  return node;
+  ymuint nc = expr.child_num();
+  vector<SbjHandle> tmp_list(nc);
+  for (ymuint i = 0;i < nc; ++ i) {
+    tmp_list[i] = new_logic(expr.child(i), ihandle_list);
+  }
+
+  if ( expr.is_and() ) {
+    return new_and(tmp_list);
+  }
+  if ( expr.is_or() ) {
+    return new_or(tmp_list);
+  }
+  if ( expr.is_xor() ) {
+    return new_xor(tmp_list);
+  }
+
+  ASSERT_NOT_REACHED;
+  return SbjHandle::make_zero();
 }
 
 // @brief ANDノードを作る．
 // @param[in] ihandle1 1番めの入力ハンドル
 // @param[in] ihandle2 2番めの入力ハンドル
 // @return 作成したノードのハンドルを返す．
-// @note ihandle1/ihandle2 が定数の時も考慮している．
+//
+// ihandle1/ihandle2 が定数の時も考慮している．
 SbjHandle
 SbjGraph::new_and(SbjHandle ihandle1,
 		  SbjHandle ihandle2)
@@ -629,14 +658,15 @@ SbjGraph::new_and(SbjHandle ihandle1,
   if ( ihandle2.inv() ) {
     fcode |= 2U;
   }
-  SbjNode* sbjnode = new_logic(fcode, ihandle1.node(), ihandle2.node());
+  SbjNode* sbjnode = _new_lnode(fcode, ihandle1.node(), ihandle2.node());
   return SbjHandle(sbjnode, false);
 }
 
 // @brief ANDノードを作る．
 // @param[in] ihandle_list 入力ハンドルのリスト
 // @return 作成したノードのハンドルを返す．
-// @note 入力が定数の時も考慮している．
+//
+// 入力が定数の時も考慮している．
 SbjHandle
 SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
 {
@@ -711,7 +741,7 @@ SbjGraph::new_or(SbjHandle ihandle1,
   if ( !ihandle2.inv() ) {
     fcode |= 2U;
   }
-  SbjNode* sbjnode = new_logic(fcode, ihandle1.node(), ihandle2.node());
+  SbjNode* sbjnode = _new_lnode(fcode, ihandle1.node(), ihandle2.node());
   return SbjHandle(sbjnode, true);
 }
 
@@ -764,7 +794,8 @@ SbjGraph::_new_or(const vector<SbjHandle>& ihandle_list,
 // @param[in] ihandle1 1番めの入力ハンドル
 // @param[in] ihandle2 2番めの入力ハンドル
 // @return 作成したノードのハンドルを返す．
-// @note ihandle1/ihandle2 が定数の時も考慮している．
+//
+// ihandle1/ihandle2 が定数の時も考慮している．
 SbjHandle
 SbjGraph::new_xor(SbjHandle ihandle1,
 		  SbjHandle ihandle2)
@@ -787,14 +818,15 @@ SbjGraph::new_xor(SbjHandle ihandle1,
   }
 
   bool inv = ihandle1.inv() ^ ihandle2.inv();
-  SbjNode* node = new_logic(4U, ihandle1.node(), ihandle2.node());
+  SbjNode* node = _new_lnode(4U, ihandle1.node(), ihandle2.node());
   return SbjHandle(node, inv);
 }
 
 // @brief XORノードを作る．
 // @param[in] ihandle_list 入力ハンドルのリスト
 // @return 作成したノードのハンドルを返す．
-// @note 入力が定数の時も考慮している．
+//
+// 入力が定数の時も考慮している．
 SbjHandle
 SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
 {
@@ -838,6 +870,28 @@ SbjGraph::_new_xor(const vector<SbjHandle>& ihandle_list,
   SbjHandle l = _new_xor(ihandle_list, start, h);
   SbjHandle r = _new_xor(ihandle_list, start + h, num - h);
   return new_xor(l, r);
+}
+
+// @brief 論理ノードを作る．
+// @param[in] fcode 機能コード
+// @param[in] inode1 1番めの入力ノード
+// @param[in] inode2 2番めの入力ノード
+// @return 作成したノードを返す．
+SbjNode*
+SbjGraph::_new_lnode(ymuint fcode,
+		     SbjNode* inode0,
+		     SbjNode* inode1)
+{
+  SbjNode* node = new_node(2);
+
+  // 論理ノードリストに登録
+  mLnodeList.push_back(node);
+
+  node->set_logic(fcode);
+  connect(inode0, node, 0);
+  connect(inode1, node, 1);
+
+  return node;
 }
 
 // DFFノードを作る．

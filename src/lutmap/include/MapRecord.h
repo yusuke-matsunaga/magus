@@ -11,7 +11,7 @@
 
 #include "lutmap_nsdef.h"
 #include "SbjGraph.h"
-#include "LnGraph.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -65,7 +65,7 @@ public:
   const Cut*
   get_cut(const SbjNode* node);
 
-  /// @brief マッピング結果を LnGraph にセットする．
+  /// @brief マッピング結果を BnNetwork にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] dag_cover DAG covering 結果
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
@@ -73,7 +73,7 @@ public:
   /// @param[out] depth 最大段数
   void
   gen_mapgraph(const SbjGraph& sbjgraph,
-	       LnGraph& mapgraph,
+	       BnNetwork& mapgraph,
 	       ymuint& lut_num,
 	       ymuint& depth);
 
@@ -103,10 +103,10 @@ private:
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
   /// @param[out] mapnetwork マッピング結果のネットワーク
-  LnNode*
+  BnNode*
   back_trace(const SbjNode* node,
 	     bool inv,
-	     LnGraph& mapnetwork);
+	     BnNetwork& mapnetwork);
 
   /// @brief estimate() で用いるバックトレース
   /// @param[in] node 対象のノード
@@ -127,6 +127,10 @@ private:
   /// @param[in] node 対象のノード
   void
   clear_mark(const SbjNode* node);
+
+  /// @brief 新しいノード番号を得る．
+  ymuint
+  new_id();
 
 
 private:
@@ -152,7 +156,7 @@ private:
 
     // マップ結果
     // 正極性と負極性の2通りを保持する．
-    LnNode* mMapNode[2];
+    BnNode* mMapNode[2];
 
     // estimate で用いるカウンタ
     int mMapCount[2];
@@ -176,8 +180,8 @@ private:
   // 各ノードごと作業領域を格納した配列
   vector<NodeInfo> mNodeInfo;
 
-  // back_trace 中に用いる作業領域
-  vector<LnNode*> mTmpFanins;
+  // 次のノード番号
+  ymuint mNextId;
 
 };
 

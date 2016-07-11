@@ -10,7 +10,6 @@
 #include "Bn2FraigConv.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnNode.h"
-#include "ym/BnFuncType.h"
 #include "ym/TvFunc.h"
 
 
@@ -35,14 +34,12 @@ void
 Bn2FraigConv::convert(const BnNetwork& src_network,
 		      const vector<FraigHandle>& inputs)
 {
-  ymuint bn_nn = src_network.node_num();
   ymuint ni = src_network.input_num();
   ymuint nl = src_network.logic_num();
 
   ASSERT_COND( ni == inputs.size() );
 
   mHandleMap.clear();
-  mHandleMap.resize(bn_nn);
 
   //////////////////////////////////////////////////////////////////////
   // 外部入力のマップを作成する．
@@ -50,18 +47,16 @@ Bn2FraigConv::convert(const BnNetwork& src_network,
   for (ymuint i = 0; i < ni; ++ i) {
     const BnNode* bnnode = src_network.input(i);
     FraigHandle h = inputs[i];
-    mHandleMap[bnnode->id()] = h;
+    mHandleMap.add(bnnode->id(), h);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 論理ノードを作成する．
   //////////////////////////////////////////////////////////////////////
-  vector<const BnNode*> sorted_node_list;
-  src_network.topological_sort(sorted_node_list);
   for (ymuint i = 0; i < nl; ++ i) {
-    const BnNode* bnnode = sorted_node_list[i];
+    const BnNode* bnnode = src_network.logic(i);
     FraigHandle h = node2handle(bnnode);
-    mHandleMap[bnnode->id()] = h;
+    mHandleMap.add(bnnode->id(), h);
   }
 }
 
@@ -70,7 +65,11 @@ Bn2FraigConv::convert(const BnNetwork& src_network,
 FraigHandle
 Bn2FraigConv::get_handle(ymuint node_id)
 {
-  return mHandleMap[node_id];
+  FraigHandle handle;
+  if ( mHandleMap.find(node_id, handle) ) {
+    return handle;
+  }
+  return FraigHandle();
 }
 
 // @brief BnNode に対応するハンドルを作る．
@@ -84,56 +83,51 @@ Bn2FraigConv::node2handle(const BnNode* node)
   ymuint ni = node->fanin_num();
   vector<FraigHandle> fanin_handles(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    ymuint inode_id = node->fanin_id(i);
+    ymuint inode_id = node->fanin(i);
     FraigHandle ih = get_handle(inode_id);
     fanin_handles[i] = ih;
   }
 
   // 個々の関数タイプに従って fraig を生成する．
-  const BnFuncType* func_type = node->func_type();
-  switch ( func_type->type() ) {
-  case BnFuncType::kFt_C0:
+  BnLogicType logic_type = node->logic_type();
+  switch ( logic_type ) {
+  case kBnLt_C0:
     return mFraigMgr.make_zero();
 
-  case BnFuncType::kFt_C1:
+  case kBnLt_C1:
     return mFraigMgr.make_one();
 
-  case BnFuncType::kFt_BUFF:
+  case kBnLt_BUFF:
     return fanin_handles[0];
 
-  case BnFuncType::kFt_NOT:
+  case kBnLt_NOT:
     return ~fanin_handles[0];
 
-  case BnFuncType::kFt_AND:
+  case kBnLt_AND:
     return mFraigMgr.make_and(fanin_handles);
 
-  case BnFuncType::kFt_NAND:
+  case kBnLt_NAND:
     return ~mFraigMgr.make_and(fanin_handles);
 
-  case BnFuncType::kFt_OR:
+  case kBnLt_OR:
     return mFraigMgr.make_or(fanin_handles);
 
-  case BnFuncType::kFt_NOR:
+  case kBnLt_NOR:
     return ~mFraigMgr.make_or(fanin_handles);
 
-  case BnFuncType::kFt_XOR:
+  case kBnLt_XOR:
     return mFraigMgr.make_xor(fanin_handles);
 
-  case BnFuncType::kFt_XNOR:
+  case kBnLt_XNOR:
     return ~mFraigMgr.make_xor(fanin_handles);
 
-  case BnFuncType::kFt_CELL:
-    {
-      const Cell* cell = func_type->cell();
-    }
-    break;
+  case kBnLt_EXPR:
+    return mFraigMgr.make_logic(node->expr(), fanin_handles);
 
-  case BnFuncType::kFt_EXPR:
-    return mFraigMgr.make_logic(func_type->expr(), fanin_handles);
-
-  case BnFuncType::kFt_TV:
+  case kBnLt_TV:
     {
-      TvFunc tv = func_type->truth_vector();
+      TvFunc tv = node->tv();
+      // 未完
     }
     break;
 

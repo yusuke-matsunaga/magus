@@ -10,7 +10,7 @@
 
 
 #include "BNetCmd.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -34,8 +34,8 @@ BNetCmd::~BNetCmd()
 }
 
 // @brief カレントネットワークの取得
-// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
-BNetwork*
+// @note カレントネットワークが BnNetwork でない場合には nullptr を返す．
+BnNetwork*
 BNetCmd::cur_network() const
 {
   return cur_nethandle()->_bnetwork();
@@ -52,7 +52,7 @@ BNetCmd::before_cmd_proc(TclObjVector& objv)
   if ( NetCmd::before_cmd_proc(objv) == TCL_OK ) {
     if ( cur_nethandle()->type() != NetHandle::kMagBNet ) {
       TclObj emsg;
-      emsg << "Network type mismatch. BNetwork type assumed.";
+      emsg << "Network type mismatch. BnNetwork type assumed.";
       set_result(emsg);
       return TCL_ERROR;
     }

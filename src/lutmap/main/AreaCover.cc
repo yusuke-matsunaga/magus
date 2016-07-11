@@ -8,7 +8,6 @@
 
 
 #include "AreaCover.h"
-#include "LnGraph.h"
 #include "Cut.h"
 #include "MapRecord.h"
 
@@ -40,7 +39,7 @@ void
 AreaCover::operator()(const SbjGraph& sbjgraph,
 		      ymuint limit,
 		      ymuint mode,
-		      LnGraph& mapnetwork,
+		      BnNetwork& mapnetwork,
 		      ymuint& lut_num,
 		      ymuint& depth)
 {
