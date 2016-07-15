@@ -10,12 +10,12 @@
 
 
 #include "MvnReadVerilog.h"
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/MvnVerilogReader.h"
-#include "YmNetworks/MvnVlMap.h"
+#include "ym/MvnMgr.h"
+#include "ym/MvnVerilogReader.h"
+#include "ym/MvnVlMap.h"
 
-#include "YmUtils/MsgMgr.h"
-#include "YmUtils/MsgHandler.h"
+#include "ym/MsgMgr.h"
+#include "ym/MsgHandler.h"
 
 
 BEGIN_NAMESPACE_MAGUS

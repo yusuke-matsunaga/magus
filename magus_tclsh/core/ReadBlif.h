@@ -12,8 +12,6 @@
 
 
 #include "NetCmd.h"
-#include "YmNetworks/BNetBlifReader.h"
-#include "YmNetworks/BdnBlifReader.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -47,12 +45,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // BNet 用のリーダー
-  BNetBlifReader mBnetReader;
-
-  // Bdn 用のリーダー
-  BdnBlifReader mBdnReader;
 
 };
 

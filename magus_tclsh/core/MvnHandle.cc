@@ -8,7 +8,6 @@
 
 
 #include "MvnHandle.h"
-#include "YmNetworks/MvnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -66,10 +65,7 @@ MvnHandle::copy(const NetHandle* src,
 		 bool allow_conv)
 {
   switch ( src->type() ) {
-  case kMagBNet:
-    return false;
-
-  case kMagBdn:
+  case kMagBn:
     return false;
 
   case kMagMvn:

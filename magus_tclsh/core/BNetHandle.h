@@ -10,14 +10,14 @@
 
 
 #include "NetHandle.h"
-#include "YmNetworks/BNetwork.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
 /// @class BNetHandle BNetHandle.h "BNetHandle.h"
-/// @brief BNetwork を持つネットハンドル
+/// @brief BnNetwork を持つネットハンドル
 //////////////////////////////////////////////////////////////////////
 class BNetHandle :
   public NetHandle
@@ -40,14 +40,14 @@ public:
   tType
   type() const;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
-  const BNetwork*
+  const BnNetwork*
   bnetwork() const;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
-  BNetwork*
+  BnNetwork*
   _bnetwork();
 
   /// @brief ネットワークをクリアする．
@@ -71,7 +71,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ネットワークの実体
-  BNetwork mNetwork;
+  BnNetwork mNetwork;
 
 };
 

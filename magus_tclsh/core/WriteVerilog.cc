@@ -11,9 +11,8 @@
 
 #include "WriteVerilog.h"
 
-#include "YmNetworks/BNetVerilogWriter.h"
-#include "YmNetworks/BdnVerilogWriter.h"
-#include "YmNetworks/MvnVerilogWriter.h"
+//#include "ym/BNetVerilogWriter.h"
+#include "ym/MvnVerilogWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -63,21 +62,13 @@ WriteVerilog::cmd_proc(TclObjVector& objv)
 
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
-  case NetHandle::kMagBNet:
+  case NetHandle::kMagBn:
     {
       // BNetwork の場合
+#if 0
       BNetVerilogWriter writer;
       writer.dump(*osp, *neth->bnetwork());
-      // この関数はfailしない．
-      stat = TCL_OK;
-    }
-    break;
-
-  case NetHandle::kMagBdn:
-    {
-      // Bdn の場合
-      BdnVerilogWriter writer;
-      writer(*osp, *neth->bdn());
+#endif
       // この関数はfailしない．
       stat = TCL_OK;
     }

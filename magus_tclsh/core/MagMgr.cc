@@ -8,10 +8,9 @@
 
 
 #include "MagMgr.h"
-#include "YmCell/CellLibrary.h"
+#include "ym/CellLibrary.h"
 #include "NetHandle.h"
 #include "BNetHandle.h"
-#include "BdnHandle.h"
 #include "MvnHandle.h"
 
 
@@ -114,26 +113,6 @@ MagMgr::new_bnethandle(const string& name,
 		       ostream* err_out)
 {
   NetHandle* neth = new BNetHandle(name);
-  bool stat = reg_nethandle(neth, err_out);
-  if ( !stat ) {
-    delete neth;
-    neth = nullptr;
-  }
-  return neth;
-}
-
-// @brief 新たな BdnMgr を作成して登録する．
-// @param[in] name 名前
-// @param[in] err_out エラー出力
-// @return 作成したネットハンドル
-// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
-// @note また，名前が不適切な場合にもエラーとなる．
-// @note エラーが起きた場合には nullptr を返す．
-NetHandle*
-MagMgr::new_bdnhandle(const string& name,
-		      ostream* err_out)
-{
-  NetHandle* neth = new BdnHandle(name);
   bool stat = reg_nethandle(neth, err_out);
   if ( !stat ) {
     delete neth;

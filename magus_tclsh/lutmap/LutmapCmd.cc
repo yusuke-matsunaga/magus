@@ -12,7 +12,6 @@
 #include "LutmapCmd.h"
 #include "AreaMapCmd.h"
 #include "DelayMapCmd.h"
-#include "LnGraph.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -35,7 +34,7 @@ LutmapCmd::~LutmapCmd()
 }
 
 // @brief LutNetwork を得る．
-LnGraph&
+BnNetwork&
 LutmapCmd::lutnetwork()
 {
   return mData->mLutNetwork;

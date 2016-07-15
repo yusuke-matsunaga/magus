@@ -11,7 +11,6 @@
 #include "MagMgr.h"
 #include "NetHandle.h"
 #include "BNetHandle.h"
-#include "BdnHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -82,24 +81,6 @@ MagCmd::new_bnethandle(const string& name) const
   return neth;
 }
 
-// @brief 新たな BdnMgr を作成して登録する．
-// @param[in] name 名前
-// @return 作成したネットハンドル
-// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
-// @note また，名前が不適切な場合にもエラーとなる．
-// @note エラーが起きた場合にはインタプリタに然るべきメッセージをセットして
-// nullptr を返す．
-NetHandle*
-MagCmd::new_bdnhandle(const string& name) const
-{
-  ostringstream buf;
-  NetHandle* neth = mMagMgr->new_bdnhandle(name, &buf);
-  if ( neth == nullptr ) {
-    set_result(buf.str());
-  }
-  return neth;
-}
-
 // @brief 新たな MvNetwork を作成して登録する．
 // @param[in] name 名前
 // @return 作成したネットハンドル
@@ -158,12 +139,8 @@ MagCmd::find_or_new_nethandle(const string& name,
   NetHandle* neth = mMagMgr->find_nethandle(name);
   if ( !neth ) {
     switch ( type ) {
-    case NetHandle::kMagBNet:
+    case NetHandle::kMagBn:
       neth = new_bnethandle(name);
-      break;
-
-    case NetHandle::kMagBdn:
-      neth = new_bdnhandle(name);
       break;
 
     case NetHandle::kMagMvn:

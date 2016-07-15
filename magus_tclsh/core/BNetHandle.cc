@@ -8,8 +8,6 @@
 
 
 #include "BNetHandle.h"
-#include "YmNetworks/BNetwork.h"
-#include "YmNetworks/BdnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -34,18 +32,18 @@ BNetHandle::~BNetHandle()
 NetHandle::tType
 BNetHandle::type() const
 {
-  return kMagBNet;
+  return kMagBn;
 }
 
-// @brief BNetwork を得る．
-const BNetwork*
+// @brief BnNetwork を得る．
+const BnNetwork*
 BNetHandle::bnetwork() const
 {
   return &mNetwork;
 }
 
-// @brief BNetwork を得る．
-BNetwork*
+// @brief BnNetwork を得る．
+BnNetwork*
 BNetHandle::_bnetwork()
 {
   return &mNetwork;
@@ -67,13 +65,9 @@ BNetHandle::copy(const NetHandle* src,
 		 bool allow_conv)
 {
   switch ( src->type() ) {
-  case kMagBNet:
-    mNetwork = *(src->bnetwork());
+  case kMagBn:
+    mNetwork.copy(*(src->bnetwork()));
     break;
-
-  case kMagBdn:
-#warning "TODO: 本当は Bdn から BNetwork に変換する．"
-    return false;
 
   case kMagMvn:
     return false;

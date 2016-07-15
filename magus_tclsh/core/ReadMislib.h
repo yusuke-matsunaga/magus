@@ -41,9 +41,12 @@ private:
 
   /// @brief セルライブラリを読み込む．
   /// @param[in] filename ファイル名
+  /// @param[in] library 設定対象のライブラリ
+  /// @return 読み込みが成功したら true を返す．
   virtual
-  const CellLibrary*
-  read_library(const string& filename);
+  bool
+  read_library(const string& filename,
+	       CellLibrary* library);
 
 };
 

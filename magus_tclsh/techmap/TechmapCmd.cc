@@ -10,7 +10,6 @@
 #include "TechmapCmd.h"
 #include "AreaMapCmd.h"
 #include "DumpCnCmd.h"
-#include "YmNetworks/CmnMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -20,11 +19,12 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-TechmapCmd::TechmapCmd(MagMgr* mgr,
-		       CmnMgr& cmnmgr) :
-  MagCmd(mgr),
-  mCmnMgr(cmnmgr)
+TechmapCmd::TechmapCmd(MagMgr* mgr) :
+  MagCmd(mgr)
 {
+  mPoptDstNetwork = new TclPoptStr(this, "dst_network",
+				   "specify destination network",
+				   "<network-name>");
 }
 
 // @brief デストラクタ
@@ -32,11 +32,20 @@ TechmapCmd::~TechmapCmd()
 {
 }
 
-// @brief セルネットワークを得る．
-CmnMgr&
-TechmapCmd::cmnmgr()
+// @brief 結果を納めるネットワーク
+BnNetwork&
+TechmapCmd::dst_network()
 {
-  return mCmnMgr;
+  NetHandle* neth = nullptr;
+
+  if ( mPoptDstNetwork->is_specified() ) {
+    neth = find_or_new_nethandle(mPoptDstNetwork->val(), NetHandle::kMagBn);
+    if ( neth == nullptr ) {
+      // 見付からなかった
+      // エラーメッセージは find_network() の中でセットされている．
+      return TCL_ERROR;
+    }
+  }
 }
 
 END_NAMESPACE_MAGUS_TECHMAP
@@ -49,12 +58,8 @@ techmap_init(Tcl_Interp* interp,
 {
   using namespace nsTechmap;
 
-  CmnMgr* cmnmgr = new CmnMgr;
-
-  TclCmdBinder2<AreaMapCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
-						       "magus::techmap::area_map");
-  TclCmdBinder2<DumpCnCmd, MagMgr*, CmnMgr&>::reg(interp, mgr, *cmnmgr,
-						       "magus::techmap::dump_cngraph");
+  TclCmdBinder2<AreaMapCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::area_map");
+  TclCmdBinder2<DumpCnCmd, MagMgr*>::reg(interp, mgr,  "magus::techmap::dump_cngraph");
 
 
   const char* init =

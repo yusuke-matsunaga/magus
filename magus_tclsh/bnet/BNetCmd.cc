@@ -50,7 +50,7 @@ int
 BNetCmd::before_cmd_proc(TclObjVector& objv)
 {
   if ( NetCmd::before_cmd_proc(objv) == TCL_OK ) {
-    if ( cur_nethandle()->type() != NetHandle::kMagBNet ) {
+    if ( cur_nethandle()->type() != NetHandle::kMagBn ) {
       TclObj emsg;
       emsg << "Network type mismatch. BnNetwork type assumed.";
       set_result(emsg);

@@ -32,10 +32,8 @@ public:
 
   /// @brief NetHandle の表す型
   enum tType {
-    /// @brief BNetwork
-    kMagBNet,
-    /// @brief BdnMgr
-    kMagBdn,
+    /// @brief BnNetwork
+    kMagBn,
     /// @brief MvNetwork
     kMagMvn
   };
@@ -67,7 +65,7 @@ public:
   tType
   type() const = 0;
 
-  /// @brief BNetwork を得る．
+  /// @brief BnNetwork を得る．
   virtual
   const BnNetwork*
   bnetwork() const;

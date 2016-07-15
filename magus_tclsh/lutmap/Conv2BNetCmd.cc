@@ -11,8 +11,7 @@
 
 #include "LutmapCmd.h"
 #include "NetHandle.h"
-#include "Ln2BNet.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -43,7 +42,7 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
   NetHandle* neth = nullptr;
 
   if ( mPoptDstNetwork->is_specified() ) {
-    neth = find_or_new_nethandle(mPoptDstNetwork->val(), NetHandle::kMagBNet);
+    neth = find_or_new_nethandle(mPoptDstNetwork->val(), NetHandle::kMagBn);
     if ( neth == nullptr ) {
       // 見付からなかった
       // エラーメッセージは find_network() の中でセットされている．
@@ -60,9 +59,9 @@ Conv2BNetCmd::cmd_proc(TclObjVector& objv)
     if ( neth == nullptr ) {
       neth = cur_nethandle();
     }
-    BNetwork& dst_network = *neth->_bnetwork();
-    Ln2BNet conv;
-    conv(lutnetwork(), dst_network);
+    BnNetwork& dst_network = *neth->_bnetwork();
+    // 実はただのコピー
+    dst_network.copy(lutnetwork());
     return TCL_OK;
   }
   catch ( AssertError x ) {

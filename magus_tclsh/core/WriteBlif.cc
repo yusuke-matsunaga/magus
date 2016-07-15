@@ -11,8 +11,7 @@
 
 #include "WriteBlif.h"
 
-#include "YmNetworks/BNetBlifWriter.h"
-#include "YmNetworks/BdnBlifWriter.h"
+//#include "ym/BNetBlifWriter.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -62,19 +61,12 @@ WriteBlif::cmd_proc(TclObjVector& objv)
 
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
-  case NetHandle::kMagBNet:
+  case NetHandle::kMagBn:
     {
+#if 0
       BNetBlifWriter writer;
       writer.dump(*osp, *neth->bnetwork());
-      // この関数はfailしない．
-      stat = TCL_OK;
-    }
-    break;
-
-  case NetHandle::kMagBdn:
-    {
-      BdnBlifWriter writer;
-      writer(*osp, *neth->bdn());
+#endif
       // この関数はfailしない．
       stat = TCL_OK;
     }

@@ -13,9 +13,9 @@
 
 #include "MagMgr.h"
 #include "BNetInfoCmd.h"
-#include "BNetIoCmd.h"
-#include "BNetElimCmd.h"
-#include "BNetNdCmd.h"
+//#include "BNetIoCmd.h"
+//#include "BNetElimCmd.h"
+//#include "BNetNdCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -39,24 +39,24 @@ bnet_init(Tcl_Interp* interp,
   TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr, "magus::read_blif");
   TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr, "magus::read_iscas89");
 #endif
-  TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
+  //TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
 
   // ネットワーク上での処理コマンド(その2)
-  TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
-  TclCmdBinder1<SimplifyCmd, MagMgr*>::reg(interp, mgr, "magus::simplify");
-  TclCmdBinder1<SweepCmd, MagMgr*>::reg(interp, mgr,      "magus::sweep");
-  TclCmdBinder1<CleanCmd, MagMgr*>::reg(interp, mgr,      "magus::clean_up");
-  TclCmdBinder1<DecompCmd, MagMgr*>::reg(interp, mgr,     "magus::decomp");
-  TclCmdBinder1<GateDecompCmd, MagMgr*>::reg(interp, mgr, "magus::gate_decomp");
-  TclCmdBinder1<SopDecompCmd, MagMgr*>::reg(interp, mgr,  "magus::sop_decomp");
-  TclCmdBinder1<ConvCombiCmd, MagMgr*>::reg(interp, mgr,  "magus::conv_combi");
+  //TclCmdBinder1<ElimCmd, MagMgr*>::reg(interp, mgr,    "magus::eliminate");
+  //TclCmdBinder1<SimplifyCmd, MagMgr*>::reg(interp, mgr, "magus::simplify");
+  //TclCmdBinder1<SweepCmd, MagMgr*>::reg(interp, mgr,      "magus::sweep");
+  //TclCmdBinder1<CleanCmd, MagMgr*>::reg(interp, mgr,      "magus::clean_up");
+  //TclCmdBinder1<DecompCmd, MagMgr*>::reg(interp, mgr,     "magus::decomp");
+  //TclCmdBinder1<GateDecompCmd, MagMgr*>::reg(interp, mgr, "magus::gate_decomp");
+  //TclCmdBinder1<SopDecompCmd, MagMgr*>::reg(interp, mgr,  "magus::sop_decomp");
+  //TclCmdBinder1<ConvCombiCmd, MagMgr*>::reg(interp, mgr,  "magus::conv_combi");
 
   // ノードに対するコマンド
-  TclCmdBinder1<NodeInfo, MagMgr*>::reg(interp, mgr,   "magus::node_info");
-  TclCmdBinder1<ListNode, MagMgr*>::reg(interp, mgr,   "magus::list_node");
-  TclCmdBinder1<ElimNode, MagMgr*>::reg(interp, mgr,   "magus::eliminate_node");
-  TclCmdBinder1<DelNode, MagMgr*>::reg(interp, mgr,    "magus::delete_node");
-  TclCmdBinder1<SimplifyNode, MagMgr*>::reg(interp, mgr, "magus::simplify_node");
+  //TclCmdBinder1<NodeInfo, MagMgr*>::reg(interp, mgr,   "magus::node_info");
+  //TclCmdBinder1<ListNode, MagMgr*>::reg(interp, mgr,   "magus::list_node");
+  //TclCmdBinder1<ElimNode, MagMgr*>::reg(interp, mgr,   "magus::eliminate_node");
+  //TclCmdBinder1<DelNode, MagMgr*>::reg(interp, mgr,    "magus::delete_node");
+  //TclCmdBinder1<SimplifyNode, MagMgr*>::reg(interp, mgr, "magus::simplify_node");
 
 
   //////////////////////////////////////////////////////////////////////

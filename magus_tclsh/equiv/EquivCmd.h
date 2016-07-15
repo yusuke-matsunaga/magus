@@ -12,7 +12,7 @@
 
 #include "MagCmd.h"
 #include "NetHandle.h"
-#include "YmNetworks/BdnMgr.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -65,19 +65,19 @@ protected:
   sat_out() const;
 
   /// @brief ネットワーク1を返す．
-  const BdnMgr&
+  const BnNetwork&
   network1() const;
 
   /// @brief ネットワーク2を返す．
-  const BdnMgr&
+  const BnNetwork&
   network2() const;
 
   /// @brief 入力の対応関係を返す．
-  const vector<pair<ymuint32, ymuint32> >&
+  const vector<pair<ymuint, ymuint> >&
   input_match() const;
 
   /// @brief 出力の対応関係を返す．
-  const vector<pair<ymuint32, ymuint32> >&
+  const vector<pair<ymuint, ymuint> >&
   output_match() const;
 
 
@@ -95,25 +95,25 @@ private:
 
   /// @brief 順番で対応をとり，ID番号のペアのリストを作る．
   void
-  assoc_by_order(const BdnMgr& network1,
-		 const BdnMgr& network2,
-		 vector<pair<ymuint32, ymuint32> >& iassoc,
-		 vector<pair<ymuint32, ymuint32> >& oassoc);
+  assoc_by_order(const BnNetwork& network1,
+		 const BnNetwork& network2,
+		 vector<pair<ymuint, ymuint> >& iassoc,
+		 vector<pair<ymuint, ymuint> >& oassoc);
 
   /// @brief 名前で対応をとり, ID番号のペアのリストを作る．
   /// @return エラーが起きたら TCL_ERROR を返す．
   bool
-  assoc_by_name(const BdnMgr& network1,
-		const BdnMgr& network2,
-		vector<pair<ymuint32, ymuint32> >& iassoc,
-		vector<pair<ymuint32, ymuint32> >& oassoc);
+  assoc_by_name(const BnNetwork& network1,
+		const BnNetwork& network2,
+		vector<pair<ymuint, ymuint> >& iassoc,
+		vector<pair<ymuint, ymuint> >& oassoc);
 
   /// @brief 対象のネットワークを BDN に変換する．
   /// @param[in] net_handle ネットワークハンドル
   /// @param[out] dst_network 変換したネットワークを格納する変数
   void
-  conv_to_bdn(const NetHandle* net_handle,
-	      BdnMgr& dst_network);
+  conv_to_bnet(const NetHandle* net_handle,
+	       BnNetwork& dst_network);
 
 
 private:
@@ -161,16 +161,16 @@ private:
   ofstream mSatLogFile;
 
   // 検証対象のネットワーク1
-  BdnMgr mNetwork1;
+  BnNetwork mNetwork1;
 
   // 検証対象のネットワーク2
-  BdnMgr mNetwork2;
+  BnNetwork mNetwork2;
 
   // 入力の対応関係
-  vector<pair<ymuint32, ymuint32> > mInputMatch;
+  vector<pair<ymuint, ymuint> > mInputMatch;
 
   // 出力の対応関係
-  vector<pair<ymuint32, ymuint32> > mOutputMatch;
+  vector<pair<ymuint, ymuint> > mOutputMatch;
 
 };
 
@@ -298,7 +298,7 @@ EquivCmdBase::sat_out() const
 
 // @brief 検証対象のネットワーク1を返す．
 inline
-const BdnMgr&
+const BnNetwork&
 EquivCmdBase::network1() const
 {
   return mNetwork1;
@@ -306,7 +306,7 @@ EquivCmdBase::network1() const
 
 // @brief 検証対象のネットワーク2を返す．
 inline
-const BdnMgr&
+const BnNetwork&
 EquivCmdBase::network2() const
 {
   return mNetwork2;
@@ -314,7 +314,7 @@ EquivCmdBase::network2() const
 
 // @brief 入力の対応関係を返す．
 inline
-const vector<pair<ymuint32, ymuint32> >&
+const vector<pair<ymuint, ymuint> >&
 EquivCmdBase::input_match() const
 {
   return mInputMatch;
@@ -322,7 +322,7 @@ EquivCmdBase::input_match() const
 
 // @brief 出力の対応関係を返す．
 inline
-const vector<pair<ymuint32, ymuint32> >&
+const vector<pair<ymuint, ymuint> >&
 EquivCmdBase::output_match() const
 {
   return mOutputMatch;

@@ -11,8 +11,9 @@
 
 #include "ReadIscas89.h"
 
-#include "YmUtils/MsgMgr.h"
-#include "YmTclpp/TclObjMsgHandler.h"
+#include "ym/BnNetwork.h"
+#include "ym/MsgMgr.h"
+#include "ym/TclObjMsgHandler.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -61,23 +62,9 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
   // 実際の読み込みを行う．
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {
-  case NetHandle::kMagBNet:
+  case NetHandle::kMagBn:
     {
-      bool result = mBnetReader(ex_file_name, *neth->_bnetwork());
-
-      // エラーが起きていないか調べる．
-      if ( !result ) {
-	TclObj emsg = mh.msg_obj();
-	emsg << "Error occurred in reading " << objv[1];
-	set_result(emsg);
-	return TCL_ERROR;
-      }
-    }
-    break;
-
-  case NetHandle::kMagBdn:
-    {
-      bool result = mBdnReader(ex_file_name, *neth->_bdn());
+      bool result = neth->_bnetwork()->read_iscas89(ex_file_name);
 
       // エラーが起きていないか調べる．
       if ( !result ) {

@@ -5,7 +5,7 @@
 /// @brief MagMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -48,7 +48,7 @@ public:
   const CellLibrary*
   cur_cell_library();
 
-  /// @brief 新たな BNetwork を作成して登録する．
+  /// @brief 新たな BnNetwork を作成して登録する．
   /// @param[in] name 名前
   /// @param[in] err_out エラー出力
   /// @return 作成したネットハンドル
@@ -58,17 +58,6 @@ public:
   NetHandle*
   new_bnethandle(const string& name,
 		 ostream* err_out = nullptr);
-
-  /// @brief 新たな BdNetwork を作成して登録する．
-  /// @param[in] name 名前
-  /// @param[in] err_out エラー出力
-  /// @return 作成したネットハンドル
-  /// @note 同名のネットワークが既に存在していた場合にはエラーとなる．
-  /// @note また，名前が不適切な場合にもエラーとなる．
-  /// @note エラーが起きた場合には nullptr を返す．
-  NetHandle*
-  new_bdnhandle(const string& name,
-		ostream* err_out = nullptr);
 
   /// @brief 新たな MvNetwork を作成して登録する．
   /// @param[in] name 名前

@@ -8,7 +8,7 @@
 
 
 #include "ReadLiberty.h"
-#include "YmCell/CellDotlibReader.h"
+#include "ym/CellDotlibReader.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -31,11 +31,14 @@ ReadLiberty::~ReadLiberty()
 
 // @brief セルライブラリを読み込む．
 // @param[in] filename ファイル名
-const CellLibrary*
-ReadLiberty::read_library(const string& filename)
+// @param[in] library 設定対象のライブラリ
+// @return 読み込みが成功したら true を返す．
+bool
+ReadLiberty::read_library(const string& filename,
+			  CellLibrary* library)
 {
-  CellDotlibReader read;
-  return read(filename);
+  CellDotlibReader reader;
+  return reader.read(filename, library);
 }
 
 END_NAMESPACE_MAGUS

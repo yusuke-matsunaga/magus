@@ -10,7 +10,7 @@
 
 
 #include "LutmapCmd.h"
-#include "YmTclpp/TclPopt.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -56,12 +56,14 @@ DumpLutCmd::cmd_proc(TclObjVector& objv)
       }
       outp = &ofs;
     }
+#if 0
     if ( verilog ) {
       dump_verilog(*outp, lutnetwork());
     }
     else {
       dump(*outp, lutnetwork());
     }
+#endif
     return TCL_OK;
   }
   catch ( AssertError x ) {

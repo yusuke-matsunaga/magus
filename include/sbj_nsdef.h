@@ -25,6 +25,7 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_SBJ
 
+class Bn2Sbj;
 class SbjGraph;
 class SbjPort;
 class SbjEdge;
@@ -36,6 +37,7 @@ END_NAMESPACE_YM_SBJ
 
 BEGIN_NAMESPACE_YM
 
+using nsSbj::Bn2Sbj;
 using nsSbj::SbjGraph;
 using nsSbj::SbjPort;
 using nsSbj::SbjEdge;

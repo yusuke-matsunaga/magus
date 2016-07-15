@@ -10,6 +10,7 @@
 #include "LutMap.h"
 #include "SbjGraph.h"
 #include "AreaCover.h"
+#include "Bn2Sbj.h"
 #include "DelayCover.h"
 
 
@@ -51,6 +52,8 @@ LutMap::area_map(const BnNetwork& src_network,
   AreaCover area_cover;
 
   SbjGraph sbjgraph;
+  Bn2Sbj bn2sbj;
+  bn2sbj.convert(src_network, sbjgraph);
 
   area_cover(sbjgraph, limit, mode, map_network, lut_num, depth);
 }
@@ -79,6 +82,8 @@ LutMap::delay_map(const BnNetwork& src_network,
   DelayCover delay_cover;
 
   SbjGraph sbjgraph;
+  Bn2Sbj bn2sbj;
+  bn2sbj.convert(src_network, sbjgraph);
 
   delay_cover(sbjgraph, limit, slack, mode, map_network, lut_num, depth);
 }

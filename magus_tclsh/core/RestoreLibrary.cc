@@ -8,8 +8,8 @@
 
 
 #include "RestoreLibrary.h"
-#include "YmCell/CellLibrary.h"
-#include "YmUtils/FileIDO.h"
+#include "ym/CellLibrary.h"
+#include "ym/FileIDO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -32,8 +32,11 @@ RestoreLibrary::~RestoreLibrary()
 
 // @brief セルライブラリを読み込む．
 // @param[in] filename ファイル名
-const CellLibrary*
-RestoreLibrary::read_library(const string& filename)
+// @param[in] library 設定対象のライブラリ
+// @return 読み込みが成功したら true を返す．
+bool
+RestoreLibrary::read_library(const string& filename,
+			     CellLibrary* library)
 {
   FileIDO bi;
   if ( !bi.open(filename) ) {
@@ -43,9 +46,9 @@ RestoreLibrary::read_library(const string& filename)
     return nullptr;
   }
 
-  CellLibrary* library = CellLibrary::new_obj();
   library->restore(bi);
-  return library;
+
+  return true;
 }
 
 END_NAMESPACE_MAGUS

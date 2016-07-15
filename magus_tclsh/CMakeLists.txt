@@ -19,7 +19,7 @@ set (bnet_SOURCES
   bnet/BNetCmd.cc
 #  bnet/BNetElimCmd.cc
   bnet/BNetInfoCmd.cc
-  bnet/BNetIoCmd.cc
+#  bnet/BNetIoCmd.cc
 #  bnet/BNetNdCmd.cc
 #  bnet/BNetNodeCmd.cc
   bnet/bnet_init.cc
@@ -66,7 +66,6 @@ set (lutmap_SOURCES
   lutmap/Conv2BNetCmd.cc
   lutmap/DelayMapCmd.cc
   lutmap/DumpLutCmd.cc
-  lutmap/Ln2BNet.cc
   lutmap/LutmapCmd.cc
   lutmap/WriteVqmCmd.cc
   )

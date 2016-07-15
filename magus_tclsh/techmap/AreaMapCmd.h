@@ -24,8 +24,7 @@ class AreaMapCmd :
 public:
 
   /// @brief コンストラクタ
-  AreaMapCmd(MagMgr* mgr,
-	     CmnMgr& cmnmgr);
+  AreaMapCmd(MagMgr* mgr);
 
   /// @brief デストラクタ
   virtual
