@@ -10,6 +10,7 @@
 #include "SbjMinDepth.h"
 #include "SmdNode.h"
 #include "SbjGraph.h"
+#include "SbjNode.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -95,12 +96,10 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
   mNodeArray = new (p) SmdNode[n];
 
   // sbjgraph の構造を SmdNode にコピーする．
-  vector<const SbjNode*> ppi_list;
-  sbjgraph.ppi_list(ppi_list);
-  mInputList.reserve(ppi_list.size());
-  for (vector<const SbjNode*>::const_iterator p = ppi_list.begin();
-       p != ppi_list.end(); ++ p) {
-    const SbjNode* sbjnode = *p;
+  ymuint npi = sbjgraph.input_num();
+  mInputList.reserve(npi);
+  for (ymuint i = 0; i < npi; ++ i) {
+    const SbjNode* sbjnode = sbjgraph.input(i);
     ymuint id = sbjnode->id();
     SmdNode* node = &mNodeArray[id];
     node->set_id(id, false);
@@ -133,7 +132,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
     for (ymuint j = 0; j < nfo0; ++ j) {
       const SbjEdge* sbjedge = sbjnode->fanout_edge(j);
       const SbjNode* sbjfonode = sbjedge->to();
-      if ( !sbjfonode->is_ppo() ) {
+      if ( !sbjfonode->is_output() ) {
 	++nfo;
       }
     }
@@ -143,7 +142,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
     for (ymuint j = 0; j < nfo0; ++ j) {
       const SbjEdge* sbjedge = sbjnode->fanout_edge(j);
       const SbjNode* sbjfonode = sbjedge->to();
-      if ( sbjfonode->is_ppo() ) continue;
+      if ( sbjfonode->is_output() ) continue;
       SmdNode* fonode = &mNodeArray[sbjfonode->id()];
       ASSERT_COND( fonode->id() == sbjfonode->id() );
       SmdEdge* edge = nullptr;

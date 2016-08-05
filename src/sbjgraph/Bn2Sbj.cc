@@ -9,8 +9,14 @@
 
 #include "Bn2Sbj.h"
 #include "SbjGraph.h"
+#include "SbjNode.h"
+#include "SbjHandle.h"
+#include "SbjPort.h"
+#include "SbjDff.h"
 #include "ym/BnNetwork.h"
+#include "ym/BnPort.h"
 #include "ym/BnNode.h"
+#include "ym/BnDff.h"
 #include "ym/Expr.h"
 
 
@@ -60,14 +66,6 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     node_map.add(bn_node->id(), SbjHandle(sbj_node));
   }
 
-  // DFFノードの生成
-  ymuint ndff = src_network.dff_num();
-  for (ymuint i = 0; i < ndff; ++ i) {
-    const BnNode* bn_node = src_network.dff(i);
-    SbjNode* sbj_node = dst_network.new_dff();
-    node_map.add(bn_node->id(), SbjHandle(sbj_node));
-  }
-
   // 論理ノードの生成
   ymuint nl = src_network.logic_num();
   for (ymuint i = 0; i < nl; ++ i) {
@@ -75,7 +73,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     ymuint ni = bn_node->fanin_num();
     vector<SbjHandle> ihandle_list(ni);
     for (ymuint j = 0; j < ni; ++ j) {
-      const BnNode* bn_inode = src_network.find_node(bn_node->fanin(j));
+      const BnNode* bn_inode = bn_node->fanin(j);
       ASSERT_COND( bn_inode != nullptr );
       bool stat = node_map.find(bn_inode->id(), ihandle_list[j]);
       ASSERT_COND( stat );
@@ -147,7 +145,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   ymuint no = src_network.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const BnNode* bn_node = src_network.output(i);
-    const BnNode* bn_inode = src_network.find_node(bn_node->input());
+    const BnNode* bn_inode = bn_node->input();
     ASSERT_COND( bn_inode != nullptr );
     SbjHandle ihandle;
     bool stat = node_map.find(bn_inode->id(), ihandle);
@@ -156,23 +154,53 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     node_map.add(bn_node->id(), SbjHandle(sbj_node));
   }
 
-  // DFFノードの入力の設定
+  // DFFノードの生成
+  ymuint ndff = src_network.dff_num();
   for (ymuint i = 0; i < ndff; ++ i) {
-    const BnNode* bn_node = src_network.dff(i);
-    const BnNode* bn_inode = src_network.find_node(bn_node->input());
-    ASSERT_COND( bn_inode != nullptr );
-    SbjHandle ohandle;
-    bool stat1 = node_map.find(bn_node->id(), ohandle);
-    ASSERT_COND( stat1 );
-    ASSERT_COND( !ohandle.inv() );
-    SbjNode* sbj_node = ohandle.node();
-    ASSERT_COND( sbj_node->is_dff() );
+    const BnDff* bn_dff = src_network.dff(i);
 
+    const BnNode* bn_input = bn_dff->input();
     SbjHandle ihandle;
-    bool stat2 = node_map.find(bn_inode->id(), ihandle);
-    ASSERT_COND( stat2 );
+    bool stat1 = node_map.find(bn_input->id(), ihandle);
+    ASSERT_COND( stat1 );
+    ASSERT_COND( !ihandle.inv() );
+    SbjNode* sbj_input = ihandle.node();
 
-    dst_network.set_dff_data(sbj_node, ihandle);
+    const BnNode* bn_clock = bn_dff->clock();
+    SbjHandle chandle;
+    bool stat2 = node_map.find(bn_clock->id(), chandle);
+    ASSERT_COND( stat2 );
+    ASSERT_COND( !chandle.inv() );
+    SbjNode* sbj_clock = chandle.node();
+
+    const BnNode* bn_output = bn_dff->output();
+    SbjHandle ohandle;
+    bool stat3 = node_map.find(bn_output->id(), ohandle);
+    ASSERT_COND( stat3 );
+    ASSERT_COND( !ohandle.inv() );
+    SbjNode* sbj_output = ohandle.node();
+
+    const BnNode* bn_clear = bn_dff->clear();
+    SbjNode* sbj_clear = nullptr;
+    if ( bn_clear != nullptr ) {
+      SbjHandle handle1;
+      bool stat1 = node_map.find(bn_clear->id(), handle1);
+      ASSERT_COND( stat1 );
+      ASSERT_COND( !handle1.inv() );
+      sbj_clear = handle1.node();
+    }
+
+    const BnNode* bn_preset = bn_dff->preset();
+    SbjNode* sbj_preset = nullptr;
+    if ( bn_preset != nullptr ) {
+      SbjHandle handle1;
+      bool stat1 = node_map.find(bn_preset->id(), handle1);
+      ASSERT_COND( stat1 );
+      ASSERT_COND( !handle1.inv() );
+      sbj_preset = handle1.node();
+    }
+
+    SbjDff* sbj_dff = dst_network.new_dff(sbj_input, sbj_output, sbj_clock, sbj_clear, sbj_preset);
   }
 
   // ポートの生成

@@ -14,6 +14,7 @@
 
 #include "LutMap.h"
 
+#include "ym/BnBuilder.h"
 #include "ym/MvnMgr.h"
 
 
@@ -89,7 +90,9 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      lutmap.area_map(*neth->bnetwork(), limit, mode, lutnetwork(), lut_num, depth);
+      BnBuilder builder;
+      lutmap.area_map(*neth->bnetwork(), limit, mode, builder, lut_num, depth);
+      neth->_bnetwork()->copy(builder);
     }
     break;
 

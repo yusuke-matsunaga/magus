@@ -10,6 +10,8 @@
 #include "AreaCover.h"
 #include "Cut.h"
 #include "MapRecord.h"
+#include "SbjGraph.h"
+#include "SbjNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -39,7 +41,7 @@ void
 AreaCover::operator()(const SbjGraph& sbjgraph,
 		      ymuint limit,
 		      ymuint mode,
-		      BnNetwork& mapnetwork,
+		      BnBuilder& mapnetwork,
 		      ymuint& lut_num,
 		      ymuint& depth)
 {

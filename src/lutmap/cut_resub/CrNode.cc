@@ -8,7 +8,7 @@
 
 
 #include "CrNode.h"
-#include "SbjGraph.h"
+#include "SbjNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

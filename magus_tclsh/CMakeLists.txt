@@ -42,7 +42,7 @@ set (core_SOURCES
   core/NetCmd.cc
   core/NetHandle.cc
   core/NewBNetwork.cc
-  core/NewBdn.cc
+#  core/NewBdn.cc
   core/NewMvn.cc
   core/PopNetwork.cc
   core/PushNetwork.cc
@@ -97,7 +97,6 @@ set (simplify_SOURCES
 
 set (techmap_SOURCES
   techmap/AreaMapCmd.cc
-  techmap/DumpCnCmd.cc
   techmap/TechmapCmd.cc
   )
 
@@ -121,8 +120,9 @@ add_executable (magus_tclsh
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-  ${techmap_SOURCES}
+#  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_a>
+  $<TARGET_OBJECTS:magus_sbjgraph_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
 #  $<TARGET_OBJECTS:magus_cellmap_a>
@@ -136,6 +136,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:ym_sat_a>
   $<TARGET_OBJECTS:ym_udgraph_a>
   $<TARGET_OBJECTS:ym_verilog_a>
+  $<TARGET_OBJECTS:ym_tclpp_a>
   )
 
 target_compile_options (magus_tclsh
@@ -166,8 +167,9 @@ add_executable (magus_tclsh_p
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-  ${techmap_SOURCES}
+#  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_p>
+  $<TARGET_OBJECTS:magus_sbjgraph_p>
 #  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
 #  $<TARGET_OBJECTS:magus_cellmap_p>
@@ -181,6 +183,7 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:ym_sat_p>
   $<TARGET_OBJECTS:ym_udgraph_p>
   $<TARGET_OBJECTS:ym_verilog_p>
+  $<TARGET_OBJECTS:ym_tclpp_p>
   )
 
 target_compile_options (magus_tclsh_p
@@ -217,8 +220,9 @@ add_executable (magus_tclsh_d
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-  ${techmap_SOURCES}
+#  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
 #  $<TARGET_OBJECTS:magus_cellmap_d>
@@ -232,6 +236,7 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:ym_sat_d>
   $<TARGET_OBJECTS:ym_udgraph_d>
   $<TARGET_OBJECTS:ym_verilog_d>
+  $<TARGET_OBJECTS:ym_tclpp_d>
   )
 
 target_compile_options (magus_tclsh_d

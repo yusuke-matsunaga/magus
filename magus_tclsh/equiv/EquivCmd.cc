@@ -12,6 +12,7 @@
 #include "EquivCmd.h"
 #include "cec_nsdef.h"
 #include "ym/BnNode.h"
+#include "ym/BnPort.h"
 #include "ym/TclPopt.h"
 #include "ym/MvnMgr.h"
 
@@ -307,7 +308,7 @@ EquivCmdBase::assoc_by_order(const BnNetwork& network1,
   for (ymuint i = 0; i < no; ++ i) {
     const BnNode* node1 = network1.output(i);
     const BnNode* node2 = network2.output(i);
-    oassoc.push_back(make_pair(node1->input(), node2->input()));
+    oassoc.push_back(make_pair(node1->id(), node2->id()));
   }
 }
 
@@ -365,7 +366,7 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
 	    iassoc.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	  if ( node1->is_output() ) {
-	    oassoc.push_back(make_pair(node1->input(), node2->input()));
+	    oassoc.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	}
 	break;
@@ -556,13 +557,14 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
     }
 
     vector<SatBool3> comp_stats;
+#if 0
     nsYm::nsCec::check_ceq2(network1(), network2(),
 			    input_match(), output_match(),
 			    log_level(), &cout,
 			    sat_type(), sat_option(), sat_out(),
 			    sigsize,
 			    comp_stats);
-
+#endif
     bool has_neq = false;
     bool has_abt = false;
     // statistics を Tcl 変数にセットする．

@@ -8,6 +8,10 @@
 
 
 #include "SbjGraph.h"
+#include "SbjPort.h"
+#include "SbjDff.h"
+#include "SbjNode.h"
+#include "SbjHandle.h"
 #include "SbjMinDepth.h"
 
 #include "ym/Expr.h"
@@ -42,7 +46,7 @@ SbjNode::scan_po()
   for (ymuint i = 0; i < nfo; ++ i) {
     const SbjEdge* e = fanout_edge(i);
     const SbjNode* to = e->to();
-    if ( to->is_ppo() ) {
+    if ( to->is_output() ) {
       mMark |= kPoMask;
       break;
     }
@@ -62,9 +66,6 @@ SbjNode::id_str() const
   }
   else if ( is_logic() ) {
     buf << "L" << id();
-  }
-  else if ( is_dff() ) {
-    buf << "D" << id();
   }
   else {
     buf << "X" << id();
@@ -154,14 +155,6 @@ SbjGraph::copy(const SbjGraph& src,
     nodemap[src_node->id()] = dst_node;
   }
 
-  // DFF の生成
-  ymuint nf = src.dff_num();
-  for (ymuint i = 0; i < nf; ++ i) {
-    SbjNode* src_node = src.dff(i);
-    SbjNode* dst_node = new_dff();
-    nodemap[src_node->id()] = dst_node;
-  }
-
   // 論理ノードの生成
   vector<const SbjNode*> node_list;
   src.sort(node_list);
@@ -183,35 +176,6 @@ SbjGraph::copy(const SbjGraph& src,
     nodemap[src_node->id()] = dst_node;
   }
 
-  // DFF の入力の接続
-  for (ymuint i = 0; i < nf; ++ i) {
-    const SbjNode* src_onode = src.dff(i);
-    SbjNode* dst_onode = nodemap[src_onode->id()];
-
-    const SbjNode* src_inode0 = src_onode->dff_data();
-    SbjNode* dst_inode0 = nodemap[src_inode0->id()];
-    set_dff_data(dst_onode, SbjHandle(dst_inode0, src_onode->dff_data_inv()));
-
-    const SbjNode* src_inode1 = src_onode->dff_clock();
-    if ( src_inode1 ) {
-      SbjNode* dst_inode1 = nodemap[src_inode1->id()];
-      set_dff_clock(dst_onode,
-		    SbjHandle(dst_inode1, src_onode->dff_clock_inv()));
-    }
-
-    const SbjNode* src_inode2 = src_onode->dff_set();
-    if ( src_inode2 ) {
-      SbjNode* dst_inode2 = nodemap[src_inode2->id()];
-      set_dff_set(dst_onode, SbjHandle(dst_inode2, src_onode->dff_set_inv()));
-    }
-
-    const SbjNode* src_inode3 = src_onode->dff_rst();
-    if ( src_inode3 ) {
-      SbjNode* dst_inode3 = nodemap[src_inode3->id()];
-      set_dff_rst(dst_onode, SbjHandle(dst_inode3, src_onode->dff_rst_inv()));
-    }
-  }
-
   // 外部出力の生成
   ymuint no = src.output_num();
   for (ymuint i = 0; i < no; ++ i) {
@@ -223,6 +187,35 @@ SbjGraph::copy(const SbjGraph& src,
     }
     SbjNode* dst_node = new_output(SbjHandle(dst_inode, src_onode->output_inv()));
     nodemap[src_onode->id()] = dst_node;
+  }
+
+  // DFF の生成
+  ymuint nf = src.dff_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    SbjDff* src_dff = src.dff(i);
+
+    const SbjNode* src_input = src_dff->data_input();
+    SbjNode* dst_input = nodemap[src_input->id()];
+
+    const SbjNode* src_output = src_dff->data_output();
+    SbjNode* dst_output = nodemap[src_output->id()];
+
+    const SbjNode* src_clock = src_dff->clock();
+    SbjNode* dst_clock = nodemap[src_clock->id()];
+
+    const SbjNode* src_clear = src_dff->clear();
+    SbjNode* dst_clear = nullptr;
+    if ( src_clear ) {
+      dst_clear = nodemap[src_clear->id()];
+    }
+
+    const SbjNode* src_preset = src_dff->preset();
+    SbjNode* dst_preset = nullptr;
+    if ( src_preset ) {
+      dst_preset = nodemap[src_preset->id()];
+    }
+
+    new_dff(dst_input, dst_output, dst_clock, dst_clear, dst_preset);
   }
 
   // ポートの複製
@@ -260,14 +253,6 @@ SbjGraph::clear()
     SbjNode* node = *p;
     connect(nullptr, node, 0);
   }
-  for (vector<SbjNode*>::iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
-    SbjNode* node = *p;
-    connect(nullptr, node, 0);
-    connect(nullptr, node, 1);
-    connect(nullptr, node, 2);
-    connect(nullptr, node, 3);
-  }
   for (vector<SbjNode*>::iterator p = mLnodeList.begin();
        p != mLnodeList.end(); ++ p) {
     SbjNode* node = *p;
@@ -302,13 +287,13 @@ SbjGraph::clear()
     delete_logic(node);
   }
 
-  for (vector<SbjNode*>::iterator p = mDffList.begin();
+  for (vector<SbjDff*>::iterator p = mDffList.begin();
        p != mDffList.end(); ) {
     // p は実際にはノード内のメンバをアクセスするので delete する前に
     // 進めておく必要がある．
-    SbjNode* node = *p;
+    SbjDff* dff = *p;
     ++ p;
-    delete_dff(node);
+    delete_dff(dff);
   }
 
   mInputArray.clear();
@@ -377,44 +362,6 @@ SbjGraph::port_pos(const SbjNode* node) const
   }
 }
 
-// @brief 入力ノードと DFF ノードのリストを返す．
-// @param[out] node_list ノードを格納するリスト
-// @return 要素数を返す．
-ymuint
-SbjGraph::ppi_list(vector<const SbjNode*>& node_list) const
-{
-  node_list.clear();
-  node_list.reserve(input_num() + dff_num());
-  for (vector<SbjNode*>::const_iterator p = mInputArray.begin();
-       p != mInputArray.end(); ++ p) {
-    node_list.push_back(*p);
-  }
-  for (vector<SbjNode*>::const_iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
-    node_list.push_back(*p);
-  }
-  return node_list.size();
-}
-
-// @brief 出力ノードと DFF ノードのリストを返す．
-// @param[out] node_list ノードを格納するリスト
-// @return 要素数を返す．
-ymuint
-SbjGraph::ppo_list(vector<const SbjNode*>& node_list) const
-{
-  node_list.clear();
-  node_list.reserve(output_num() + dff_num());
-  for (vector<SbjNode*>::const_iterator p = mOutputArray.begin();
-       p != mOutputArray.end(); ++ p) {
-    node_list.push_back(*p);
-  }
-  for (vector<SbjNode*>::const_iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
-    node_list.push_back(*p);
-  }
-  return node_list.size();
-}
-
 
 BEGIN_NONAMESPACE
 
@@ -456,12 +403,9 @@ SbjGraph::sort(vector<const SbjNode*>& node_list) const
 
   vector<bool> mark(max_node_id(), false);
 
-  // 外部入力とDFFのみをファンインにするノードを node_list に追加する．
-  vector<const SbjNode*> tmp_list;
-  ppi_list(tmp_list);
-  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-       p != tmp_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  // 外部入力のみをファンインにするノードを node_list に追加する．
+  for (ymuint i = 0; i < input_num(); ++ i) {
+    const SbjNode* node = input(i);
     mark[node->id()] = true;
     sort_sub(node, mark, node_list);
   }
@@ -518,11 +462,8 @@ SbjGraph::rsort(vector<const SbjNode*>& node_list) const
   vector<bool> mark(max_node_id(), false);
 
   // 外部出力とDFFのみをファンアウトにするノードを node_list に追加する．
-  vector<const SbjNode*> tmp_list;
-  ppo_list(tmp_list);
-  for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-       p != tmp_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  for (ymuint i = 0; i < output_num(); ++ i) {
+    const SbjNode* node = output(i);
     mark[node->id()] = true;
     rsort_sub(node, mark, node_list);
   }
@@ -895,19 +836,20 @@ SbjGraph::_new_lnode(ymuint fcode,
 }
 
 // DFFノードを作る．
-SbjNode*
-SbjGraph::new_dff(SbjNode* inode,
-		  bool inv)
+SbjDff*
+SbjGraph::new_dff(SbjNode* input,
+		  SbjNode* output,
+		  SbjNode* clock,
+		  SbjNode* clear,
+		  SbjNode* preset)
 {
-  SbjNode* node1 = new_node(4);
+  SbjDff* dff = new SbjDff(input, output, clock, clear, preset);
 
   // DFFリストに登録
-  mDffList.push_back(node1);
+  dff->mId = mDffList.size();
+  mDffList.push_back(dff);
 
-  node1->set_dff(inv);
-  connect(inode, node1, 0);
-
-  return node1;
+  return dff;
 }
 
 // 入力ノードの削除
@@ -943,14 +885,9 @@ SbjGraph::delete_logic(SbjNode* node)
 
 // DFFノードの削除
 void
-SbjGraph::delete_dff(SbjNode* node)
+SbjGraph::delete_dff(SbjDff* dff)
 {
-  ASSERT_COND(node->is_dff() );
-
-  delete_node(node, 4);
-
-  mLevel = 0;
-  mLevelValid = false;
+  delete dff;
 }
 
 // 新しいノードを作成する．
@@ -1009,54 +946,6 @@ SbjGraph::change_output(SbjNode* node,
   connect(ihandle.node(), node, 0);
 }
 
-// @brief DFFノードの内容を変更する
-// @param[in] 変更対象の出力ノード
-// @param[in] ihandle 入力のハンドル
-void
-SbjGraph::set_dff_data(SbjNode* node,
-		       SbjHandle ihandle)
-{
-  ASSERT_COND( node->is_dff() );
-  node->set_dff(ihandle.inv());
-  connect(ihandle.node(), node, 0);
-}
-
-// @brief DFFノードのクロック入力を設定する．
-// @param[in] 変更対象のDFFノード
-// @param[in] ihandle 入力のハンドル
-void
-SbjGraph::set_dff_clock(SbjNode* node,
-			SbjHandle ihandle)
-{
-  ASSERT_COND( node->is_dff() );
-  node->set_dff_clock(ihandle.inv());
-  connect(ihandle.node(), node, 1);
-}
-
-// @brief DFFノードのセット入力を設定する．
-// @param[in] 変更対象のDFFノード
-// @param[in] ihandle 入力のハンドル
-void
-SbjGraph::set_dff_set(SbjNode* node,
-		      SbjHandle ihandle)
-{
-  ASSERT_COND( node->is_dff() );
-  node->set_dff_set(ihandle.inv());
-  connect(ihandle.node(), node, 2);
-}
-
-// @brief DFFノードのリセット入力を設定する．
-// @param[in] 変更対象のDFFノード
-// @param[in] ihandle 入力のハンドル
-void
-SbjGraph::set_dff_rst(SbjNode* node,
-		      SbjHandle ihandle)
-{
-  ASSERT_COND( node->is_dff() );
-  node->set_dff_rst(ihandle.inv());
-  connect(ihandle.node(), node, 3);
-}
-
 // from を to の pos 番目のファンインとする．
 // to の pos 番目にすでに接続があった場合には自動的に削除される．
 void
@@ -1084,11 +973,8 @@ ymuint
 SbjGraph::level() const
 {
   if ( !mLevelValid ) {
-    vector<const SbjNode*> tmp_list;
-    ppi_list(tmp_list);
-    for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-	 p != tmp_list.end(); ++ p) {
-      const SbjNode* node = *p;
+    for (ymuint i = 0; i < input_num(); ++ i) {
+      const SbjNode* node = input(i);
       // node の const を取り去るギミック
       mNodeArray[node->id()]->mLevel = 0;
     }
@@ -1110,10 +996,8 @@ SbjGraph::level() const
     }
 
     ymuint max_l = 0;
-    ppo_list(tmp_list);
-    for (vector<const SbjNode*>::const_iterator p = tmp_list.begin();
-	 p != tmp_list.end(); ++ p) {
-      const SbjNode* node = *p;
+    for (ymuint i = 0; i < output_num(); ++ i) {
+      const SbjNode* node = output(i);
       const SbjNode* inode = node->fanin(0);
       if ( inode ) {
 	ymuint l1 = inode->level();

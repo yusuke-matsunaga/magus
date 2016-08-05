@@ -53,15 +53,7 @@ BNetInfo::cmd_proc(TclObjVector& objv)
   string attr = objv[1];
   TclObj result;
   if ( attr == "model_name" ) {
-    if ( objc == 3 ) {
-      // 値の設定
-      string name = objv[2];
-      network->set_model_name(name);
-      result = objv[2];
-    }
-    else {
-      result = network->model_name();
-    }
+    result = network->model_name();
   }
   else {
     if ( attr == "input_num" ) {

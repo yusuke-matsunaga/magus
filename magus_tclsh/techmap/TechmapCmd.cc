@@ -9,7 +9,7 @@
 
 #include "TechmapCmd.h"
 #include "AreaMapCmd.h"
-#include "DumpCnCmd.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -32,6 +32,7 @@ TechmapCmd::~TechmapCmd()
 {
 }
 
+#if 0
 // @brief 結果を納めるネットワーク
 BnNetwork&
 TechmapCmd::dst_network()
@@ -47,6 +48,7 @@ TechmapCmd::dst_network()
     }
   }
 }
+#endif
 
 END_NAMESPACE_MAGUS_TECHMAP
 
@@ -58,8 +60,7 @@ techmap_init(Tcl_Interp* interp,
 {
   using namespace nsTechmap;
 
-  TclCmdBinder2<AreaMapCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::area_map");
-  TclCmdBinder2<DumpCnCmd, MagMgr*>::reg(interp, mgr,  "magus::techmap::dump_cngraph");
+  TclCmdBinder1<AreaMapCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::area_map");
 
 
   const char* init =

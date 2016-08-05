@@ -42,7 +42,7 @@ DelayCover::operator()(const SbjGraph& sbjgraph,
 		       ymuint limit,
 		       ymuint slack,
 		       ymuint mode,
-		       BnNetwork& map_network,
+		       BnBuilder& map_network,
 		       ymuint& lut_num,
 		       ymuint& depth)
 {

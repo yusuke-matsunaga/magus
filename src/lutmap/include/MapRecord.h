@@ -10,8 +10,8 @@
 
 
 #include "lutmap_nsdef.h"
-#include "SbjGraph.h"
-#include "ym/BnNetwork.h"
+#include "sbj_nsdef.h"
+#include "ym/ym_bnet.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -73,7 +73,7 @@ public:
   /// @param[out] depth 最大段数
   void
   gen_mapgraph(const SbjGraph& sbjgraph,
-	       BnNetwork& mapgraph,
+	       BnBuilder& mapgraph,
 	       ymuint& lut_num,
 	       ymuint& depth);
 
@@ -103,10 +103,10 @@ private:
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
   /// @param[out] mapnetwork マッピング結果のネットワーク
-  BnNode*
+  ymuint
   back_trace(const SbjNode* node,
 	     bool inv,
-	     BnNetwork& mapnetwork);
+	     BnBuilder& mapnetwork);
 
   /// @brief estimate() で用いるバックトレース
   /// @param[in] node 対象のノード
@@ -144,8 +144,8 @@ private:
     NodeInfo()
     {
       mCut = nullptr;
-      mMapNode[0] = nullptr;
-      mMapNode[1] = nullptr;
+      mMapNode[0] = 0;
+      mMapNode[1] = 0;
       mMapCount[0] = 0;
       mMapCount[1] = 0;
       mDepth = 0;
@@ -156,7 +156,7 @@ private:
 
     // マップ結果
     // 正極性と負極性の2通りを保持する．
-    BnNode* mMapNode[2];
+    ymuint mMapNode[2];
 
     // estimate で用いるカウンタ
     int mMapCount[2];

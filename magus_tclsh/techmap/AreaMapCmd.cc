@@ -14,8 +14,9 @@
 
 #include "ym/MvnMgr.h"
 #include "ym/BnNetwork.h"
-#include "ym/MvnBnConv.h"
-#include "ym/MvnBnMap.h"
+#include "ym/BnBuilder.h"
+//#include "ym/MvnBnConv.h"
+//#include "ym/MvnBnMap.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -86,7 +87,9 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      mapper.area_map(*cur_cell_library(), *neth->bnetwork(), 0, cmnmgr());
+      BnBuilder builder;
+      mapper.area_map(*cur_cell_library(), *neth->bnetwork(), 0, builder);
+      neth->_bnetwork()->copy(builder);
     }
     break;
 
