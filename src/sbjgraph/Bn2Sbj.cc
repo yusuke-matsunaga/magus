@@ -43,13 +43,6 @@ void
 Bn2Sbj::convert(const BnNetwork& src_network,
 		SbjGraph& dst_network)
 {
-#if 0
-  if ( !src_network.wrap_up() ) {
-    // もとのネットワークが適切でなかった．
-    return;
-  }
-#endif
-
   dst_network.clear();
 
   // ネットワーク名の設定
@@ -81,55 +74,55 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     SbjHandle sbj_handle;
     BnLogicType logic_type = bn_node->logic_type();
     switch ( logic_type ) {
-    kBnLt_NONE:
-      ASSERT_NOT_REACHED;
+    case kBnLt_NONE:
+      //ASSERT_NOT_REACHED;
       break;
 
-    kBnLt_C0:
+    case kBnLt_C0:
       sbj_handle = SbjHandle::make_zero();
       break;
 
-    kBnLt_C1:
+    case kBnLt_C1:
       sbj_handle = SbjHandle::make_one();
       break;
 
-    kBnLt_BUFF:
+    case kBnLt_BUFF:
       sbj_handle = ihandle_list[0];
       break;
 
-    kBnLt_NOT:
+    case kBnLt_NOT:
       sbj_handle = ~ihandle_list[0];
       break;
 
-    kBnLt_AND:
+    case kBnLt_AND:
       sbj_handle = dst_network.new_and(ihandle_list);
       break;
 
-    kBnLt_NAND:
+    case kBnLt_NAND:
       sbj_handle = ~dst_network.new_and(ihandle_list);
       break;
 
-    kBnLt_OR:
+    case kBnLt_OR:
       sbj_handle = dst_network.new_or(ihandle_list);
       break;
 
-    kBnLt_NOR:
+    case kBnLt_NOR:
       sbj_handle = ~dst_network.new_or(ihandle_list);
       break;
 
-    kBnLt_XOR:
+    case kBnLt_XOR:
       sbj_handle = dst_network.new_xor(ihandle_list);
       break;
 
-    kBnLt_XNOR:
+    case kBnLt_XNOR:
       sbj_handle = ~dst_network.new_xor(ihandle_list);
       break;
 
-    kBnLt_EXPR:
+    case kBnLt_EXPR:
       sbj_handle = dst_network.new_logic(bn_node->expr(), ihandle_list);
       break;
 
-    kBnLt_TV:
+    case kBnLt_TV:
       cerr << "Sorry, truth vector type is not supported!" << endl;
       sbj_handle = SbjHandle::make_zero();
       break;
