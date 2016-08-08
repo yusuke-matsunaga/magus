@@ -454,6 +454,17 @@ SbjGraph::new_and(SbjHandle ihandle1,
     return ihandle1;
   }
 
+  if ( ihandle1.node() == ihandle2.node() ) {
+    if ( ihandle1.inv() == ihandle2.inv() ) {
+      // 同じ入力
+      return ihandle1;
+    }
+    else {
+      // 同じノードで逆相
+      return SbjHandle::make_zero();
+    }
+  }
+
   ymuint fcode = 0U;
   if ( ihandle1.inv() ) {
     fcode |= 1U;
@@ -537,6 +548,17 @@ SbjGraph::new_or(SbjHandle ihandle1,
     return SbjHandle::make_one();
   }
 
+  if ( ihandle1.node() == ihandle2.node() ) {
+    if ( ihandle1.inv() == ihandle2.inv() ) {
+      // 同じ入力
+      return ihandle1;
+    }
+    else {
+      // 同じノードで逆相
+      return SbjHandle::make_one();
+    }
+  }
+
   ymuint fcode = 0U;
   if ( !ihandle1.inv() ) {
     fcode |= 1U;
@@ -618,6 +640,17 @@ SbjGraph::new_xor(SbjHandle ihandle1,
   if ( ihandle2.is_const1() ) {
     // 入力2が1固定
     return ~ihandle1;
+  }
+
+  if ( ihandle1.node() == ihandle2.node() ) {
+    if ( ihandle1.inv() == ihandle2.inv() ) {
+      // 同じ入力
+      return ihandle1;
+    }
+    else {
+      // 同じノードで逆相
+      return SbjHandle::make_one();
+    }
   }
 
   bool inv = ihandle1.inv() ^ ihandle2.inv();
