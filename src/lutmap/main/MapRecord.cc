@@ -13,6 +13,7 @@
 #include "ym/TvFunc.h"
 #include "SbjNode.h"
 #include "SbjDff.h"
+#include "SbjLatch.h"
 #include "SbjPort.h"
 
 
@@ -96,8 +97,8 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   int max_depth = 0;
   for (ymuint i = 0; i < no; ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
-    const SbjNode* node = onode->fanin(0);
-    bool inv = onode->output_inv();
+    const SbjNode* node = onode->output_fanin();
+    bool inv = onode->output_fanin_inv();
     ymuint node_id;
     if ( node ) {
       node_id = back_trace(node, inv, mapgraph);
@@ -143,6 +144,32 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     const SbjNode* preset = dff->preset();
     if ( preset != nullptr ) {
       dff_info.mPreset = mNodeInfo[preset->id()].mMapNode[0];
+    }
+  }
+
+  // ラッチの生成
+  ymuint nlatch = sbjgraph.latch_num();
+  for (ymuint i = 0; i < nlatch; ++ i) {
+    const SbjLatch* latch = sbjgraph.latch(i);
+    BnBuilder::LatchInfo& latch_info = mapgraph.add_latch(string());
+
+    const SbjNode* input = latch->data_input();
+    latch_info.mInput = mNodeInfo[input->id()].mMapNode[0];
+
+    const SbjNode* output = latch->data_output();
+    latch_info.mOutput = mNodeInfo[output->id()].mMapNode[0];
+
+    const SbjNode* enable = latch->enable();
+    latch_info.mEnable = mNodeInfo[enable->id()].mMapNode[0];
+
+    const SbjNode* clear = latch->clear();
+    if ( clear != nullptr ) {
+      latch_info.mClear = mNodeInfo[clear->id()].mMapNode[0];
+    }
+
+    const SbjNode* preset = latch->preset();
+    if ( preset != nullptr ) {
+      latch_info.mPreset = mNodeInfo[preset->id()].mMapNode[0];
     }
   }
 
@@ -222,8 +249,6 @@ MapRecord::back_trace(const SbjNode* node,
   node_info.mMapNode[idx] = node_id;
   node_info.mDepth = idepth + 1;
 
-  cout << "back_trace(Node#" << node->id() << ", " << node_info.mDepth << ")" << endl;
-
   return node_id;
 }
 
@@ -253,13 +278,13 @@ MapRecord::estimate(const SbjGraph& sbjgraph)
   ymuint no = sbjgraph.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
-    const SbjNode* node = onode->fanin(0);
+    const SbjNode* node = onode->output_fanin();
     if ( node && node->is_logic() ) {
       if ( mNodeInfo[node->id()].mCut == nullptr ) {
 	lut_num = -1;
 	break;
       }
-      bool inv = onode->output_inv();
+      bool inv = onode->output_fanin_inv();
       lut_num += back_trace2(node, inv);
     }
   }

@@ -72,12 +72,11 @@ SbjDumper::dump(ostream& s,
   ymuint no = sbjgraph.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const SbjNode* node = sbjgraph.output(i);
-    const SbjEdge* e = node->fanin_edge(0);
+    const SbjNode* inode = node->output_fanin();
     s << "Output#" << node->subid() << ": " << node->id_str()
       << " : " << sbjgraph.port(node)->name()
       << "[" << sbjgraph.port_pos(node) << "]"
       << " = ";
-    const SbjNode* inode = e->from();
     if ( inode ) {
       // 普通のノードの場合
       if ( node->output_fanin_inv() ) {

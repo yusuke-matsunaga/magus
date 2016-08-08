@@ -98,11 +98,9 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   }
 
   // 各ノードごとにカットを記録
-  vector<const SbjNode*> snode_list;
-  sbjgraph.sort(snode_list);
-  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
-       p != snode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nl = sbjgraph.logic_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.logic(i);
     record(node);
   }
 
@@ -113,7 +111,7 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   int min_depth = 0;
   for (ymuint i = 0; i < no; ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
-    const SbjNode* node = onode->fanin(0);
+    const SbjNode* node = onode->output_fanin();
     if ( node == nullptr) continue;
     if ( node->is_logic() ) {
       onode_list.push_back(node);
@@ -133,9 +131,8 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   }
 
   // 要求された段数制約を満たす中でコスト最小の解を選ぶ．
-  for (vector<const SbjNode*>::reverse_iterator p = snode_list.rbegin();
-       p != snode_list.rend(); ++ p) {
-    const SbjNode* node = *p;
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.logic(nl - i - 1);
     select(node, maprec);
   }
 }
@@ -252,7 +249,6 @@ DelayCover::select(const SbjNode* node,
     // このノードは必要ではない．
     return;
   }
-  cout << "select(Node#" << node->id() << ", " << rd << ")" << endl;
 
   const Cut* cut = nullptr;
   for (ADCostIterator<double> p = t.mCostList.begin();

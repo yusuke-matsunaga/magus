@@ -88,11 +88,9 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   }
 
   // 論理ノードのコストを入力側から計算
-  vector<const SbjNode*> snode_list;
-  sbjgraph.sort(snode_list);
-  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
-       p != snode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nl = sbjgraph.logic_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.logic(i);
 
     double min_cost = DBL_MAX;
     const Cut* best_cut = nullptr;

@@ -51,13 +51,14 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
   mInputs = new const SbjNode*[limit];
 
-  mInodeStack = new ymuint32[sbjgraph.lnode_num()];
+  ymuint ni = sbjgraph.input_num();
+  ymuint nl = sbjgraph.logic_num();
+
+  mInodeStack = new ymuint32[nl];
   mIsPos = &mInodeStack[0];
 
   // 外部入力用の(ダミーの)クラスタを作る．
-  ymuint ni = sbjgraph.input_num();
-  ymuint nf = sbjgraph.dff_num();
-  mNall = ni + nf + sbjgraph.lnode_num();
+  mNall = ni + nl;
   mNcAll = 0;
   mCurPos = 0;
   for (ymuint i = 0; i < ni; ++ i) {
@@ -81,12 +82,8 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   }
 
   // 入力側から内部ノード用のクラスタを作る．
-  vector<const SbjNode*> node_list;
-  sbjgraph.sort(node_list);
-  for (vector<const SbjNode*>::const_iterator p = node_list.begin();
-       p != node_list.end(); ++ p) {
-    const SbjNode* node = *p;
-    ASSERT_COND( node->is_logic() );
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.logic(i);
 
     mMarkedNodesLast = 0;
 

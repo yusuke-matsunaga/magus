@@ -56,9 +56,6 @@ CutResub::operator()(const SbjGraph& sbjgraph,
   mLQ.init(max_size);
   mRQ.init(max_size);
 
-  vector<const SbjNode*> snode_list;
-  sbjgraph.sort(snode_list);
-
   // 外部入力ノードの対応付けを行う．
   ymuint ni = sbjgraph.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
@@ -72,11 +69,13 @@ CutResub::operator()(const SbjGraph& sbjgraph,
   ymuint no = sbjgraph.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
-    const SbjNode* sbjnode = onode->fanin(0);
+    const SbjNode* sbjnode = onode->output_fanin();
     if ( sbjnode && !sbjnode->is_input() ) {
       back_trace(sbjnode, maprec, nullptr);
     }
   }
+
+  ymuint nl = sbjgraph.logic_num();
 
   // 置き換えのための初期計算を行う．
   {
@@ -85,9 +84,8 @@ CutResub::operator()(const SbjGraph& sbjgraph,
     vector<CrNode*> root_list;
     root_list.reserve(sbjgraph.max_node_id());
     ymuint max_level = 0;
-    for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
-	 p != snode_list.end(); ++ p) {
-      const SbjNode* node = *p;
+    for (ymuint i = 0; i < nl; ++ i) {
+      const SbjNode* node = sbjgraph.logic(i);
       CrNode* crnode = mNodeArray[node->id()];
       if ( crnode == nullptr ) continue;
 
@@ -179,9 +177,8 @@ CutResub::operator()(const SbjGraph& sbjgraph,
 #if 0
     for ( ; ; ) {
       bool changed = false;
-      for (vector<const SbjNode*>::const_reverse_iterator p = snode_list.rbegin();
-	   p != snode_list.rend(); ++ p) {
-	const SbjNode* node = *p;
+      for (ymuint i = 0; i < nl; ++ i) {
+	const SbjNode* node = sbjgraph.logic(nl - i - 1);
 	CrNode* crnode = mNodeArray[node->id()];
 	if ( crnode == nullptr || crnode->is_output() ) continue;
 	if ( find_subst2(crnode, subst_list) ) {
