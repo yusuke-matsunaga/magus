@@ -11,6 +11,7 @@
 #include "SbjGraph.h"
 #include "SbjPort.h"
 #include "SbjDff.h"
+#include "SbjLatch.h"
 #include "SbjNode.h"
 
 
@@ -79,14 +80,14 @@ SbjDumper::dump(ostream& s,
     const SbjNode* inode = e->from();
     if ( inode ) {
       // 普通のノードの場合
-      if ( node->output_inv() ) {
+      if ( node->output_fanin_inv() ) {
 	s << "~";
       }
       s << inode->id_str();
     }
     else {
       // 定数ノードの場合
-      if ( node->output_inv() ) {
+      if ( node->output_fanin_inv() ) {
 	s << "1";
       }
       else {
@@ -96,8 +97,8 @@ SbjDumper::dump(ostream& s,
     s << endl;
   }
 
-  ymuint nf = sbjgraph.dff_num();
-  for (ymuint i = 0; i < nf; ++ i) {
+  ymuint nff = sbjgraph.dff_num();
+  for (ymuint i = 0; i < nff; ++ i) {
     const SbjDff* dff = sbjgraph.dff(i);
     s << "DFF(" << dff->id() << ") :";
 
@@ -124,9 +125,37 @@ SbjDumper::dump(ostream& s,
     s << endl;
   }
 
-  ymuint nl = sbjgraph.lnode_num();
-  for (ymuint i = 0; i < nl; ++ i) {
-    const SbjNode* node = sbjgraph.lnode(i);
+  ymuint nlatch = sbjgraph.latch_num();
+  for (ymuint i = 0; i < nlatch; ++ i) {
+    const SbjLatch* latch = sbjgraph.latch(i);
+    s << "LATCH(" << latch->id() << ") :";
+
+    const SbjNode* onode = latch->data_output();
+    s << "Q = " << onode->id_str();
+
+    const SbjNode* inode = latch->data_input();
+    s << "DATA = " << inode->id_str();
+
+    const SbjNode* cnode = latch->enable();
+    if ( cnode ) {
+      s << ", ENABLE = " << cnode->id_str();
+    }
+
+    const SbjNode* rnode = latch->clear();
+    if ( rnode ) {
+      s << ", CLEAR = " << rnode->id_str();
+    }
+
+    const SbjNode* snode = latch->preset();
+    if ( snode ) {
+      s << ", PRESET = " << snode->id_str();
+    }
+    s << endl;
+  }
+
+  ymuint nlogic = sbjgraph.logic_num();
+  for (ymuint i = 0; i < nlogic; ++ i) {
+    const SbjNode* node = sbjgraph.logic(i);
     const char* pol0 = node->fanin_inv(0) ? "~" : "";
     const char* pol1 = node->fanin_inv(1) ? "~" : "";
     const char* op   = node->is_xor() ? "^" : "&";
@@ -162,7 +191,7 @@ SbjDumper::dump_blif(ostream& s,
     const SbjNode* inode = node->fanin(0);
     if ( inode == 0 ) {
       s << ".names " << node->id_str() << endl;
-      if ( node->output_inv() ) {
+      if ( node->output_fanin_inv() ) {
 	s << "1" << endl;
       }
       else {
@@ -171,7 +200,7 @@ SbjDumper::dump_blif(ostream& s,
     }
     else {
       s << ".names " << inode->id_str() << " " << node->id_str() << endl;
-      if ( node->output_inv() ) {
+      if ( node->output_fanin_inv() ) {
 	s << "0 1" << endl;
       }
       else {
@@ -181,6 +210,7 @@ SbjDumper::dump_blif(ostream& s,
     s << endl;
   }
 
+  // blif では DFF を .latch 文で表す．
   ymuint nf = sbjgraph.dff_num();
   for (ymuint i = 0; i < nf; ++ i) {
     const SbjDff* dff = sbjgraph.dff(i);
@@ -190,9 +220,11 @@ SbjDumper::dump_blif(ostream& s,
       << inode->id_str() << endl;
   }
 
-  ymuint nl = sbjgraph.lnode_num();
+  // latch は無視
+
+  ymuint nl = sbjgraph.logic_num();
   for (ymuint i = 0; i < nl; ++ i) {
-    const SbjNode* node = sbjgraph.lnode(i);
+    const SbjNode* node = sbjgraph.logic(i);
     s << ".names " << node->fanin(0)->id_str()
       << " " << node->fanin(1)->id_str()
       << " " << node->id_str() << endl;
@@ -298,9 +330,9 @@ SbjDumper::dump_verilog(ostream& s,
   s << endl;
 
   // wire 定義
-  ymuint nl = sbjgraph.lnode_num();
+  ymuint nl = sbjgraph.logic_num();
   for (ymuint i = 0; i < nl; ++ i) {
-    const SbjNode* node = sbjgraph.lnode(i);
+    const SbjNode* node = sbjgraph.logic(i);
     s << "  wire   " << node_name(node) << ";" << endl;
   }
   s << endl;
@@ -311,7 +343,7 @@ SbjDumper::dump_verilog(ostream& s,
     const SbjNode* inode = node->fanin(0);
     s << "  assign " << node_name(node) << " = ";
     if ( inode == 0 ) {
-      if ( node->output_inv() ) {
+      if ( node->output_fanin_inv() ) {
 	s << "1'b1";
       }
       else {
@@ -319,7 +351,7 @@ SbjDumper::dump_verilog(ostream& s,
       }
     }
     else {
-      if ( node->output_inv() ) {
+      if ( node->output_fanin_inv() ) {
 	s << "~";
       }
       s << node_name(inode);
@@ -330,7 +362,7 @@ SbjDumper::dump_verilog(ostream& s,
 
   // 論理ノード用の assign 文
   for (ymuint i = 0; i < nl; ++ i) {
-    const SbjNode* node = sbjgraph.lnode(i);
+    const SbjNode* node = sbjgraph.logic(i);
     s << "  assign " << node_name(node) << " = ";
 
     const char* pol0 = node->fanin_inv(0) ? "~" : "";
@@ -390,6 +422,55 @@ SbjDumper::dump_verilog(ostream& s,
     s << node_name(dnode) << ";" << endl;
     s << endl;
   }
+
+  // ラッチ用の always 文
+  for (ymuint i = 0; i < nf; ++ i) {
+    const SbjLatch* latch = sbjgraph.latch(i);
+    const SbjNode* node = latch->data_output();
+    const SbjNode* dnode = latch->data_input();
+    const SbjNode* cnode = latch->enable();
+    const SbjNode* snode = latch->preset();
+    const SbjNode* rnode = latch->clear();
+    ASSERT_COND( cnode != nullptr );
+    s << "  always @ ( ";
+    s << "posedge";
+    s << " " << node_name(cnode);
+    if ( snode ) {
+      s << " or ";
+      s << "posedge";
+      s << " " << node_name(snode);
+    }
+    if ( rnode ) {
+      s << " or ";
+      s << "posedge";
+      s << " " << node_name(rnode);
+    }
+    s << " )" << endl;
+    if ( snode ) {
+      s << "    if ( ";
+      s << " " << node_name(snode) << " )" << endl;
+      s << "      " << node_name(node)
+	<< " <= 1;" << endl;
+    }
+    if ( rnode ) {
+      s << "    ";
+      if ( snode ) {
+	s << "else ";
+      }
+      s << "if ( ";
+      s << " " << node_name(rnode) << " )" << endl;
+      s << "      " << node_name(node)
+	<< " <= 0;" << endl;
+    }
+    if ( snode || rnode ) {
+      s << "    else" << endl
+	<< "  ";
+    }
+    s << "    " << node_name(node) << " <= ";
+    s << node_name(dnode) << ";" << endl;
+    s << endl;
+  }
+
   s << "endmodule" << endl;
 }
 

@@ -5,16 +5,11 @@
 /// @brief SbjNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
+/// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "sbj_nsdef.h"
-
-//#include "ym/ym_logic.h"
-//#include "ym/SimpleAlloc.h"
-//#include "ym/FragAlloc.h"
-//#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -79,15 +74,6 @@ private:
   /// @brief デストラクタ
   ~SbjEdge();
 
-  /// @brief from ノードをセットする．
-  void
-  set_from(SbjNode* from);
-
-  /// @brief to ノードをセットする．
-  void
-  set_to(SbjNode* to,
-	 ymuint pos);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -114,8 +100,7 @@ private:
 /// - 入力ノード
 /// - 出力ノード
 /// - 論理ノード
-/// - DFFノード
-/// の 4種類がある．
+/// の 3種類がある．
 ///
 /// 論理ノードの場合，常に2つのファンインを持つ．
 /// ノードの論理タイプが AND と XOR の2種類があり，
@@ -129,7 +114,7 @@ class SbjNode
 
 public:
   /// @brief ノードの型
-  enum tType {
+  enum Type {
     /// @brief 入力ノード
     kINPUT  = 0,
     /// @brief 出力ノード
@@ -170,7 +155,7 @@ public:
   id_str() const;
 
   /// @brief タイプを得る．
-  tType
+  Type
   type() const;
 
   /// @brief 入力ノードの時に true を返す．
@@ -198,10 +183,14 @@ public:
   ymuint
   subid() const;
 
-  /// @brief 出力ノードの極性を返す．
+  /// @brief 出力ノードの場合のファンインを得る．
+  const SbjNode*
+  output_fanin() const;
+
+  /// @brief 出力ノードの場合のファンインの極性を返す．
   /// @return 反転していたら true を返す．
   bool
-  output_inv() const;
+  output_fanin_inv() const;
 
   /// @brief 機能コードを得る．
   ///
@@ -264,37 +253,27 @@ private:
   // 内容の設定に用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief ファンインのノードを得る．
-  /// @param[in] pos 入力番号(0 or 1)
-  /// @return pos 番めのファンインのノード
-  /// @note 該当するファンインがなければ nullptr を返す．
-  SbjNode*
-  fanin(ymuint pos);
-
-  /// @brief ファンインの枝を得る．
-  /// @param[in] pos 入力番号(0 or 1)
-  /// @return pos 番目の入力の枝
-  /// @note 該当するファンインの枝がなければ nullptr を返す．
-  SbjEdge*
-  fanin_edge(ymuint pos);
-
   /// @brief タイプを入力に設定する．
+  /// @param[in] subid 入力番号
   void
   set_input(ymuint subid);
 
   /// @brief タイプを出力に設定する．
+  /// @param[in] subidr 出力番号
   /// @param[in] inv 反転属性
+  /// @param[in] inode 入力ノード
   void
   set_output(ymuint subid,
-	     bool inv);
+	     bool inv,
+	     SbjNode* inode);
 
   /// @brief タイプを論理に設定する．
+  /// @param[in] fcode 機能コード
+  /// @param[in] inode0, inode1 ファンインのノード
   void
-  set_logic(ymuint fcode);
-
-  /// @brief ファンアウトに出力が含まれているか調べ pomark をセットする．
-  void
-  scan_po();
+  set_logic(ymuint fcode,
+	    SbjNode* inode0,
+	    SbjNode* inode1);
 
 
 private:
@@ -309,8 +288,7 @@ private:
   ymuint32 mFlags;
 
   // ファンインの枝(そのもの)の配列
-  // 要素数は通常2だが DFF の場合は4
-  SbjEdge* mFanins;
+  SbjEdge mFanins[2];
 
   // ファンアウトの枝のポインタ配列
   vector<SbjEdge*> mFanoutList;
@@ -423,24 +401,6 @@ SbjEdge::pos() const
   return mIpos;
 }
 
-// @brief from ノードをセットする．
-inline
-void
-SbjEdge::set_from(SbjNode* from)
-{
-  mFrom = from;
-}
-
-// @brief to ノードをセットする．
-inline
-void
-SbjEdge::set_to(SbjNode* to,
-		ymuint pos)
-{
-  mTo = to;
-  mIpos = pos;
-}
-
 // @brief 出力ノードに接続している時 true を返す．
 inline
 bool
@@ -468,33 +428,65 @@ void
 SbjNode::set_input(ymuint subid)
 {
   mFlags = static_cast<ymuint>(kINPUT) | (subid << kSubidShift);
+  mLevel = 0;
 }
 
 // タイプを出力に設定する．
 inline
 void
 SbjNode::set_output(ymuint subid,
-		    bool inv)
+		    bool inv,
+		    SbjNode* inode)
 {
+  ASSERT_COND( inode != nullptr );
+
   mFlags = static_cast<ymuint>(kOUTPUT) |
     (subid << kSubidShift) |
     (inv << kOinvShift);
+
+  SbjEdge& edge = mFanins[0];
+  edge.mFrom = inode;
+  inode->mFanoutList.push_back(&edge);
+  inode->mMark |= kPoMask;
+
+  mLevel = inode->mLevel;
 }
 
-// タイプを論理に設定する．
+// @brief タイプを論理に設定する．
+// @param[in] fcode 機能コード
+// @param[in] inode0, inode1 ファンインのノード
 inline
 void
-SbjNode::set_logic(ymuint fcode)
+SbjNode::set_logic(ymuint fcode,
+		   SbjNode* inode0,
+		   SbjNode* inode1)
 {
+  ASSERT_COND( inode0 != nullptr );
+  ASSERT_COND( inode1 != nullptr );
+
   mFlags = static_cast<ymuint>(kLOGIC) | (fcode << kFcodeShift);
+
+  SbjEdge& edge0 = mFanins[0];
+  edge0.mFrom = inode0;
+  inode0->mFanoutList.push_back(&edge0);
+
+  SbjEdge& edge1 = mFanins[1];
+  edge1.mFrom = inode1;
+  inode1->mFanoutList.push_back(&edge1);
+
+  mLevel = inode0->mLevel;
+  if ( mLevel < inode1->mLevel ) {
+    mLevel = inode1->mLevel;
+  }
+  ++ mLevel;
 }
 
 // タイプを得る．
 inline
-SbjNode::tType
+SbjNode::Type
 SbjNode::type() const
 {
-  return static_cast<tType>(mFlags & kTypeMask);
+  return static_cast<Type>(mFlags & kTypeMask);
 }
 
 // 入力ノードの時に true を返す．
@@ -526,6 +518,7 @@ inline
 bool
 SbjNode::is_and() const
 {
+  ASSERT_COND( is_logic() );
   // 注意! encoding が変わったら変更すること．
   return (mFlags & 0x13U) == 0x02U;
 }
@@ -535,6 +528,7 @@ inline
 bool
 SbjNode::is_xor() const
 {
+  ASSERT_COND( is_logic() );
   // 注意! encoding が変わったら変更すること．
   return (mFlags & 0x13U) == 0x12U;
 }
@@ -544,14 +538,25 @@ inline
 ymuint
 SbjNode::subid() const
 {
+  ASSERT_COND( is_input() || is_output() );
   return mFlags >> kSubidShift;
+}
+
+// @brief 出力ノードの場合のファンインを得る．
+inline
+const SbjNode*
+SbjNode::output_fanin() const
+{
+  ASSERT_COND( is_output() );
+  return mFanins[0].from();
 }
 
 // @brief 出力ノードの極性を得る．
 inline
 bool
-SbjNode::output_inv() const
+SbjNode::output_fanin_inv() const
 {
+  ASSERT_COND( is_output() );
   return static_cast<bool>((mFlags >> kOinvShift) & 1U);
 }
 
@@ -568,16 +573,8 @@ inline
 const SbjNode*
 SbjNode::fanin(ymuint pos) const
 {
-  // pos の範囲チェックはしていない！！！
-  return mFanins[pos].from();
-}
-
-// @brief ファンインのノードを得る．
-inline
-SbjNode*
-SbjNode::fanin(ymuint pos)
-{
-  // pos の範囲チェックはしていない！！！
+  ASSERT_COND( is_logic() );
+  ASSERT_COND( pos < 2 );
   return mFanins[pos].from();
 }
 
@@ -587,6 +584,8 @@ inline
 bool
 SbjNode::fanin_inv(ymuint pos) const
 {
+  ASSERT_COND( is_logic() );
+  ASSERT_COND( pos < 2 );
   return static_cast<bool>((mFlags >> (pos + kFcodeShift)) & 1U);
 }
 
@@ -595,16 +594,8 @@ inline
 const SbjEdge*
 SbjNode::fanin_edge(ymuint pos) const
 {
-  // pos の範囲チェックはしていない！！！
-  return &mFanins[pos];
-}
-
-// ファンインの枝を得る．
-inline
-SbjEdge*
-SbjNode::fanin_edge(ymuint pos)
-{
-  // pos の範囲チェックはしていない！！！
+  ASSERT_COND( is_logic() );
+  ASSERT_COND( pos < 2 );
   return &mFanins[pos];
 }
 

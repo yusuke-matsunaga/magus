@@ -124,7 +124,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       break;
 
     case kBnLt_EXPR:
-      sbj_handle = dst_network.new_logic(bn_node->expr(), ihandle_list);
+      sbj_handle = dst_network.new_expr(bn_node->expr(), ihandle_list);
       break;
 
     case kBnLt_TV:

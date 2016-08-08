@@ -82,6 +82,23 @@ private:
 // inline 関数の定義
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+// @param[in] name 名前
+// @param[in] body 入出力ノードのベクタ
+inline
+SbjPort::SbjPort(const string& name,
+		 const vector<SbjNode*>& body) :
+  mName(name),
+  mBody(body)
+{
+}
+
+// @brief デストラクタ
+inline
+SbjPort::~SbjPort()
+{
+}
+
 // @brief 名前を得る．
 inline
 string

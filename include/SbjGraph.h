@@ -12,9 +12,6 @@
 #include "sbj_nsdef.h"
 
 #include "ym/ym_logic.h"
-#include "ym/SimpleAlloc.h"
-#include "ym/FragAlloc.h"
-#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -58,7 +55,7 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  /// @name 外部インターフェイス情報の取得
+  /// @name 外部インターフェイス情報(ポート)の取得
   /// @{
 
   /// @brief モジュール名を得る．
@@ -155,20 +152,12 @@ public:
 
   /// @brief 論理ノード数を得る．
   ymuint
-  lnode_num() const;
+  logic_num() const;
 
   /// @brief 論理ノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < lnode_num() )
+  /// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
   SbjNode*
-  lnode(ymuint pos) const;
-
-  /// @brief ソートされた論理ノードのリストを得る．
-  void
-  sort(vector<const SbjNode*>& node_list) const;
-
-  /// @brief 逆順で論理ソートされたノードのリストを得る．
-  void
-  rsort(vector<const SbjNode*>& node_list) const;
+  logic(ymuint pos) const;
 
   /// @brief 段数を求める．
   /// @note 副作用として各 SbjNode のレベルが設定される．
@@ -246,8 +235,8 @@ public:
   ///
   /// 入力が定数の時も考慮している．
   SbjHandle
-  new_logic(const Expr& expr,
-	    const vector<SbjHandle>& ihandle_list);
+  new_expr(const Expr& expr,
+	   const vector<SbjHandle>& ihandle_list);
 
   /// @brief ANDノードを作る．
   /// @param[in] ihandle1 1番めの入力ハンドル
@@ -302,13 +291,6 @@ public:
   /// 入力が定数の時も考慮している．
   SbjHandle
   new_xor(const vector<SbjHandle>& ihandle_list);
-
-  /// @brief 出力ノードの内容を変更する
-  /// @param[in] node 変更対象の出力ノード
-  /// @param[in] ihandle 入力ハンドル
-  void
-  change_output(SbjNode* node,
-		SbjHandle ihandle);
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -375,8 +357,8 @@ private:
   ///
   /// nodemap はsrcのノード番号をキーにして新しいノードを保持する．
   void
-  copy(const SbjGraph& src,
-       vector<SbjNode*>& nodemap);
+  _copy(const SbjGraph& src,
+	vector<SbjNode*>& nodemap);
 
   /// @brief 論理ノードを作る．
   /// @param[in] fcode 機能コード
@@ -384,7 +366,7 @@ private:
   /// @param[in] inode2 2番めの入力ノード
   /// @return 作成したノードを返す．
   SbjNode*
-  _new_lnode(ymuint fcode,
+  _new_logic(ymuint fcode,
 	     SbjNode* inode1,
 	     SbjNode* inode2);
 
@@ -415,42 +397,10 @@ private:
 	   ymuint start,
 	   ymuint num);
 
-  // 新しいノードを作成し mNodeList に登録する．
-  // 作成されたノードを返す．
+  /// @brief 新しいノードを作成し mNodeList に登録する．
+  /// @return 作成されたノードを返す．
   SbjNode*
-  new_node(ymuint ni);
-
-  // 入力ノードの削除
-  void
-  delete_input(SbjNode* node);
-
-  // 出力ノードの削除
-  void
-  delete_output(SbjNode* node);
-
-  // 論理ノードの削除
-  void
-  delete_logic(SbjNode* node);
-
-  // DFFノードの削除
-  void
-  delete_dff(SbjDff* node);
-
-  // ラッチノードの削除
-  void
-  delete_latch(SbjLatch* node);
-
-  // node を削除する．
-  void
-  delete_node(SbjNode* node,
-	      ymuint ni);
-
-  // from を to の pos 番目のファンインとする．
-  // to の pos 番目にすでに接続があった場合には自動的に削除される．
-  void
-  connect(SbjNode* from,
-	  SbjNode* to,
-	  ymuint pos);
+  _new_node();
 
 
 private:
@@ -473,12 +423,6 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // ノードを確保するためのアロケータ
-  SimpleAlloc mAlloc;
-
-  // SbjEdge の配列を確保するためのアロケータ
-  FragAlloc mAlloc2;
-
   // 名前
   string mName;
 
@@ -488,9 +432,6 @@ private:
   // ID 番号をキーにしたノードの配列
   // すべてのノードが格納される．
   vector<SbjNode*> mNodeArray;
-
-  // ID 番号を管理するためのオブジェクト
-  ItvlMgr mItvlMgr;
 
   // 入力番号をキーにした入力ノードの配列
   // 穴はあいていない．
@@ -507,7 +448,7 @@ private:
   vector<PortInfo> mOutputPortArray;
 
   // 論理ノードのリスト
-  vector<SbjNode*> mLnodeList;
+  vector<SbjNode*> mLogicList;
 
   // DFFノードのリスト
   vector<SbjDff*> mDffList;
@@ -626,19 +567,19 @@ SbjGraph::output(ymuint id) const
 // 論理ノード数を得る．
 inline
 ymuint
-SbjGraph::lnode_num() const
+SbjGraph::logic_num() const
 {
-  return mLnodeList.size();
+  return mLogicList.size();
 }
 
 // @brief 論理ノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < lnode_num() )
+// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
 inline
 SbjNode*
-SbjGraph::lnode(ymuint pos) const
+SbjGraph::logic(ymuint pos) const
 {
-  ASSERT_COND( pos < lnode_num() );
-  return mLnodeList[pos];
+  ASSERT_COND( pos < logic_num() );
+  return mLogicList[pos];
 }
 
 // DFFノード数を得る．
@@ -675,6 +616,14 @@ SbjGraph::latch(ymuint pos) const
 {
   ASSERT_COND( pos < latch_num() );
   return mLatchList[pos];
+}
+
+// @brief 段数を求める．
+inline
+ymuint
+SbjGraph::level() const
+{
+  return mLevel;
 }
 
 END_NAMESPACE_YM_SBJ

@@ -105,13 +105,11 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
     node->set_id(id, false);
     mInputList.push_back(node);
   }
-  vector<const SbjNode*> sbjnode_list;
-  sbjgraph.sort(sbjnode_list);
-  mLogicNodeList.reserve(sbjgraph.lnode_num());
-  for (vector<const SbjNode*>::const_iterator p = sbjnode_list.begin();
-       p != sbjnode_list.end(); ++ p) {
-    const SbjNode* sbjnode = *p;
-    ASSERT_COND( sbjnode->is_logic() );
+
+  ymuint nlogic = sbjgraph.logic_num();
+  mLogicNodeList.reserve(nlogic);
+  for (ymuint i = 0; i < nlogic; ++ i) {
+    const SbjNode* sbjnode = sbjgraph.logic(i);
     ymuint id = sbjnode->id();
     SmdNode* node = &mNodeArray[id];
     mLogicNodeList.push_back(node);
