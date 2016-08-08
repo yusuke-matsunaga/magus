@@ -11,10 +11,6 @@ include_directories (
 # ===================================================================
 #  ソースファイルの設定
 # ===================================================================
-set (bdn_SOURCES
-  bdn/BdnCmd.cc
-  )
-
 set (bnet_SOURCES
   bnet/BNetCmd.cc
 #  bnet/BNetElimCmd.cc
@@ -27,7 +23,6 @@ set (bnet_SOURCES
 
 set (core_SOURCES
   core/BNetHandle.cc
-#  core/BdnHandle.cc
   core/ChgNetwork.cc
   core/ClrNetwork.cc
   core/CopyNetwork.cc
@@ -42,7 +37,6 @@ set (core_SOURCES
   core/NetCmd.cc
   core/NetHandle.cc
   core/NewBNetwork.cc
-  core/NewBdn.cc
   core/NewMvn.cc
   core/PopNetwork.cc
   core/PushNetwork.cc
@@ -97,7 +91,6 @@ set (simplify_SOURCES
 
 set (techmap_SOURCES
   techmap/AreaMapCmd.cc
-  techmap/DumpCnCmd.cc
   techmap/TechmapCmd.cc
   )
 
@@ -112,7 +105,6 @@ set (magus_SOURCES
 # ===================================================================
 add_executable (magus_tclsh
   ${magus_SOURCES}
-#  ${bdn_SOURCES}
   ${bnet_SOURCES}
   ${core_SOURCES}
   ${equiv_SOURCES}
@@ -125,7 +117,8 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:magus_cequiv_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
-#  $<TARGET_OBJECTS:magus_cellmap_a>
+  $<TARGET_OBJECTS:magus_cellmap_a>
+  $<TARGET_OBJECTS:magus_sbjgraph_a>
   $<TARGET_OBJECTS:ym_common_a>
   $<TARGET_OBJECTS:ym_logic_a>
   $<TARGET_OBJECTS:ym_cell_a>
@@ -136,6 +129,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:ym_sat_a>
   $<TARGET_OBJECTS:ym_udgraph_a>
   $<TARGET_OBJECTS:ym_verilog_a>
+  $<TARGET_OBJECTS:ym_tclpp_a>
   )
 
 target_compile_options (magus_tclsh
@@ -170,7 +164,8 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:magus_cequiv_p>
 #  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
-#  $<TARGET_OBJECTS:magus_cellmap_p>
+  $<TARGET_OBJECTS:magus_cellmap_p>
+  $<TARGET_OBJECTS:magus_sbjgraph_p>
   $<TARGET_OBJECTS:ym_common_p>
   $<TARGET_OBJECTS:ym_logic_p>
   $<TARGET_OBJECTS:ym_cell_p>
@@ -181,6 +176,7 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:ym_sat_p>
   $<TARGET_OBJECTS:ym_udgraph_p>
   $<TARGET_OBJECTS:ym_verilog_p>
+  $<TARGET_OBJECTS:ym_tclpp_p>
   )
 
 target_compile_options (magus_tclsh_p
@@ -221,7 +217,8 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:magus_cequiv_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
-#  $<TARGET_OBJECTS:magus_cellmap_d>
+  $<TARGET_OBJECTS:magus_cellmap_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_d>
   $<TARGET_OBJECTS:ym_common_d>
   $<TARGET_OBJECTS:ym_logic_d>
   $<TARGET_OBJECTS:ym_cell_d>
@@ -232,6 +229,7 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:ym_sat_d>
   $<TARGET_OBJECTS:ym_udgraph_d>
   $<TARGET_OBJECTS:ym_verilog_d>
+  $<TARGET_OBJECTS:ym_tclpp_d>
   )
 
 target_compile_options (magus_tclsh_d

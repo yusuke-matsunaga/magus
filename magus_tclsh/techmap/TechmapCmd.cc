@@ -9,7 +9,6 @@
 
 #include "TechmapCmd.h"
 #include "AreaMapCmd.h"
-#include "DumpCnCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -22,30 +21,11 @@ BEGIN_NAMESPACE_MAGUS_TECHMAP
 TechmapCmd::TechmapCmd(MagMgr* mgr) :
   MagCmd(mgr)
 {
-  mPoptDstNetwork = new TclPoptStr(this, "dst_network",
-				   "specify destination network",
-				   "<network-name>");
 }
 
 // @brief デストラクタ
 TechmapCmd::~TechmapCmd()
 {
-}
-
-// @brief 結果を納めるネットワーク
-BnNetwork&
-TechmapCmd::dst_network()
-{
-  NetHandle* neth = nullptr;
-
-  if ( mPoptDstNetwork->is_specified() ) {
-    neth = find_or_new_nethandle(mPoptDstNetwork->val(), NetHandle::kMagBn);
-    if ( neth == nullptr ) {
-      // 見付からなかった
-      // エラーメッセージは find_network() の中でセットされている．
-      return TCL_ERROR;
-    }
-  }
 }
 
 END_NAMESPACE_MAGUS_TECHMAP
@@ -58,9 +38,7 @@ techmap_init(Tcl_Interp* interp,
 {
   using namespace nsTechmap;
 
-  TclCmdBinder2<AreaMapCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::area_map");
-  TclCmdBinder2<DumpCnCmd, MagMgr*>::reg(interp, mgr,  "magus::techmap::dump_cngraph");
-
+  TclCmdBinder1<AreaMapCmd, MagMgr*>::reg(interp, mgr, "magus::techmap::area_map");
 
   const char* init =
     "namespace eval tclreadline {\n"
@@ -69,7 +47,6 @@ techmap_init(Tcl_Interp* interp,
     "proc complete(load_pat) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_pat) { text start end line pos mod } { return \"\" }\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
-    "proc complete(dump_cngraph) { text start end line pos mod } { return \"\" }\n"
     "}\n"
     "}\n"
     "}\n";

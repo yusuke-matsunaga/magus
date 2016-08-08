@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 ReadIscas89::ReadIscas89(MagMgr* mgr) :
-  NetCmd(mgr, true, true, false)
+  NetCmd(mgr, true, false)
 {
   set_usage_string("<filename>");
 }

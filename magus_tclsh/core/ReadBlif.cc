@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 ReadBlif::ReadBlif(MagMgr* mgr) :
-  NetCmd(mgr, true, true, false)
+  NetCmd(mgr, true, false)
 {
   set_usage_string("<filename>");
 }

@@ -43,10 +43,6 @@ int
 techmap_init(Tcl_Interp* interp,
 	     MagMgr* mgr);
 
-int
-seal_init(Tcl_Interp* interp,
-	  MagMgr* mgr);
-
 #if defined(USE_TEST_PACKAGE)
 int
 test_init(Tcl_Interp* interp,
@@ -100,10 +96,6 @@ magus_init(Tcl_Interp* interp)
   }
 
   if ( techmap_init(interp, mgr) == TCL_ERROR ) {
-    return TCL_ERROR;
-  }
-
-  if ( seal_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
 

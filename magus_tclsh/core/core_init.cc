@@ -12,7 +12,6 @@
 #include <tcl.h>
 
 #include "NewBNetwork.h"
-#include "NewBdn.h"
 #include "NewMvn.h"
 #include "ClrNetwork.h"
 #include "DelNetwork.h"
@@ -47,8 +46,6 @@ core_init(Tcl_Interp* interp,
   // ネットワークの生成／削除／複写コマンド
   TclCmdBinder1<NewBNetwork, MagMgr*>::reg(interp, mgr,
 					   "magus::new_bnetwork");
-  TclCmdBinder1<NewBdn, MagMgr*>::reg(interp, mgr,
-				      "magus::new_bdnetwork");
   TclCmdBinder1<NewMvn, MagMgr*>::reg(interp, mgr,
 				      "magus::new_mvnetwork");
   TclCmdBinder1<DelNetwork, MagMgr*>::reg(interp, mgr,
