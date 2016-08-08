@@ -9,9 +9,11 @@
 
 #include "MapRecord.h"
 #include "Cut.h"
-#include "ym/BnNetwork.h"
-#include "ym/BnNode.h"
+#include "ym/BnBuilder.h"
 #include "ym/TvFunc.h"
+#include "SbjNode.h"
+#include "SbjDff.h"
+#include "SbjPort.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -68,7 +70,7 @@ MapRecord::get_cut(const SbjNode* node)
 // @brief マッピング結果を BnNetwork にセットする．
 void
 MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
-			BnNetwork& mapgraph,
+			BnBuilder& mapgraph,
 			ymuint& lut_num,
 			ymuint& depth)
 {
@@ -83,25 +85,11 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* node = sbjgraph.input(i);
     ymuint map_id = node->id() * 2;
-    BnNode* mapnode = mapgraph.new_input(map_id, string());
+    ymuint node_id = mapgraph.add_input(string());
     NodeInfo& node_info = mNodeInfo[node->id()];
-    node_info.mMapNode[0] = mapnode;
+    node_info.mMapNode[0] = node_id;
     node_info.mDepth = 0;
   }
-
-#if 0
-  // DFFの生成
-  ymuint nf = sbjgraph.dff_num();
-  for (ymuint i = 0; i < nf; ++ i) {
-    const SbjNode* node = sbjgraph.dff(i);
-    ymuint map_id = node->id() * 2;
-    ymuint input_id; // node->input() から作る．
-    BnNode* mapnode = mapgraph.new_dff(map_id, string(), input_id);
-    NodeInfo& node_info = mNodeInfo[node->id()];
-    node_info.mMapNode[0] = mapnode;
-    node_info.mDepth = 0;
-  }
-#endif
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   ymuint no = sbjgraph.output_num();
@@ -110,9 +98,9 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->fanin(0);
     bool inv = onode->output_inv();
-    BnNode* mapnode = nullptr;
+    ymuint node_id;
     if ( node ) {
-      mapnode = back_trace(node, inv, mapgraph);
+      node_id = back_trace(node, inv, mapgraph);
       int depth1 = mNodeInfo[node->id()].mDepth;
       if ( max_depth < depth1 ) {
 	max_depth = depth1;
@@ -126,109 +114,53 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
       else {
 	tv = TvFunc::const_zero(0);
       }
-      ymuint id = new_id();
-      mapnode = mapgraph.new_tv(id, string(), vector<ymuint>(0), tv);
+      node_id = mapgraph.add_tv(string(), tv);
     }
-    BnNode* omapnode = mapgraph.new_output(string(), mapnode->id());
-    mNodeInfo[onode->id()].mMapNode[0] = omapnode;
+    ymuint onode_id = mapgraph.add_output(string(), node_id);
+    mNodeInfo[onode->id()].mMapNode[0] = onode_id;
   }
 
-#if 0
-  // DFFからバックトレースを行い全ノードの生成を行う．
+  // DFFの生成
+  ymuint nf = sbjgraph.dff_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    const SbjNode* onode = sbjgraph.dff(i);
+    const SbjDff* dff = sbjgraph.dff(i);
+    BnBuilder::DffInfo& dff_info = mapgraph.add_dff(string());
 
-    {
-      const SbjNode* node = onode->fanin_data();
-      bool inv = onode->fanin_data_inv();
-      BnNode* mapnode = nullptr;
-      if ( node ) {
-	mapnode = back_trace(node, inv, mapgraph);
-	int depth1 = mNodeInfo[node->id()].mDepth;
-	if ( max_depth < depth1 ) {
-	  max_depth = depth1;
-	}
-      }
-      else {
-	TvFunc tv;
-	if ( inv ) {
-	  tv = TvFunc::const_one(0);
-	}
-	else {
-	  tv = TvFunc::const_zero(0);
-	}
-	ymuint id = new_id();
-	mapnode = mapgraph.new_tv(id, string(), vector<BnNode*>(0), tv);
-      }
-      BnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
-      mapgraph.set_dff_input(omapnode, mapnode);
+    const SbjNode* input = dff->data_input();
+    dff_info.mInput = mNodeInfo[input->id()].mMapNode[0];
+
+    const SbjNode* output = dff->data_output();
+    dff_info.mOutput = mNodeInfo[output->id()].mMapNode[0];
+
+    const SbjNode* clock = dff->clock();
+    dff_info.mClock = mNodeInfo[clock->id()].mMapNode[0];
+
+    const SbjNode* clear = dff->clear();
+    if ( clear != nullptr ) {
+      dff_info.mClear = mNodeInfo[clear->id()].mMapNode[0];
     }
-    {
-      const SbjNode* node = onode->fanin_clock();
-      bool inv = onode->fanin_clock_inv();
-      BnNode* mapnode = nullptr;
-      if ( node ) {
-	mapnode = back_trace(node, inv, mapgraph);
-	int depth1 = mNodeInfo[node->id()].mDepth;
-	if ( max_depth < depth1 ) {
-	  max_depth = depth1;
-	}
-	BnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
-	mapgraph.set_dff_clock(omapnode, mapnode);
-      }
-    }
-    {
-      const SbjNode* node = onode->fanin_set();
-      bool inv = onode->fanin_set_inv();
-      BnNode* mapnode = nullptr;
-      if ( node ) {
-	mapnode = back_trace(node, inv, mapgraph);
-	int depth1 = mNodeInfo[node->id()].mDepth;
-	if ( max_depth < depth1 ) {
-	  max_depth = depth1;
-	}
-	BnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
-	mapgraph.set_dff_set(omapnode, mapnode);
-      }
-    }
-    {
-      const SbjNode* node = onode->fanin_rst();
-      bool inv = onode->fanin_rst_inv();
-      BnNode* mapnode = nullptr;
-      if ( node ) {
-	mapnode = back_trace(node, inv, mapgraph);
-	int depth1 = mNodeInfo[node->id()].mDepth;
-	if ( max_depth < depth1 ) {
-	  max_depth = depth1;
-	}
-	BnNode* omapnode = mNodeInfo[onode->id()].mMapNode[0];
-	mapgraph.set_dff_rst(omapnode, mapnode);
-      }
+
+    const SbjNode* preset = dff->preset();
+    if ( preset != nullptr ) {
+      dff_info.mPreset = mNodeInfo[preset->id()].mMapNode[0];
     }
   }
-#endif
 
   // ポートの生成
   ymuint np = sbjgraph.port_num();
   for (ymuint i = 0; i < np; ++ i) {
     const SbjPort* sbjport = sbjgraph.port(i);
     ymuint nb = sbjport->bit_width();
-    vector<BnNode*> tmp(nb);
+    vector<ymuint> tmp(nb);
     for (ymuint j = 0; j < nb; ++ j) {
-      BnNode* node = nullptr;
       const SbjNode* sbjnode = sbjport->bit(j);
-      if ( sbjnode->is_input() ) {
-	node = mNodeInfo[sbjnode->id()].mMapNode[0];
-	ASSERT_COND( node != nullptr );
-      }
-      else if ( sbjnode->is_output() ) {
-	node = mNodeInfo[sbjnode->id()].mMapNode[0];
-	ASSERT_COND( node != nullptr );
-      }
-      tmp[j] = node;
+      tmp[j] = mNodeInfo[sbjnode->id()].mMapNode[0];
     }
-    mapgraph.new_port(sbjport->name(), tmp);
+    mapgraph.add_port(sbjport->name(), tmp);
   }
+
+  bool stat = mapgraph.wrap_up();
+  ASSERT_COND( stat );
 
   lut_num = mapgraph.logic_num();
   depth = max_depth;
@@ -236,29 +168,29 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
 
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
-BnNode*
+ymuint
 MapRecord::back_trace(const SbjNode* node,
 		      bool inv,
-		      BnNetwork& mapnetwork)
+		      BnBuilder& mapnetwork)
 {
   NodeInfo& node_info = mNodeInfo[node->id()];
   ymuint idx = (inv) ? 1 : 0;
-  BnNode* mapnode = node_info.mMapNode[idx];
-  if ( mapnode ) {
+  ymuint node_id = node_info.mMapNode[idx];
+  if ( node_id ) {
     // すでに生成済みならそのノードを返す．
-    return mapnode;
+    return node_id;
   }
 
   if ( node->is_input() ) {
     // ということは inv = true のはず．
     ASSERT_COND(inv );
     // NOT ゲートを表す LUT を作る．
-    vector<ymuint> inputs(1, node_info.mMapNode[0]->id());
+    ymuint src_id = node_info.mMapNode[0];
     TvFunc tv = TvFunc::nega_literal(1, VarId(0));
-    ymuint id = new_id();
-    BnNode* mapnode1 = mapnetwork.new_tv(id, string(), inputs, tv);
-    node_info.mMapNode[1] = mapnode1;
-    return mapnode1;
+    node_id = mapnetwork.add_tv(string(), tv);
+    mapnetwork.connect(src_id, node_id, 0);
+    node_info.mMapNode[1] = node_id;
+    return node_id;
   }
 
   // node を根とするカットを取り出す．
@@ -271,29 +203,28 @@ MapRecord::back_trace(const SbjNode* node,
     back_trace(inode, false, mapnetwork);
   }
 
-  vector<ymuint> tmp_fanins(ni);
+  // カットの実現している関数の真理値表を得る．
+  TvFunc tv = cut->make_tv(inv);
+
+  // 新しいノードを作り mNodeMap に登録する．
+  node_id = mapnetwork.add_tv(string(), tv);
   int idepth = 0;
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = cut->input(i);
     NodeInfo& inode_info = mNodeInfo[inode->id()];
-    BnNode* imapnode = inode_info.mMapNode[0];
-    tmp_fanins[i] = imapnode->id();
+    ymuint src_id = inode_info.mMapNode[0];
+    mapnetwork.connect(src_id, node_id, i);
     int idepth1 = inode_info.mDepth;
     if ( idepth < idepth1 ) {
       idepth = idepth1;
     }
   }
-
-  // カットの実現している関数の真理値表を得る．
-  TvFunc tv = cut->make_tv(inv);
-
-  // 新しいノードを作り mNodeMap に登録する．
-  ymuint id = node->id() * 2 + idx;
-  mapnode = mapnetwork.new_tv(id, string(), tmp_fanins, tv);
-  node_info.mMapNode[idx] = mapnode;
+  node_info.mMapNode[idx] = node_id;
   node_info.mDepth = idepth + 1;
 
-  return mapnode;
+  cout << "back_trace(Node#" << node->id() << ", " << node_info.mDepth << ")" << endl;
+
+  return node_id;
 }
 
 // @brief マッピング結果の LUT 数を見積もる．

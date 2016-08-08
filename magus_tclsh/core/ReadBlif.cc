@@ -12,6 +12,8 @@
 #include "ReadBlif.h"
 
 #include "ym/BnNetwork.h"
+#include "ym/BnBlifReader.h"
+#include "ym/BnBuilder.h"
 #include "ym/MsgMgr.h"
 #include "ym/TclObjMsgHandler.h"
 
@@ -64,7 +66,9 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      bool result = neth->_bnetwork()->read_blif(ex_file_name, cur_cell_library());
+      BnBuilder builder;
+      BnBlifReader reader;
+      bool result = reader.read(builder, ex_file_name, cur_cell_library());
 
       // エラーが起きていないか調べる．
       if ( !result ) {
@@ -73,6 +77,8 @@ ReadBlif::cmd_proc(TclObjVector& objv)
 	set_result(emsg);
 	return TCL_ERROR;
       }
+
+      neth->_bnetwork()->copy(builder);
     }
     break;
 

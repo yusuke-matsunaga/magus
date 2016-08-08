@@ -2,13 +2,11 @@
 #define MAGUS_MAGBNETCMD_H
 
 /// @file BNetCmd.h
-/// @brief MagCmd のヘッダファイル
+/// @brief BNetCmd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 

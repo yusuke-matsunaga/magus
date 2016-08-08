@@ -1,9 +1,9 @@
 ﻿
-/// @file src/logbase/MvnHandle.cc
+/// @file MvnHandle.cc
 /// @brief MvnHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -29,7 +29,7 @@ MvnHandle::~MvnHandle()
 }
 
 // @brief 型を返す．
-NetHandle::tType
+NetHandle::Type
 MvnHandle::type() const
 {
   return kMagMvn;
@@ -53,7 +53,7 @@ MvnHandle::_mvn()
 void
 MvnHandle::clear()
 {
-  #warning "MvnHandle::clear(): no implemented yet"
+#warning "MvnHandle::clear(): no implemented yet"
 }
 
 // @brief ネットワークをコピーする．

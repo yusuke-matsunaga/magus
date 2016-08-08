@@ -23,16 +23,13 @@ BEGIN_NAMESPACE_MAGUS
 // @brief コンストラクタ
 // @param[in] mgr Magus の管理オブジェクト
 // @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
-// @param[in] new_bdn_enable -new_bdn オプションを使用するとき true
 // @param[in] new_mvn_enable -new_mvn オプションを使用するとき true
 NetCmd::NetCmd(MagMgr* mgr,
 	       bool new_bnet_enable,
-	       bool new_bdn_enable,
 	       bool new_mvn_enable) :
   MagCmd(mgr),
   mPoptNtwk(nullptr),
   mPoptNewBNet(nullptr),
-  mPoptNewBdn(nullptr),
   mPoptNewMvn(nullptr),
   mNetworkSpecified(false)
 {
@@ -46,12 +43,6 @@ NetCmd::NetCmd(MagMgr* mgr,
 				  "specify target with creating new bnetwork",
 				  "<network-name>");
     add_popt(popt_group, mPoptNewBNet);
-  }
-  if ( new_bdn_enable ) {
-    mPoptNewBdn = new TclPoptObj(this, "new_bdn",
-				 "specify target with creating new bdnetwork",
-				 "<network-name>");
-    add_popt(popt_group, mPoptNewBdn);
   }
   if ( new_mvn_enable ) {
     mPoptNewMvn = new TclPoptObj(this, "new_mvn",
@@ -86,9 +77,6 @@ NetCmd::before_cmd_proc(TclObjVector& objv)
   // BNetwork を新規作成する時 true とするフラグ
   bool bnet_flag = false;
 
-  // BdnMgr を新規作成する時 true とするフラグ
-  bool bdn_flag = false;
-
   // MvNetwork を新規作成する時 true とするフラグ
   bool mvn_flag = false;
 
@@ -101,11 +89,6 @@ NetCmd::before_cmd_proc(TclObjVector& objv)
   else if ( mPoptNewBNet != nullptr && mPoptNewBNet->is_specified() ) {
     bnet_flag = true;
     name = mPoptNewBNet->val();
-    ntwk_flag = true;
-  }
-  else if ( mPoptNewBdn != nullptr && mPoptNewBdn->is_specified() ) {
-    bdn_flag = true;
-    name = mPoptNewBdn->val();
     ntwk_flag = true;
   }
   else if ( mPoptNewMvn != nullptr && mPoptNewMvn->is_specified() ) {
@@ -125,11 +108,6 @@ NetCmd::before_cmd_proc(TclObjVector& objv)
     }
     if ( bnet_flag ) {
       if ( script.append_element("-new_bnet") != TCL_OK ) {
-	return TCL_ERROR;
-      }
-    }
-    else if ( bdn_flag ) {
-      if ( script.append_element("-new_bdn") != TCL_OK ) {
 	return TCL_ERROR;
       }
     }

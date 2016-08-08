@@ -1,9 +1,9 @@
 ﻿
-/// @file src/logbase/BNetHandle.cc
+/// @file BNetHandle.cc
 /// @brief BNetHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -29,7 +29,7 @@ BNetHandle::~BNetHandle()
 }
 
 // @brief 型を返す．
-NetHandle::tType
+NetHandle::Type
 BNetHandle::type() const
 {
   return kMagBn;

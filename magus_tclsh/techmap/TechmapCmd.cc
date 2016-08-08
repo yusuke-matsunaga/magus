@@ -9,6 +9,7 @@
 
 #include "TechmapCmd.h"
 #include "AreaMapCmd.h"
+#include "ym/TclPopt.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -27,6 +28,24 @@ TechmapCmd::TechmapCmd(MagMgr* mgr) :
 TechmapCmd::~TechmapCmd()
 {
 }
+
+#if 0
+// @brief 結果を納めるネットワーク
+BnNetwork&
+TechmapCmd::dst_network()
+{
+  NetHandle* neth = nullptr;
+
+  if ( mPoptDstNetwork->is_specified() ) {
+    neth = find_or_new_nethandle(mPoptDstNetwork->val(), NetHandle::kMagBn);
+    if ( neth == nullptr ) {
+      // 見付からなかった
+      // エラーメッセージは find_network() の中でセットされている．
+      return TCL_ERROR;
+    }
+  }
+}
+#endif
 
 END_NAMESPACE_MAGUS_TECHMAP
 

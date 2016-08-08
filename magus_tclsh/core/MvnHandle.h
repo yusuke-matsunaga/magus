@@ -1,11 +1,11 @@
-﻿#ifndef SRC_LOGBASE_MVNHANDLE_H
-#define SRC_LOGBASE_MVNHANDLE_H
+﻿#ifndef MVNHANDLE_H
+#define MVNHANDLE_H
 
-/// @file src/logbase/MvnHandle.h
+/// @file MvnHandle.h
 /// @brief MvnHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -37,7 +37,7 @@ public:
 
   /// @brief 型を返す．
   virtual
-  tType
+  Type
   type() const;
 
   /// @brief MvnMgr を得る．
@@ -77,4 +77,4 @@ private:
 
 END_NAMESPACE_MAGUS
 
-#endif // SRC_LOGBASE_MVNHANDLE_H
+#endif // MVNHANDLE_H

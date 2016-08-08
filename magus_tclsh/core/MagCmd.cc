@@ -134,7 +134,7 @@ MagCmd::find_nethandle(const string& name) const
 // 存在しない場合には新たに生成する．
 NetHandle*
 MagCmd::find_or_new_nethandle(const string& name,
-			      NetHandle::tType type) const
+			      NetHandle::Type type) const
 {
   NetHandle* neth = mMagMgr->find_nethandle(name);
   if ( !neth ) {

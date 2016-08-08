@@ -10,7 +10,7 @@
 
 
 #include "cellmap_nsdef.h"
-#include "SbjGraph.h"
+#include "SbjNode.h"
 #include "ym/ym_bnet.h"
 #include "ym/ym_cell.h"
 #include "ym/CellFFInfo.h"

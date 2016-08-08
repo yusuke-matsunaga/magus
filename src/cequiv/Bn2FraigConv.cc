@@ -83,7 +83,7 @@ Bn2FraigConv::node2handle(const BnNode* node)
   ymuint ni = node->fanin_num();
   vector<FraigHandle> fanin_handles(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    ymuint inode_id = node->fanin(i);
+    ymuint inode_id = node->fanin(i)->id();
     FraigHandle ih = get_handle(inode_id);
     fanin_handles[i] = ih;
   }
@@ -126,7 +126,7 @@ Bn2FraigConv::node2handle(const BnNode* node)
 
   case kBnLt_TV:
     {
-      TvFunc tv = node->tv();
+      TvFunc tv = node->func();
       // 未完
     }
     break;

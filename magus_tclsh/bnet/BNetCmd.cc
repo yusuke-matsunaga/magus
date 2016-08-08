@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_MAGUS
 // @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
 BNetCmd::BNetCmd(MagMgr* mgr,
 		 bool new_bnet_enable) :
-  NetCmd(mgr, new_bnet_enable, false, false)
+  NetCmd(mgr, new_bnet_enable, false)
 {
 }
 

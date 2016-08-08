@@ -5,9 +5,7 @@
 /// @brief NetHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NetHandle.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "magus_nsdef.h"
@@ -31,7 +29,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief NetHandle の表す型
-  enum tType {
+  enum Type {
     /// @brief BnNetwork
     kMagBn,
     /// @brief MvNetwork
@@ -62,7 +60,7 @@ public:
 
   /// @brief 型を返す．
   virtual
-  tType
+  Type
   type() const = 0;
 
   /// @brief BnNetwork を得る．

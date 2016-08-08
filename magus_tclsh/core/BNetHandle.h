@@ -1,11 +1,11 @@
-﻿#ifndef SRC_LOGBASE_BNETHANDLE_H
-#define SRC_LOGBASE_BNETHANDLE_H
+﻿#ifndef BNETHANDLE_H
+#define BNETHANDLE_H
 
-/// @file src/logbase/BNetHandle.h
+/// @file BNetHandle.h
 /// @brief BNetHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -37,7 +37,7 @@ public:
 
   /// @brief 型を返す．
   virtual
-  tType
+  Type
   type() const;
 
   /// @brief BnNetwork を得る．
@@ -77,4 +77,4 @@ private:
 
 END_NAMESPACE_MAGUS
 
-#endif // SRC_LOGBASE_BNETHANDLE_H
+#endif // BNETHANDLE_H

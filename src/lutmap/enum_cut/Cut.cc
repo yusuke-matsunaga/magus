@@ -8,6 +8,7 @@
 
 
 #include "Cut.h"
+#include "SbjNode.h"
 #include "ym/HashMap.h"
 
 

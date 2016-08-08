@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 // @brief コンストラクタ
 MvnCmd::MvnCmd(MagMgr* mgr,
 	       bool new_mvn_enable) :
-  NetCmd(mgr, false, false, new_mvn_enable)
+  NetCmd(mgr, false, new_mvn_enable)
 {
 }
 

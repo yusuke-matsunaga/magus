@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 WriteBlif::WriteBlif(MagMgr* mgr) :
-  NetCmd(mgr, false, false, false)
+  NetCmd(mgr, false, false)
 {
   set_usage_string("?<filename>?");
 }

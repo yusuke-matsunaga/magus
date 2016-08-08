@@ -95,9 +95,11 @@ magus_init(Tcl_Interp* interp)
     return TCL_ERROR;
   }
 
+#if 0
   if ( techmap_init(interp, mgr) == TCL_ERROR ) {
     return TCL_ERROR;
   }
+#endif
 
 #if defined(USE_TEST_PACKAGE)
   if ( test_init(interp, mgr) == TCL_ERROR ) {

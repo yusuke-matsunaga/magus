@@ -113,11 +113,12 @@ add_executable (magus_tclsh
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-  ${techmap_SOURCES}
+#  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_a>
+  $<TARGET_OBJECTS:magus_sbjgraph_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
-  $<TARGET_OBJECTS:magus_cellmap_a>
+#  $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
   $<TARGET_OBJECTS:ym_common_a>
   $<TARGET_OBJECTS:ym_logic_a>
@@ -145,6 +146,12 @@ target_link_libraries (magus_tclsh
   ${TCL_LIBRARY}
   )
 
+if ( GPERFTOOLS_FOUND )
+  target_link_libraries ( magus_tclsh
+    ${GPERFTOOLS_LIBRARIES}
+    )
+endif ()
+
 
 # ===================================================================
 #  release with debug info ターゲットの設定
@@ -160,11 +167,12 @@ add_executable (magus_tclsh_p
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-  ${techmap_SOURCES}
+#  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_p>
+  $<TARGET_OBJECTS:magus_sbjgraph_p>
 #  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
-  $<TARGET_OBJECTS:magus_cellmap_p>
+#  $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
   $<TARGET_OBJECTS:ym_common_p>
   $<TARGET_OBJECTS:ym_logic_p>
@@ -213,11 +221,12 @@ add_executable (magus_tclsh_d
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-  ${techmap_SOURCES}
+#  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
-  $<TARGET_OBJECTS:magus_cellmap_d>
+#  $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
   $<TARGET_OBJECTS:ym_common_d>
   $<TARGET_OBJECTS:ym_logic_d>
@@ -240,6 +249,12 @@ target_link_libraries (magus_tclsh_d
   ${YM_LIB_DEPENDS}
   ${TCL_LIBRARY}
   )
+
+if ( GPERFTOOLS_FOUND )
+  target_link_libraries ( magus_tclsh_d
+    ${GPERFTOOLS_LIBRARIES}
+    )
+endif ()
 
 
 # ===================================================================

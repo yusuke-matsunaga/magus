@@ -1,11 +1,9 @@
 ﻿
-/// @file magus/logbase/NetHandle.cc
+/// @file NetHandle.cc
 /// @brief NetHandle の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: NetHandle.cc 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 

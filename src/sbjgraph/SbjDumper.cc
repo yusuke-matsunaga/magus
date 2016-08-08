@@ -9,6 +9,9 @@
 
 #include "SbjDumper.h"
 #include "SbjGraph.h"
+#include "SbjPort.h"
+#include "SbjDff.h"
+#include "SbjNode.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -95,54 +98,29 @@ SbjDumper::dump(ostream& s,
 
   ymuint nf = sbjgraph.dff_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    const SbjNode* node = sbjgraph.dff(i);
-    s << "DFF(" << node->id_str() << ") :";
-    s << "DATA = ";
-    const SbjNode* inode = node->dff_data();
-    if ( inode ) {
-      // 普通のノードの場合
-      if ( node->dff_data_inv() ) {
-	s << "~";
-      }
-      s << inode->id_str();
-    }
-    else {
-      // 定数ノードの場合
-      if ( node->dff_data_inv() ) {
-	s << "1";
-      }
-      else {
-	s << "0";
-      }
-    }
+    const SbjDff* dff = sbjgraph.dff(i);
+    s << "DFF(" << dff->id() << ") :";
 
-    const SbjNode* cnode = node->dff_clock();
+    const SbjNode* onode = dff->data_output();
+    s << "Q = " << onode->id_str();
+
+    const SbjNode* inode = dff->data_input();
+    s << "DATA = " << inode->id_str();
+
+    const SbjNode* cnode = dff->clock();
     if ( cnode ) {
-      s << ", CLOCK = ";
-      if ( node->dff_clock_inv() ) {
-	s << "~";
-      }
-      s << cnode->id_str();
+      s << ", CLOCK = " << cnode->id_str();
     }
 
-    const SbjNode* snode = node->dff_set();
-    if ( snode ) {
-      s << ", SET = ";
-      if ( node->dff_set_inv() ) {
-	s << "~";
-      }
-      s << snode->id_str();
-    }
-
-    const SbjNode* rnode = node->dff_rst();
+    const SbjNode* rnode = dff->clear();
     if ( rnode ) {
-      s << ", RST = ";
-      if ( node->dff_rst_inv() ) {
-	s << "~";
-      }
-      s << rnode->id_str();
+      s << ", CLEAR = " << rnode->id_str();
     }
 
+    const SbjNode* snode = dff->preset();
+    if ( snode ) {
+      s << ", PRESET = " << snode->id_str();
+    }
     s << endl;
   }
 
@@ -205,9 +183,10 @@ SbjDumper::dump_blif(ostream& s,
 
   ymuint nf = sbjgraph.dff_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    const SbjNode* node = sbjgraph.dff(i);
-    const SbjNode* inode = node->fanin(0);
-    s << ".latch " << node->id_str() << " "
+    const SbjDff* dff = sbjgraph.dff(i);
+    const SbjNode* onode = dff->data_output();
+    const SbjNode* inode = dff->data_input();
+    s << ".latch " << onode->id_str() << " "
       << inode->id_str() << endl;
   }
 
@@ -312,7 +291,8 @@ SbjDumper::dump_verilog(ostream& s,
   // reg 定義
   ymuint nf = sbjgraph.dff_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    const SbjNode* node = sbjgraph.dff(i);
+    const SbjDff* dff = sbjgraph.dff(i);
+    const SbjNode* node = dff->data_output();
     s << "  reg    " << node_name(node) << ";" << endl;
   }
   s << endl;
@@ -364,51 +344,30 @@ SbjDumper::dump_verilog(ostream& s,
   s << endl;
 
   // ff 用の always 文
-  for (ymuint i = 0; i < nl; ++ i) {
-    const SbjNode* node = sbjgraph.lnode(i);
-    const SbjNode* dnode = node->dff_data();
-    bool dinv = node->dff_data_inv();
-    const SbjNode* cnode = node->dff_clock();
-    bool cinv = node->dff_clock_inv();
-    const SbjNode* snode = node->dff_set();
-    bool sinv = node->dff_set_inv();
-    const SbjNode* rnode = node->dff_rst();
-    bool rinv = node->dff_rst_inv();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const SbjDff* dff = sbjgraph.dff(i);
+    const SbjNode* node = dff->data_output();
+    const SbjNode* dnode = dff->data_input();
+    const SbjNode* cnode = dff->clock();
+    const SbjNode* snode = dff->preset();
+    const SbjNode* rnode = dff->clear();
     ASSERT_COND( cnode != nullptr );
     s << "  always @ ( ";
-    if ( cinv ) {
-      s << "negedge";
-    }
-    else {
-      s << "posedge";
-    }
+    s << "posedge";
     s << " " << node_name(cnode);
     if ( snode ) {
       s << " or ";
-      if ( sinv ) {
-	s << "negedge";
-      }
-      else {
-	s << "posedge";
-      }
+      s << "posedge";
       s << " " << node_name(snode);
     }
     if ( rnode ) {
       s << " or ";
-      if ( rinv ) {
-	s << "negedge";
-      }
-      else {
-	s << "posedge";
-      }
+      s << "posedge";
       s << " " << node_name(rnode);
     }
     s << " )" << endl;
     if ( snode ) {
       s << "    if ( ";
-      if ( sinv ) {
-	s << "!";
-      }
       s << " " << node_name(snode) << " )" << endl;
       s << "      " << node_name(node)
 	<< " <= 1;" << endl;
@@ -419,9 +378,6 @@ SbjDumper::dump_verilog(ostream& s,
 	s << "else ";
       }
       s << "if ( ";
-      if ( rinv ) {
-	s << "!";
-      }
       s << " " << node_name(rnode) << " )" << endl;
       s << "      " << node_name(node)
 	<< " <= 0;" << endl;
@@ -431,9 +387,6 @@ SbjDumper::dump_verilog(ostream& s,
 	<< "  ";
     }
     s << "    " << node_name(node) << " <= ";
-    if ( dinv ) {
-      s << "~";
-    }
     s << node_name(dnode) << ";" << endl;
     s << endl;
   }

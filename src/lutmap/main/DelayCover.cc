@@ -42,7 +42,7 @@ DelayCover::operator()(const SbjGraph& sbjgraph,
 		       ymuint limit,
 		       ymuint slack,
 		       ymuint mode,
-		       BnNetwork& map_network,
+		       BnBuilder& map_network,
 		       ymuint& lut_num,
 		       ymuint& depth)
 {
@@ -127,8 +127,8 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 
   // それに slack を足したものが制約となる．
   min_depth += slack;
-  for (ymuint i = 0; i < no; ++ i) {
-    const SbjNode* node = sbjgraph.output(i);
+  for (ymuint i = 0; i < onode_list.size(); ++ i) {
+    const SbjNode* node = onode_list[i];
     mNodeInfo[node->id()].mReqDepth = min_depth;
   }
 
@@ -181,6 +181,7 @@ DelayCover::record(const SbjNode* node)
     if ( min_depth > cur_depth ) {
       min_depth = cur_depth;
     }
+
     // mIcostLists から解を作る．
     for ( ; ; ) {
       // 各入力のなかでもっとも深い値を求める．
@@ -251,6 +252,8 @@ DelayCover::select(const SbjNode* node,
     // このノードは必要ではない．
     return;
   }
+  cout << "select(Node#" << node->id() << ", " << rd << ")" << endl;
+
   const Cut* cut = nullptr;
   for (ADCostIterator<double> p = t.mCostList.begin();
        !p.is_end(); ++ p) {
@@ -260,7 +263,7 @@ DelayCover::select(const SbjNode* node,
       break;
     }
   }
-  ASSERT_COND(cut );
+  ASSERT_COND( cut );
   maprec.set_cut(node, cut);
   -- rd;
   for (ymuint i = 0; i < cut->input_num(); ++ i) {

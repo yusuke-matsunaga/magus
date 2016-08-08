@@ -121,7 +121,7 @@ protected:
   /// @note 要するに無ければ作る．
   NetHandle*
   find_or_new_nethandle(const string& name,
-			NetHandle::tType type) const;
+			NetHandle::Type type) const;
 
 
 

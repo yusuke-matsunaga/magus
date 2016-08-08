@@ -11,6 +11,7 @@
 
 #include "lutmap_nsdef.h"
 #include "EnumCutOp.h"
+#include "SbjNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP

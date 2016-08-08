@@ -10,8 +10,8 @@
 
 
 #include "lutmap_nsdef.h"
+#include "sbj_nsdef.h"
 #include "ym/ym_bnet.h"
-#include "SbjGraph.h"
 #include "CutHolder.h"
 #include "CutResub.h"
 
@@ -57,7 +57,7 @@ public:
   operator()(const SbjGraph& sbjgraph,
 	     ymuint limit,
 	     ymuint mode,
-	     BnNetwork& map_network,
+	     BnBuilder& map_network,
 	     ymuint& lut_num,
 	     ymuint& depth);
 

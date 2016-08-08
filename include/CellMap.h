@@ -49,7 +49,7 @@ public:
   area_map(const CellLibrary& cell_library,
 	   const BnNetwork& sbjgraph,
 	   ymuint mode,
-	   BnNetwork& mapnetwork);
+	   BnBuilder& mapnetwork);
 
 #if 0
   /// @brief 段数最小化 DAG covering のヒューリスティック関数
