@@ -75,7 +75,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     BnLogicType logic_type = bn_node->logic_type();
     switch ( logic_type ) {
     case kBnLt_NONE:
-      //ASSERT_NOT_REACHED;
+      ASSERT_NOT_REACHED;
       break;
 
     case kBnLt_C0:

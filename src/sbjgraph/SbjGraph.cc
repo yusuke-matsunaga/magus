@@ -260,6 +260,7 @@ SbjGraph::clear()
     connect(nullptr, node, 1);
   }
 
+
   for (vector<SbjNode*>::iterator p = mInputArray.begin();
        p != mInputArray.end(); ) {
     // p は実際にはノード内のメンバをアクセスするので delete する前に
@@ -876,7 +877,9 @@ void
 SbjGraph::delete_logic(SbjNode* node)
 {
   ASSERT_COND(node->is_logic() );
+#if 0
   ASSERT_COND(node->fanout_num() == 0 );
+#endif
   connect(nullptr, node, 0);
   connect(nullptr, node, 1);
 
@@ -928,8 +931,10 @@ SbjGraph::delete_node(SbjNode* node,
 		      ymuint ni)
 {
   // new_node の逆の処理を行なう．
-  mAlloc2.put_memory(sizeof(SbjEdge) * ni, node->mFanins);
-  node->mFanins = nullptr;
+  if ( ni > 0 ) {
+    mAlloc2.put_memory(sizeof(SbjEdge) * ni, node->mFanins);
+    node->mFanins = nullptr;
+  }
   mItvlMgr.add(static_cast<int>(node->mId));
 }
 
@@ -956,7 +961,6 @@ SbjGraph::connect(SbjNode* from,
   // SbjNode::mFaoutList を変更するのはここだけ
 
   SbjEdge* edge = to->fanin_edge(pos);
-  ASSERT_COND( edge->from() == nullptr );
   edge->set_from(from);
   if ( from ) {
     from->mFanoutList.push_back(edge);

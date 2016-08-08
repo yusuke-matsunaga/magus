@@ -159,6 +159,9 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
     mapgraph.add_port(sbjport->name(), tmp);
   }
 
+  bool stat = mapgraph.wrap_up();
+  ASSERT_COND( stat );
+
   lut_num = mapgraph.logic_num();
   depth = max_depth;
 }
