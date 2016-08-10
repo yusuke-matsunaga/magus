@@ -13,6 +13,8 @@
 #include "AreaMapCmd.h"
 #include "DelayMapCmd.h"
 
+#include "AreaMap2Cmd.h"
+
 
 BEGIN_NAMESPACE_MAGUS
 
@@ -58,12 +60,16 @@ lutmap_init(Tcl_Interp* interp,
   TclCmdBinder2<WriteVqmCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::write_vqm");
 
+  TclCmdBinder2<AreaMap2Cmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
+							"magus::lutmap::area_map2");
+
 
   const char* init =
     "namespace eval tclreadline {\n"
     "namespace eval magus {\n"
     "namespace eval lutmap {\n"
     "proc complete(area_map) { text start end line pos mod } { return \"\" }\n"
+    "proc complete(area_map2) { text start end line pos mod } { return \"\" }\n"
     "proc complete(delay_map) { text start end line pos mod } { return \"\" }\n"
     "proc complete(dump_lutnetwork) { text start end line pos mod } { return \"\" }\n"
     "proc complete(conv2bnet) { text start end line pos mod } { return \"\" }\n"

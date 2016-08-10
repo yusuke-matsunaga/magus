@@ -1,0 +1,50 @@
+﻿
+/// @file lutmap/DagDCover.cc
+/// @brief DagDCover の実装ファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2010, 2015 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "DagDCover.h"
+#include "WeightDCover.h"
+
+
+BEGIN_NAMESPACE_YM_LUTMAP
+
+//////////////////////////////////////////////////////////////////////
+// クラス DagDCoverFactory
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+DagDCoverFactory::DagDCoverFactory()
+{
+}
+
+// @brief デストラクタ
+DagDCoverFactory::~DagDCoverFactory()
+{
+}
+
+// @brief DagDCover (の派生クラス)を生成する．
+DagDCover*
+DagDCoverFactory::operator()(const string& args)
+{
+  if ( args == "dag" ) {
+    return new WeightDCover(0);
+  }
+  else if ( args == "dag-r" ) {
+    return new WeightDCover(2);
+  }
+  else if ( args == "fo" ) {
+    return new WeightDCover(1);
+  }
+  else if ( args == "fo-r" ) {
+    return new WeightDCover(3);
+  }
+  ASSERT_NOT_REACHED;
+  return nullptr;
+}
+
+END_NAMESPACE_YM_LUTMAP
