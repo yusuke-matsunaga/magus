@@ -5,16 +5,18 @@
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "lutmap2_nsdef.h"
+#include "lutmap3_nsdef.h"
 #include "sbj_nsdef.h"
 #include "ym/ym_bnet.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP2
+BEGIN_NAMESPACE_YM_LUTMAP3
+
+class Cut;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapRecord MapRecord.h "MapRecord.h"
@@ -29,8 +31,11 @@ public:
   // コンストラクタ/デストラクタ
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief コンストラクタ
+  /// @brief 空のコンストラクタ
   MapRecord();
+
+  /// @brief コピーコンストラクタ
+  MapRecord(const MapRecord& src);
 
   /// @brief デストラクタ
   ~MapRecord();
@@ -48,13 +53,19 @@ public:
 
   /// @brief カットを記録する．
   /// @param[in] node 該当のノード
-  /// @param[in] input_list 入力ノードのリスト
+  /// @param[in] cut 対応するカット
   void
   set_cut(const SbjNode* node,
-	  const vector<const SbjNode*>& input_list);
+	  const Cut* cut);
+
+  /// @brief カットを取り出す．
+  /// @param[in] node 該当のノード
+  const Cut*
+  get_cut(const SbjNode* node) const;
 
   /// @brief マッピング結果を BnNetwork にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] dag_cover DAG covering 結果
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
   /// @param[out] lut_num LUT数
   /// @param[out] depth 最大段数
@@ -62,7 +73,36 @@ public:
   gen_mapgraph(const SbjGraph& sbjgraph,
 	       BnBuilder& mapgraph,
 	       ymuint& lut_num,
-	       ymuint& depth);
+	       ymuint& depth) const;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で使われるデータ構造
+  //////////////////////////////////////////////////////////////////////
+
+  struct MapWork
+  {
+    MapWork()
+    {
+      mMapNode[0] = 0;
+      mMapNode[1] = 0;
+      mDepth = 0;
+    }
+
+    // 外部出力から要求されている極性
+    // 1: 正極性
+    // 2: 負極性
+    int mReqPhase;
+
+    // マップ結果
+    // 正極性と負極性の2通りを保持する．
+    ymuint mMapNode[2];
+
+    // 段数
+    int mDepth;
+
+  };
 
 
 private:
@@ -77,41 +117,8 @@ private:
   ymuint
   back_trace(const SbjNode* node,
 	     bool inv,
-	     BnBuilder& mapnetwork);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で使われるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // ノードごとの情報
-  struct NodeInfo
-  {
-    NodeInfo()
-    {
-      mReqPhase = 0;
-      mMapNode[0] = 0;
-      mMapNode[1] = 0;
-      mDepth = 0;
-    }
-
-    // カットの入力のリスト
-    vector<const SbjNode*> mInputs;
-
-    // 外部出力から要求される極性
-    // 1: 正極性
-    // 2: 負極性
-    // のビットワイズORで表す．
-    ymuint mReqPhase;
-
-    // マップ結果
-    // 正極性と負極性の2通りを保持する．
-    ymuint mMapNode[2];
-
-    // 段数
-    int mDepth;
-  };
+	     vector<MapWork>& work,
+	     BnBuilder& mapnetwork) const;
 
 
 private:
@@ -119,11 +126,12 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 各ノードごと作業領域を格納した配列
-  vector<NodeInfo> mNodeInfo;
+  // 選択されたカットを保持する配列
+  // 選択されていない場合には nullptr が入る．
+  vector<const Cut*> mCutArray;
 
 };
 
-END_NAMESPACE_YM_LUTMAP2
+END_NAMESPACE_YM_LUTMAP3
 
 #endif // MAPRECORD_H

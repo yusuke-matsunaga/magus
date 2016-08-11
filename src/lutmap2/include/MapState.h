@@ -10,20 +10,19 @@
 
 
 #include "lutmap2_nsdef.h"
-#include "ym/ym_bnet.h"
 #include "sbj_nsdef.h"
 #include "SbjNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP2
 
+class MapRecord;
+
 //////////////////////////////////////////////////////////////////////
 /// @class MapState MapState.h "MapState.h"
 /// @brief マッピングの状態を保持するクラス
 ///
 /// 具体的には各ノードごとに選択されたカットを保持する．
-/// 新しいカットはすでに選択されているカットの根のノードよりも
-/// トポロジカル順で後ろにあるノードを根とするものに限られる．
 //////////////////////////////////////////////////////////////////////
 class MapState
 {
@@ -47,15 +46,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 次に選択可能な POカットのリストを得る．
-  /// @param[in] cut_list カットのリスト
-  const vector<const SbjNode*>&
-  next_pocandidates() const;
+  /// @brief 初期状態に戻す．
+  void
+  init();
 
-  /// @brief 次に選択可能なカットのリストを作る．
-  /// @param[in] cut_list カットのリスト
+  /// @brief 次に選択可能な POカットのリストを得る．
   const vector<const SbjNode*>&
-  next_candidates() const;
+  pocandidates() const;
+
+  /// @brief 次に選択可能なカットのリストを得る．
+  const vector<const SbjNode*>&
+  candidates() const;
 
   /// @brief カット候補の重みリストを得る．
   const vector<ymuint>&
@@ -66,18 +67,17 @@ public:
   void
   update(const SbjNode* cut_root);
 
+  /// @brief マッピング情報をコピーする．
+  void
+  copy_to(MapRecord& maprecord);
+
   /// @brief LUT 数を得る．
   ymuint
   lut_num() const;
 
-  /// @brief マッピング結果を BnBuilder にセットする．
-  /// @param[out] mapgraph マッピング結果を格納するネットワーク
-  /// @param[out] lut_num LUT数
-  /// @param[out] depth 最大段数
-  void
-  gen_mapgraph(BnBuilder& mapgraph,
-	       ymuint& lut_num,
-	       ymuint& depth);
+  /// @brief 全体の段数を得る．
+  int
+  depth() const;
 
   /// @brief 'blocked' 状態をチェックする．
   void
@@ -86,7 +86,7 @@ public:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部でのみ用いられる関数
+  // ノードに関するいくつかのフラグを操作する関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 'blocked' マークを得る．
@@ -124,6 +124,12 @@ private:
   void
   clear_cut(const SbjNode* node);
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // テンポラリマーク関連の関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief テンポラリマークを得る．
   bool
   is_marked(const SbjNode* node) const;
@@ -136,6 +142,30 @@ private:
   void
   clear_mark();
 
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // キュー関連の関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief キューに入っているか調べる．
+  bool
+  qmark(const SbjNode* node) const;
+
+  /// @brief キューに入れる．
+  void
+  put_queue(const SbjNode* node);
+
+  /// @brief キューを空にする．
+  void
+  clear_queue();
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // その他の下請け関数
+  //////////////////////////////////////////////////////////////////////
+
   /// @brief 2つのカットの入力をマージする．
   void
   merge_inputs(const vector<const SbjNode*>& inputs1,
@@ -145,18 +175,6 @@ private:
   /// @brief カットの候補を求める．
   void
   get_cut_candidates();
-
-  /// @brief カットの入力を求めるための DFS
-  void
-  dfs(const SbjNode* node,
-      vector<const SbjNode*>& node_list);
-
-  /// @brief 最終結果を作るためのバックトレースを行う．
-  /// @param[in] node 対象のノード
-  /// @param[out] mapnetwork マッピング結果のネットワーク
-  ymuint
-  back_trace(const SbjNode* node,
-	     BnBuilder& mapnetwork);
 
   void
   check_cover_node(const SbjNode* node);
@@ -173,7 +191,6 @@ private:
     NodeInfo()
     {
       mFlags = 0;
-      mMapNode = 0;
       mDepth = 0;
     }
 
@@ -185,9 +202,6 @@ private:
 
     // いくつかの情報をパックしたフィールド
     ymuint mFlags;
-
-    // マップ結果のノード番号
-    ymuint mMapNode;
 
     // 段数
     int mDepth;
@@ -215,8 +229,6 @@ private:
   // カット候補を求めるためのキュー
   vector<const SbjNode*> mQueue;
 
-  vector<bool> mQmark;
-
   // カット候補の根のノードのリスト
   vector<const SbjNode*> mCandidateList;
 
@@ -226,14 +238,17 @@ private:
   // カット候補の入力数のリスト
   vector<ymuint> mCandNiList;
 
+  // カットとして選ばれたノードのリスト
+  vector<const SbjNode*> mSelectedList;
+
   // set_mark() でマークされたノード番号のリスト
   vector<ymuint> mMarkedList;
 
-  // LUT数
-  ymuint mLutNum;
+  // 余分に必要となるNOTゲートの数
+  ymuint mInvNum;
 
-  // カットの探索を行うノード番号
-  ymuint mNextId;
+  // 回路全体のレベル
+  int mDepth;
 
 };
 
@@ -325,6 +340,14 @@ MapState::clear_mark()
     mNodeInfo[id].mFlags &= ~(1U << 3);
   }
   mMarkedList.clear();
+}
+
+// @brief キューに入っているか調べる．
+inline
+bool
+MapState::qmark(const SbjNode* node) const
+{
+  return static_cast<bool>((mNodeInfo[node->id()].mFlags >> 4) & 1U);
 }
 
 END_NAMESPACE_YM_LUTMAP2

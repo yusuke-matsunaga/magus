@@ -1,38 +1,32 @@
 ﻿
-/// @file LutMap2.cc
-/// @brief LutMap2 の実装ファイル
+/// @file LutMap.cc
+/// @brief LutMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LutMap2.h"
+#include "LutMap3.h"
 #include "SbjGraph.h"
-#include "SbjNode.h"
+#include "AreaCover.h"
 #include "Bn2Sbj.h"
-#include "MapState.h"
 #include "MapRecord.h"
-#include "MctSearch.h"
-
-#include "ym/RandGen.h"
-
-#define UNIFORM_SAMPLING 0
 
 
-BEGIN_NAMESPACE_YM_LUTMAP2
+BEGIN_NAMESPACE_YM_LUTMAP3
 
 //////////////////////////////////////////////////////////////////////
-// クラス LutMap2
+// クラス LutMap3
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LutMap2::LutMap2()
+LutMap3::LutMap3()
 {
 }
 
 // @brief デストラクタ
-LutMap2::~LutMap2()
+LutMap3::~LutMap3()
 {
 }
 
@@ -48,24 +42,24 @@ LutMap2::~LutMap2()
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-LutMap2::area_map(const BnNetwork& src_network,
+LutMap3::area_map(const BnNetwork& src_network,
 		  ymuint limit,
 		  ymuint mode,
 		  BnBuilder& map_network,
 		  ymuint& lut_num,
 		  ymuint& depth)
 {
+  AreaCover area_cover;
+
   SbjGraph sbjgraph;
   Bn2Sbj bn2sbj;
   bn2sbj.convert(src_network, sbjgraph);
 
-  MctSearch mct(sbjgraph, limit);
+  MapRecord record = area_cover(sbjgraph, limit);
 
-  mct.search(1000000);
+  record.gen_mapgraph(sbjgraph, map_network, lut_num, depth);
 
-  //const MapRecord& record = mct.best_record();
-
-  //record.gen_mapgraph(sbjgraph, map_network, lut_num, depth);
+  cout << "#LUT = " << lut_num << ", depth = " << depth << endl;
 }
 
-END_NAMESPACE_YM_LUTMAP2
+END_NAMESPACE_YM_LUTMAP3

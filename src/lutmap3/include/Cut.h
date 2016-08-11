@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "lutmap2_nsdef.h"
+#include "lutmap3_nsdef.h"
 #include "SbjGraph.h"
 #include "ym/TvFunc.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP2
+BEGIN_NAMESPACE_YM_LUTMAP3
 
 //////////////////////////////////////////////////////////////////////
 /// @class Cut Cut.h "Cut.h"
@@ -79,7 +79,8 @@ public:
   /// @brief 論理関数を表す真理値表を得る．
   /// @param[in] inv 出力を反転する時 true にするフラグ
   TvFunc
-  make_tv(bool inv) const;
+  make_tv(bool output_inv,
+	  const vector<bool>& input_inv) const;
 
   /// @brief デバッグ用の表示ルーティン
   /// @param[in] s 出力先のストリーム
@@ -150,6 +151,6 @@ Cut::input(ymuint pos) const
   return mInputs[pos];
 }
 
-END_NAMESPACE_YM_LUTMAP2
+END_NAMESPACE_YM_LUTMAP3
 
 #endif // CUT_H

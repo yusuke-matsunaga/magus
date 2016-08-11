@@ -13,6 +13,7 @@
 #include "ym/TclPopt.h"
 
 #include "LutMap2.h"
+#include "LutMap3.h"
 
 #include "ym/BnBuilder.h"
 #include "ym/MvnMgr.h"

@@ -8,16 +8,153 @@
 
 
 #include "MapRecord.h"
-#include "Cut.h"
 #include "ym/BnBuilder.h"
 #include "ym/TvFunc.h"
+
+#include "SbjGraph.h"
 #include "SbjNode.h"
 #include "SbjDff.h"
 #include "SbjLatch.h"
 #include "SbjPort.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP2
+
+BEGIN_NONAMESPACE
+
+// valmap に終端のノード番号をキーとしてビットベクタ値を登録する．
+// その時の node の値を計算する．
+ymuint64
+eval_node(const SbjNode* node,
+	  HashMap<ymuint, ymuint64>& valmap)
+{
+  if ( node == nullptr ) {
+    return 0ULL;
+  }
+
+  // まずすでに評価済みかどうか調べる．
+  // 葉のノードの場合もここに登録されている．
+  ymuint64 ans;
+  if ( !valmap.find(node->id(), ans) ) {
+    // 未登録の場合は必ず論理ノード
+    ASSERT_COND( node->is_logic() );
+
+    // 子供の値を評価する．
+    ymuint64 val0 = eval_node(node->fanin(0), valmap);
+    if ( node->fanin_inv(0) ) {
+      val0 ^= 0xFFFFFFFFFFFFFFFFULL;
+    }
+
+    ymuint64 val1 = eval_node(node->fanin(1), valmap);
+    if ( node->fanin_inv(0) ) {
+      val1 ^= 0xFFFFFFFFFFFFFFFFULL;
+    }
+
+    // 自分の値を計算する．
+    if ( node->is_xor() ) {
+      ans = val0 ^ val1;
+    }
+    else {
+      ans = val0 & val1;
+    }
+
+    // 登録しておく．
+    valmap.add(node->id(), ans);
+  }
+
+  return ans;
+}
+
+// カットの表している論理関数を評価する．
+ymuint64
+eval_cut(const SbjNode* root,
+	 const vector<const SbjNode*>& cut_inputs,
+	 const vector<ymuint64>& vals)
+{
+  ymuint ni = cut_inputs.size();
+  ASSERT_COND( ni == vals.size() );
+  HashMap<ymuint, ymuint64> valmap;
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* inode = cut_inputs[i];
+    valmap.add(inode->id(), vals[i]);
+  }
+  return eval_node(root, valmap);
+}
+
+// @brief 論理関数を表す真理値表を得る．
+TvFunc
+make_tv(const SbjNode* root,
+	const vector<const SbjNode*>& cut_inputs,
+	bool inv,
+	const vector<bool>& input_inv)
+{
+  ymuint ni = cut_inputs.size();
+  ymuint np = 1 << ni;
+
+  vector<int> tv(np);
+
+  // 1 の値と 0 の値
+  int v1 = inv ? 0 : 1;
+  int v0 = inv ? 1 : 0;
+
+  // 真理値表の各変数の値を表すビットベクタ
+  // 6入力以上の場合には1語に収まらないので複数回にわけて処理する．
+  vector<ymuint64> vals(ni);
+  for (ymuint i = 0; i < ni; ++ i) {
+    vals[i] = 0ULL;
+  }
+
+  ymuint64 s = 1ULL;
+  ymuint p0 = 0;
+  for (ymuint p = 0; p < np; ++ p) {
+    for (ymuint i = 0; i < ni; ++ i) {
+      if ( input_inv[i] ) {
+	if ( (p & (1U << i)) == 0U ) {
+	  vals[i] |= s;
+	}
+      }
+      else {
+	if ( p & (1U << i) ) {
+	  vals[i] |= s;
+	}
+      }
+    }
+    s <<= 1;
+    if ( s == 0ULL ) {
+      // 64 パタン目
+      ymuint64 tmp = eval_cut(root, cut_inputs, vals);
+      for (ymuint p1 = p0; p1 < p; ++ p1) {
+	if ( tmp & (1ULL << (p1 - p0)) ) {
+	  tv[p1] = v1;
+	}
+	else {
+	  tv[p1] = v0;
+	}
+      }
+      s = 1ULL;
+      p0 = p + 1;
+      for (ymuint i = 0; i < ni; ++ i) {
+	vals[i] = 0ULL;
+      }
+    }
+  }
+  if ( s != 1ULL ) {
+    // 処理されていない残りがあった．
+    ymuint64 tmp = eval_cut(root, cut_inputs, vals);
+    for (ymuint p1 = p0; p1 < np; ++ p1) {
+      if ( tmp & (1ULL << (p1 - p0)) ) {
+	tv[p1] = v1;
+      }
+      else {
+	tv[p1] = v0;
+      }
+    }
+  }
+
+  return TvFunc(ni, tv);
+}
+
+END_NONAMESPACE
 
 // コンストラクタ
 MapRecord::MapRecord()
@@ -38,34 +175,14 @@ MapRecord::init(const SbjGraph& sbjgraph)
   mNodeInfo.resize(sbjgraph.max_node_id());
 }
 
-// @brief カットの情報だけコピーする．
-void
-MapRecord::copy(const MapRecord& src)
-{
-  ymuint n = src.mNodeInfo.size();
-  mNodeInfo.clear();
-  mNodeInfo.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    mNodeInfo[i].mCut = src.mNodeInfo[i].mCut;
-  }
-}
-
 // @blif カットを記録する．
 // @param[in] node 該当のノード
-// @param[in] cut 対応するカット
+// @param[in] input_list 入力ノードのリスト
 void
 MapRecord::set_cut(const SbjNode* node,
-		   const Cut* cut)
+		   const vector<const SbjNode*>& input_list)
 {
-  mNodeInfo[node->id()].mCut = cut;
-}
-
-// @brief カットを取り出す．
-// @param[in] node 該当のノード
-const Cut*
-MapRecord::get_cut(const SbjNode* node)
-{
-  return mNodeInfo[node->id()].mCut;
+  mNodeInfo[node->id()].mInputs = input_list;
 }
 
 // @brief マッピング結果を BnNetwork にセットする．
@@ -78,8 +195,6 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
   mapgraph.clear();
 
   mapgraph.set_model_name(sbjgraph.name());
-
-  mNextId = sbjgraph.max_node_id() * 2;
 
   // 外部入力の生成
   ymuint ni = sbjgraph.input_num();
@@ -94,6 +209,21 @@ MapRecord::gen_mapgraph(const SbjGraph& sbjgraph,
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   ymuint no = sbjgraph.output_num();
+
+  // まず外部出力で要求されている極性を記録しておく．
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* onode = sbjgraph.output(i);
+    const SbjNode* node = onode->output_fanin();
+    ymuint phase = 0;
+    if ( onode->output_fanin_inv() ) {
+      phase = 2;
+    }
+    else {
+      phase = 1;
+    }
+    mNodeInfo[node->id()].mReqPhase |= phase;
+  }
+
   int max_depth = 0;
   for (ymuint i = 0; i < no; ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
@@ -210,7 +340,7 @@ MapRecord::back_trace(const SbjNode* node,
 
   if ( node->is_input() ) {
     // ということは inv = true のはず．
-    ASSERT_COND(inv );
+    ASSERT_COND( inv );
     // NOT ゲートを表す LUT を作る．
     ymuint src_id = node_info.mMapNode[0];
     TvFunc tv = TvFunc::nega_literal(1, VarId(0));
@@ -220,26 +350,45 @@ MapRecord::back_trace(const SbjNode* node,
     return node_id;
   }
 
+  // 反対側の極性のノードができていたら NOT ゲートを作る．
+  if ( node_info.mMapNode[idx ^ 1] ) {
+    // NOT ゲートを表す LUT を作る．
+    ymuint src_id = node_info.mMapNode[idx ^ 1];
+    TvFunc tv = TvFunc::nega_literal(1, VarId(0));
+    node_id = mapnetwork.add_tv(string(), tv);
+    cout << "extra 2" << endl;
+    mapnetwork.connect(src_id, node_id, 0);
+    node_info.mMapNode[idx] = node_id;
+    return node_id;
+  }
+
   // node を根とするカットを取り出す．
-  const Cut* cut = node_info.mCut;
+  const vector<const SbjNode*>& inputs = node_info.mInputs;
 
   // その入力に対応するノードを再帰的に生成する．
-  ymuint ni = cut->input_num();
+  ymuint ni = inputs.size();
+  vector<bool> input_inv(ni, false);
   for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = cut->input(i);
-    back_trace(inode, false, mapnetwork);
+    const SbjNode* inode = inputs[i];
+    bool inv = false;
+    if ( mNodeInfo[inode->id()].mReqPhase == 2 ) {
+      inv = true;
+    }
+    input_inv[i] = inv;
+    back_trace(inode, inv, mapnetwork);
   }
 
   // カットの実現している関数の真理値表を得る．
-  TvFunc tv = cut->make_tv(inv);
+  TvFunc tv = make_tv(node, inputs, inv, input_inv);
 
   // 新しいノードを作り mNodeMap に登録する．
   node_id = mapnetwork.add_tv(string(), tv);
   int idepth = 0;
   for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = cut->input(i);
+    const SbjNode* inode = inputs[i];
     NodeInfo& inode_info = mNodeInfo[inode->id()];
-    ymuint src_id = inode_info.mMapNode[0];
+    ymuint idx = input_inv[i] ? 1 : 0;
+    ymuint src_id = inode_info.mMapNode[idx];
     mapnetwork.connect(src_id, node_id, i);
     int idepth1 = inode_info.mDepth;
     if ( idepth < idepth1 ) {
@@ -252,137 +401,4 @@ MapRecord::back_trace(const SbjNode* node,
   return node_id;
 }
 
-// @brief マッピング結果の LUT 数を見積もる．
-int
-MapRecord::estimate(const SbjGraph& sbjgraph)
-{
-  for (vector<NodeInfo>::iterator p = mNodeInfo.begin();
-       p != mNodeInfo.end(); ++ p) {
-    NodeInfo& node_info = *p;
-    node_info.mMapCount[0] = 0;
-    node_info.mMapCount[1] = 0;
-    node_info.mCovCount = 0;
-    node_info.mTmpFlag = false;
-  }
-
-  // 外部入力の生成
-  ymuint ni = sbjgraph.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* node = sbjgraph.input(i);
-    NodeInfo& node_info = mNodeInfo[node->id()];
-    node_info.mMapCount[0] = 1;
-  }
-
-  // 外部出力からバックトレースを行い全ノードの生成を行う．
-  int lut_num = 0;
-  ymuint no = sbjgraph.output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    const SbjNode* onode = sbjgraph.output(i);
-    const SbjNode* node = onode->output_fanin();
-    if ( node && node->is_logic() ) {
-      if ( mNodeInfo[node->id()].mCut == nullptr ) {
-	lut_num = -1;
-	break;
-      }
-      bool inv = onode->output_fanin_inv();
-      lut_num += back_trace2(node, inv);
-    }
-  }
-  return lut_num;
-}
-
-// estimate 用のバックトレース
-int
-MapRecord::back_trace2(const SbjNode* node,
-		       bool inv)
-{
-  NodeInfo& node_info = mNodeInfo[node->id()];
-  ymuint idx = (inv) ? 1 : 0;
-  ++ node_info.mMapCount[idx];
-  if ( node_info.mMapCount[idx] > 1 ) {
-    return 0;
-  }
-
-  if ( node->is_input() ) {
-    // ということは inv = true のはず．
-    node_info.mMapCount[1] = 1;
-    // インバーターが必要ということ
-    return 1;
-  }
-
-  // node を根とするカットを取り出す．
-  const Cut* cut = node_info.mCut;
-
-  // cut のカバーしているノードの mCovCount を1つ増やす．
-  for (ymuint i = 0; i < cut->input_num(); ++ i) {
-    const SbjNode* leaf = cut->input(i);
-    mNodeInfo[leaf->id()].mTmpFlag = true;
-  }
-  mark_cover(node, cut);
-  clear_mark(node);
-
-  int lut_num = 1;
-  // その入力に対応するノードを再帰的に生成する．
-  ymuint ni = cut->input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = cut->input(i);
-    lut_num += back_trace2(inode, false);
-  }
-
-  return lut_num;
-}
-
-// @brief 直前の estimate の結果 node が fanout node なら true を返す．
-bool
-MapRecord::check_fonode(const SbjNode* node)
-{
-  NodeInfo& node_info = mNodeInfo[node->id()];
-  return (node_info.mMapCount[0] + node_info.mMapCount[1]) > 1;
-}
-
-// @brief 直前の estimate の結果で node のカバーされている回数を返す．
-int
-MapRecord::cover_count(const SbjNode* node)
-{
-  NodeInfo& node_info = mNodeInfo[node->id()];
-  return node_info.mCovCount;
-}
-
-// cut でカバーされるノードの mCovCount を一つ増やす．
-void
-MapRecord::mark_cover(const SbjNode* node,
-		      const Cut* cut)
-{
-  NodeInfo& node_info = mNodeInfo[node->id()];
-  if ( !node_info.mTmpFlag ) {
-    node_info.mTmpFlag = true;
-    ++ node_info.mCovCount;
-    mark_cover(node->fanin(0), cut);
-    mark_cover(node->fanin(1), cut);
-  }
-}
-
-// mark_cover でつけた mTmpFlag を下ろす．
-void
-MapRecord::clear_mark(const SbjNode* node)
-{
-  NodeInfo& node_info = mNodeInfo[node->id()];
-  if ( node_info.mTmpFlag ) {
-    node_info.mTmpFlag = false;
-    if ( node->is_logic() ) {
-      clear_mark(node->fanin(0));
-      clear_mark(node->fanin(1));
-    }
-  }
-}
-
-// @brief 新しいノード番号を得る．
-ymuint
-MapRecord::new_id()
-{
-  ymuint id = mNextId;
-  ++ mNextId;
-  return id;
-}
-
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_LUTMAP2

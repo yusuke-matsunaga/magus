@@ -1,9 +1,9 @@
 ﻿
-/// @file Cut.cc
+/// @file libym_techmap/lutmap/Cut.cc
 /// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
-///
-/// Copyright (C) 2016 Yusuke Matsunaga
+//
+/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -12,7 +12,7 @@
 #include "ym/HashMap.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP2
+BEGIN_NAMESPACE_YM_LUTMAP3
 
 BEGIN_NONAMESPACE
 
@@ -76,54 +76,34 @@ eval_cut(const Cut* cut,
 
 END_NONAMESPACE
 
-//////////////////////////////////////////////////////////////////////
-// クラス Cut
-//////////////////////////////////////////////////////////////////////
-
-// @brief カットを生成する．
-// @param[in] root 根のノード
-// @param[in] input_list 入力ノードのリスト
-Cut*
-Cut::new_cut(const SbjNode* root,
-	     const vector<const SbjNode*>& input_list)
+// @brief 論理シミュレーションを行う．
+// @param[in] vals 葉のノードの値
+// @return 値のノードの値を返す．
+//
+// vals[i] が input(i) の葉の値に対応する．
+// 値は64ビットのビットベクタで表す．
+ymuint64
+Cut::eval(const vector<ymuint64>& vals) const
 {
-  ymuint ni = input_list.size();
-  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const SbjNode*);
-  void* p = new char[size];
-  return new (p) Cut(root, input_list);
-}
+  ymuint ni = input_num();
+  ASSERT_COND( ni == vals.size() );
 
-// @brief カットの領域を開放する．
-// @param[in] cut 開放するカット
-void
-Cut::delete_cut(Cut* cut)
-{
-  char* p = reinterpret_cast<char*>(cut);
-  delete [] p;
-}
-
-// @brief コンストラクタ
-// @param[in] root 根のノード
-// @param[in] input_list 入力ノードのリスト
-Cut::Cut(const SbjNode* root,
-	 const vector<const SbjNode*>& input_list)
-{
-  mRoot = root;
-  mNi = input_list.size();
-  for (ymuint i = 0; i < mNi; ++ i) {
-    mInputs[i] = input_list[i];
+  // ノードの ID 番号をキーにして値を保持するハッシュ表
+  HashMap<ymuint, ymuint64> valmap;
+  // 葉のノードの値を登録する．
+  for (ymuint i = 0; i < ni; ++ i) {
+    valmap.add(input(i)->id(), vals[i]);
   }
-}
 
-// @brief デストラクタ
-Cut::~Cut()
-{
+  // 評価を行う．
+  return eval_node(root(), valmap);
 }
 
 // @brief 論理関数を表す真理値表を得る．
 // @param[in] inv 出力を反転する時 true にするフラグ
 TvFunc
-Cut::make_tv(bool inv) const
+Cut::make_tv(bool output_inv,
+	     const vector<bool>& input_inv) const
 {
   ymuint ni = input_num();
   ymuint np = 1 << ni;
@@ -132,8 +112,8 @@ Cut::make_tv(bool inv) const
 
   // 1 の値と 0 の値
   // inv == true の時には逆にする．
-  int v1 = inv ? 0 : 1;
-  int v0 = inv ? 1 : 0;
+  int v1 = output_inv ? 0 : 1;
+  int v0 = output_inv ? 1 : 0;
 
   // 真理値表の各変数の値を表すビットベクタ
   // 6入力以上の場合には1語に収まらないので複数回にわけて処理する．
@@ -146,8 +126,15 @@ Cut::make_tv(bool inv) const
   ymuint p0 = 0;
   for (ymuint p = 0; p < np; ++ p) {
     for (ymuint i = 0; i < ni; ++ i) {
-      if ( p & (1U << i) ) {
-	vals[i] |= s;
+      if ( input_inv[i] ) {
+	if ( (p & (1U << i)) == 0U ) {
+	  vals[i] |= s;
+	}
+      }
+      else {
+	if ( p & (1U << i) ) {
+	  vals[i] |= s;
+	}
       }
     }
     s <<= 1;
@@ -185,4 +172,24 @@ Cut::make_tv(bool inv) const
   return TvFunc(ni, tv);
 }
 
-END_NAMESPACE_YM_LUTMAP2
+// デバッグ用の表示関数
+// @param[in] s 出力先のストリーム
+void
+Cut::print(ostream& s) const
+{
+  if ( root() == nullptr ) {
+    s << "null cut" << endl;
+  }
+  else {
+    s << "Node[" << root()->id() << "] : ";
+    string comma = "";
+    for (ymuint i = 0; i < input_num(); i ++) {
+      const SbjNode* node = mInputs[i];
+      s << comma << "Node[" << node->id() << "]";
+      comma = ", ";
+    }
+    s << endl;
+  }
+}
+
+END_NAMESPACE_YM_LUTMAP3
