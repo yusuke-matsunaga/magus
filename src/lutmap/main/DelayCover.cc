@@ -9,7 +9,7 @@
 
 #include "DelayCover.h"
 #include "Cut.h"
-#include "CutHolder.h"
+#include "MapGen.h"
 #include "MapRecord.h"
 
 
@@ -61,7 +61,8 @@ DelayCover::operator()(const SbjGraph& sbjgraph,
   }
 
   // 最終的なネットワークを生成する．
-  maprec.gen_mapgraph(sbjgraph, map_network, lut_num, depth);
+  MapGen gen;
+  gen.generate(sbjgraph, maprec, map_network, lut_num, depth);
 }
 
 // @brief best cut の記録を行う．

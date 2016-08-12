@@ -15,7 +15,6 @@ set ( main_SOURCES
   main/AreaCover.cc
   main/DelayCover.cc
   main/LutMap.cc
-  main/MapRecord.cc
   )
 
 set ( enum_cut_SOURCES
@@ -23,6 +22,12 @@ set ( enum_cut_SOURCES
   enum_cut/CutHolder.cc
   enum_cut/EnumCut.cc
   enum_cut/EnumCutOp.cc
+  )
+
+set ( mapgen_SOURCES
+  mapgen/MapEst.cc
+  mapgen/MapGen.cc
+  mapgen/MapRecord.cc
   )
 
 set ( cut_resub_SOURCES
@@ -40,5 +45,6 @@ set ( cut_resub_SOURCES
 ym_add_object_library (magus_lutmap
   ${main_SOURCES}
   ${enum_cut_SOURCES}
+  ${mapgen_SOURCES}
   ${cut_resub_SOURCES}
   )

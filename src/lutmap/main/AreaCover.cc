@@ -9,6 +9,7 @@
 
 #include "AreaCover.h"
 #include "Cut.h"
+#include "MapGen.h"
 #include "MapRecord.h"
 #include "SbjGraph.h"
 #include "SbjNode.h"
@@ -60,7 +61,9 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
   }
 
   // 最終的なネットワークを生成する．
-  maprec.gen_mapgraph(sbjgraph, mapnetwork, lut_num, depth);
+  MapGen gen;
+
+  gen.generate(sbjgraph, maprec, mapnetwork, lut_num, depth);
 }
 
 // @brief best cut の記録を行う．
