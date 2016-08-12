@@ -62,7 +62,6 @@ END_NONAMESPACE
 MctSearch::MctSearch(const SbjGraph& sbjgraph,
 		     ymuint cut_size) :
   mSbjGraph(sbjgraph),
-  mCutSize(cut_size),
   mState(sbjgraph)
 {
   CutCount cc;
@@ -145,7 +144,7 @@ MctSearch::default_policy(MctNode* node)
   while ( mState.index() < mFanoutPointList.size() ) {
     ymuint index = mState.index();
     ymuint ni = mInputSizeList[index];
-#if 1
+#if 0
     // 1/2 の確率で選ばない．
     double ratio = 0.5;
 #else
@@ -166,8 +165,7 @@ MctSearch::default_policy(MctNode* node)
   }
 
   MapRecord record;
-  //mAreaCover(mSbjGraph, mCutHolder, mState.boundary_list(), record);
-  mAreaCover(mSbjGraph, mCutHolder, 0, mState.boundary_list(), record);
+  mAreaCover(mSbjGraph, mCutHolder, mState.boundary_list(), record);
   ymuint lut_num;
   ymuint depth;
   BnBuilder mapgraph;

@@ -13,6 +13,8 @@
 #include "SbjGraph.h"
 #include "SbjNode.h"
 
+#include "SbjDumper.h"
+
 
 BEGIN_NAMESPACE_YM_LUTMAP3
 
@@ -28,43 +30,41 @@ AreaCover::~AreaCover()
 
 // @brief 面積最小化マッピングを行う．
 // @param[in] sbjgraph サブジェクトグラフ
-// @param[in] limit LUT の入力数
-// @param[in] mode モード
-//  - 0: fanout フロー, resub なし
-//  - 1: weighted フロー, resub なし
-//  - 2: fanout フロー, resub あり
-//  - 3: weighted フロー, resub あり
-// @param[out] mapnetwork マッピング結果
-// @param[out] lut_num LUT数
-// @param[out] depth 段数
+// @param[in] cut_holder カットを保持するオブジェクト
+// @param[out] maprec マッピング結果を記録するオブジェクト
+// @return LUT数を返す．
 void
 AreaCover::operator()(const SbjGraph& sbjgraph,
 		      const CutHolder& cut_holder,
-		      ymuint mode,
 		      const vector<const SbjNode*>& boundary_list,
-		      MapRecord& record)
+		      MapRecord& maprec)
 {
-  mMode = mode;
-
   ymuint n = sbjgraph.max_node_id();
+
   mBestCost.clear();
   mBestCost.resize(n);
-  mWeight.resize(cut_holder.limit());
 
-  record.init(sbjgraph);
+  mFlags.clear();
+  mFlags.resize(n, 0);
+
+  mWeight.resize(10);
+
+  mMode = 1;
+
+  for (ymuint i = 0; i < boundary_list.size(); ++ i) {
+    const SbjNode* node = boundary_list[i];
+    ASSERT_COND( node );
+    set_fpmark(node);
+  }
+
+  maprec.init(sbjgraph);
 
   // 入力のコストを設定
   ymuint ni = sbjgraph.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* node = sbjgraph.input(i);
-    record.set_cut(node, nullptr);
+    maprec.set_cut(node, nullptr);
     mBestCost[node->id()] = 0.0;
-  }
-
-  vector<bool> mark(n, false);
-  for (ymuint i = 0; i < boundary_list.size(); ++ i) {
-    const SbjNode* node = boundary_list[i];
-    mark[node->id()] = true;
   }
 
   // 論理ノードのコストを入力側から計算
@@ -108,7 +108,7 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
       double cur_cost = 1.0;
       for (ymuint i = 0; i < ni; ++ i) {
 	const SbjNode* inode = cut->input(i);
-	if ( !mark[inode->id()] ) {
+	if ( !fpmark(inode) ) {
 	  cur_cost += mBestCost[inode->id()] * mWeight[i];
 	}
       }
@@ -119,8 +119,14 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
     }
     ASSERT_COND(min_cost < DBL_MAX );
     ASSERT_COND( best_cut != nullptr );
-    record.set_cut(node, best_cut);
+    maprec.set_cut(node, best_cut);
     mBestCost[node->id()] = min_cost;
+  }
+
+  for (ymuint i = 0; i < boundary_list.size(); ++ i) {
+    const SbjNode* node = boundary_list[i];
+    ASSERT_COND( node );
+    clear_fpmark(node);
   }
 }
 
@@ -145,6 +151,23 @@ AreaCover::calc_weight(const SbjNode* node,
     calc_weight(inode0, cut, cur_weight0);
     node = node->fanin(1);
     cur_weight /= node->fanout_num();
+  }
+}
+
+// @brief FFR に印をつける．
+void
+AreaCover::dfs(const SbjNode* node,
+	       vector<const SbjNode*>& node_list)
+{
+  if ( mark(node) ) {
+    return;
+  }
+  set_mark(node);
+  node_list.push_back(node);
+
+  if ( node->is_logic() && !fpmark(node) ) {
+    dfs(node->fanin(0), node_list);
+    dfs(node->fanin(1), node_list);
   }
 }
 

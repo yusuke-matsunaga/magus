@@ -107,7 +107,7 @@ private:
   ymuint mUnexpandedNum;
 
   // 子ノードのリスト
-  vector<MctNode*> mChildList;
+  MctNode* mChildList[2];
 
   // 評価値の総和
   double mSum;
@@ -182,7 +182,7 @@ inline
 double
 MctNode::UCB1(double n_all_ln) const
 {
-  return mMean + 0.3 * sqrt(2 * n_all_ln / mNum);
+  return mMean + sqrt(2 * n_all_ln / mNum);
 }
 
 END_NAMESPACE_YM_LUTMAP3

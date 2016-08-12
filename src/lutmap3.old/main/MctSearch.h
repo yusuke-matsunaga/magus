@@ -10,7 +10,10 @@
 
 
 #include "lutmap3_nsdef.h"
+#include "AreaCover.h"
+#include "CutHolder.h"
 #include "MapRecord.h"
+#include "MctState.h"
 #include "ym/RandGen.h"
 
 
@@ -69,25 +72,29 @@ private:
   back_up(MctNode* node,
 	  double val);
 
-  /// @brief 状態を遷移させる．
-  /// @param[in] cut_root カットの根のノード
-  void
-  move(const SbjNode* cut_root);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // 対象のサブジェクトグラフ
+  const SbjGraph& mSbjGraph;
+
   // ファンアウトポイントのリスト
   vector<const SbjNode*> mFanoutPointList;
 
-  // 境界ノードのリスト
-  vector<const SbjNode*> mBoundaryList;
+  // ファンアウトポイントの入力サイズのリスト
+  vector<ymuint> mInputSizeList;
 
-  // 境界ノードのマップ
-  vector<bool> mBoundaryMap;
+  // カットを保持するオブジェクト
+  CutHolder mCutHolder;
+
+  // マッパー
+  AreaCover mAreaCover;
+
+  // 状態
+  MctState mState;
 
   // 基準値
   double mBaseline;

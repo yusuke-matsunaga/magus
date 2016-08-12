@@ -48,8 +48,8 @@ private:
   // method オプションの解析用オブジェクト
   TclPoptStr* mPoptMethod;
 
-  // resub オプションの解析用オブジェクト
-  TclPopt* mPoptResub;
+  // count オプションの解析用オブジェクト
+  TclPoptInt* mPoptCount;
 
   // verbose オプションの解析用オブジェクト
   TclPopt* mPoptVerbose;

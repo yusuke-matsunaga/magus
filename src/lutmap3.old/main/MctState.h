@@ -52,6 +52,10 @@ public:
   ymuint
   index() const;
 
+  /// @brief インデックスを一つすすめる．
+  void
+  next_index();
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -71,10 +75,6 @@ private:
   // 境界ノードのリスト
   vector<const SbjNode*> mBoundaryList;
 
-  // 境界ノードのマークの配列
-  // サイズは max_node_id
-  vector<bool> mBoundaryMark;
-
   // 処理済みのファンアウトポイントのインデックス
   ymuint mIndex;
 
@@ -90,10 +90,8 @@ inline
 void
 MctState::add_boundary(const SbjNode* node)
 {
-  if ( !mBoundaryMark[node->id()] ) {
-    mBoundaryMark[node->id()] = true;
-    mBoundaryList.push_back(node);
-  }
+  ASSERT_COND( node );
+  mBoundaryList.push_back(node);
 }
 
 // @brief 境界ノードのリストを得る．
@@ -110,6 +108,14 @@ ymuint
 MctState::index() const
 {
   return mIndex;
+}
+
+// @brief インデックスを一つすすめる．
+inline
+void
+MctState::next_index()
+{
+  ++ mIndex;
 }
 
 END_NAMESPACE_YM_LUTMAP3

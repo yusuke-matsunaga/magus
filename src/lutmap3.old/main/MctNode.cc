@@ -49,7 +49,7 @@ MctNode::expand_child()
   if ( is_expanded() ) {
     return nullptr;
   }
-  bool select = (mUnexpandedNum == 1);
+  bool select = (mUnexpandedNum == 2);
   MctNode* child = new MctNode(this, mIndex + 1, select);
   if ( mUnexpandedNum == 2 ) {
     mChildList[0] = child;

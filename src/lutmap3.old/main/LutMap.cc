@@ -60,8 +60,8 @@ LutMap3::area_map(const BnNetwork& src_network,
 
   mct.search(count);
 
-  MapRecord record;
-  record.copy(mct.best_record());
+  const MapRecord& record = mct.best_record();
+
   record.gen_mapgraph(sbjgraph, map_network, lut_num, depth);
 
   cout << "#LUT = " << lut_num << ", depth = " << depth << endl;

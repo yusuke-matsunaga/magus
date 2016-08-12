@@ -31,11 +31,13 @@ public:
   // コンストラクタ/デストラクタ
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief コンストラクタ
+  /// @brief 空のコンストラクタ
   MapRecord();
 
+  /// @brief コピーコンストラクタ
+  MapRecord(const MapRecord& src);
+
   /// @brief デストラクタ
-  virtual
   ~MapRecord();
 
 
@@ -49,10 +51,6 @@ public:
   void
   init(const SbjGraph& sbjgraph);
 
-  /// @brief カットの情報だけコピーする．
-  void
-  copy(const MapRecord& src);
-
   /// @brief カットを記録する．
   /// @param[in] node 該当のノード
   /// @param[in] cut 対応するカット
@@ -63,7 +61,7 @@ public:
   /// @brief カットを取り出す．
   /// @param[in] node 該当のノード
   const Cut*
-  get_cut(const SbjNode* node);
+  get_cut(const SbjNode* node) const;
 
   /// @brief マッピング結果を BnNetwork にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -75,23 +73,36 @@ public:
   gen_mapgraph(const SbjGraph& sbjgraph,
 	       BnBuilder& mapgraph,
 	       ymuint& lut_num,
-	       ymuint& depth);
+	       ymuint& depth) const;
 
-  /// @brief マッピング結果の LUT 数を数える．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @return 見積もった LUT 数を返す．
-  int
-  estimate(const SbjGraph& sbjgraph);
 
-  /// @brief 直前の estimate の結果 node が fanout node なら true を返す．
-  /// @param[in] node 対象のノード
-  bool
-  check_fonode(const SbjNode* node);
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で使われるデータ構造
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief 直前の estimate の結果で node のカバーされている回数を返す．
-  /// @param[in] node 対象のノード
-  int
-  cover_count(const SbjNode* node);
+  struct MapWork
+  {
+    MapWork()
+    {
+      mMapNode[0] = 0;
+      mMapNode[1] = 0;
+      mDepth = 0;
+    }
+
+    // 外部出力から要求されている極性
+    // 1: 正極性
+    // 2: 負極性
+    int mReqPhase;
+
+    // マップ結果
+    // 正極性と負極性の2通りを保持する．
+    ymuint mMapNode[2];
+
+    // 段数
+    int mDepth;
+
+  };
 
 
 private:
@@ -106,70 +117,8 @@ private:
   ymuint
   back_trace(const SbjNode* node,
 	     bool inv,
-	     BnBuilder& mapnetwork);
-
-  /// @brief estimate() で用いるバックトレース
-  /// @param[in] node 対象のノード
-  /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
-  /// @return 見積もったLUT数を返す．
-  int
-  back_trace2(const SbjNode* node,
-	      bool inv);
-
-  /// @brief cut でカバーされるノードの mCovCount を一つ増やす．
-  /// @param[in] node 対象のノード
-  /// @param[in] cut カット
-  void
-  mark_cover(const SbjNode* node,
-	     const Cut* cut);
-
-  /// @brief mark_cover でつけた mTmpFlag を下ろす．
-  /// @param[in] node 対象のノード
-  void
-  clear_mark(const SbjNode* node);
-
-  /// @brief 新しいノード番号を得る．
-  ymuint
-  new_id();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で使われるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  // ノードごとの情報
-  struct NodeInfo
-  {
-    NodeInfo()
-    {
-      mCut = nullptr;
-      mMapNode[0] = 0;
-      mMapNode[1] = 0;
-      mMapCount[0] = 0;
-      mMapCount[1] = 0;
-      mDepth = 0;
-    }
-
-    // 選択されているカット
-    const Cut* mCut;
-
-    // マップ結果
-    // 正極性と負極性の2通りを保持する．
-    ymuint mMapNode[2];
-
-    // estimate で用いるカウンタ
-    int mMapCount[2];
-
-    // estimate でカットにカバーされている回数を保持するカウンタ
-    int mCovCount;
-
-    // mCovCount の更新で用いるフラグ
-    bool mTmpFlag;
-
-    // 段数
-    int mDepth;
-  };
+	     vector<MapWork>& work,
+	     BnBuilder& mapnetwork) const;
 
 
 private:
@@ -177,11 +126,9 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 各ノードごと作業領域を格納した配列
-  vector<NodeInfo> mNodeInfo;
-
-  // 次のノード番号
-  ymuint mNextId;
+  // 選択されたカットを保持する配列
+  // 選択されていない場合には nullptr が入る．
+  vector<const Cut*> mCutArray;
 
 };
 
