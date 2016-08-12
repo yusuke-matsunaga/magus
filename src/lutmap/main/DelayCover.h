@@ -11,13 +11,14 @@
 
 #include "lutmap_nsdef.h"
 #include "sbj_nsdef.h"
-#include "ym/ym_bnet.h"
-#include "CutHolder.h"
-#include "CutResub.h"
 #include "ADCost.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
+
+class Cut;
+class CutHolder;
+class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DelayCover DelayCover.h "DelayCover.h"
@@ -31,7 +32,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  DelayCover();
+  DelayCover(ymuint mode);
 
   /// @brief デストラクタ
   ~DelayCover();
@@ -42,26 +43,16 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 遅延最小化マッピングを行う．
+  /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] limit LUT の入力数
+  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
   /// @param[in] slack 最小段数に対するスラック
-  /// @param[in] mode モード
-  ///  - 0: fanout フロー, resub なし
-  ///  - 1: weighted フロー, resub なし
-  ///  - 2: fanout フロー, resub あり
-  ///  - 3: weighted フロー, resub あり
-  /// @param[out] map_network マッピング結果
-  /// @param[out] lut_num LUT数
-  /// @param[out] depth 段数
+  /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
-  operator()(const SbjGraph& sbjgraph,
-	     ymuint limit,
-	     ymuint slack,
-	     ymuint mode,
-	     BnBuilder& map_network,
-	     ymuint& lut_num,
-	     ymuint& depth);
+  record_cuts(const SbjGraph& sbjgraph,
+	      const CutHolder& cut_holder,
+	      ymuint slack,
+	      MapRecord& maprec);
 
 
 private:
@@ -69,19 +60,10 @@ private:
   // 下請けの関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] limit LUT の入力数
-  /// @param[in] slack 最小段数に対するスラック
-  void
-  record_cuts(const SbjGraph& sbjgraph,
-	      ymuint limit,
-	      ymuint slack,
-	      MapRecord& maprec);
-
   // node のカットを記録する．
   void
-  record(const SbjNode* node);
+  record(const SbjNode* node,
+	 const CutHolder& cut_holder);
 
   // node のカットを選択する．
   void
@@ -124,12 +106,6 @@ private:
 
   // モード
   ymuint mMode;
-
-  // カットを保持するオブジェクト
-  CutHolder mCutHolder;
-
-  // カットの置き換えを行うオブジェクト
-  CutResub mCutResub;
 
   // マッピング用の作業領域
   vector<NodeInfo> mNodeInfo;

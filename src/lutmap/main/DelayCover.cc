@@ -9,15 +9,16 @@
 
 #include "DelayCover.h"
 #include "Cut.h"
-#include "MapGen.h"
+#include "CutHolder.h"
 #include "MapRecord.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
-DelayCover::DelayCover()
+DelayCover::DelayCover(ymuint mode)
 {
+  mMode = mode;
 }
 
 // デストラクタ
@@ -25,54 +26,14 @@ DelayCover::~DelayCover()
 {
 }
 
-// @brief 遅延最小化マッピングを行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] limit LUT の入力数
-// @param[in] slack 最小段数に対するスラック
-// @param[in] mode モード
-//  - 0: fanout フロー, resub なし
-//  - 1: weighted フロー, resub なし
-//  - 2: fanout フロー, resub あり
-//  - 3: weighted フロー, resub あり
-// @param[out] map_network マッピング結果
-// @param[out] lut_num LUT数
-// @param[out] depth 段数
-void
-DelayCover::operator()(const SbjGraph& sbjgraph,
-		       ymuint limit,
-		       ymuint slack,
-		       ymuint mode,
-		       BnBuilder& map_network,
-		       ymuint& lut_num,
-		       ymuint& depth)
-{
-  mMode = mode;
-
-  // カットを列挙する．
-  mCutHolder.enum_cut(sbjgraph, limit);
-
-  // 最良カットを記録する．
-  MapRecord maprec;
-  record_cuts(sbjgraph, limit, slack, maprec);
-
-  if ( mode & 2 ) {
-    // cut resubstituion
-    mCutResub(sbjgraph, mCutHolder, maprec, slack);
-  }
-
-  // 最終的なネットワークを生成する．
-  MapGen gen;
-  gen.generate(sbjgraph, maprec, map_network, lut_num, depth);
-}
-
 // @brief best cut の記録を行う．
 // @param[in] sbjgraph サブジェクトグラフ
-// @param[in] limit LUT の入力数
+// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
 // @param[in] slack 最小段数に対するスラック
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 DelayCover::record_cuts(const SbjGraph& sbjgraph,
-			ymuint limit,
+			const CutHolder& cut_holder,
 			ymuint slack,
 			MapRecord& maprec)
 {
@@ -86,6 +47,7 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   for (ymuint i = 0; i < n; ++ i) {
     mNodeInfo[i].mCostList.set_mgr(&mCostMgr);
   }
+  ymuint limit = cut_holder.limit();
   mWeight.resize(limit);
   mIcostLists.resize(limit);
 
@@ -102,7 +64,7 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   ymuint nl = sbjgraph.logic_num();
   for (ymuint i = 0; i < nl; ++ i) {
     const SbjNode* node = sbjgraph.logic(i);
-    record(node);
+    record(node, cut_holder);
   }
 
   // 最小段数の最大値をもとめる．
@@ -140,11 +102,12 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 
 // node のカットを選択する．
 void
-DelayCover::record(const SbjNode* node)
+DelayCover::record(const SbjNode* node,
+		   const CutHolder& cut_holder)
 {
   int min_depth = INT_MAX;
   NodeInfo& t = mNodeInfo[node->id()];
-  const CutList& cut_list = mCutHolder.cut_list(node);
+  const CutList& cut_list = cut_holder.cut_list(node);
   for (CutListIterator p = cut_list.begin();
        p != cut_list.end(); ++ p) {
     const Cut* cut = *p;

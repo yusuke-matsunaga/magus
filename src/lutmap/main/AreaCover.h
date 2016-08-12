@@ -5,19 +5,18 @@
 /// @brief AreCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "lutmap_nsdef.h"
 #include "sbj_nsdef.h"
-#include "ym/ym_bnet.h"
-#include "CutHolder.h"
-#include "CutResub.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
+class Cut;
+class CutHolder;
 class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
@@ -31,7 +30,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  AreaCover();
+  /// @param[in] mode モード
+  AreaCover(ymuint mode);
 
   /// @brief デストラクタ
   ~AreaCover();
@@ -42,39 +42,20 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 面積最小化マッピングを行う．
+  /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] limit LUT の入力数
-  /// @param[in] mode モード
-  ///  - 0: fanout フロー, resub なし
-  ///  - 1: weighted フロー, resub なし
-  ///  - 2: fanout フロー, resub あり
-  ///  - 3: weighted フロー, resub あり
-  /// @param[out] map_network マッピング結果
-  /// @param[out] lut_num LUT数
-  /// @param[out] depth 段数
+  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
+  /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
-  operator()(const SbjGraph& sbjgraph,
-	     ymuint limit,
-	     ymuint mode,
-	     BnBuilder& map_network,
-	     ymuint& lut_num,
-	     ymuint& depth);
+  record_cuts(const SbjGraph& sbjgraph,
+	      const CutHolder& cut_holder,
+	      MapRecord& maprec);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] limit LUT の入力数
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
-  void
-  record_cuts(const SbjGraph& sbjgraph,
-	      ymuint limit,
-	      MapRecord& maprec);
 
   // node から各入力にいたる経路の重みを計算する．
   void
@@ -90,12 +71,6 @@ private:
 
   // モード
   ymuint mMode;
-
-  // カットを保持するオブジェクト
-  CutHolder mCutHolder;
-
-  // cut resubstitution を実行するファンクター
-  CutResub mCutResub;
 
   // 各ノードのベスト値を記録する配列．
   vector<double> mBestCost;

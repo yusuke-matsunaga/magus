@@ -9,7 +9,7 @@
 
 #include "AreaCover.h"
 #include "Cut.h"
-#include "MapGen.h"
+#include "CutHolder.h"
 #include "MapRecord.h"
 #include "SbjGraph.h"
 #include "SbjNode.h"
@@ -18,8 +18,9 @@
 BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
-AreaCover::AreaCover()
+AreaCover::AreaCover(ymuint mode)
 {
+  mMode = mode;
 }
 
 // デストラクタ
@@ -27,58 +28,19 @@ AreaCover::~AreaCover()
 {
 }
 
-// @brief 面積最小化マッピングを行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] limit LUT の入力数
-// @param[in] mode モード
-//  - 0: fanout フロー, resub なし
-//  - 1: weighted フロー, resub なし
-//  - 2: fanout フロー, resub あり
-//  - 3: weighted フロー, resub あり
-// @param[out] mapnetwork マッピング結果
-// @param[out] lut_num LUT数
-// @param[out] depth 段数
-void
-AreaCover::operator()(const SbjGraph& sbjgraph,
-		      ymuint limit,
-		      ymuint mode,
-		      BnBuilder& mapnetwork,
-		      ymuint& lut_num,
-		      ymuint& depth)
-{
-  mMode = mode;
-
-  // カットを列挙する．
-  mCutHolder.enum_cut(sbjgraph, limit);
-
-  // 最良カットを記録する．
-  MapRecord maprec;
-  record_cuts(sbjgraph, limit, maprec);
-
-  if ( mode & 2 ) {
-    // cut resubstituion
-    mCutResub(sbjgraph, mCutHolder, maprec);
-  }
-
-  // 最終的なネットワークを生成する．
-  MapGen gen;
-
-  gen.generate(sbjgraph, maprec, mapnetwork, lut_num, depth);
-}
-
 // @brief best cut の記録を行う．
 // @param[in] sbjgraph サブジェクトグラフ
-// @param[in] limit LUT の入力数
+// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 AreaCover::record_cuts(const SbjGraph& sbjgraph,
-		       ymuint limit,
+		       const CutHolder& cut_holder,
 		       MapRecord& maprec)
 {
   ymuint n = sbjgraph.max_node_id();
   mBestCost.clear();
   mBestCost.resize(n);
-  mWeight.resize(limit);
+  mWeight.resize(cut_holder.limit());
 
   maprec.init(sbjgraph);
 
@@ -97,7 +59,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
     double min_cost = DBL_MAX;
     const Cut* best_cut = nullptr;
-    const CutList& cut_list = mCutHolder.cut_list(node);
+    const CutList& cut_list = cut_holder.cut_list(node);
     for (CutListIterator p = cut_list.begin();
 	 p != cut_list.end(); ++ p) {
       const Cut* cut = *p;
