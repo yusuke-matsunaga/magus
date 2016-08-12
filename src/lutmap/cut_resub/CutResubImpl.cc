@@ -1,6 +1,6 @@
 ﻿
-/// @file lutmap/CutResub.cc
-/// @brief CutResub の実装ファイル
+/// @file lutmap/CutResubImpl.cc
+/// @brief CutResubImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
@@ -8,6 +8,7 @@
 
 
 #include "CutResub.h"
+#include "CutResubImpl.h"
 #include "SbjGraph.h"
 #include "Cut.h"
 #include "CutHolder.h"
@@ -23,14 +24,45 @@ BEGIN_NAMESPACE_YM_LUTMAP
 // クラス CutResub
 //////////////////////////////////////////////////////////////////////
 
+// @brief コンストラクタ
+CutResub::CutResub()
+{
+  mImpl = new CutResubImpl;
+}
+
+// @brief デストラクタ
+CutResub::~CutResub()
+{
+  delete mImpl;
+}
+
+// @brief カットの置き換えを行って LUT 数の削減を行う．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] cut_holder サブジェクトグラフ上のカット集合
+// @param[in] slack 段数のスラック(-1 で段数制約なし)
+// @param[inout] maprec マッピング結果
+void
+CutResub::operator()(const SbjGraph& sbjgraph,
+		     const CutHolder& cut_holder,
+		     MapRecord& maprec,
+		     int slack)
+{
+  mImpl->resub(sbjgraph, cut_holder, maprec, slack);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス CutResubImpl
+//////////////////////////////////////////////////////////////////////
+
 // コンストラクタ
-CutResub::CutResub() :
+CutResubImpl::CutResubImpl() :
   mAlloc(4096)
 {
 }
 
 // デストラクタ
-CutResub::~CutResub()
+CutResubImpl::~CutResubImpl()
 {
 }
 
@@ -39,10 +71,10 @@ CutResub::~CutResub()
 // @param[in] cut_holder サブジェクトグラフ上のカット集合
 // @param[inout] maprec マッピング結果
 void
-CutResub::operator()(const SbjGraph& sbjgraph,
-		     const CutHolder& cut_holder,
-		     MapRecord& maprec,
-		     int slack)
+CutResubImpl::resub(const SbjGraph& sbjgraph,
+		    const CutHolder& cut_holder,
+		    MapRecord& maprec,
+		    int slack)
 {
   // 作業領域の初期化(mHeap はあとで)
   ymuint n = sbjgraph.max_node_id();
@@ -231,9 +263,9 @@ CutResub::operator()(const SbjGraph& sbjgraph,
 
 // node の最適カットを選ぶ．
 void
-CutResub::back_trace(const SbjNode* sbjnode,
-		     MapRecord& maprec,
-		     CrNode* from)
+CutResubImpl::back_trace(const SbjNode* sbjnode,
+			 MapRecord& maprec,
+			 CrNode* from)
 {
   CrNode* node = mNodeArray[sbjnode->id()];
   if ( node == nullptr ) {
@@ -260,7 +292,7 @@ CutResub::back_trace(const SbjNode* sbjnode,
 
 // ゲインの計算を行う．
 ymuint
-CutResub::calc_gain(CrNode* node)
+CutResubImpl::calc_gain(CrNode* node)
 {
   if ( node->is_output() ) return 0;
 
@@ -278,7 +310,7 @@ CutResub::calc_gain(CrNode* node)
 
 // 構造のみで置き換えが可能かどうか判断する．
 bool
-CutResub::check_structure(CrNode* node)
+CutResubImpl::check_structure(CrNode* node)
 {
   if ( node->is_output() ) {
     return false;
@@ -316,8 +348,8 @@ CutResub::check_structure(CrNode* node)
 
 // node を冗長にする置き換えカットを求める．
 bool
-CutResub::find_subst(CrNode* node,
-		     vector<const Cut*>& subst_list)
+CutResubImpl::find_subst(CrNode* node,
+			 vector<const Cut*>& subst_list)
 {
   subst_list.clear();
   const vector<CrNode*>& fo_list = node->fanout_list();
@@ -367,8 +399,8 @@ END_NONAMESPACE
 
 // レベルを考慮しつつ node を冗長にする置き換えカットを求める．
 bool
-CutResub::find_subst2(CrNode* node,
-		      vector<const Cut*>& subst_list)
+CutResubImpl::find_subst2(CrNode* node,
+			  vector<const Cut*>& subst_list)
 {
   subst_list.clear();
 
@@ -440,8 +472,8 @@ CutResub::find_subst2(CrNode* node,
 }
 
 void
-CutResub::update(CrNode* node,
-		 const vector<const Cut*>& subst_list)
+CutResubImpl::update(CrNode* node,
+		     const vector<const Cut*>& subst_list)
 {
 #ifdef DEBUG_UPDATE
   cout << "update at " << node->sbjnode()->id_str()
@@ -603,9 +635,9 @@ CutResub::update(CrNode* node,
 
 // node のカットを old_cut から new_cut に置き換える．
 void
-CutResub::subst_cut_fanouts(CrNode* node,
-			    const Cut* old_cut,
-			    const Cut* new_cut)
+CutResubImpl::subst_cut_fanouts(CrNode* node,
+				const Cut* old_cut,
+				const Cut* new_cut)
 {
   ymuint old_ni = old_cut->input_num();
   ymuint new_ni = new_cut->input_num();
@@ -663,7 +695,7 @@ CutResub::subst_cut_fanouts(CrNode* node,
 
 // ゲイン計算用のキューにつむ．
 void
-CutResub::put_gq(CrNode* node)
+CutResubImpl::put_gq(CrNode* node)
 {
   if ( !node->is_output() && !node->in_GQ() ) {
     node->set_GQ();
@@ -673,7 +705,7 @@ CutResub::put_gq(CrNode* node)
 
 // ゲイン計算用のキューから取り出す．
 CrNode*
-CutResub::get_gq()
+CutResubImpl::get_gq()
 {
   CrNode* node = mGQ.getmin();
   node->clear_GQ();
@@ -682,7 +714,7 @@ CutResub::get_gq()
 
 // レベル計算用のキューにつむ．
 void
-CutResub::put_lq(CrNode* node)
+CutResubImpl::put_lq(CrNode* node)
 {
   if ( !node->in_LQ() ) {
     node->set_LQ();
@@ -692,7 +724,7 @@ CutResub::put_lq(CrNode* node)
 
 // レベル計算用のキューから取り出す．
 CrNode*
-CutResub::get_lq()
+CutResubImpl::get_lq()
 {
   CrNode* node = mLQ.getmin();
   node->clear_LQ();
@@ -701,7 +733,7 @@ CutResub::get_lq()
 
 // 要求レベル計算用のキューにつむ．
 void
-CutResub::put_rq(CrNode* node)
+CutResubImpl::put_rq(CrNode* node)
 {
   if ( !node->in_RQ() ) {
     node->set_RQ();
@@ -711,7 +743,7 @@ CutResub::put_rq(CrNode* node)
 
 // 要求レベル計算用のキューから取り出す．
 CrNode*
-CutResub::get_rq()
+CutResubImpl::get_rq()
 {
   CrNode* node = mRQ.getmin();
   node->clear_RQ();
@@ -720,22 +752,22 @@ CutResub::get_rq()
 
 // カットの根に対応するノードを取り出す．
 CrNode*
-CutResub::cut_root(const Cut* cut)
+CutResubImpl::cut_root(const Cut* cut)
 {
   return mNodeArray[cut->root()->id()];
 }
 
 // カットの入力に対応するノードを取り出す．
 CrNode*
-CutResub::cut_input(const Cut* cut,
-		    ymuint pos)
+CutResubImpl::cut_input(const Cut* cut,
+			ymuint pos)
 {
   return mNodeArray[cut->input(pos)->id()];
 }
 
 // CrNode を確保する．
 CrNode*
-CutResub::alloc_node()
+CutResubImpl::alloc_node()
 {
   if ( mGarbageList.empty() ) {
     void* p =  mAlloc.get_memory(sizeof(CrNode));
@@ -750,7 +782,7 @@ CutResub::alloc_node()
 
 // CrNode を解放する．
 void
-CutResub::free_node(CrNode* node)
+CutResubImpl::free_node(CrNode* node)
 {
   mGarbageList.push_back(node);
 }

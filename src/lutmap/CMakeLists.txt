@@ -34,7 +34,7 @@ set ( cut_resub_SOURCES
   cut_resub/CrHeap.cc
   cut_resub/CrLevelQ.cc
   cut_resub/CrNode.cc
-  cut_resub/CutResub.cc
+  cut_resub/CutResubImpl.cc
   )
 
 
