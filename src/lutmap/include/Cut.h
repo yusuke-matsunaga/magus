@@ -28,23 +28,26 @@ BEGIN_NAMESPACE_YM_LUTMAP
 /// さらに葉のノードのポインタ配列を Cut 自身のメモリ領域として確保
 /// するようにしているので Cut オブジェクトの生成は特殊な方法を用いている．
 /// その為，普通には Cut オブジェクトを生成できないようにコンストラクタを
-/// private にしている．Cut オブジェクトの生成は CutHolder が行う．
+/// private にしている．Cut オブジェクトの生成は CutMgr が行う．
 ///
 /// また，Cut のリストを内部のリンクポインタで実装しているので
 /// CutList および CutListIterator を friend class にしている．
 //////////////////////////////////////////////////////////////////////
 class Cut
 {
-  friend class CutHolder;
+  friend class CutMgr;
   friend class CutList;
   friend class CutListIterator;
 
 private:
 
-  /// @brief 空のコンストラクタ
-  ///
-  /// 内容は正しくない．
-  Cut();
+  /// @brief コンストラクタ
+  /// @param[in] root カットの根のノード
+  /// @param[in] ni カットの入力数
+  /// @param[in] inputs カットの入力のノードの配列
+  Cut(const SbjNode* root,
+      ymuint ni,
+      const SbjNode* inputs[]);
 
   /// @brief デストラクタ
   ~Cut();
@@ -113,11 +116,21 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// 空のコンストラクタ
+// @brief コンストラクタ
+// @param[in] root カットの根のノード
+// @param[in] ni カットの入力数
+// @param[in] inputs カットの入力のノードの配列
 inline
-Cut::Cut() :
-  mLink(nullptr)
+Cut::Cut(const SbjNode* root,
+	 ymuint ni,
+	 const SbjNode* inputs[]) :
+  mRoot(root),
+  mLink(nullptr),
+  mNi(ni)
 {
+  for (ymuint i = 0; i < ni; ++ i) {
+    mInputs[i] = inputs[i];
+  }
 }
 
 // @brief デストラクタ

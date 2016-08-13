@@ -1,0 +1,72 @@
+#ifndef LBCALC_H
+#define LBCALC_H
+
+/// @file LbCalc.h
+/// @brief LbCalc のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2016 Yusuke Matsunaga
+/// All rights reserved.
+
+
+#include "lutmap_nsdef.h"
+#include "sbj_nsdef.h"
+
+
+BEGIN_NAMESPACE_YM_LUTMAP
+
+class Cut;
+class CutHolder;
+
+//////////////////////////////////////////////////////////////////////
+/// @class LbCalc LbCalc.h "LbCalc.h"
+/// @brief 下界を計算するクラス
+//////////////////////////////////////////////////////////////////////
+class LbCalc
+{
+public:
+
+  /// @brief コンストラクタ
+  LbCalc();
+
+  /// @brief デストラクタ
+  ~LbCalc();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @breif 下界の計算をする．
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] cut_holder カットを保持するオブジェクト
+  double
+  lower_bound1(const SbjGraph& sbjgraph,
+	       const CutHolder& cut_holder);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief カットのカバーしているノードを求める．
+  void
+  get_node_list(const Cut* cut,
+		vector<const SbjNode*>& node_list);
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 作業領域
+  vector<bool> mMark;
+
+};
+
+END_NAMESPACE_YM_LUTMAP
+
+#endif // LBCALC_H

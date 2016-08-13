@@ -11,6 +11,7 @@
 #include "Bn2Sbj.h"
 #include "SbjGraph.h"
 #include "AreaCover.h"
+#include "AreaCover_MCT2.h"
 #include "DelayCover.h"
 #include "CutHolder.h"
 #include "CutResub.h"
@@ -63,9 +64,15 @@ LutMap::area_map(const BnNetwork& src_network,
   cut_holder.enum_cut(sbjgraph, limit);
 
   // 最良カットを記録する．
-  AreaCover area_cover(mode);
   MapRecord maprec;
-  area_cover.record_cuts(sbjgraph, cut_holder, maprec);
+  if ( mode & 4 ) {
+    nsMct2::AreaCover_MCT2 area_cover(mode);
+    area_cover.record_cuts(sbjgraph, cut_holder, maprec);
+  }
+  else {
+    AreaCover area_cover(mode);
+    area_cover.record_cuts(sbjgraph, cut_holder, maprec);
+  }
 
   if ( mode & 2 ) {
     // cut resubstituion

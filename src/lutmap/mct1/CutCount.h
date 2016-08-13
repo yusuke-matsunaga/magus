@@ -1,58 +1,52 @@
-﻿#ifndef CUTHOLDER_H
-#define CUTHOLDER_H
+#ifndef CUTCOUNT_H
+#define CUTCOUNT_H
 
-/// @file CutHolder.h
-/// @brief CutHolder のヘッダファイル
+/// @file CutCount.h
+/// @brief CutCount のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
+#include "mct1_nsdef.h"
 #include "EnumCutOp.h"
-#include "Cut.h"
-#include "CutList.h"
-#include "CutMgr.h"
-#include "SbjNode.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP
+BEGIN_NAMESPACE_YM_LUTMAP_MCT1
 
 //////////////////////////////////////////////////////////////////////
-/// @class CutHolder
-/// @brief 各ノードの cut を保持するクラス
+/// @class CutCount CutCount.h "CutCount.h"
+/// @brief 各ノードをカバーするカットの最大サイズを求めるためのクラス
 //////////////////////////////////////////////////////////////////////
-class CutHolder :
+class CutCount :
   public EnumCutOp
 {
 public:
 
   /// @brief コンストラクタ
-  CutHolder();
+  CutCount();
 
   /// @brief デストラクタ
-  virtual
-  ~CutHolder();
+  ~CutCount();
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
-  /// @brief node を根とするカットのリストを取り出す．
-  const CutList&
-  cut_list(const SbjNode* node) const;
-
-  /// @brief 現在のカットを列挙したときのカットサイズを返す．
-  ymuint
-  limit() const;
-
-  /// @brief 保持しているカットのリストを削除する．
-  void
-  clear();
+  /// @brief 理論上の下界を計算する．
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] limit カットサイズ
+  double
+  lower_bound(const SbjGraph& sbjgraph,
+	      ymuint limit);
 
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // EnumCutOp の継承クラスが定義する必要のある仮想関数
+  // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 処理の最初に呼ばれる関数
@@ -98,10 +92,6 @@ private:
 	   ymuint ncuts);
 
   /// @brief 処理の最後に呼ばれる関数
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] limit カットサイズ
-  /// @note sbjgraph, limit, mode は 対となる all_init で
-  /// 用いられたものと同じものが与えられる．
   virtual
   void
   all_end(const SbjGraph& sbjgraph,
@@ -113,38 +103,19 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // カットを管理するオブジェクト
-  CutMgr mMgr;
+  // ノード数
+  ymuint mNodeNum;
 
-  // カットサイズ
-  ymuint32 mLimit;
+  // 各ノードをカバーするカットの最大サイズを記録する配列
+  // サイズは mNodeNum
+  vector<ymuint> mCutSizeArray;
 
-  // 各ノードのカットのリスト
-  CutList* mCutList;
+  // 作業用のマークを入れる配列
+  // サイズは mNodeNum
+  vector<bool> mMark;
 
 };
 
+END_NAMESPACE_YM_LUTMAP_MCT1
 
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief node を根とするカットのリストを取り出す．
-inline
-const CutList&
-CutHolder::cut_list(const SbjNode* node) const
-{
-  return mCutList[node->id()];
-}
-
-// @brief 現在のカットを列挙したときのカットサイズを返す．
-inline
-ymuint
-CutHolder::limit() const
-{
-  return mLimit;
-}
-
-END_NAMESPACE_YM_LUTMAP
-
-#endif // CUTHOLDER_H
+#endif // CUTCOUNT_H

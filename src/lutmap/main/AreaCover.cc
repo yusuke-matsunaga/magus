@@ -37,9 +37,34 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       const CutHolder& cut_holder,
 		       MapRecord& maprec)
 {
+  record_cuts(sbjgraph, cut_holder, vector<const SbjNode*>(0), maprec);
+}
+
+// @brief best cut の記録を行う．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
+// @param[in] boundary_list 境界ノードのリスト
+// @param[out] maprec マッピング結果を記録するオブジェクト
+void
+AreaCover::record_cuts(const SbjGraph& sbjgraph,
+		       const CutHolder& cut_holder,
+		       const vector<const SbjNode*>& boundary_list,
+		       MapRecord& maprec)
+{
   ymuint n = sbjgraph.max_node_id();
+
+  // 作業領域の初期化
   mBestCost.clear();
   mBestCost.resize(n);
+
+  // 境界マークをつける．
+  mBoundaryMark.clear();
+  mBoundaryMark.resize(n, false);
+  for (ymuint i = 0; i < boundary_list.size(); ++ i) {
+    const SbjNode* node = boundary_list[i];
+    mBoundaryMark[node->id()] = true;
+  }
+
   mWeight.resize(cut_holder.limit());
 
   maprec.init(sbjgraph);
@@ -93,7 +118,9 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       double cur_cost = 1.0;
       for (ymuint i = 0; i < ni; ++ i) {
 	const SbjNode* inode = cut->input(i);
-	cur_cost += mBestCost[inode->id()] * mWeight[i];
+	if ( !mBoundaryMark[inode->id()] ) {
+	  cur_cost += mBestCost[inode->id()] * mWeight[i];
+	}
       }
       if ( min_cost > cur_cost ) {
 	min_cost = cur_cost;
