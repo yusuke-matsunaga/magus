@@ -1,8 +1,8 @@
-#ifndef LBCALC_H
-#define LBCALC_H
+#ifndef DGGRAPH_H
+#define DGGRAPH_H
 
-/// @file LbCalc.h
-/// @brief LbCalc のヘッダファイル
+/// @file DgGraph.h
+/// @brief DgGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2016 Yusuke Matsunaga
@@ -10,27 +10,26 @@
 
 
 #include "lutmap_nsdef.h"
-#include "sbj_nsdef.h"
-
+#include "ym/HashMap.h"
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
-class Cut;
-class CutHolder;
+class DgNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class LbCalc LbCalc.h "LbCalc.h"
-/// @brief 下界を計算するクラス
+/// @class DgGraph DgGraph.h "DgGraph.h"
+/// @brief dependence graph (DG)を表すクラス
 //////////////////////////////////////////////////////////////////////
-class LbCalc
+class DgGraph
 {
 public:
 
   /// @brief コンストラクタ
-  LbCalc();
+  /// @param[in] node_num ノード数
+  DgGraph(ymuint node_num);
 
   /// @brief デストラクタ
-  ~LbCalc();
+  ~DgGraph();
 
 
 public:
@@ -38,12 +37,24 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @breif 下界の計算をする．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder カットを保持するオブジェクト
+  /// @brief ノード数を得る．
   ymuint
-  lower_bound(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder);
+  node_num() const;
+
+  /// @brief ノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < node_num() )
+  DgNode*
+  node(ymuint pos);
+
+  /// @brief 枝を張nる．
+  /// @param[in] id1, id2 両端のノード番号
+  void
+  connect(ymuint id1,
+	  ymuint id2);
+
+  /// @brief maximal independent set のサイズを求める．
+  ymuint
+  get_mis_size();
 
 
 private:
@@ -51,22 +62,30 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief カットのカバーしているノードを求める．
-  void
-  get_node_list(const Cut* cut,
-		vector<const SbjNode*>& node_list);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 作業領域
-  vector<bool> mMark;
+  // ノード数
+  ymuint mNodeNum;
+
+  // ノードの(実体の)配列
+  DgNode* mNodeArray;
+
+  HashMap<ymuint, ymuint> mEdgeHash;
 
 };
 
+// @brief ノード数を得る．
+inline
+ymuint
+DgGraph::node_num() const
+{
+  return mNodeNum;
+}
+
 END_NAMESPACE_YM_LUTMAP
 
-#endif // LBCALC_H
+#endif // DGGRAPH_H

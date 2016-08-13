@@ -22,7 +22,9 @@ set ( main_SOURCES
   main/AreaCover.cc
   main/DelayCover.cc
   main/LbCalc.cc
+  main/DgGraph.cc
   main/LutMap.cc
+  main/LutMap2.cc
   )
 
 set ( mct1_SOURCES

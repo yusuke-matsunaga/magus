@@ -113,8 +113,6 @@ add_subdirectory (src/cequiv)
 #add_subdirectory (src/seal)
 add_subdirectory (src/sbjgraph)
 add_subdirectory (src/lutmap)
-add_subdirectory (src/lutmap2)
-add_subdirectory (src/lutmap3)
 #add_subdirectory (src/cellmap)
 
 add_subdirectory (magus_tclsh)

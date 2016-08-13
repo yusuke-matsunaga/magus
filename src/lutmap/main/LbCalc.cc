@@ -12,6 +12,8 @@
 #include "Cut.h"
 #include "CutHolder.h"
 #include "CutList.h"
+#include "DgGraph.h"
+#include "DgNode.h"
 
 
 BEGIN_NAMESPACE_YM_LUTMAP
@@ -33,9 +35,9 @@ LbCalc::~LbCalc()
 // @breif 下界の計算をする．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cut_holder カットを保持するオブジェクト
-double
-LbCalc::lower_bound1(const SbjGraph& sbjgraph,
-		     const CutHolder& cut_holder)
+ymuint
+LbCalc::lower_bound(const SbjGraph& sbjgraph,
+		    const CutHolder& cut_holder)
 {
   ymuint node_num = sbjgraph.max_node_id();
 
@@ -43,9 +45,16 @@ LbCalc::lower_bound1(const SbjGraph& sbjgraph,
   mMark.clear();
   mMark.resize(node_num, false);
 
+  DgGraph dg(node_num);
+
   vector<ymuint> max_value(node_num, 0);
   for (ymuint i = 0; i < node_num; ++ i) {
     const SbjNode* node = sbjgraph.node(i);
+    if ( !node->is_logic() ) {
+      DgNode* dgnode = dg.node(node->id());
+      dgnode->inactivate();
+    }
+
     const CutList& cut_list = cut_holder.cut_list(node);
     for (CutListIterator p = cut_list.begin(); p != cut_list.end(); ++ p) {
       const Cut* cut = *p;
@@ -61,21 +70,35 @@ LbCalc::lower_bound1(const SbjGraph& sbjgraph,
 	  max_value[node1->id()] = n;
 	}
       }
+
+      // このカットでカバーされているノード対を隣接リストに入れる．
+      for (ymuint j1 = 0; j1 < n - 1; ++ j1) {
+	ymuint id1 = node_list[j1]->id();
+	for (ymuint j2 = j1 + 1; j2 < n; ++ j2) {
+	  ymuint id2 = node_list[j2]->id();
+	  dg.connect(id1, id2);
+	}
+      }
     }
   }
 
   // 各ノードの最大値の逆数が下界となる．
-  double ans = 0.0;
+  double d_lb1 = 0.0;
   for (ymuint i = 0; i < node_num; ++ i) {
     ymuint n = max_value[i];
     if ( n == 0 ) {
       continue;
     }
     double l = 1.0 / n;
-    ans += l;
+    d_lb1 += l;
   }
+  ymuint lb1 = static_cast<ymuint>(ceil(d_lb1));
 
-  return ans;
+  ymuint lb2 = dg.get_mis_size();
+
+  ymuint lb = lb1 > lb2 ? lb1 : lb2;
+
+  return lb;
 }
 
 // @brief カットのカバーしているノードを求める．

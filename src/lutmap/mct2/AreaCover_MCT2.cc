@@ -33,15 +33,17 @@ AreaCover_MCT2::~AreaCover_MCT2()
 // @brief best cut の記録を行う．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cut_holder 各ノードのカットを保持するオブジェクト
+// @param[in] count 試行回数
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 AreaCover_MCT2::record_cuts(const SbjGraph& sbjgraph,
 			    const CutHolder& cut_holder,
+			    ymuint count,
 			    MapRecord& maprec)
 {
   MctSearch mct(sbjgraph, cut_holder, cut_holder.limit(), mMode);
 
-  mct.search(1000000);
+  mct.search(count);
 
   maprec = mct.best_record();
 }

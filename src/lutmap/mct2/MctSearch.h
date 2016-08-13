@@ -108,8 +108,14 @@ private:
   // 状態
   MctState mState;
 
-  // 基準値
-  double mBaseline;
+  // 上界
+  ymuint mUpperBound;
+
+  // 下界
+  ymuint mLowerBound;
+
+  // 上界と下界の幅
+  double mWidth;
 
   // トータルの試行回数
   ymuint mNumAll;

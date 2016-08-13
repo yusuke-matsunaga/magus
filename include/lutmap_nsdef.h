@@ -26,21 +26,14 @@ END_NAMESPACE_YM
 BEGIN_NAMESPACE_YM_LUTMAP
 
 class LutMap;
-
-class LnGraph;
-class LnPort;
-class LnEdge;
-class LnNode;
+class LutMap2;
 
 END_NAMESPACE_YM_LUTMAP
 
 BEGIN_NAMESPACE_YM
 
 using nsLutmap::LutMap;
-using nsLutmap::LnGraph;
-using nsLutmap::LnPort;
-using nsLutmap::LnEdge;
-using nsLutmap::LnNode;
+using nsLutmap::LutMap2;
 
 END_NAMESPACE_YM
 

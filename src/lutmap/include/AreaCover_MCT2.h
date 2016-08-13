@@ -49,10 +49,12 @@ public:
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
+  /// @param[in] count 試行回数
   /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
   record_cuts(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder,
+	      ymuint count,
 	      MapRecord& maprec);
 
 

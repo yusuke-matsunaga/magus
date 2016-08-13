@@ -37,7 +37,7 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
   mInsideNodeMark(sbjgraph.max_node_id(), false)
 {
   LbCalc lbcalc;
-  mBaseline = lbcalc.lower_bound1(sbjgraph, cut_holder);
+  mBaseline = lbcalc.lower_bound(sbjgraph, cut_holder);
 
   ymuint nf = 0;
   for (ymuint i = 0; i < sbjgraph.logic_num(); ++ i) {

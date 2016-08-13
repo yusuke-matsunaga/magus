@@ -1,16 +1,16 @@
 ﻿
-/// @file LutMap.cc
-/// @brief LutMap の実装ファイル
+/// @file LutMap2.cc
+/// @brief LutMap2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LutMap.h"
+#include "LutMap2.h"
 #include "Bn2Sbj.h"
 #include "SbjGraph.h"
-#include "AreaCover.h"
+#include "AreaCover_MCT2.h"
 #include "DelayCover.h"
 #include "CutHolder.h"
 #include "CutResub.h"
@@ -21,16 +21,16 @@
 BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
-// クラス LutMap
+// クラス LutMap2
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LutMap::LutMap()
+LutMap2::LutMap2()
 {
 }
 
 // @brief デストラクタ
-LutMap::~LutMap()
+LutMap2::~LutMap2()
 {
 }
 
@@ -42,16 +42,18 @@ LutMap::~LutMap()
 //  - 1: weighted フロー, resub なし
 //  - 2: fanout フロー, resub あり
 //  - 3: weighted フロー, resub あり
+// @param[in] count 試行回数
 // @param[out] map_network マッピング結果
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-LutMap::area_map(const BnNetwork& src_network,
-		 ymuint limit,
-		 ymuint mode,
-		 BnBuilder& map_network,
-		 ymuint& lut_num,
-		 ymuint& depth)
+LutMap2::area_map(const BnNetwork& src_network,
+		  ymuint limit,
+		  ymuint mode,
+		  ymuint count,
+		  BnBuilder& map_network,
+		  ymuint& lut_num,
+		  ymuint& depth)
 {
 
   SbjGraph sbjgraph;
@@ -64,8 +66,8 @@ LutMap::area_map(const BnNetwork& src_network,
 
   // 最良カットを記録する．
   MapRecord maprec;
-  AreaCover area_cover(mode);
-  area_cover.record_cuts(sbjgraph, cut_holder, maprec);
+  nsMct2::AreaCover_MCT2 area_cover(mode);
+  area_cover.record_cuts(sbjgraph, cut_holder, count, maprec);
 
   if ( mode & 2 ) {
     // cut resubstituion
@@ -79,6 +81,7 @@ LutMap::area_map(const BnNetwork& src_network,
   gen.generate(sbjgraph, maprec, map_network, lut_num, depth);
 }
 
+#if 0
 // @brief 段数最小化 DAG covering のヒューリスティック関数
 // @param[in] src_network もとのネットワーク
 // @param[in] limit カットサイズ
@@ -92,7 +95,7 @@ LutMap::area_map(const BnNetwork& src_network,
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-LutMap::delay_map(const BnNetwork& src_network,
+LutMap2::delay_map(const BnNetwork& src_network,
 		  ymuint limit,
 		  ymuint slack,
 		  ymuint mode,
@@ -124,5 +127,6 @@ LutMap::delay_map(const BnNetwork& src_network,
   MapGen gen;
   gen.generate(sbjgraph, maprec, map_network, lut_num, depth);
 }
+#endif
 
 END_NAMESPACE_YM_LUTMAP

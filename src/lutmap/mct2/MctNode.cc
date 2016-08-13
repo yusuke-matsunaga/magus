@@ -66,14 +66,16 @@ MctNode::expand_child()
 
 // @brief 子供ノードを並び替える．
 // @param[in] n_all_ln トータルの試行回数の ln
+// @param[in] cp 調整パラメータ
 void
-MctNode::reorder(double n_all_ln)
+MctNode::reorder(double n_all_ln,
+		 double cp)
 {
   if ( mUnexpandedNum == 0 ) {
     MctNode* node0 = mChildList[0];
     MctNode* node1 = mChildList[1];
-    double val0 = node0->UCB1(n_all_ln);
-    double val1 = node1->UCB1(n_all_ln);
+    double val0 = node0->UCB1(n_all_ln, cp);
+    double val1 = node1->UCB1(n_all_ln, cp);
     if ( val0 < val1 ) {
       mChildList[0] = node1;
       mChildList[1] = node0;

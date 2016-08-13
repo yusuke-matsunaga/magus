@@ -69,8 +69,10 @@ public:
 
   /// @brief 子供ノードを並び替える．
   /// @param[in] n_all_ln トータルの試行回数の ln
+  /// @param[in] cp 調整パラメータ
   void
-  reorder(double n_all_ln);
+  reorder(double n_all_ln,
+	  double cp);
 
   /// @brief 評価値の更新を行う．
   /// @param[in] val 評価値
@@ -79,8 +81,10 @@ public:
 
   /// @brief UCB1 値を返す．
   /// @param[in] n_all_ln トータルの試行回数の ln
+  /// @param[in] cp 調整パラメータ
   double
-  UCB1(double n_all_ln) const;
+  UCB1(double n_all_ln,
+       double cp) const;
 
 
 private:
@@ -178,11 +182,13 @@ MctNode::update(double val)
 
 // @brief UCB1 値を返す．
 // @param[in] n_all トータルの試行回数の ln
+// @param[in] cp 調整パラメータ
 inline
 double
-MctNode::UCB1(double n_all_ln) const
+MctNode::UCB1(double n_all_ln,
+	      double cp) const
 {
-  return mMean + 0.3 * sqrt(2 * n_all_ln / mNum);
+  return mMean + cp * sqrt(2 * n_all_ln / mNum);
 }
 
 END_NAMESPACE_YM_LUTMAP_MCT2

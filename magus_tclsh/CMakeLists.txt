@@ -119,8 +119,6 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:magus_sbjgraph_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
-  $<TARGET_OBJECTS:magus_lutmap2_a>
-  $<TARGET_OBJECTS:magus_lutmap3_a>
 #  $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
   $<TARGET_OBJECTS:ym_common_a>
@@ -175,8 +173,6 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:magus_sbjgraph_p>
 #  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
-  $<TARGET_OBJECTS:magus_lutmap2_p>
-  $<TARGET_OBJECTS:magus_lutmap3_p>
 #  $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
   $<TARGET_OBJECTS:ym_common_p>
@@ -231,8 +227,6 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:magus_sbjgraph_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
-  $<TARGET_OBJECTS:magus_lutmap2_d>
-  $<TARGET_OBJECTS:magus_lutmap3_d>
 #  $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
   $<TARGET_OBJECTS:ym_common_d>

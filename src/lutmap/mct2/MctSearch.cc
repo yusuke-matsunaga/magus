@@ -73,8 +73,11 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
   mAreaCover(mode),
   mState(sbjgraph)
 {
+
+  mUpperBound = sbjgraph.logic_num();
   LbCalc lbcalc;
-  mBaseline = lbcalc.lower_bound1(sbjgraph, cut_holder);
+  mLowerBound = lbcalc.lower_bound(sbjgraph, cut_holder);
+  mWidth = static_cast<double>(mUpperBound - mLowerBound);
 
   // ファンアウトポイントを求める．
   vector<pair<const SbjNode*, ymuint> > tmp_list;
@@ -85,7 +88,6 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
       ymuint ni = dfs(node->fanin(0), mark);
       ni += dfs(node->fanin(1), mark);
       tmp_list.push_back(make_pair(node, ni));
-      cout << node->id_str() << ": " << ni << endl;
     }
   }
   // サイズの降順にソートする．
@@ -237,7 +239,7 @@ MctSearch::default_policy(MctNode* node)
     mMinimumLutNum = lut_num;
     mBestRecord = record;
   }
-  double val = mBaseline / lut_num;
+  double val = static_cast<double>(mUpperBound - lut_num) / mWidth;
   ymuint slack = mFanoutPointList.size() - node->index();
   cout << "#LUT = " << lut_num << "(" << slack << ")" << " / " << mMinimumLutNum << endl;
   return val;
@@ -256,7 +258,7 @@ MctSearch::back_up(MctNode* node,
       break;
     }
     ASSERT_COND( parent->best_child() == node );
-    parent->reorder(num_all_ln);
+    parent->reorder(num_all_ln, 0.5);
     node = parent;
   }
 }

@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "lutmap2_nsdef.h"
+#include "lutmap_nsdef.h"
 #include "ym/ym_bnet.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP2
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class LutMap2 LutMap2.h "LutMap2.h"
@@ -43,6 +43,7 @@ public:
   ///  - 1: weighted フロー, resub なし
   ///  - 2: fanout フロー, resub あり
   ///  - 3: weighted フロー, resub あり
+  /// @param[in] count 試行回数
   /// @param[out] mapnetwork マッピング結果
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
@@ -50,6 +51,7 @@ public:
   area_map(const BnNetwork& sbjgraph,
 	   ymuint limit,
 	   ymuint mode,
+	   ymuint count,
 	   BnBuilder& mapnetwork,
 	   ymuint& lut_num,
 	   ymuint& depth);
@@ -79,6 +81,6 @@ public:
 
 };
 
-END_NAMESPACE_YM_LUTMAP2
+END_NAMESPACE_YM_LUTMAP
 
 #endif // LUTMAP2_H

@@ -13,7 +13,6 @@
 #include "ym/TclPopt.h"
 
 #include "LutMap2.h"
-#include "LutMap3.h"
 
 #include "ym/BnBuilder.h"
 #include "ym/MvnMgr.h"
@@ -32,7 +31,9 @@ AreaMap2Cmd::AreaMap2Cmd(MagMgr* mgr,
 {
   mPoptMethod = new TclPoptStr(this, "method",
 			       "specify covering method",
-			       "tree|df|dag|fo");
+			       "dag|fo");
+  mPoptResub = new TclPopt(this, "resub",
+			   "do cut resubstitution");
   mPoptCount = new TclPoptInt(this, "count",
 			      "sepcify count limit <INT>");
   mPoptVerbose = new TclPopt(this, "verbose",
@@ -66,7 +67,11 @@ AreaMap2Cmd::cmd_proc(TclObjVector& objv)
       return TCL_ERROR;
     }
   }
-  ymuint count = 10000;
+  if ( mPoptResub->is_specified() ) {
+    mode |= 2;
+  }
+
+  ymuint count = 1000;
   if ( mPoptCount->is_specified() ) {
     count = mPoptCount->val();
   }
@@ -83,7 +88,7 @@ AreaMap2Cmd::cmd_proc(TclObjVector& objv)
     return code;
   }
 
-  LutMap3 lutmap;
+  LutMap2 lutmap;
 
   ymuint lut_num;
   ymuint depth;
@@ -93,7 +98,7 @@ AreaMap2Cmd::cmd_proc(TclObjVector& objv)
   case NetHandle::kMagBn:
     {
       BnBuilder builder;
-      lutmap.area_map(*neth->bnetwork(), limit, count, builder, lut_num, depth);
+      lutmap.area_map(*neth->bnetwork(), limit, mode, count, builder, lut_num, depth);
       neth->_bnetwork()->copy(builder);
     }
     break;
