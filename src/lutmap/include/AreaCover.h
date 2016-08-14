@@ -62,6 +62,19 @@ public:
 	      const vector<const SbjNode*>& boundary_list,
 	      MapRecord& maprec);
 
+  /// @brief best cut の記録を行う．
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
+  /// @param[in] boundary_list 境界ノードのリスト
+  /// @param[in] dupnode_list 重複ノードのリスト
+  /// @param[out] maprec マッピング結果を記録するオブジェクト
+  void
+  record_cuts(const SbjGraph& sbjgraph,
+	      const CutHolder& cut_holder,
+	      const vector<const SbjNode*>& boundary_list,
+	      const vector<const SbjNode*>& dupnode_list,
+	      MapRecord& maprec);
+
 
 private:
   //////////////////////////////////////////////////////////////////////

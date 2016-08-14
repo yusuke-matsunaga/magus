@@ -11,10 +11,10 @@
 #include "MctNode.h"
 #include "MctState.h"
 #include "MapRecord.h"
-#include "MapGen.h"
+#include "MapEst.h"
 #include "LbCalc.h"
 #include "SbjGraph.h"
-#include "ym/BnBuilder.h"
+
 #include "SbjDumper.h"
 
 
@@ -256,7 +256,7 @@ MctSearch::default_policy(MctNode* node)
   }
 
   MapRecord record;
-  mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), record);
+  mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), mState.block_list(), record);
 #else
 
   ymuint nf = mFanoutPointList.size();
@@ -269,18 +269,17 @@ MctSearch::default_policy(MctNode* node)
       const SbjNode* node = mFanoutPointList[pos];
       boundary_list.push_back(node);
     }
-    mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
+    mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, mState.block_list(), record);
   }
   else {
-    mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), record);
+    mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), mState.block_list(), record);
   }
 #endif
 
-  MapGen mapgen;
+  MapEst mapest;
   ymuint lut_num;
   ymuint depth;
-  BnBuilder mapgraph;
-  mapgen.generate(mSbjGraph, record, mapgraph, lut_num, depth);
+  mapest.estimate(mSbjGraph, record, lut_num, depth);
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;
     mBestRecord = record;

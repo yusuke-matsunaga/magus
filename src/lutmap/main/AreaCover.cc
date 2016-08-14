@@ -37,7 +37,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       const CutHolder& cut_holder,
 		       MapRecord& maprec)
 {
-  record_cuts(sbjgraph, cut_holder, vector<const SbjNode*>(0), maprec);
+  record_cuts(sbjgraph, cut_holder, vector<const SbjNode*>(0), vector<const SbjNode*>(0), maprec);
 }
 
 // @brief best cut の記録を行う．
@@ -49,6 +49,22 @@ void
 AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       const CutHolder& cut_holder,
 		       const vector<const SbjNode*>& boundary_list,
+		       MapRecord& maprec)
+{
+  record_cuts(sbjgraph, cut_holder, boundary_list, vector<const SbjNode*>(0), maprec);
+}
+
+// @brief best cut の記録を行う．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
+// @param[in] boundary_list 境界ノードのリスト
+// @param[in] dupnode_list 重複ノードのリスト
+// @param[out] maprec マッピング結果を記録するオブジェクト
+void
+AreaCover::record_cuts(const SbjGraph& sbjgraph,
+		       const CutHolder& cut_holder,
+		       const vector<const SbjNode*>& boundary_list,
+		       const vector<const SbjNode*>& dupnode_list,
 		       MapRecord& maprec)
 {
   ymuint n = sbjgraph.max_node_id();
@@ -63,6 +79,12 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   for (ymuint i = 0; i < boundary_list.size(); ++ i) {
     const SbjNode* node = boundary_list[i];
     mBoundaryMark[node->id()] = 1;
+  }
+  for (ymuint i = 0; i < dupnode_list.size(); ++ i) {
+    const SbjNode* node = dupnode_list[i];
+    if ( mBoundaryMark[node->id()] == 0 ) {
+      mBoundaryMark[node->id()] = 2;
+    }
   }
 
   mWeight.resize(cut_holder.limit());
@@ -104,7 +126,19 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	// ファンアウトモード
 	for (ymuint i = 0; i < ni; ++ i) {
 	  const SbjNode* inode = cut->input(i);
-	  mWeight[i] = 1.0 / inode->fanout_num();
+	  switch ( mBoundaryMark[inode->id()] ) {
+	  case 0:
+	    mWeight[i] = 1.0 / inode->fanout_num();
+	    break;
+
+	  case 1:
+	    mWeight[i] = 0.0;
+	    break;
+
+	  case 2:
+	    mWeight[i] = 1.0;
+	    break;
+	  }
 	}
       }
       else {
@@ -113,14 +147,27 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	  mWeight[i] = 0.0;
 	}
 	calc_weight(node, cut, 1.0);
+	for (ymuint i = 0; i < ni; ++ i) {
+	  const SbjNode* inode = cut->input(i);
+	  switch ( mBoundaryMark[inode->id()] ) {
+	  case 0:
+	    break;
+
+	  case 1:
+	    mWeight[i] = 0.0;
+	    break;
+
+	  case 2:
+	    mWeight[i] = 1.0;
+	    break;
+	  }
+	}
       }
 
       double cur_cost = 1.0;
       for (ymuint i = 0; i < ni; ++ i) {
 	const SbjNode* inode = cut->input(i);
-	if ( mBoundaryMark[inode->id()] == 0 ) {
-	  cur_cost += mBestCost[inode->id()] * mWeight[i];
-	}
+	cur_cost += mBestCost[inode->id()] * mWeight[i];
       }
       if ( min_cost > cur_cost ) {
 	min_cost = cur_cost;

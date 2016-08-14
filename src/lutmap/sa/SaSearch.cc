@@ -9,11 +9,9 @@
 
 #include "SaSearch.h"
 #include "MapRecord.h"
-#include "MapGen.h"
 #include "MapEst.h"
 #include "LbCalc.h"
 #include "SbjGraph.h"
-#include "ym/BnBuilder.h"
 #include "SbjDumper.h"
 
 
@@ -147,6 +145,45 @@ SaSearch::search(ymuint search_limit)
   }
 }
 
+#if 0
+
+// @brief 現在の割り当てのもとで評価を行う．
+ymuint
+SaSearch::evaluate(const vector<bool>& state)
+{
+  ymuint nf = mFanoutPointList.size();
+  vector<const SbjNode*> boundary_list;
+  boundary_list.reserve(nf);
+  vector<const SbjNode*> dupnode_list;
+  dupnode_list.reserve(nf);
+  for (ymuint i = 0; i < nf; ++ i) {
+    const SbjNode* fpnode = mFanoutPointList[i];
+    if ( state[i] ) {
+      boundary_list.push_back(fpnode);
+    }
+    else {
+      dupnode_list.push_back(fpnode);
+    }
+  }
+
+  MapRecord record;
+  mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, dupnode_list, record);
+
+  MapEst mapest;
+  ymuint lut_num;
+  ymuint depth;
+  mapest.estimate(mSbjGraph, record, lut_num, depth);
+
+  if ( mMinimumLutNum > lut_num ) {
+    mMinimumLutNum = lut_num;
+    mBestRecord = record;
+  }
+
+  return lut_num;
+}
+
+#else
+
 // @brief 現在の割り当てのもとで評価を行う．
 ymuint
 SaSearch::evaluate(const vector<bool>& state)
@@ -164,17 +201,10 @@ SaSearch::evaluate(const vector<bool>& state)
   MapRecord record;
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
 
-  MapGen mapgen;
+  MapEst mapest;
   ymuint lut_num;
   ymuint depth;
-  BnBuilder mapgraph;
-  mapgen.generate(mSbjGraph, record, mapgraph, lut_num, depth);
-
-  MapEst mapest;
-  ymuint lut_num1;
-  ymuint depth1;
-  mapest.estimate(mSbjGraph, record, lut_num1, depth1);
-  ASSERT_COND( lut_num == lut_num1 );
+  mapest.estimate(mSbjGraph, record, lut_num, depth);
 
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;
@@ -183,6 +213,8 @@ SaSearch::evaluate(const vector<bool>& state)
 
   return lut_num;
 }
+
+#endif
 
 // @brief verbose フラグをセットする．
 void
