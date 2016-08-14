@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "lutmap3_nsdef.h"
+#include "lutmap_nsdef.h"
 #include "ym/ym_bnet.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP3
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
 /// @class LutMap3 LutMap3.h "LutMap3.h"
@@ -43,6 +43,7 @@ public:
   ///  - 1: weighted フロー, resub なし
   ///  - 2: fanout フロー, resub あり
   ///  - 3: weighted フロー, resub あり
+  /// @param[in] count 試行回数
   /// @param[out] mapnetwork マッピング結果
   /// @param[out] lut_num LUT数
   /// @param[out] depth 段数
@@ -50,12 +51,37 @@ public:
   area_map(const BnNetwork& sbjgraph,
 	   ymuint limit,
 	   ymuint mode,
+	   ymuint count,
+	   bool verbose,
 	   BnBuilder& mapnetwork,
 	   ymuint& lut_num,
 	   ymuint& depth);
 
+#if 0
+  /// @brief 段数最小化 DAG covering のヒューリスティック関数
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] limit カットサイズ
+  /// @param[in] slack 最小段数に対するスラック
+  /// @param[in] mode モード
+  ///  - 0: fanout フロー, resub なし
+  ///  - 1: weighted フロー, resub なし
+  ///  - 2: fanout フロー, resub あり
+  ///  - 3: weighted フロー, resub あり
+  /// @param[out] mapnetwork マッピング結果
+  /// @param[out] lut_num LUT数
+  /// @param[out] depth 段数
+  void
+  delay_map(const BnNetwork& sbjgraph,
+	    ymuint limit,
+	    ymuint slack,
+	    ymuint mode,
+	    BnBuilder& mapnetwork,
+	    ymuint& lut_num,
+	    ymuint& depth);
+#endif
+
 };
 
-END_NAMESPACE_YM_LUTMAP3
+END_NAMESPACE_YM_LUTMAP
 
 #endif // LUTMAP3_H

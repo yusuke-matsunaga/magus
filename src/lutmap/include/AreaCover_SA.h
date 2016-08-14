@@ -1,8 +1,8 @@
-﻿#ifndef AREACOVER_H
-#define AREACOVER_H
+﻿#ifndef AREACOVER_SA_H
+#define AREACOVER_SA_H
 
-/// @file AreaCover.h
-/// @brief AreCover のヘッダファイル
+/// @file AreaCover_MCT1.h
+/// @brief AreaCover_MCT1 のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2016 Yusuke Matsunaga
@@ -22,7 +22,7 @@ class MapRecord;
 //////////////////////////////////////////////////////////////////////
 /// @brief 面積モードの DAG covering のヒューリスティック
 //////////////////////////////////////////////////////////////////////
-class AreaCover
+class AreaCover_SA
 {
 public:
   //////////////////////////////////////////////////////////////////////
@@ -31,10 +31,10 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] mode モード
-  AreaCover(ymuint mode);
+  AreaCover_SA(ymuint mode);
 
   /// @brief デストラクタ
-  ~AreaCover();
+  ~AreaCover_SA();
 
 
 public:
@@ -45,21 +45,13 @@ public:
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
+  /// @param[in] count 試行回数
   /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
   record_cuts(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder,
-	      MapRecord& maprec);
-
-  /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[in] boundary_list 境界ノードのリスト
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
-  void
-  record_cuts(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder,
-	      const vector<const SbjNode*>& boundary_list,
+	      ymuint count,
+	      bool verbose,
 	      MapRecord& maprec);
 
 
@@ -67,12 +59,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
-
-  // node から各入力にいたる経路の重みを計算する．
-  void
-  calc_weight(const SbjNode* node,
-	      const Cut* cut,
-	      double cur_weight);
 
 
 private:
@@ -83,17 +69,8 @@ private:
   // モード
   ymuint mMode;
 
-  // 各ノードのベスト値を記録する配列．
-  vector<double> mBestCost;
-
-  // 境界ノードの印
-  vector<ymuint8> mBoundaryMark;
-
-  // 各入力から根の出力に抜ける経路上の重みを入れる配列
-  vector<double> mWeight;
-
 };
 
 END_NAMESPACE_YM_LUTMAP
 
-#endif // AREACOVER_H
+#endif // AREACOVER_SA_H

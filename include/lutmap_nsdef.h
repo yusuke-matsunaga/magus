@@ -27,6 +27,7 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 class LutMap;
 class LutMap2;
+class LutMap3;
 
 END_NAMESPACE_YM_LUTMAP
 
@@ -34,6 +35,7 @@ BEGIN_NAMESPACE_YM
 
 using nsLutmap::LutMap;
 using nsLutmap::LutMap2;
+using nsLutmap::LutMap3;
 
 END_NAMESPACE_YM
 

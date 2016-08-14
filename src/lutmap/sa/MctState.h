@@ -44,17 +44,9 @@ public:
   void
   add_boundary(const SbjNode* node);
 
-  /// @brief ブロックノードを追加する．
-  void
-  add_block(const SbjNode* node);
-
   /// @brief 境界ノードのリストを得る．
   const vector<const SbjNode*>&
   boundary_list() const;
-
-  /// @brief ブロックノードのリストを得る．
-  const vector<const SbjNode*>&
-  block_list() const;
 
   /// @brief 処理済みのファンアウトポイントのインデックスを得る．
   ymuint
@@ -83,9 +75,6 @@ private:
   // 境界ノードのリスト
   vector<const SbjNode*> mBoundaryList;
 
-  // ブロックノードのリスト
-  vector<const SbjNode*> mBlockList;
-
   // 処理済みのファンアウトポイントのインデックス
   ymuint mIndex;
 
@@ -105,29 +94,12 @@ MctState::add_boundary(const SbjNode* node)
   mBoundaryList.push_back(node);
 }
 
-// @brief ブロックノードを追加する．
-inline
-void
-MctState::add_block(const SbjNode* node)
-{
-  ASSERT_COND( node );
-  mBlockList.push_back(node);
-}
-
 // @brief 境界ノードのリストを得る．
 inline
 const vector<const SbjNode*>&
 MctState::boundary_list() const
 {
   return mBoundaryList;
-}
-
-// @brief ブロックノードのリストを得る．
-inline
-const vector<const SbjNode*>&
-MctState::block_list() const
-{
-  return mBlockList;
 }
 
 // @brief 処理済みのファンアウトポイントのインデックスを得る．

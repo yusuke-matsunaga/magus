@@ -12,6 +12,7 @@
 #include "LutmapCmd.h"
 #include "AreaMapCmd.h"
 #include "AreaMap2Cmd.h"
+#include "AreaMap3Cmd.h"
 #include "DelayMapCmd.h"
 
 #include "AreaMap2Cmd.h"
@@ -54,6 +55,8 @@ lutmap_init(Tcl_Interp* interp,
 						       "magus::lutmap::area_map");
   TclCmdBinder2<AreaMap2Cmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::area_map2");
+  TclCmdBinder2<AreaMap3Cmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
+							"magus::lutmap::area_map3");
   TclCmdBinder2<DelayMapCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,
 							"magus::lutmap::delay_map");
   TclCmdBinder2<DumpLutCmd, MagMgr*, LutmapData*>::reg(interp, mgr, data,

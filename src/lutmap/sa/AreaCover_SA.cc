@@ -1,32 +1,32 @@
 
-/// @file AreaCover_MCT2.cc
-/// @brief AreaCover_MCT2 の実装ファイル
+/// @file AreaCover_SA.cc
+/// @brief AreaCover_SA の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AreaCover_MCT2.h"
-#include "MctSearch.h"
+#include "AreaCover_SA.h"
+#include "SaSearch.h"
 #include "CutHolder.h"
 
 
-BEGIN_NAMESPACE_YM_LUTMAP_MCT2
+BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
-// クラス AreaCover_MCT2
+// クラス AreaCover_SA
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] mode モード
-AreaCover_MCT2::AreaCover_MCT2(ymuint mode)
+AreaCover_SA::AreaCover_SA(ymuint mode)
 {
   mMode = mode;
 }
 
 // @brief デストラクタ
-AreaCover_MCT2::~AreaCover_MCT2()
+AreaCover_SA::~AreaCover_SA()
 {
 }
 
@@ -36,19 +36,19 @@ AreaCover_MCT2::~AreaCover_MCT2()
 // @param[in] count 試行回数
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover_MCT2::record_cuts(const SbjGraph& sbjgraph,
-			    const CutHolder& cut_holder,
-			    ymuint count,
-			    bool verbose,
-			    MapRecord& maprec)
+AreaCover_SA::record_cuts(const SbjGraph& sbjgraph,
+			  const CutHolder& cut_holder,
+			  ymuint count,
+			  bool verbose,
+			  MapRecord& maprec)
 {
-  MctSearch mct(sbjgraph, cut_holder, cut_holder.limit(), mMode);
+  SaSearch sa(sbjgraph, cut_holder, cut_holder.limit(), mMode);
 
-  mct.set_verbose(verbose);
+  sa.set_verbose(verbose);
 
-  mct.search(count);
+  sa.search(count);
 
-  maprec = mct.best_record();
+  maprec = sa.best_record();
 }
 
-END_NAMESPACE_YM_LUTMAP_MCT2
+END_NAMESPACE_YM_LUTMAP

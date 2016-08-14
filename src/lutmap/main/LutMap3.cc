@@ -1,16 +1,16 @@
 ﻿
-/// @file LutMap2.cc
-/// @brief LutMap2 の実装ファイル
+/// @file LutMap3.cc
+/// @brief LutMap3 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "LutMap2.h"
+#include "LutMap3.h"
 #include "Bn2Sbj.h"
 #include "SbjGraph.h"
-#include "AreaCover_MCT2.h"
+#include "AreaCover_SA.h"
 #include "DelayCover.h"
 #include "CutHolder.h"
 #include "CutResub.h"
@@ -21,16 +21,16 @@
 BEGIN_NAMESPACE_YM_LUTMAP
 
 //////////////////////////////////////////////////////////////////////
-// クラス LutMap2
+// クラス LutMap3
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-LutMap2::LutMap2()
+LutMap3::LutMap3()
 {
 }
 
 // @brief デストラクタ
-LutMap2::~LutMap2()
+LutMap3::~LutMap3()
 {
 }
 
@@ -47,7 +47,7 @@ LutMap2::~LutMap2()
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-LutMap2::area_map(const BnNetwork& src_network,
+LutMap3::area_map(const BnNetwork& src_network,
 		  ymuint limit,
 		  ymuint mode,
 		  ymuint count,
@@ -67,7 +67,7 @@ LutMap2::area_map(const BnNetwork& src_network,
 
   // 最良カットを記録する．
   MapRecord maprec;
-  nsMct2::AreaCover_MCT2 area_cover(mode);
+  AreaCover_SA area_cover(mode);
   area_cover.record_cuts(sbjgraph, cut_holder, count, verbose, maprec);
 
   if ( mode & 2 ) {
@@ -96,7 +96,7 @@ LutMap2::area_map(const BnNetwork& src_network,
 // @param[out] lut_num LUT数
 // @param[out] depth 段数
 void
-LutMap2::delay_map(const BnNetwork& src_network,
+LutMap3::delay_map(const BnNetwork& src_network,
 		  ymuint limit,
 		  ymuint slack,
 		  ymuint mode,

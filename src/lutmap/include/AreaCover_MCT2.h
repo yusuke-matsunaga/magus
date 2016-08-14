@@ -55,6 +55,7 @@ public:
   record_cuts(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder,
 	      ymuint count,
+	      bool verbose,
 	      MapRecord& maprec);
 
 

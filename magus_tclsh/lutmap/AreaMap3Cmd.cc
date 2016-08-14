@@ -1,18 +1,18 @@
 ﻿
-/// @file magus/lutmap/AreaMap2Cmd.cc
-/// @brief AreaMap2Cmd の実装ファイル
+/// @file magus/lutmap/AreaMap3Cmd.cc
+/// @brief AreaMap3Cmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: AreaMap2Cmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
+/// $Id: AreaMap3Cmd.cc 2274 2009-06-10 07:45:29Z matsunaga $
 ///
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "AreaMap2Cmd.h"
+#include "AreaMap3Cmd.h"
 #include "ym/TclPopt.h"
 
-#include "LutMap2.h"
+#include "LutMap3.h"
 
 #include "ym/BnBuilder.h"
 #include "ym/MvnMgr.h"
@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-AreaMap2Cmd::AreaMap2Cmd(MagMgr* mgr,
+AreaMap3Cmd::AreaMap3Cmd(MagMgr* mgr,
 		       LutmapData* data) :
   LutmapCmd(mgr, data)
 {
@@ -42,13 +42,13 @@ AreaMap2Cmd::AreaMap2Cmd(MagMgr* mgr,
 }
 
 // @brief デストラクタ
-AreaMap2Cmd::~AreaMap2Cmd()
+AreaMap3Cmd::~AreaMap3Cmd()
 {
 }
 
 // @brief コマンドを実行する仮想関数
 int
-AreaMap2Cmd::cmd_proc(TclObjVector& objv)
+AreaMap3Cmd::cmd_proc(TclObjVector& objv)
 {
   bool verbose = mPoptVerbose->is_specified();
 
@@ -88,7 +88,7 @@ AreaMap2Cmd::cmd_proc(TclObjVector& objv)
     return code;
   }
 
-  LutMap2 lutmap;
+  LutMap3 lutmap;
 
   ymuint lut_num;
   ymuint depth;

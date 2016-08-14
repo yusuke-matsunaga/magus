@@ -197,6 +197,11 @@ MapGen::back_trace(const SbjNode* node,
 
   // node を根とするカットを取り出す．
   const Cut* cut = record.get_cut(node);
+  if ( cut == nullptr ) {
+    cout << "Error!: " << node->id_str()
+	 << " has no cuts" << endl;
+    ASSERT_NOT_REACHED;
+  }
 
   // その入力に対応するノードを再帰的に生成する．
   ymuint ni = cut->input_num();

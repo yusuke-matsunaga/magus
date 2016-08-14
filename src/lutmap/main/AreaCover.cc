@@ -59,10 +59,10 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
   // 境界マークをつける．
   mBoundaryMark.clear();
-  mBoundaryMark.resize(n, false);
+  mBoundaryMark.resize(n, 0);
   for (ymuint i = 0; i < boundary_list.size(); ++ i) {
     const SbjNode* node = boundary_list[i];
-    mBoundaryMark[node->id()] = true;
+    mBoundaryMark[node->id()] = 1;
   }
 
   mWeight.resize(cut_holder.limit());
@@ -118,7 +118,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       double cur_cost = 1.0;
       for (ymuint i = 0; i < ni; ++ i) {
 	const SbjNode* inode = cut->input(i);
-	if ( !mBoundaryMark[inode->id()] ) {
+	if ( mBoundaryMark[inode->id()] == 0 ) {
 	  cur_cost += mBestCost[inode->id()] * mWeight[i];
 	}
       }
@@ -127,8 +127,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	best_cut = cut;
       }
     }
-    ASSERT_COND(min_cost < DBL_MAX );
-    ASSERT_COND( best_cut != nullptr );
+    ASSERT_COND( min_cost != DBL_MAX );
     maprec.set_cut(node, best_cut);
     mBestCost[node->id()] = min_cost;
   }

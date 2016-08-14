@@ -25,6 +25,7 @@ set ( main_SOURCES
   main/DgGraph.cc
   main/LutMap.cc
   main/LutMap2.cc
+  main/LutMap3.cc
   )
 
 set ( mct1_SOURCES
@@ -38,6 +39,11 @@ set ( mct2_SOURCES
   mct2/MctNode.cc
   mct2/MctSearch.cc
   mct2/MctState.cc
+  )
+
+set ( sa_SOURCES
+  sa/AreaCover_SA.cc
+  sa/SaSearch.cc
   )
 
 set ( mapgen_SOURCES
@@ -63,6 +69,7 @@ ym_add_object_library (magus_lutmap
   ${main_SOURCES}
   ${mct1_SOURCES}
   ${mct2_SOURCES}
+  ${sa_SOURCES}
   ${mapgen_SOURCES}
   ${cut_resub_SOURCES}
   )
