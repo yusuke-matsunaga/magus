@@ -1,18 +1,18 @@
-#ifndef SASEARCH_H
-#define SASEARCH_H
+#ifndef MCT2_MCTSEARCH_H
+#define MCT2_MCTSEARCH_H
 
-/// @file SaSearch.h
-/// @brief SaSearch のヘッダファイル
+/// @file MctSearch.h
+/// @brief MctSearch のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
+#include "mct2/mct2_nsdef.h"
+#include "mct2/MctState.h"
 #include "AreaCover.h"
 #include "MapRecord.h"
-#include "MctState.h"
 #include "ym/RandGen.h"
 
 
@@ -20,13 +20,17 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 class CutHolder;
 
+END_NAMESPACE_YM_LUTMAP
+
+BEGIN_NAMESPACE_YM_LUTMAP_MCT2
+
 class MctNode;
 
 //////////////////////////////////////////////////////////////////////
-/// @class SaSearch SaSearch.h "SaSearch.h"
+/// @class MctSearch MctSearch.h "MctSearch.h"
 /// @brief MCT 探索を行うクラス
 //////////////////////////////////////////////////////////////////////
-class SaSearch
+class MctSearch
 {
 public:
 
@@ -35,13 +39,13 @@ public:
   /// @param[in] cut_holder カットフォルダー
   /// @param[in] cut_size カットサイズ
   /// @param[in] mode area_cover のモード
-  SaSearch(const SbjGraph& sbjgraph,
+  MctSearch(const SbjGraph& sbjgraph,
 	    const CutHolder& cut_holder,
 	    ymuint cut_size,
 	    ymuint mode);
 
   /// @brief デストラクタ
-  ~SaSearch();
+  ~MctSearch();
 
 
 public:
@@ -68,9 +72,18 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 現在の割り当てのもとで評価を行う．
-  ymuint
-  evaluate(const vector<bool>& state);
+  /// @brief 評価値の良い子ノードを見つける．
+  MctNode*
+  tree_policy(MctNode* node);
+
+  /// @brief ランダムサンプリングを行って評価値を求める．
+  double
+  default_policy(MctNode* node);
+
+  /// @brief 評価値の更新を行う．
+  void
+  back_up(MctNode* node,
+	  double val);
 
 
 private:
@@ -96,6 +109,9 @@ private:
   // マッパー
   AreaCover mAreaCover;
 
+  // 状態
+  MctState mState;
+
   // 上界
   ymuint mUpperBound;
 
@@ -114,6 +130,9 @@ private:
   // 最良解
   MapRecord mBestRecord;
 
+  // 根のノード
+  MctNode* mRootNode;
+
   // 乱数発生器
   RandGen mRandGen;
 
@@ -130,11 +149,11 @@ private:
 // @brief 最良解を返す．
 inline
 const MapRecord&
-SaSearch::best_record() const
+MctSearch::best_record() const
 {
   return mBestRecord;
 }
 
-END_NAMESPACE_YM_LUTMAP
+END_NAMESPACE_YM_LUTMAP_MCT2
 
-#endif // SASEARCH_H
+#endif // MCTSEARCH_H

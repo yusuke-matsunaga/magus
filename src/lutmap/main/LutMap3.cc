@@ -10,10 +10,10 @@
 #include "LutMap3.h"
 #include "Bn2Sbj.h"
 #include "SbjGraph.h"
-#include "AreaCover_SA.h"
 #include "DelayCover.h"
 #include "CutHolder.h"
 #include "CutResub.h"
+#include "SaSearch.h"
 #include "MapGen.h"
 #include "MapRecord.h"
 
@@ -66,9 +66,10 @@ LutMap3::area_map(const BnNetwork& src_network,
   cut_holder.enum_cut(sbjgraph, limit);
 
   // 最良カットを記録する．
-  MapRecord maprec;
-  AreaCover_SA area_cover(mode);
-  area_cover.record_cuts(sbjgraph, cut_holder, count, verbose, maprec);
+  SaSearch sa(sbjgraph, cut_holder, limit, mode);
+  sa.set_verbose(verbose);
+  sa.search(count);
+  MapRecord maprec = sa.best_record();
 
   if ( mode & 2 ) {
     // cut resubstituion

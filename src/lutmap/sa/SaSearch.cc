@@ -15,41 +15,7 @@
 #include "SbjDumper.h"
 
 
-#define UNIFORM_SAMPLING 0
-
-
 BEGIN_NAMESPACE_YM_LUTMAP
-
-BEGIN_NONAMESPACE
-
-ymuint
-dfs(const SbjNode* node,
-    vector<bool>& mark)
-{
-  if ( mark[node->id()] ) {
-    return 0;
-  }
-  mark[node->id()] = true;
-
-  ymuint n = 1;
-  if ( node->fanout_num() == 1 && node->is_logic() ) {
-    n += dfs(node->fanin(0), mark);
-    n += dfs(node->fanin(1), mark);
-  }
-  return n;
-}
-
-struct Lt
-{
-  bool
-  operator()(const pair<const SbjNode*, ymuint>& left,
-	     const pair<const SbjNode*, ymuint>& right) {
-    return left.second < right.second;
-  }
-};
-
-END_NONAMESPACE
-
 
 //////////////////////////////////////////////////////////////////////
 // クラス SaSearch
@@ -70,6 +36,9 @@ SaSearch::SaSearch(const SbjGraph& sbjgraph,
   mAreaCover(mode),
   mVerbose(false)
 {
+  mInitTemp  = 5.0;
+  mEndTemp   = 0.001;
+  mDecrement = 0.9;
 
   mUpperBound = sbjgraph.logic_num();
   LbCalc lbcalc;
@@ -77,25 +46,11 @@ SaSearch::SaSearch(const SbjGraph& sbjgraph,
   mWidth = static_cast<double>(mUpperBound - mLowerBound);
 
   // ファンアウトポイントを求める．
-  vector<pair<const SbjNode*, ymuint> > tmp_list;
   for (ymuint i = 0; i < sbjgraph.logic_num(); ++ i) {
     const SbjNode* node = sbjgraph.logic(i);
     if ( node->fanout_num() > 1 ) {
-      vector<bool> mark(sbjgraph.max_node_id(), false);
-      ymuint ni = dfs(node->fanin(0), mark);
-      ni += dfs(node->fanin(1), mark);
-      tmp_list.push_back(make_pair(node, ni));
+      mFanoutPointList.push_back(node);
     }
-  }
-  // サイズの降順にソートする．
-  //sort(tmp_list.begin(), tmp_list.end(), Lt());
-  ymuint n = tmp_list.size();
-  mFanoutPointList.reserve(n);
-  mInputSizeList.reserve(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const pair<const SbjNode*, ymuint>& p = tmp_list[i];
-    mFanoutPointList.push_back(p.first);
-    mInputSizeList.push_back(p.second);
   }
 
   mMinimumLutNum = sbjgraph.max_node_id() + 1;
@@ -114,7 +69,7 @@ SaSearch::search(ymuint search_limit)
   ymuint nf = mFanoutPointList.size();
   vector<bool> state(nf, false);
   ymuint prev_val = evaluate(state);
-  for (double T = 5.0; T > 0.001; T = T * 0.9) {
+  for (double T = mInitTemp; T > mEndTemp; T = T * mDecrement) {
     ymuint n_acc = 0;
     for (mNumAll = 1; mNumAll <= search_limit; ++ mNumAll) {
       ymuint pos = mRandGen.int32() % nf;

@@ -35,14 +35,12 @@ set ( mct1_SOURCES
   )
 
 set ( mct2_SOURCES
-  mct2/AreaCover_MCT2.cc
   mct2/MctNode.cc
   mct2/MctSearch.cc
   mct2/MctState.cc
   )
 
 set ( sa_SOURCES
-  sa/AreaCover_SA.cc
   sa/SaSearch.cc
   )
 

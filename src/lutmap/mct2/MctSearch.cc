@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "MctSearch.h"
+#include "mct2/MctSearch.h"
+#include "mct2/MctState.h"
 #include "MctNode.h"
-#include "MctState.h"
 #include "MapRecord.h"
 #include "MapEst.h"
 #include "LbCalc.h"
@@ -160,7 +160,7 @@ MctSearch::tree_policy(MctNode* node)
       mState.add_boundary(fpnode);
     }
     else {
-      //mState.add_block(fpnode);
+      //pmState.add_block(fpnode);
     }
     mState.next_index();
   }

@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "MctState.h"
+#include "mct2/MctState.h"
 #include "SbjGraph.h"
 #include "SbjNode.h"
 
