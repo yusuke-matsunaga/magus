@@ -126,15 +126,20 @@ MctSearch::~MctSearch()
 
 // @brief 探索を行う．
 // @param[in] search_limit 試行回数
-void
-MctSearch::search(ymuint search_limit)
+// @param[in] verbose verbose フラグ
+// @return 最良解を返す．
+const MapRecord&
+MctSearch::search(ymuint search_limit,
+		  bool verbose)
 {
+  mVerbose = verbose;
   for (mNumAll = 1; mNumAll <= search_limit; ++ mNumAll) {
     mState.init();
     MctNode* node = tree_policy(mRootNode);
     double val = default_policy(node);
     back_up(node, val);
   }
+  return mBestRecord;
 }
 
 // @brief 評価値の良い子ノードを見つける．
@@ -309,13 +314,6 @@ MctSearch::back_up(MctNode* node,
     parent->reorder(num_all_ln, 0.5);
     node = parent;
   }
-}
-
-// @brief verbose フラグをセットする．
-void
-MctSearch::set_verbose(bool val)
-{
-  mVerbose = val;
 }
 
 END_NAMESPACE_YM_LUTMAP_MCT2

@@ -84,6 +84,13 @@ public:
   TvFunc
   make_tv(bool inv) const;
 
+  /// @brief 論理関数を表す真理値表を得る．
+  /// @param[in] oinv 出力を反転する時 true にするフラグ
+  /// @param[in] iinv 入力を反転極性の配列
+  TvFunc
+  make_tv(bool oinv,
+	  const vector<bool>& iinv) const;
+
   /// @brief デバッグ用の表示ルーティン
   /// @param[in] s 出力先のストリーム
   ///

@@ -55,16 +55,11 @@ public:
 
   /// @brief 探索を行う．
   /// @param[in] search_limit 試行回数
-  void
-  search(ymuint search_limit);
-
-  /// @brief 最良解を返す．
+  /// @param[in] verbose verbose フラグ
+  /// @return 最良解を返す．
   const MapRecord&
-  best_record() const;
-
-  /// @brief verbose フラグをセットする．
-  void
-  set_verbose(bool val);
+  search(ymuint search_limit,
+	 bool verbose);
 
 
 private:
@@ -145,14 +140,6 @@ private:
 //////////////////////////////////////////////////////////////////////
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
-
-// @brief 最良解を返す．
-inline
-const MapRecord&
-MctSearch::best_record() const
-{
-  return mBestRecord;
-}
 
 END_NAMESPACE_YM_LUTMAP_MCT2
 

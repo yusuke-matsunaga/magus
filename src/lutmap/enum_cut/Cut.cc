@@ -104,6 +104,16 @@ Cut::eval(const vector<ymuint64>& vals) const
 TvFunc
 Cut::make_tv(bool inv) const
 {
+  return make_tv(inv, vector<bool>(input_num(), false));
+}
+
+// @brief 論理関数を表す真理値表を得る．
+// @param[in] oinv 出力を反転する時 true にするフラグ
+// @param[in] iinv 入力を反転極性の配列
+TvFunc
+Cut::make_tv(bool oinv,
+	     const vector<bool>& iinv) const
+{
   ymuint ni = input_num();
   ymuint np = 1 << ni;
 
@@ -111,8 +121,8 @@ Cut::make_tv(bool inv) const
 
   // 1 の値と 0 の値
   // inv == true の時には逆にする．
-  int v1 = inv ? 0 : 1;
-  int v0 = inv ? 1 : 0;
+  int v1 = oinv ? 0 : 1;
+  int v0 = oinv ? 1 : 0;
 
   // 真理値表の各変数の値を表すビットベクタ
   // 6入力以上の場合には1語に収まらないので複数回にわけて処理する．
@@ -125,7 +135,9 @@ Cut::make_tv(bool inv) const
   ymuint p0 = 0;
   for (ymuint p = 0; p < np; ++ p) {
     for (ymuint i = 0; i < ni; ++ i) {
-      if ( p & (1U << i) ) {
+      ymuint mask = 1U << i;
+      ymuint mask1 = iinv[i] ? 0U : mask;
+      if ( (p & mask) == mask1 ) {
 	vals[i] |= s;
       }
     }

@@ -64,12 +64,18 @@ private:
     {
       mMapNode[0] = 0;
       mMapNode[1] = 0;
+      mReqPhase = 0;
       mDepth = 0;
     }
 
     // マップ結果
     // 正極性と負極性の2通りを保持する．
     ymuint mMapNode[2];
+
+    // 要求されている極性
+    // 1: 正極性
+    // 2: 負極性
+    ymuint mReqPhase;
 
     // 段数
     int mDepth;

@@ -64,18 +64,6 @@ private:
 	     bool inv,
 	     const MapRecord& record);
 
-  /// @brief cut でカバーされるノードの mCovCount を一つ増やす．
-  /// @param[in] node 対象のノード
-  /// @param[in] cut カット
-  void
-  mark_cover(const SbjNode* node,
-	     const Cut* cut);
-
-  /// @brief mark_cover でつけた mTmpFlag を下ろす．
-  /// @param[in] node 対象のノード
-  void
-  clear_mark(const SbjNode* node);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -89,7 +77,6 @@ private:
     {
       mMapCount[0] = 0;
       mMapCount[1] = 0;
-      mTmpFlag = false;
       mDepth = 0;
     }
 
@@ -97,11 +84,10 @@ private:
     // 正極性と負極性の2通りを保持する．
     ymuint mMapCount[2];
 
-    // estimate でカットにカバーされている回数を保持するカウンタ
-    int mCovCount;
-
-    // mCovCount の更新で用いるフラグ
-    bool mTmpFlag;
+    // 要求されている極性
+    // 1 : 正極性
+    // 2 : 負極性
+    ymuint mReqPhase;
 
     // 段数
     int mDepth;

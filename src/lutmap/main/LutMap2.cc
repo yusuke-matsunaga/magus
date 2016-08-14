@@ -67,9 +67,8 @@ LutMap2::area_map(const BnNetwork& src_network,
 
   // 最良カットを記録する．
   nsMct2::MctSearch mct(sbjgraph, cut_holder, limit, mode);
-  mct.set_verbose(verbose);
-  mct.search(count);
-  MapRecord maprec = mct.best_record();
+
+  MapRecord maprec = mct.search(count, verbose);
 
   if ( mode & 2 ) {
     // cut resubstituion

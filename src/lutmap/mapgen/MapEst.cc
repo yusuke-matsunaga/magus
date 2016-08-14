@@ -39,17 +39,26 @@ MapEst::estimate(const SbjGraph& sbjgraph,
   mNodeInfo.clear();
   mNodeInfo.resize(sbjgraph.max_node_id());
 
-  // 外部入力の生成
   ymuint ni = sbjgraph.input_num();
+  ymuint no = sbjgraph.output_num();
+
+  // 外部入力の生成
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* node = sbjgraph.input(i);
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.mMapCount[0] = 1;
   }
 
+  // 外部出力から要求されている極性を記録する．
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* onode = sbjgraph.output(i);
+    const SbjNode* node = onode->output_fanin();
+    ymuint phase = onode->output_fanin_inv() ? 2 : 1;
+    mNodeInfo[node->id()].mReqPhase = phase;
+  }
+
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   lut_num = 0;
-  ymuint no = sbjgraph.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
@@ -87,57 +96,24 @@ MapEst::back_trace(const SbjNode* node,
     return 1;
   }
 
+  if ( node_info.mMapCount[idx ^ 1] ) {
+    // 逆の極性のノードが生成済み
+    return 1;
+  }
+
   // node を根とするカットを取り出す．
   const Cut* cut = record.get_cut(node);
-
-  // cut のカバーしているノードの mCovCount を1つ増やす．
-  for (ymuint i = 0; i < cut->input_num(); ++ i) {
-    const SbjNode* leaf = cut->input(i);
-    mNodeInfo[leaf->id()].mTmpFlag = true;
-  }
-  mark_cover(node, cut);
-  clear_mark(node);
 
   int lut_num = 1;
   // その入力に対応するノードを再帰的に生成する．
   ymuint ni = cut->input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = cut->input(i);
-    lut_num += back_trace(inode, false, record);
+    bool iinv = (mNodeInfo[inode->id()].mReqPhase == 2) ? true : false;
+    lut_num += back_trace(inode, iinv, record);
   }
 
   return lut_num;
-}
-
-// @brief cut でカバーされるノードの mCovCount を一つ増やす．
-// @param[in] node 対象のノード
-// @param[in] cut カット
-void
-MapEst::mark_cover(const SbjNode* node,
-		   const Cut* cut)
-{
-  NodeInfo& node_info = mNodeInfo[node->id()];
-  if ( !node_info.mTmpFlag ) {
-    node_info.mTmpFlag = true;
-    ++ node_info.mCovCount;
-    mark_cover(node->fanin(0), cut);
-    mark_cover(node->fanin(1), cut);
-  }
-}
-
-// @brief mark_cover でつけた mTmpFlag を下ろす．
-// @param[in] node 対象のノード
-void
-MapEst::clear_mark(const SbjNode* node)
-{
-  NodeInfo& node_info = mNodeInfo[node->id()];
-  if ( node_info.mTmpFlag ) {
-    node_info.mTmpFlag = false;
-    if ( node->is_logic() ) {
-      clear_mark(node->fanin(0));
-      clear_mark(node->fanin(1));
-    }
-  }
 }
 
 END_NAMESPACE_YM_LUTMAP

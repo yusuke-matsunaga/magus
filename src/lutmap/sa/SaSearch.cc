@@ -63,9 +63,13 @@ SaSearch::~SaSearch()
 
 // @brief 探索を行う．
 // @param[in] search_limit 試行回数
-void
-SaSearch::search(ymuint search_limit)
+// @brief verbose フラグをセットする．
+// @brief 最良解を返す．
+const MapRecord&
+SaSearch::search(ymuint search_limit,
+		 bool verbose)
 {
+  mVerbose = verbose;
   ymuint nf = mFanoutPointList.size();
   vector<bool> state(nf, false);
   ymuint prev_val = evaluate(state);
@@ -98,6 +102,7 @@ SaSearch::search(ymuint search_limit)
       }
     }
   }
+  return mBestRecord;
 }
 
 #if 0
@@ -170,12 +175,5 @@ SaSearch::evaluate(const vector<bool>& state)
 }
 
 #endif
-
-// @brief verbose フラグをセットする．
-void
-SaSearch::set_verbose(bool val)
-{
-  mVerbose = val;
-}
 
 END_NAMESPACE_YM_LUTMAP
