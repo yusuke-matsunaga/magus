@@ -19,6 +19,8 @@
 #include "SbjLatch.h"
 #include "SbjPort.h"
 
+#define LUTMAP_DEBUG_MAPGEN 0
+
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
@@ -45,6 +47,10 @@ MapGen::generate(const SbjGraph& sbjgraph,
 		 ymuint& lut_num,
 		 ymuint& depth)
 {
+#if LUTMAP_DEBUG_MAPGEN
+  cout << "MapGen::generate() start" << endl;
+#endif
+
   mapgraph.clear();
 
   mapgraph.set_model_name(sbjgraph.name());
@@ -71,6 +77,9 @@ MapGen::generate(const SbjGraph& sbjgraph,
     const SbjNode* node = onode->output_fanin();
     ymuint phase = onode->output_fanin_inv() ? 2 : 1;
     mNodeInfo[node->id()].mReqPhase = phase;
+#if LUTMAP_DEBUG_MAPGEN
+    cout << node->id_str() << ": reqphase = " << phase << endl;
+#endif
   }
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
@@ -81,7 +90,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
     bool inv = onode->output_fanin_inv();
     ymuint node_id;
     if ( node ) {
-      node_id = back_trace(node, inv, record, mapgraph);
+      node_id = gen_back_trace(node, inv, record, mapgraph);
       int depth1 = mNodeInfo[node->id()].mDepth;
       if ( max_depth < depth1 ) {
 	max_depth = depth1;
@@ -96,6 +105,9 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	tv = TvFunc::const_zero(0);
       }
       node_id = mapgraph.add_tv(string(), tv);
+#if LUTMAP_DEBUG_MAPGEN
+      cout << onode->id_str() << endl;
+#endif
     }
     ymuint onode_id = mapgraph.add_output(string(), node_id);
     mNodeInfo[onode->id()].mMapNode[0] = onode_id;
@@ -171,6 +183,10 @@ MapGen::generate(const SbjGraph& sbjgraph,
 
   lut_num = mapgraph.logic_num();
   depth = max_depth;
+
+#if LUTMAP_DEBUG_MAPGEN
+  cout << "MapGen::generate() end" << endl;
+#endif
 }
 
 // @brief 最終結果を作るためのバックトレースを行う．
@@ -179,11 +195,14 @@ MapGen::generate(const SbjGraph& sbjgraph,
 // @param[in] record マッピング結果
 // @param[out] mapnetwork マッピング結果のネットワーク
 ymuint
-MapGen::back_trace(const SbjNode* node,
-		   bool output_inv,
-		   const MapRecord& record,
-		   BnBuilder& mapnetwork)
+MapGen::gen_back_trace(const SbjNode* node,
+		       bool output_inv,
+		       const MapRecord& record,
+		       BnBuilder& mapnetwork)
 {
+#if LUTMAP_DEBUG_MAPGEN
+  cout << "back_trace(" << node->id_str() << ", " << output_inv << ")" << endl;
+#endif
   NodeInfo& node_info = mNodeInfo[node->id()];
   ymuint idx = (output_inv) ? 1 : 0;
   ymuint node_id = node_info.mMapNode[idx];
@@ -201,6 +220,9 @@ MapGen::back_trace(const SbjNode* node,
     node_id = mapnetwork.add_tv(string(), tv);
     mapnetwork.connect(src_id, node_id, 0);
     node_info.mMapNode[1] = node_id;
+#if LUTMAP_DEBUG_MAPGEN
+    cout << node->id_str() << "[1]" << endl;
+#endif
     return node_id;
   }
 
@@ -211,6 +233,9 @@ MapGen::back_trace(const SbjNode* node,
     node_id = mapnetwork.add_tv(string(), tv);
     mapnetwork.connect(src_id, node_id, 0);
     node_info.mMapNode[idx] = node_id;
+#if LUTMAP_DEBUG_MAPGEN
+    cout << node->id_str() << "[" << (idx ^ 1) << "]" << endl;
+#endif
     return node_id;
   }
 
@@ -228,7 +253,7 @@ MapGen::back_trace(const SbjNode* node,
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = cut->input(i);
     input_inv[i] = (mNodeInfo[inode->id()].mReqPhase == 2) ? true : false;
-    back_trace(inode, input_inv[i], record, mapnetwork);
+    gen_back_trace(inode, input_inv[i], record, mapnetwork);
   }
 
   // カットの実現している関数の真理値表を得る．
@@ -236,6 +261,10 @@ MapGen::back_trace(const SbjNode* node,
 
   // 新しいノードを作り mNodeMap に登録する．
   node_id = mapnetwork.add_tv(string(), tv);
+#if LUTMAP_DEBUG_MAPGEN
+  cout << node->id_str() << "[" << idx << "]" << endl;
+#endif
+
   int idepth = 0;
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = cut->input(i);
@@ -252,6 +281,127 @@ MapGen::back_trace(const SbjNode* node,
   node_info.mDepth = idepth + 1;
 
   return node_id;
+}
+
+// @brief マッピング結果から見積もりを行う．
+// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] record マッピング結果
+// @param[out] lut_num LUT数
+// @param[out] depth 最大段数
+void
+MapGen::estimate(const SbjGraph& sbjgraph,
+		 const MapRecord& record,
+		 ymuint& lut_num,
+		 ymuint& depth)
+{
+#if LUTMAP_DEBUG_MAPEST
+  cout << "MapGen::estimate() start" << endl;
+#endif
+
+  mNodeInfo.clear();
+  mNodeInfo.resize(sbjgraph.max_node_id());
+
+  mFanoutPointList.clear();
+
+  ymuint ni = sbjgraph.input_num();
+  ymuint no = sbjgraph.output_num();
+
+  // 外部入力の生成
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* node = sbjgraph.input(i);
+    NodeInfo& node_info = mNodeInfo[node->id()];
+    node_info.mMapNode[0] = 1;
+  }
+
+  // 外部出力から要求されている極性を記録する．
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* onode = sbjgraph.output(i);
+    const SbjNode* node = onode->output_fanin();
+    ymuint phase = onode->output_fanin_inv() ? 2 : 1;
+    mNodeInfo[node->id()].mReqPhase = phase;
+#if LUTMAP_DEBUG_MAPEST
+    cout << node->id_str() << ": reqphase = " << phase << endl;
+#endif
+  }
+
+  // 外部出力からバックトレースを行い全ノードの生成を行う．
+  lut_num = 0;
+  for (ymuint i = 0; i < no; ++ i) {
+    const SbjNode* onode = sbjgraph.output(i);
+    const SbjNode* node = onode->output_fanin();
+    bool inv = onode->output_fanin_inv();
+    if ( node ) {
+      lut_num += est_back_trace(node, inv, record);
+    }
+    else {
+      lut_num += 1;
+#if LUTMAP_DEBUG_MAPEST
+      cout << onode->id_str() << endl;
+#endif
+    }
+  }
+
+#if LUTMAP_DEBUG_MAPEST
+  cout << "MapGen::estimate() end" << endl;
+#endif
+}
+
+// @brief 最終結果を作るためのバックトレースを行う．
+// @param[in] node 対象のノード
+// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
+// @param[in] record マッピング結果
+ymuint
+MapGen::est_back_trace(const SbjNode* node,
+		       bool inv,
+		       const MapRecord& record)
+{
+#if LUTMAP_DEBUG_MAPEST
+  cout << "back_trace(" << node->id_str() << ", " << inv << ")" << endl;
+#endif
+  NodeInfo& node_info = mNodeInfo[node->id()];
+  ymuint idx = (inv) ? 1 : 0;
+  ++ node_info.mMapNode[idx];
+  if ( node_info.mMapNode[idx] > 1 ) {
+    if ( node_info.mMapNode[idx] == 2 ) {
+      mFanoutPointList.push_back(node);
+    }
+    return 0;
+  }
+
+  if ( node->is_input() ) {
+    // ということは inv = true のはず．
+    // インバーターが必要ということ
+#if LUTMAP_DEBUG_MAPEST
+    cout << node->id_str() << "[1]" << endl;
+#endif
+    return 1;
+  }
+
+  if ( node_info.mMapNode[idx ^ 1] ) {
+    // 逆の極性のノードが生成済み
+#if LUTMAP_DEBUG_MAPEST
+    cout << node->id_str() << "[" << (idx ^ 1) << "]" << endl;
+#endif
+    return 1;
+  }
+
+  // node を根とするカットを取り出す．
+  const Cut* cut = record.get_cut(node);
+
+#if LUTMAP_DEBUG_MAPEST
+    cout << node->id_str() << "[" << idx << "]" << endl;
+#endif
+
+  int lut_num = 1;
+  // その入力に対応するノードを再帰的に生成する．
+  ymuint ni = cut->input_num();
+  for (ymuint i = 0; i < ni; ++ i) {
+    const SbjNode* inode = cut->input(i);
+    bool iinv = (mNodeInfo[inode->id()].mReqPhase == 2) ? true : false;
+    lut_num += est_back_trace(inode, iinv, record);
+  }
+
+  return lut_num;
 }
 
 END_NAMESPACE_YM_LUTMAP

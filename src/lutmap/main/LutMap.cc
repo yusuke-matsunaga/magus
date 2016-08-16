@@ -17,6 +17,8 @@
 #include "MapGen.h"
 #include "MapRecord.h"
 
+#include "SbjDumper.h"
+
 
 BEGIN_NAMESPACE_YM_LUTMAP
 

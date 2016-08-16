@@ -51,6 +51,21 @@ public:
 	   ymuint& lut_num,
 	   ymuint& depth);
 
+  /// @brief マッピング結果から見積もりを行う．
+  /// @param[in] sbjgraph サブジェクトグラフ
+  /// @param[in] record マッピング結果
+  /// @param[out] lut_num LUT数
+  /// @param[out] depth 最大段数
+  void
+  estimate(const SbjGraph& sbjgraph,
+	   const MapRecord& record,
+	   ymuint& lut_num,
+	   ymuint& depth);
+
+  /// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
+  const vector<const SbjNode*>&
+  fanoutpoint_list() const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -88,16 +103,25 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 最終結果を作るためのバックトレースを行う．
+  /// @brief generate 用のバックトレースを行う．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
   /// @param[in] record マッピング結果
   /// @param[out] mapnetwork マッピング結果のネットワーク
   ymuint
-  back_trace(const SbjNode* node,
-	     bool inv,
-	     const MapRecord& record,
-	     BnBuilder& mapnetwork);
+  gen_back_trace(const SbjNode* node,
+		 bool inv,
+		 const MapRecord& record,
+		 BnBuilder& mapnetwork);
+
+  /// @brief estimate 用のバックトレースを行う．
+  /// @param[in] node 対象のノード
+  /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
+  /// @param[in] record マッピング結果
+  ymuint
+  est_back_trace(const SbjNode* node,
+		 bool inv,
+		 const MapRecord& record);
 
 
 private:
@@ -108,7 +132,23 @@ private:
   // ノードごとの情報を持つ配列
   vector<NodeInfo> mNodeInfo;
 
+  // ファンアウトポイントのリスト
+  vector<const SbjNode*> mFanoutPointList;
+
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
+inline
+const vector<const SbjNode*>&
+MapGen::fanoutpoint_list() const
+{
+  return mFanoutPointList;
+}
 
 END_NAMESPACE_YM_LUTMAP
 

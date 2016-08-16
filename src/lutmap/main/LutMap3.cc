@@ -17,6 +17,8 @@
 #include "MapGen.h"
 #include "MapRecord.h"
 
+#include "SbjDumper.h"
+
 
 BEGIN_NAMESPACE_YM_LUTMAP
 
@@ -69,6 +71,37 @@ LutMap3::area_map(const BnNetwork& src_network,
   SaSearch sa(sbjgraph, cut_holder, limit, mode);
 
   MapRecord maprec = sa.search(count, verbose);
+
+  if ( false ) {
+    SbjDumper dumper;
+    dumper.dump(cout, sbjgraph);
+
+    MapGen gen;
+    ymuint lut_num;
+    ymuint depth;
+    gen.estimate(sbjgraph, maprec, lut_num, depth);
+    const vector<const SbjNode*>& fp_list = gen.fanoutpoint_list();
+    vector<bool> mark(sbjgraph.max_node_id(), false);
+    for (ymuint i = 0; i < fp_list.size(); ++ i) {
+      const SbjNode* node = fp_list[i];
+      mark[node->id()] = true;
+    }
+    for (ymuint i = 0; i < sbjgraph.logic_num(); ++ i) {
+      const SbjNode* node = sbjgraph.logic(i);
+      if ( node->fanout_num() > 1 ) {
+	if ( mark[node->id()] ) {
+	  cout << " " << node->id_str();
+	}
+	else {
+	  cout << " ***" << node->id_str() << "***";
+	}
+      }
+      else if ( mark[node->id()] ) {
+	cout << " XXX" << node->id_str() << "XXX";
+      }
+    }
+    cout << endl;
+  }
 
   if ( mode & 2 ) {
     // cut resubstituion

@@ -71,7 +71,7 @@ AreaMap2Cmd::cmd_proc(TclObjVector& objv)
     mode |= 2;
   }
 
-  ymuint count = 1000;
+  ymuint count = 10000;
   if ( mPoptCount->is_specified() ) {
     count = mPoptCount->val();
   }

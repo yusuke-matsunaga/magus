@@ -45,7 +45,6 @@ set ( sa_SOURCES
   )
 
 set ( mapgen_SOURCES
-  mapgen/MapEst.cc
   mapgen/MapGen.cc
   mapgen/MapRecord.cc
   )

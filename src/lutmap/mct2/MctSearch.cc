@@ -11,7 +11,7 @@
 #include "mct2/MctState.h"
 #include "MctNode.h"
 #include "MapRecord.h"
-#include "MapEst.h"
+#include "MapGen.h"
 #include "LbCalc.h"
 #include "SbjGraph.h"
 
@@ -115,6 +115,8 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
     mInputSizeList.push_back(p.second);
   }
 
+  cout << "#logic = " << sbjgraph.logic_num() << ", #fp = " << mFanoutPointList.size() << endl;
+
   mMinimumLutNum = sbjgraph.max_node_id() + 1;
   mRootNode = new MctNode(nullptr, 0, false);
 }
@@ -154,7 +156,7 @@ MctSearch::tree_policy(MctNode* node)
 	mState.add_boundary(fpnode);
       }
       else {
-	//mState.add_block(fpnode);
+	mState.add_block(fpnode);
       }
       mState.next_index();
       return child_node;
@@ -165,7 +167,7 @@ MctSearch::tree_policy(MctNode* node)
       mState.add_boundary(fpnode);
     }
     else {
-      //pmState.add_block(fpnode);
+      mState.add_block(fpnode);
     }
     mState.next_index();
   }
@@ -192,11 +194,10 @@ MctSearch::default_policy(MctNode* node)
       }
       MapRecord record;
       mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
-      MapGen mapgen;
+      MapGen gen;
       ymuint lut_num1;
       ymuint depth;
-      BnBuilder mapgraph;
-      mapgen.generate(mSbjGraph, record, mapgraph, lut_num1, depth);
+      gen.estimate(mSbjGraph, record, lut_num1, depth);
       cout << "  #LUT1 = " << lut_num1 << " / " << mMinimumLutNum << endl;
       if ( lut_num > lut_num1 ) {
 	lut_num = lut_num1;
@@ -225,10 +226,9 @@ MctSearch::default_policy(MctNode* node)
   else {
     MapRecord record;
     mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), record);
-    MapGen mapgen;
+    MapGen gen;
     ymuint depth;
-    BnBuilder mapgraph;
-    mapgen.generate(mSbjGraph, record, mapgraph, lut_num, depth);
+    gen.estimate(mSbjGraph, record, lut_num, depth);
     if ( mMinimumLutNum > lut_num ) {
       mMinimumLutNum = lut_num;
       mBestRecord = record;
@@ -244,7 +244,7 @@ MctSearch::default_policy(MctNode* node)
     double ratio = 0.50;
     ratio = 0.99;
 #else
-#if 1
+#if 0
     // 1 / ni の確率で選ばない．
     double ratio = 1.0 / ni;
 #else
@@ -253,9 +253,12 @@ MctSearch::default_policy(MctNode* node)
 #endif
 #endif
     double r = mRandGen.real1();
+    const SbjNode* fanout_node = mFanoutPointList[index];
     if ( r > ratio ) {
-      const SbjNode* fanout_node = mFanoutPointList[index];
       mState.add_boundary(fanout_node);
+    }
+    else {
+      //mState.add_block(fanout_node);
     }
     mState.next_index();
   }
@@ -281,10 +284,10 @@ MctSearch::default_policy(MctNode* node)
   }
 #endif
 
-  MapEst mapest;
+  MapGen gen;
   ymuint lut_num;
   ymuint depth;
-  mapest.estimate(mSbjGraph, record, lut_num, depth);
+  gen.estimate(mSbjGraph, record, lut_num, depth);
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;
     mBestRecord = record;
@@ -303,7 +306,7 @@ void
 MctSearch::back_up(MctNode* node,
 		   double val)
 {
-  double num_all_ln = log(mNumAll) / log(2);
+  double num_all_ln = log(mNumAll);
   for ( ; ; ) {
     node->update(val);
     MctNode* parent = node->parent();

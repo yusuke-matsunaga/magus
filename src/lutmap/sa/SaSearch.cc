@@ -9,7 +9,7 @@
 
 #include "SaSearch.h"
 #include "MapRecord.h"
-#include "MapEst.h"
+#include "MapGen.h"
 #include "LbCalc.h"
 #include "SbjGraph.h"
 #include "SbjDumper.h"
@@ -129,10 +129,10 @@ SaSearch::evaluate(const vector<bool>& state)
   MapRecord record;
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, dupnode_list, record);
 
-  MapEst mapest;
+  MapGen gen;
   ymuint lut_num;
   ymuint depth;
-  mapest.estimate(mSbjGraph, record, lut_num, depth);
+  gen.estimate(mSbjGraph, record, lut_num, depth);
 
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;
@@ -161,10 +161,10 @@ SaSearch::evaluate(const vector<bool>& state)
   MapRecord record;
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
 
-  MapEst mapest;
+  MapGen gen;
   ymuint lut_num;
   ymuint depth;
-  mapest.estimate(mSbjGraph, record, lut_num, depth);
+  gen.estimate(mSbjGraph, record, lut_num, depth);
 
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;
