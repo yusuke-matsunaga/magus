@@ -116,3 +116,7 @@ add_subdirectory (src/lutmap)
 #add_subdirectory (src/cellmap)
 
 add_subdirectory (magus_tclsh)
+
+if (DOXYGEN_FOUND)
+  add_subdirectory( doxygen-src )
+endif (DOXYGEN_FOUND)
