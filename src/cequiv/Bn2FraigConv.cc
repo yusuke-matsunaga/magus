@@ -83,7 +83,7 @@ Bn2FraigConv::node2handle(const BnNode* node)
   ymuint ni = node->fanin_num();
   vector<FraigHandle> fanin_handles(ni);
   for (ymuint i = 0; i < ni; ++ i) {
-    ymuint inode_id = node->fanin(i)->id();
+    ymuint inode_id = node->fanin(i);
     FraigHandle ih = get_handle(inode_id);
     fanin_handles[i] = ih;
   }
