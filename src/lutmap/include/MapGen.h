@@ -20,7 +20,7 @@ class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapGen MapGen.h "MapGen.h"
-/// @brief マッピング結果を BnBuilder にセットするクラス
+/// @brief マッピング結果を BnNetwork にセットするクラス
 //////////////////////////////////////////////////////////////////////
 class MapGen
 {
@@ -38,7 +38,7 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief マッピング結果を BnBuilder にセットする．
+  /// @brief マッピング結果を BnNetwork にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] record マッピング結果
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
@@ -47,7 +47,7 @@ public:
   void
   generate(const SbjGraph& sbjgraph,
 	   const MapRecord& record,
-	   BnBuilder& mapgraph,
+	   BnNetwork& mapgraph,
 	   ymuint& lut_num,
 	   ymuint& depth);
 
@@ -156,7 +156,7 @@ private:
   gen_back_trace(const SbjNode* node,
 		 bool inv,
 		 const MapRecord& record,
-		 BnBuilder& mapnetwork);
+		 BnNetwork& mapnetwork);
 
   /// @brief estimate 用のバックトレースを行う．
   /// @param[in] node 対象のノード

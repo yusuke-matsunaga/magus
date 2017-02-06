@@ -8,7 +8,7 @@
 
 
 #include "ReadMislib.h"
-#include "ym/CellMislibReader.h"
+#include "ym/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -37,8 +37,7 @@ bool
 ReadMislib::read_library(const string& filename,
 			 CellLibrary* library)
 {
-  CellMislibReader reader;
-  return reader.read(filename, library);
+  return read_mislib(filename, library);
 }
 
 END_NAMESPACE_MAGUS

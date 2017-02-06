@@ -53,7 +53,7 @@ BNetInfo::cmd_proc(TclObjVector& objv)
   string attr = objv[1];
   TclObj result;
   if ( attr == "model_name" ) {
-    result = network->model_name();
+    result = network->name();
   }
   else {
     if ( attr == "input_num" ) {
@@ -135,7 +135,7 @@ BNetAllInfo::cmd_proc(TclObjVector& objv)
   BnNetwork* network = cur_network();
 
   // モデル名
-  set_var(base, "model_name", network->model_name(), 0);
+  set_var(base, "model_name", network->name(), 0);
   // 入力数
   set_var(base, "input_num", network->input_num(), 0);
   // 出力数
@@ -182,7 +182,7 @@ BNetPrintStats::cmd_proc(TclObjVector& objv)
 {
   BnNetwork* network = cur_network();
   TclObj msg;
-  msg << network->model_name()
+  msg << network->name()
       << "\tpi=" << TclObj(network->input_num())
       << "\tpo=" << TclObj(network->output_num())
       << "\tnodes=" << TclObj(network->logic_num())

@@ -14,7 +14,6 @@
 
 #include "LutMap.h"
 
-#include "ym/BnBuilder.h"
 #include "ym/MvnMgr.h"
 
 
@@ -102,10 +101,8 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      BnBuilder builder;
       lutmap.delay_map(*neth->bnetwork(), limit, slack, mode,
-		       builder, lut_num, depth);
-      neth->_bnetwork()->copy(builder);
+		       *neth->_bnetwork(), lut_num, depth);
     }
     break;
 

@@ -51,7 +51,7 @@ void
 LutMap::area_map(const BnNetwork& src_network,
 		 ymuint limit,
 		 ymuint mode,
-		 BnBuilder& map_network,
+		 BnNetwork& map_network,
 		 ymuint& lut_num,
 		 ymuint& depth)
 {
@@ -98,7 +98,7 @@ LutMap::delay_map(const BnNetwork& src_network,
 		  ymuint limit,
 		  ymuint slack,
 		  ymuint mode,
-		  BnBuilder& map_network,
+		  BnNetwork& map_network,
 		  ymuint& lut_num,
 		  ymuint& depth)
 {

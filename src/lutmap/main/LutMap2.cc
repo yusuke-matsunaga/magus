@@ -52,7 +52,7 @@ LutMap2::area_map(const BnNetwork& src_network,
 		  ymuint mode,
 		  ymuint count,
 		  bool verbose,
-		  BnBuilder& map_network,
+		  BnNetwork& map_network,
 		  ymuint& lut_num,
 		  ymuint& depth)
 {
@@ -100,7 +100,7 @@ LutMap2::delay_map(const BnNetwork& src_network,
 		  ymuint limit,
 		  ymuint slack,
 		  ymuint mode,
-		  BnBuilder& map_network,
+		  BnNetwork& map_network,
 		  ymuint& lut_num,
 		  ymuint& depth)
 {

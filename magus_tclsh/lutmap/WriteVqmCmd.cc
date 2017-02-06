@@ -55,7 +55,7 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
   for (ymuint i = 0; i < no; ++ i) {
     fout << " ," << endl;
     const BnNode* po = mapgraph.output(i);
-    fout << " po_" << po->input();
+    fout << " po_" << po->fanin();
   }
   fout << endl
        << ");" << endl;
@@ -67,7 +67,7 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
   }
   for (ymuint i = 0; i < no; ++ i) {
     const BnNode* po = mapgraph.output(i);
-    fout << " output po_" << po->input() << " ;" << endl;
+    fout << " output po_" << po->fanin() << " ;" << endl;
   }
   for (ymuint i = 0; i < ni; ++ i) {
     const BnNode* pi = mapgraph.input(i);

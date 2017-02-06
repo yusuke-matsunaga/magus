@@ -11,7 +11,10 @@
 #include "MapRecord.h"
 #include "Cut.h"
 
-#include "ym/BnBuilder.h"
+#include "ym/BnNetwork.h"
+#include "ym/BnPort.h"
+#include "ym/BnDff.h"
+#include "ym/BnLatch.h"
 #include "ym/TvFunc.h"
 
 #include "SbjNode.h"
@@ -103,7 +106,7 @@ MapGen::init(ymuint node_num)
   mFanoutPointList.clear();
 }
 
-// @brief マッピング結果を BnBuilder にセットする．
+// @brief マッピング結果を BnNetwork にセットする．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] record マッピング結果
 // @param[out] mapgraph マッピング結果を格納するネットワーク
@@ -112,7 +115,7 @@ MapGen::init(ymuint node_num)
 void
 MapGen::generate(const SbjGraph& sbjgraph,
 		 const MapRecord& record,
-		 BnBuilder& mapgraph,
+		 BnNetwork& mapgraph,
 		 ymuint& lut_num,
 		 ymuint& depth)
 {
@@ -121,7 +124,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
 #endif
 
   mapgraph.clear();
-  mapgraph.set_model_name(sbjgraph.name());
+  mapgraph.set_name(sbjgraph.name());
 
   init(sbjgraph.max_node_id());
 
@@ -137,16 +140,84 @@ MapGen::generate(const SbjGraph& sbjgraph,
     }
   }
 
+  // ポートの生成
+  ymuint np = sbjgraph.port_num();
+  for (ymuint i = 0; i < np; ++ i) {
+    const SbjPort* sbjport = sbjgraph.port(i);
+    ymuint nb = sbjport->bit_width();
+    vector<int> dir_vect(nb);
+    for (ymuint j = 0; j < nb; ++ j) {
+      const SbjNode* sbjnode = sbjport->bit(j);
+      dir_vect[j] = sbjnode->is_input() ? 0 : 1;
+    }
+    BnPort* bn_port = mapgraph.new_port(sbjport->name(), dir_vect);
+    for (ymuint j = 0; j < nb; ++ j) {
+      const SbjNode* sbjnode = sbjport->bit(j);
+      mNodeInfo[sbjnode->id()].set_map(bn_port->bit(j), 0);
+    }
+  }
+
+  // DFFの生成
+  ymuint nf = sbjgraph.dff_num();
+  for (ymuint i = 0; i < nf; ++ i) {
+    const SbjDff* dff = sbjgraph.dff(i);
+    const SbjNode* input = dff->data_input();
+    const SbjNode* output = dff->data_output();
+    const SbjNode* clock = dff->clock();
+    const SbjNode* clear = dff->clear();
+    const SbjNode* preset = dff->preset();
+
+    bool has_clear = (clear != nullptr);
+    bool has_preset = (preset != nullptr);
+
+    BnDff* bn_dff = mapgraph.new_dff(string(), has_clear, has_preset);
+
+    mNodeInfo[input->id()].set_map(bn_dff->input(), 0);
+    mNodeInfo[output->id()].set_map(bn_dff->output(), 0);
+    mNodeInfo[clock->id()].set_map(bn_dff->clock(), 0);
+    if ( has_clear ) {
+      mNodeInfo[clear->id()].set_map(bn_dff->clear(), 0);
+    }
+    if ( has_preset ) {
+      mNodeInfo[preset->id()].set_map(bn_dff->preset(), 0);
+    }
+  }
+
+  // ラッチの生成
+  ymuint nlatch = sbjgraph.latch_num();
+  for (ymuint i = 0; i < nlatch; ++ i) {
+    const SbjLatch* latch = sbjgraph.latch(i);
+    const SbjNode* input = latch->data_input();
+    const SbjNode* output = latch->data_output();
+    const SbjNode* enable = latch->enable();
+    const SbjNode* clear = latch->clear();
+    const SbjNode* preset = latch->preset();
+
+    bool has_clear = (clear != nullptr);
+    bool has_preset = (preset != nullptr);
+
+    BnLatch* bn_latch = mapgraph.new_latch(string(), has_clear, has_preset);
+
+    mNodeInfo[input->id()].set_map(bn_latch->input(), 0);
+    mNodeInfo[output->id()].set_map(bn_latch->output(), 0);
+    mNodeInfo[enable->id()].set_map(bn_latch->enable(), 0);
+    if ( has_clear ) {
+      mNodeInfo[clear->id()].set_map(bn_latch->clear(), 0);
+    }
+    if ( has_preset ) {
+      mNodeInfo[preset->id()].set_map(bn_latch->preset(), 0);
+    }
+  }
+
   // 外部入力の生成
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* node = sbjgraph.input(i);
-    ymuint node_id = mapgraph.add_input(string());
     NodeInfo& node_info = mNodeInfo[node->id()];
-    node_info.set_map(node_id, 0);
+    ymuint node_id = node_info.map_node();
     if ( node_info.inv_req() ) {
       // NOT ゲートを表す LUT を作る．
       TvFunc tv = TvFunc::nega_literal(1, VarId(0));
-      ymuint inv_id = mapgraph.add_tv(string(), tv);
+      ymuint inv_id = mapgraph.new_tv(string(), 1, tv);
       mapgraph.connect(node_id, inv_id, 0);
 
       ++ mLutNum;
@@ -179,7 +250,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       if ( inv ) {
 	if ( mConst1 == 0 ) {
 	  TvFunc tv = TvFunc::const_one(0);
-	  mConst1 = mapgraph.add_tv(string(), tv);
+	  mConst1 = mapgraph.new_tv(string(), 0, tv);
 	  mConst1 = node_id;
 
 	  ++ mLutNum;
@@ -193,7 +264,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       else {
 	if ( mConst0 == 0 ) {
 	  TvFunc tv = TvFunc::const_zero(0);
-	  mConst0 = mapgraph.add_tv(string(), tv);
+	  mConst0 = mapgraph.new_tv(string(), 0, tv);
 
 	  ++ mLutNum;
 
@@ -205,73 +276,10 @@ MapGen::generate(const SbjGraph& sbjgraph,
       }
       depth = 0;
     }
-    ymuint onode_id = mapgraph.add_output(string(), node_id);
+    ymuint onode_id = mNodeInfo[onode->id()].map_node();
+    mapgraph.connect(node_id, onode_id, 0);
+    // depth の設定のため
     mNodeInfo[onode->id()].set_map(onode_id, depth);
-  }
-
-  // DFFの生成
-  ymuint nf = sbjgraph.dff_num();
-  for (ymuint i = 0; i < nf; ++ i) {
-    const SbjDff* dff = sbjgraph.dff(i);
-    BnBuilder::DffInfo& dff_info = mapgraph.add_dff(string());
-
-    const SbjNode* input = dff->data_input();
-    dff_info.mInput = mNodeInfo[input->id()].map_node();
-
-    const SbjNode* output = dff->data_output();
-    dff_info.mOutput = mNodeInfo[output->id()].map_node();
-
-    const SbjNode* clock = dff->clock();
-    dff_info.mClock = mNodeInfo[clock->id()].map_node();
-
-    const SbjNode* clear = dff->clear();
-    if ( clear != nullptr ) {
-      dff_info.mClear = mNodeInfo[clear->id()].map_node();
-    }
-
-    const SbjNode* preset = dff->preset();
-    if ( preset != nullptr ) {
-      dff_info.mPreset = mNodeInfo[preset->id()].map_node();
-    }
-  }
-
-  // ラッチの生成
-  ymuint nlatch = sbjgraph.latch_num();
-  for (ymuint i = 0; i < nlatch; ++ i) {
-    const SbjLatch* latch = sbjgraph.latch(i);
-    BnBuilder::LatchInfo& latch_info = mapgraph.add_latch(string());
-
-    const SbjNode* input = latch->data_input();
-    latch_info.mInput = mNodeInfo[input->id()].map_node();
-
-    const SbjNode* output = latch->data_output();
-    latch_info.mOutput = mNodeInfo[output->id()].map_node();
-
-    const SbjNode* enable = latch->enable();
-    latch_info.mEnable = mNodeInfo[enable->id()].map_node();
-
-    const SbjNode* clear = latch->clear();
-    if ( clear != nullptr ) {
-      latch_info.mClear = mNodeInfo[clear->id()].map_node();
-    }
-
-    const SbjNode* preset = latch->preset();
-    if ( preset != nullptr ) {
-      latch_info.mPreset = mNodeInfo[preset->id()].map_node();
-    }
-  }
-
-  // ポートの生成
-  ymuint np = sbjgraph.port_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    const SbjPort* sbjport = sbjgraph.port(i);
-    ymuint nb = sbjport->bit_width();
-    vector<ymuint> tmp(nb);
-    for (ymuint j = 0; j < nb; ++ j) {
-      const SbjNode* sbjnode = sbjport->bit(j);
-      tmp[j] = mNodeInfo[sbjnode->id()].map_node();
-    }
-    mapgraph.add_port(sbjport->name(), tmp);
   }
 
   bool stat = mapgraph.wrap_up();
@@ -305,7 +313,7 @@ ymuint
 MapGen::gen_back_trace(const SbjNode* node,
 		       bool output_inv,
 		       const MapRecord& record,
-		       BnBuilder& mapnetwork)
+		       BnNetwork& mapnetwork)
 {
 #if LUTMAP_DEBUG_MAPGEN
   cout << "back_trace(" << node->id_str() << ", " << output_inv << ")" << endl;
@@ -361,7 +369,7 @@ MapGen::gen_back_trace(const SbjNode* node,
   TvFunc tv = cut->make_tv(output_inv, input_inv);
 
   // 新しいノードを作る．
-  node_id = mapnetwork.add_tv(string(), tv);
+  node_id = mapnetwork.new_tv(string(), ni, tv);
 
   ++ mLutNum;
 

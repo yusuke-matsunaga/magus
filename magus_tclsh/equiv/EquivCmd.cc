@@ -351,8 +351,8 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
 	}
 
 	for (ymuint k = 0; k < bw1; ++ k) {
-	  const BnNode* node1 = port1->bit(k);
-	  const BnNode* node2 = port2->bit(k);
+	  const BnNode* node1 = network1.node(port1->bit(k));
+	  const BnNode* node2 = network2.node(port2->bit(k));
 	  if ( node1->type() != node2->type() ) {
 	    TclObj emsg;
 	    emsg
@@ -482,14 +482,14 @@ EquivCmd::cmd_proc(TclObjVector& objv)
 	if ( comp_stats[i] == kB3False ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
-	  cout << "Node#" << node1->input() << "@network1 and "
-	       << "Node#" << node2->input() << "@network2 are not equivalent" << endl;
+	  cout << "Node#" << node1->fanin() << "@network1 and "
+	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
 	}
 	else if ( comp_stats[i] == kB3X ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
-	  cout << "Node#" << node1->input() << "@network1 and "
-	       << "Node#" << node2->input() << "@network2 are unknown" << endl;
+	  cout << "Node#" << node1->fanin() << "@network1 and "
+	       << "Node#" << node2->fanin() << "@network2 are unknown" << endl;
 	}
       }
     }
@@ -589,14 +589,14 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
 	if ( comp_stats[i] == kB3False ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
-	  cout << "Node#" << node1->input() << "@network1 and "
-	       << "Node#" << node2->input() << "@network2 are not equivalent" << endl;
+	  cout << "Node#" << node1->fanin() << "@network1 and "
+	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
 	}
 	else if ( comp_stats[i] == kB3X ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
-	  cout << "Node#" << node1->input() << "@network1 and "
-	       << "Node#" << node2->input() << "@network2 are unknown" << endl;
+	  cout << "Node#" << node1->fanin() << "@network1 and "
+	       << "Node#" << node2->fanin() << "@network2 are unknown" << endl;
 	}
       }
     }

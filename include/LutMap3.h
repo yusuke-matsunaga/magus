@@ -53,7 +53,7 @@ public:
 	   ymuint mode,
 	   ymuint count,
 	   bool verbose,
-	   BnBuilder& mapnetwork,
+	   BnNetwork& mapnetwork,
 	   ymuint& lut_num,
 	   ymuint& depth);
 
@@ -75,7 +75,7 @@ public:
 	    ymuint limit,
 	    ymuint slack,
 	    ymuint mode,
-	    BnBuilder& mapnetwork,
+	    BnNetwork& mapnetwork,
 	    ymuint& lut_num,
 	    ymuint& depth);
 #endif

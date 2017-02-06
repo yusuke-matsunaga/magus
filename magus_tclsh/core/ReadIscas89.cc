@@ -13,7 +13,6 @@
 
 #include "ym/BnNetwork.h"
 #include "ym/BnIscas89Reader.h"
-#include "ym/BnBuilder.h"
 #include "ym/MsgMgr.h"
 #include "ym/TclObjMsgHandler.h"
 
@@ -66,9 +65,7 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      BnIscas89Reader reader;
-      BnBuilder builder;
-      bool result = reader.read(builder, ex_file_name);
+      bool result = BnIscas89Reader::read(*neth->_bnetwork(), ex_file_name);
 
       // エラーが起きていないか調べる．
       if ( !result ) {
@@ -77,9 +74,6 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
 	set_result(emsg);
 	return TCL_ERROR;
       }
-
-
-      neth->_bnetwork()->copy(builder);
     }
     break;
 

@@ -8,7 +8,7 @@
 
 
 #include "ReadLiberty.h"
-#include "ym/CellDotlibReader.h"
+#include "ym/CellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -37,8 +37,7 @@ bool
 ReadLiberty::read_library(const string& filename,
 			  CellLibrary* library)
 {
-  CellDotlibReader reader;
-  return reader.read(filename, library);
+  return read_liberty(filename, library);
 }
 
 END_NAMESPACE_MAGUS

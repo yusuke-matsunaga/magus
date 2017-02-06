@@ -51,7 +51,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   dst_network.clear();
 
   // ネットワーク名の設定
-  dst_network.set_name(src_network.model_name());
+  dst_network.set_name(src_network.name());
 
   // BnNode::id() をキーにして SbjHandle を記録するハッシュ表
   HashMap<ymuint, SbjHandle> node_map;
@@ -71,9 +71,8 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     ymuint ni = bn_node->fanin_num();
     vector<SbjHandle> ihandle_list(ni);
     for (ymuint j = 0; j < ni; ++ j) {
-      const BnNode* bn_inode = bn_node->fanin(j);
-      ASSERT_COND( bn_inode != nullptr );
-      bool stat = node_map.find(bn_inode->id(), ihandle_list[j]);
+      ymuint iid = bn_node->fanin(j);
+      bool stat = node_map.find(iid, ihandle_list[j]);
       ASSERT_COND( stat );
     }
     SbjHandle sbj_handle;
@@ -143,10 +142,9 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   ymuint no = src_network.output_num();
   for (ymuint i = 0; i < no; ++ i) {
     const BnNode* bn_node = src_network.output(i);
-    const BnNode* bn_inode = bn_node->input();
-    ASSERT_COND( bn_inode != nullptr );
+    ymuint iid = bn_node->fanin();
     SbjHandle ihandle;
-    bool stat = node_map.find(bn_inode->id(), ihandle);
+    bool stat = node_map.find(iid, ihandle);
     ASSERT_COND( stat );
     SbjNode* sbj_node = dst_network.new_output(ihandle);
     node_map.add(bn_node->id(), SbjHandle(sbj_node));
@@ -157,42 +155,42 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   for (ymuint i = 0; i < ndff; ++ i) {
     const BnDff* bn_dff = src_network.dff(i);
 
-    const BnNode* bn_input = bn_dff->input();
+    ymuint iid = bn_dff->input();
     SbjHandle ihandle;
-    bool stat1 = node_map.find(bn_input->id(), ihandle);
+    bool stat1 = node_map.find(iid, ihandle);
     ASSERT_COND( stat1 );
     ASSERT_COND( !ihandle.inv() );
     SbjNode* sbj_input = ihandle.node();
 
-    const BnNode* bn_clock = bn_dff->clock();
+    ymuint cid = bn_dff->clock();
     SbjHandle chandle;
-    bool stat2 = node_map.find(bn_clock->id(), chandle);
+    bool stat2 = node_map.find(cid, chandle);
     ASSERT_COND( stat2 );
     ASSERT_COND( !chandle.inv() );
     SbjNode* sbj_clock = chandle.node();
 
-    const BnNode* bn_output = bn_dff->output();
+    ymuint oid = bn_dff->output();
     SbjHandle ohandle;
-    bool stat3 = node_map.find(bn_output->id(), ohandle);
+    bool stat3 = node_map.find(oid, ohandle);
     ASSERT_COND( stat3 );
     ASSERT_COND( !ohandle.inv() );
     SbjNode* sbj_output = ohandle.node();
 
-    const BnNode* bn_clear = bn_dff->clear();
+    ymuint rid = bn_dff->clear();
     SbjNode* sbj_clear = nullptr;
-    if ( bn_clear != nullptr ) {
+    if ( rid != kBnNullId ) {
       SbjHandle handle1;
-      bool stat1 = node_map.find(bn_clear->id(), handle1);
+      bool stat1 = node_map.find(rid, handle1);
       ASSERT_COND( stat1 );
       ASSERT_COND( !handle1.inv() );
       sbj_clear = handle1.node();
     }
 
-    const BnNode* bn_preset = bn_dff->preset();
+    ymuint pid = bn_dff->preset();
     SbjNode* sbj_preset = nullptr;
-    if ( bn_preset != nullptr ) {
+    if ( pid != kBnNullId ) {
       SbjHandle handle1;
-      bool stat1 = node_map.find(bn_preset->id(), handle1);
+      bool stat1 = node_map.find(pid, handle1);
       ASSERT_COND( stat1 );
       ASSERT_COND( !handle1.inv() );
       sbj_preset = handle1.node();
@@ -206,42 +204,42 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   for (ymuint i = 0; i < nlatch; ++ i) {
     const BnLatch* bn_latch = src_network.latch(i);
 
-    const BnNode* bn_input = bn_latch->input();
+    ymuint iid = bn_latch->input();
     SbjHandle ihandle;
-    bool stat1 = node_map.find(bn_input->id(), ihandle);
+    bool stat1 = node_map.find(iid, ihandle);
     ASSERT_COND( stat1 );
     ASSERT_COND( !ihandle.inv() );
     SbjNode* sbj_input = ihandle.node();
 
-    const BnNode* bn_enable = bn_latch->enable();
+    ymuint eid = bn_latch->enable();
     SbjHandle chandle;
-    bool stat2 = node_map.find(bn_enable->id(), chandle);
+    bool stat2 = node_map.find(eid, chandle);
     ASSERT_COND( stat2 );
     ASSERT_COND( !chandle.inv() );
     SbjNode* sbj_enable = chandle.node();
 
-    const BnNode* bn_output = bn_latch->output();
+    ymuint oid = bn_latch->output();
     SbjHandle ohandle;
-    bool stat3 = node_map.find(bn_output->id(), ohandle);
+    bool stat3 = node_map.find(oid, ohandle);
     ASSERT_COND( stat3 );
     ASSERT_COND( !ohandle.inv() );
     SbjNode* sbj_output = ohandle.node();
 
-    const BnNode* bn_clear = bn_latch->clear();
+    ymuint rid = bn_latch->clear();
     SbjNode* sbj_clear = nullptr;
-    if ( bn_clear != nullptr ) {
+    if ( rid != kBnNullId ) {
       SbjHandle handle1;
-      bool stat1 = node_map.find(bn_clear->id(), handle1);
+      bool stat1 = node_map.find(rid, handle1);
       ASSERT_COND( stat1 );
       ASSERT_COND( !handle1.inv() );
       sbj_clear = handle1.node();
     }
 
-    const BnNode* bn_preset = bn_latch->preset();
+    ymuint pid = bn_latch->preset();
     SbjNode* sbj_preset = nullptr;
-    if ( bn_preset != nullptr ) {
+    if ( pid != kBnNullId ) {
       SbjHandle handle1;
-      bool stat1 = node_map.find(bn_preset->id(), handle1);
+      bool stat1 = node_map.find(pid, handle1);
       ASSERT_COND( stat1 );
       ASSERT_COND( !handle1.inv() );
       sbj_preset = handle1.node();
@@ -257,9 +255,9 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     ymuint bw = bn_port->bit_width();
     vector<SbjNode*> sbj_bits(bw);
     for (ymuint j = 0; j < bw; ++ j) {
-      const BnNode* bn_node = bn_port->bit(j);
+      ymuint id = bn_port->bit(j);
       SbjHandle handle;
-      bool stat = node_map.find(bn_node->id(), handle);
+      bool stat = node_map.find(id, handle);
       ASSERT_COND( stat );
       ASSERT_COND( !handle.inv() );
       SbjNode* sbj_node = handle.node();
