@@ -99,8 +99,8 @@ MapGen::init(ymuint node_num)
   // 具体的な初期化は NodeInfo のコンストラクタが行っている．
   mNodeInfo.clear();
   mNodeInfo.resize(node_num);
-  mConst0 = 0;
-  mConst1 = 0;
+  mConst0 = kBnNullId;
+  mConst1 = kBnNullId;
   mLutNum = 0;
 
   mFanoutPointList.clear();
@@ -248,7 +248,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
     else {
       // 定数の場合
       if ( inv ) {
-	if ( mConst1 == 0 ) {
+	if ( mConst1 == kBnNullId ) {
 	  TvFunc tv = TvFunc::const_one(0);
 	  mConst1 = mapgraph.new_tv(string(), 0, tv);
 	  mConst1 = node_id;
@@ -262,7 +262,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	node_id = mConst1;
       }
       else {
-	if ( mConst0 == 0 ) {
+	if ( mConst0 == kBnNullId ) {
 	  TvFunc tv = TvFunc::const_zero(0);
 	  mConst0 = mapgraph.new_tv(string(), 0, tv);
 
@@ -452,7 +452,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
     }
     else {
       if ( inv ) {
-	if ( mConst1 == 0 ) {
+	if ( mConst1 == kBnNullId ) {
 	  mConst1 = 1;
 
 	  ++ mLutNum;
@@ -463,7 +463,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
 	}
       }
       else {
-	if ( mConst0 == 0 ) {
+	if ( mConst0 == kBnNullId ) {
 	  mConst0 = 1;
 
 	  ++ mLutNum;
