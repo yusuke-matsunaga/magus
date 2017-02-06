@@ -321,7 +321,7 @@ MapGen::gen_back_trace(const SbjNode* node,
   NodeInfo& node_info = mNodeInfo[node->id()];
 
   ymuint node_id = node_info.map_node(output_inv);
-  if ( node_id ) {
+  if ( node_id != kBnNullId ) {
     // すでに生成済みならそのノードを返す．
     return node_id;
   }
@@ -373,10 +373,6 @@ MapGen::gen_back_trace(const SbjNode* node,
 
   ++ mLutNum;
 
-#if LUTMAP_DEBUG_MAPGEN
-  cout << node->id_str() << "[" << idx << "]" << endl;
-#endif
-
   // 入力側のノードとの接続を行う．
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = cut->input(i);
@@ -388,6 +384,10 @@ MapGen::gen_back_trace(const SbjNode* node,
 
   // マップ結果をセットする．
   node_info.set_map(node_id, depth, output_inv);
+
+#if LUTMAP_DEBUG_MAPGEN
+  cout << node->id_str() << " => " << node_id << ": " << depth << endl;
+#endif
 
   return node_id;
 }

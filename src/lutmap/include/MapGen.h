@@ -211,8 +211,8 @@ MapGen::NodeInfo::NodeInfo()
 {
   mRefCount[0] = 0;
   mRefCount[1] = 0;
-  mMapNode[0] = 0;
-  mMapNode[1] = 0;
+  mMapNode[0] = kBnNullId;
+  mMapNode[1] = kBnNullId;
   mDepth[0] = 0;
   mDepth[1] = 0;
 }
