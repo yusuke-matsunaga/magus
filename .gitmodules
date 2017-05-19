@@ -28,3 +28,6 @@
 [submodule "ym-mvn"]
 	path = ym-mvn
 	url = git@github.com:yusuke-matsunaga/ym-mvn.git
+[submodule "ym-base"]
+	path = ym-base
+	url = git@github.com:yusuke-matsunaga/ym-base.git

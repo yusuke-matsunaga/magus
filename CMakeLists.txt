@@ -80,6 +80,7 @@ configure_file(
 # ===================================================================
 include_directories (
   ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/ym-base/include
   ${PROJECT_SOURCE_DIR}/ym-bnet/include
   ${PROJECT_SOURCE_DIR}/ym-cell/include
   ${PROJECT_SOURCE_DIR}/ym-common/include
@@ -99,6 +100,7 @@ include_directories (
 # ===================================================================
 
 add_subdirectory ( ym-common )
+add_subdirectory ( ym-base )
 add_subdirectory ( ym-logic )
 add_subdirectory ( ym-cell )
 add_subdirectory ( ym-bnet )

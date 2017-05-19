@@ -122,7 +122,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:magus_lutmap_a>
 #  $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
-  $<TARGET_OBJECTS:ym_common_a>
+  $<TARGET_OBJECTS:ym_base_a>
   $<TARGET_OBJECTS:ym_logic_a>
   $<TARGET_OBJECTS:ym_cell_a>
   $<TARGET_OBJECTS:ym_bnet_a>
@@ -176,7 +176,7 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:magus_lutmap_p>
 #  $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
-  $<TARGET_OBJECTS:ym_common_p>
+  $<TARGET_OBJECTS:ym_base_p>
   $<TARGET_OBJECTS:ym_logic_p>
   $<TARGET_OBJECTS:ym_cell_p>
   $<TARGET_OBJECTS:ym_bnet_p>
@@ -230,7 +230,7 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:magus_lutmap_d>
 #  $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
-  $<TARGET_OBJECTS:ym_common_d>
+  $<TARGET_OBJECTS:ym_base_d>
   $<TARGET_OBJECTS:ym_logic_d>
   $<TARGET_OBJECTS:ym_cell_d>
   $<TARGET_OBJECTS:ym_bnet_d>
