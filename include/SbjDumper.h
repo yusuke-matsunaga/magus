@@ -17,19 +17,11 @@ BEGIN_NAMESPACE_YM_SBJ
 //////////////////////////////////////////////////////////////////////
 /// @class SbjDumper SbjDumper.h "SbjDumper.h"
 /// @brief SbjGraph の内容を出力するためのクラス
-/// @note 実はクラスにする必要はない．
+///
+/// すべてクラスメソッドなのでクラスにする意味はあまりない．
 //////////////////////////////////////////////////////////////////////
 class SbjDumper
 {
-public:
-
-  /// @brief コンストラクタ
-  SbjDumper();
-
-  /// @brief デストラクタ
-  ~SbjDumper();
-
-
 public:
   //////////////////////////////////////////////////////////////////////
   // 出力関数
@@ -38,6 +30,7 @@ public:
   /// @brief 独自形式で出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] sbjgraph 対象のサブジェクトグラフ
+  static
   void
   dump(ostream& s,
        const SbjGraph& sbjgraph);
@@ -45,6 +38,7 @@ public:
   /// @brief blif 形式で出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] sbjgraph 対象のサブジェクトグラフ
+  static
   void
   dump_blif(ostream& s,
 	    const SbjGraph& sbjgraph);
@@ -52,6 +46,7 @@ public:
   /// @brief Verilog-HDL 形式で出力する関数
   /// @param[in] s 出力先のストリーム
   /// @param[in] sbjgraph 対象のネットワーク
+  static
   void
   dump_verilog(ostream& s,
 	       const SbjGraph& sbjgraph);

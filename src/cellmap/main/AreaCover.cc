@@ -13,9 +13,11 @@
 #include "ym/CellPatGraph.h"
 #include "ym/CellClass.h"
 #include "ym/CellGroup.h"
+#include "SbjGraph.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
 #include "MapGen.h"
+#include "SbjDumper.h"
 
 #include "ym/NpnMapM.h"
 
@@ -51,8 +53,7 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 		      BnNetwork& mapnetwork)
 {
   if ( debug ) {
-    SbjDumper dump;
-    dump(cout, sbjgraph);
+    SbjDumper::dump(cout, sbjgraph);
   }
 
   MapRecord maprec;
@@ -82,7 +83,7 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
   // 最終的なネットワークを生成する．
   MapGen gen;
 
-  mapgen.generate(sbjgraph, maprec, mapnetwork);
+  gen.generate(sbjgraph, maprec, mapnetwork);
 }
 
 // @brief FF のマッピングを行う．
@@ -135,10 +136,9 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
     }
   }
 
-  const SbjDffList& dff_list = sbjgraph.dff_list();
-  for (SbjDffList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjDff* dff = *p;
+  ymuint ndff = sbjgraph.dff_num();
+  for (ymuint i = 0; i < ndff; ++ i) {
+    const SbjDff* dff = sbjgraph.dff(i);
     const SbjNode* clear = dff->clear();
     const SbjNode* preset = dff->preset();
     bool has_clear = false;
@@ -157,11 +157,11 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
     }
     FFInfo& ff_info1 = mFFInfo[sig];
     if ( ff_info1.mCell != nullptr ) {
-      maprec.set_dff_match(dff, false, ff_info1.mCell, ff_info1.mPinInfo);
+      maprec.set_dff_match(dff, false, ff_info1.mCell);
     }
     FFInfo& ff_info2 = mFFInfo[xsig];
     if ( ff_info2.mCell != nullptr ) {
-      maprec.set_dff_match(dff, true, ff_info2.mCell, ff_info2.mPinInfo);
+      maprec.set_dff_match(dff, true, ff_info2.mCell);
     }
   }
 }

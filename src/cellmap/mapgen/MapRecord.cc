@@ -33,6 +33,15 @@ MapRecord::MapRecord()
 {
 }
 
+// @brief コピーコンストラクタ
+MapRecord::MapRecord(const MapRecord& src) :
+  mConst0(src.mConst0),
+  mDffInfo(src.mDffInfo),
+  mLatchInfo(src.mLatchInfo),
+  mNodeInfo(mNodeInfo)
+{
+}
+
 // デストラクタ
 MapRecord::~MapRecord()
 {
@@ -51,16 +60,18 @@ MapRecord::init(const BdnMgr& sbjgraph)
   mNodeInfo.resize(sbjgraph.max_node_id() * 2);
 }
 
-// @brief マッチの情報だけコピーする．
+// @brief 定数０セルをセットする．
 void
-MapRecord::copy(const MapRecord& src)
+MapRecord::set_const0(const Cell* cell)
 {
-  ymuint n = src.mNodeInfo.size();
-  mNodeInfo.clear();
-  mNodeInfo.resize(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    mNodeInfo[i].mMatch = src.mNodeInfo[i].mMatch;
-  }
+  return mConst0 = cell;
+}
+
+// @brief 定数1セルをセットする．
+void
+MapRecord::set_const1(const Cell* cell)
+{
+  return mConst1 = cell;
 }
 
 // @brief D-FF のマッチを記録する．

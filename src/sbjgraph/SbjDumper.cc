@@ -17,16 +17,6 @@
 
 BEGIN_NAMESPACE_YM_SBJ
 
-// @brief コンストラクタ
-SbjDumper::SbjDumper()
-{
-}
-
-// @brief デストラクタ
-SbjDumper::~SbjDumper()
-{
-}
-
 /// @brief 独自形式で出力する．
 /// @param[in] s 出力先のストリーム
 /// @param[in] sbjgraph 対象のサブジェクトグラフ

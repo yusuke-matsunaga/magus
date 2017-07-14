@@ -10,7 +10,7 @@
 
 
 #include "cellmap_nsdef.h"
-#include "SbjGraph.h"
+#include "SbjNode.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -110,7 +110,6 @@ Cut::resize(ymuint nl)
     mLeafNum = nl;
     mLeafArray = new ympuint[nl];
   }
-  mInvArray = 0U;
 }
 
 // @brief 葉のノードを設定する．
@@ -142,7 +141,7 @@ const SbjNode*
 Cut::leaf_node(ymuint pos) const
 {
   ASSERT_COND( pos < leaf_num() );
-  return reinterpret_cast<ympuint>(mLeafArray[pos] & ~1ULL);
+  return reinterpret_cast<const SbjNode*>(mLeafArray[pos] & ~1UL);
 }
 
 // @brief 葉の極性を得る．

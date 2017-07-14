@@ -53,38 +53,6 @@ private:
   // 内部で用いられるデータ構造
   //////////////////////////////////////////////////////////////////////
 
-  // D-FF の割り当て情報
-  struct DffInfo
-  {
-    DffInfo() :
-      mCell(nullptr)
-    {
-    }
-
-    // セル
-    const Cell* mCell;
-
-    // ピンの割り当て情報
-    CellFFInfo mPinInfo;
-
-  };
-
-  // ラッチの割り当て情報
-  struct LatchInfo
-  {
-    LatchInfo()
-    {
-      mCell = nullptr;
-    }
-
-    // セル
-    const Cell* mCell;
-
-    // ピンの割り当て情報
-    CellLatchInfo mPinInfo;
-
-  };
-
   // ノードの割り当て情報
   struct NodeInfo
   {
@@ -95,7 +63,7 @@ private:
     }
 
     // マッチ
-    Match mMatch;
+    Cut mMatch;
 
     // セル
     const Cell* mCell;
@@ -154,21 +122,6 @@ private:
   back_trace(const SbjNode* node,
 	     bool inv);
 
-  /// @brief D-FF の割り当て情報を取り出す．
-  DffInfo&
-  get_dff_info(const SbjDff* dff,
-	       bool inv);
-
-  /// @brief ラッチの割り当て情報を取り出す．
-  LatchInfo&
-  get_latch_info(const SbjLatch* latch,
-		 bool inv);
-
-  /// @brief NodeInfo を取り出す．
-  NodeInfo&
-  get_node_info(const SbjNode* node,
-		bool inv);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -177,14 +130,6 @@ private:
 
   // 答えのマップグラフ
   BnNetwork* mMapGraph;
-
-  // D-FF の割り当て情報を格納した配列
-  // キーは BdnDff の ID 番号
-  vector<DffInfo> mDffInfo;
-
-  // ラッチの割り当て情報を格納した配列
-  // キーは BdnLatch の ID 番号
-  vector<LatchInfo> mLatchInfo;
 
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは BdnNode の ID 番号
