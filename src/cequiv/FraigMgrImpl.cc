@@ -558,7 +558,7 @@ FraigMgrImpl::new_node()
 {
   void* p = mAlloc.get_memory(sizeof(FraigNode));
   FraigNode* node = new (p) FraigNode();
-  node->mVarId = mSolver.new_var();
+  node->mVarId = mSolver.new_variable();
   ASSERT_COND(node->mVarId.val() == mAllNodes.size() );
   init_pat(node);
   mAllNodes.push_back(node);
@@ -696,7 +696,7 @@ FraigMgrImpl::check_condition(SatLiteral lit1)
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    SatVarId id = solver.new_var();
+    SatVarId id = solver.new_variable();
     ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
       SatLiteral lito(id, false);
@@ -747,7 +747,7 @@ FraigMgrImpl::check_condition(SatLiteral lit1,
   for (vector<FraigNode*>::iterator p = mAllNodes.begin();
        p != mAllNodes.end(); ++ p) {
     FraigNode* node = *p;
-    SatVarId id = solver.new_var();
+    SatVarId id = solver.new_variable();
     ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
       SatLiteral lito(id, false);

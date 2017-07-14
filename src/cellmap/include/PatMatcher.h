@@ -1,5 +1,5 @@
-﻿#ifndef MAGUS_CELLMAP_PATMATCHER_H
-#define MAGUS_CELLMAP_PATMATCHER_H
+﻿#ifndef PATMATCHER_H
+#define PATMATCHER_H
 
 /// @file PatMatcher.h
 /// @brief PatMatcher のヘッダファイル
@@ -10,7 +10,7 @@
 
 
 #include "cellmap_nsdef.h"
-#include "Match.h"
+#include "Cut.h"
 #include "ym/ym_cell.h"
 #include "ym/HashMap.h"
 
@@ -44,7 +44,7 @@ public:
   bool
   operator()(const SbjNode* sbj_root,
 	     const CellPatGraph& pat_graph,
-	     Match& match);
+	     Cut& match);
 
 #if 0
   /// @brief 直前のマッチングにおける入力のノードを得る．
@@ -137,4 +137,4 @@ PatMatcher::leaf_inv(ymuint pos) const
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // MAGUS_CELLMAP_PATMATCHER_H
+#endif // PATMATCHER_H

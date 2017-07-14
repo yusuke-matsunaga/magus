@@ -1,5 +1,5 @@
 ﻿
-/// @file cellmap/CellMap.cc
+/// @file CellMap.cc
 /// @brief CellMap の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -34,9 +34,9 @@ CellMap::~CellMap()
 // @param[out] mapnetwork マッピング結果
 void
 CellMap::area_map(const CellLibrary& cell_library,
-		  const BdnMgr& sbjgraph,
+		  const SbjGraph& sbjgraph,
 		  ymuint mode,
-		  CmnMgr& mapnetwork)
+		  BnNetwork& mapnetwork)
 {
   AreaCover area_cover;
 

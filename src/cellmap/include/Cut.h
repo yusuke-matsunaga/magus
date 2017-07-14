@@ -1,8 +1,8 @@
-﻿#ifndef MAGUS_CELLMAP_MATCH_H
-#define MAGUS_CELLMAP_MATCH_H
+﻿#ifndef CUT_H
+#define CUT_H
 
-/// @file cellmap/Match.h
-/// @brief Match のヘッダファイル
+/// @file Cut.h
+/// @brief Cut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
@@ -11,33 +11,36 @@
 
 #include "cellmap_nsdef.h"
 #include "SbjGraph.h"
-#include "ym/ym_logic.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class Match Match.h "Match.h"
-/// @brief サブジェクトグラフとパタングラフのマッチを表すクラス
+/// @class Cut Cut.h "Cut.h"
+/// @brief パタングラフとマッチするサブジェクトグラフのサブグラフ
+///
+/// - 具体的には葉のノード配列と葉の極性を持つ．
+/// - 根のノードはこのクラスには保持されない．
+/// - 葉から根を通らずに出力へ至る経路は存在しないので cut と呼ぶ．
 //////////////////////////////////////////////////////////////////////
-class Match
+class Cut
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] nl 葉の数(入力数)
-  Match(ymuint nl = 0);
+  Cut(ymuint nl = 0);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
-  Match(const Match& src);
+  Cut(const Cut& src);
 
   /// @brief デストラクタ
-  ~Match();
+  ~Cut();
 
   /// @brief 代入演算子
-  const Match&
-  operator=(const Match& src);
+  const Cut&
+  operator=(const Cut& src);
 
 
 public:
@@ -87,11 +90,8 @@ private:
   // 葉の数
   ymuint mLeafNum;
 
-  // 葉のノードの配列
-  const SbjNode** mLeafArray;
-
-  // 根と葉の極性をパックしたもの
-  ymuint mInvArray;
+  // 葉のノードと極性をパックしたの配列
+  ympuint* mLeafArray;
 
 };
 
@@ -103,12 +103,12 @@ private:
 // @brief 葉の数を再設定する．
 inline
 void
-Match::resize(ymuint nl)
+Cut::resize(ymuint nl)
 {
   if ( mLeafNum != nl ) {
     delete [] mLeafArray;
     mLeafNum = nl;
-    mLeafArray = new const SbjNode*[nl];
+    mLeafArray = new ympuint[nl];
   }
   mInvArray = 0U;
 }
@@ -119,19 +119,18 @@ Match::resize(ymuint nl)
 // @param[in] leaf_inv 葉の極性
 inline
 void
-Match::set_leaf(ymuint pos,
-		const SbjNode* leaf_node,
-		bool leaf_inv)
+Cut::set_leaf(ymuint pos,
+	      const SbjNode* leaf_node,
+	      bool leaf_inv)
 {
   ASSERT_COND( pos < leaf_num() );
-  mLeafArray[pos] = leaf_node;
-  mInvArray |= (static_cast<ymuint>(leaf_inv) << pos);
+  mLeafArray[pos] = reinterpret_cast<ympuint>(leaf_node) | leaf_inv;
 }
 
 // @brief 葉の数を得る．
 inline
 ymuint
-Match::leaf_num() const
+Cut::leaf_num() const
 {
   return mLeafNum;
 }
@@ -140,20 +139,22 @@ Match::leaf_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
 inline
 const SbjNode*
-Match::leaf_node(ymuint pos) const
+Cut::leaf_node(ymuint pos) const
 {
-  return mLeafArray[pos];
+  ASSERT_COND( pos < leaf_num() );
+  return reinterpret_cast<ympuint>(mLeafArray[pos] & ~1ULL);
 }
 
 // @brief 葉の極性を得る．
 // @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
 inline
 bool
-Match::leaf_inv(ymuint pos) const
+Cut::leaf_inv(ymuint pos) const
 {
-  return static_cast<bool>((mInvArray >> pos) & 1U);
+  ASSERT_COND( pos < leaf_num() );
+  return static_cast<bool>(mLeafArray[pos] & 1U);
 }
 
 END_NAMESPACE_YM_CELLMAP
 
-#endif // MAGUS_CELLMAP_MATCH_H
+#endif // CUT_H

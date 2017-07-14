@@ -15,6 +15,7 @@
 #include "ym/CellGroup.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
+#include "MapGen.h"
 
 #include "ym/NpnMapM.h"
 
@@ -47,10 +48,10 @@ AreaCover::~AreaCover()
 void
 AreaCover::operator()(const SbjGraph& sbjgraph,
 		      const CellLibrary& cell_library,
-		      CmnMgr& mapnetwork)
+		      BnNetwork& mapnetwork)
 {
   if ( debug ) {
-    BdnDumper dump;
+    SbjDumper dump;
     dump(cout, sbjgraph);
   }
 
@@ -64,16 +65,24 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
   // マッピング結果を maprec に記録する．
   record_cuts(sbjgraph, cell_library, maprec);
 
-  // maprec の情報から mapnetwork を生成する．
+  // 定数０のセルを登録する．
   const Cell* c0_cell = nullptr;
   if ( cell_library.const0_func()->cell_num() > 0 ) {
     c0_cell = cell_library.const0_func()->cell(0);
+    maprec.set_const0(c0_cell);
   }
+
+  // 定数１のセルを登録する．
   const Cell* c1_cell = nullptr;
   if ( cell_library.const1_func()->cell_num() > 0 ) {
     c1_cell = cell_library.const1_func()->cell(0);
+    maprec.set_const1(c1_cell);
   }
-  maprec.gen_mapgraph(sbjgraph, c0_cell, c1_cell, mapnetwork);
+
+  // 最終的なネットワークを生成する．
+  MapGen gen;
+
+  mapgen.generate(sbjgraph, maprec, mapnetwork);
 }
 
 // @brief FF のマッピングを行う．
@@ -126,12 +135,12 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
     }
   }
 
-  const BdnDffList& dff_list = sbjgraph.dff_list();
-  for (BdnDffList::const_iterator p = dff_list.begin();
+  const SbjDffList& dff_list = sbjgraph.dff_list();
+  for (SbjDffList::const_iterator p = dff_list.begin();
        p != dff_list.end(); ++ p) {
-    const BdnDff* dff = *p;
-    const BdnNode* clear = dff->clear();
-    const BdnNode* preset = dff->preset();
+    const SbjDff* dff = *p;
+    const SbjNode* clear = dff->clear();
+    const SbjNode* preset = dff->preset();
     bool has_clear = false;
     bool has_preset = false;
     ymuint sig = 0U;
@@ -182,31 +191,31 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
     ASSERT_COND( node->is_input() );
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
-    switch ( node->input_type() ) {
-    case BdnNode::kPRIMARY_INPUT:
+    if ( node->is_port_input() ) {
       // 外部入力の場合，肯定の極性のみが利用可能
       p_cost = 0.0;
       n_cost = DBL_MAX;
       add_inv(node, true, inv_func, maprec);
-      break;
-
-    case BdnNode::kDFF_OUTPUT:
-    case BdnNode::kLATCH_OUTPUT:
+    }
+    else if ( node->is_dff_output() ||
+	      node->is_latch_output() ) {
       // DFFとラッチの場合，肯定，否定のどちらの極性も利用可能
       p_cost = 0.0;
       n_cost = 0.0;
-      break;
+    }
+    else {
+      ASSERT_NOT_REACHED;
     }
   }
 
   // 論理ノードのコストを入力側から計算
   PatMatcher pat_match(cell_library);
   ymuint np = cell_library.pg_pat_num();
-  vector<const BdnNode*> snode_list;
+  vector<const SbjNode*> snode_list;
   sbjgraph.sort(snode_list);
-  for (vector<const BdnNode*>::const_iterator p = snode_list.begin();
+  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
        p != snode_list.end(); ++ p) {
-    const BdnNode* node = *p;
+    const SbjNode* node = *p;
     if ( debug ) {
       cout << endl
 	   << "Processing Node[" << node->id() << "]" << endl;
@@ -235,7 +244,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	    NpnVmap imap = npn_map.imap(VarId(i));
 	    VarId dst_var = imap.var();
 	    ymuint pos = dst_var.val();
-	    const BdnNode* inode = match.leaf_node(pos);
+	    const SbjNode* inode = match.leaf_node(pos);
 	    bool iinv = match.leaf_inv(pos);
 	    if ( imap.inv() ) {
 	      iinv = !iinv;
@@ -271,7 +280,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
 	  double leaf_cost = 0.0;
 	  for (ymuint i = 0; i < ni; ++ i) {
-	    const BdnNode* leaf_node = c_match.leaf_node(i);
+	    const SbjNode* leaf_node = c_match.leaf_node(i);
 	    bool leaf_inv = c_match.leaf_inv(i);
 	    leaf_cost += cost(leaf_node, leaf_inv) * mWeight[i];
 	  }
@@ -313,7 +322,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 // @param[in] inv 極性
 // @param[in] inv_func インバータの関数グループ
 void
-AreaCover::add_inv(const BdnNode* node,
+AreaCover::add_inv(const SbjNode* node,
 		   bool inv,
 		   const CellGroup* inv_func,
 		   MapRecord& maprec)
@@ -346,7 +355,7 @@ AreaCover::add_inv(const BdnNode* node,
 
 // @brief node から各入力にいたる経路の重みを計算する．
 void
-AreaCover::calc_weight(const BdnNode* node,
+AreaCover::calc_weight(const SbjNode* node,
 		       double cur_weight)
 {
   for ( ; ; ) {
@@ -360,7 +369,7 @@ AreaCover::calc_weight(const BdnNode* node,
     }
     ASSERT_COND( !node->is_input() );
 
-    const BdnNode* inode0 = node->fanin(0);
+    const SbjNode* inode0 = node->fanin(0);
     double cur_weight0 = cur_weight / inode0->fanout_num();
     calc_weight(inode0, cur_weight0);
     node = node->fanin(1);

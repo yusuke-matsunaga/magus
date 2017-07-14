@@ -1,8 +1,8 @@
-﻿#ifndef MAGUS_CELLMAP_MAPRECORD_H
-#define MAGUS_CELLMAP_MAPRECORD_H
+﻿#ifndef MAPGEN_H
+#define MAPGEN_H
 
-/// @file MapRecord.h
-/// @brief MapRecord のヘッダファイル
+/// @file MapGen.h
+/// @brief MapGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
@@ -11,100 +11,41 @@
 
 #include "cellmap_nsdef.h"
 #include "ym/ym_cell.h"
-#include "ym/BnNetwork.h"
+#include "ym/ym_bnet.h"
 #include "ym/CellFFInfo.h"
 #include "ym/CellLatchInfo.h"
-#include "Match.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
-/// @class MapRecord MapRecord.h "MapRecord.h"
-/// @brief マッピングの解を保持するクラス
+/// @class MapGen MapGen.h "MapGen.h"
+/// @brief マッピング結果を BnNetwork にセットするクラス
 //////////////////////////////////////////////////////////////////////
-class MapRecord
+class MapGen
 {
 public:
 
   /// @brief コンストラクタ
-  MapRecord();
+  MapGen();
 
   /// @brief デストラクタ
-  virtual
-  ~MapRecord();
+  ~MapGen();
 
 
 public:
-
-  /// @brief @brief 作業領域を初期化する．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  void
-  init(const SbjGraph& sbjgraph);
-
-  /// @brief マッチの情報だけコピーする．
-  void
-  copy(const MapRecord& src);
-
-  /// @brief D-FF のマッチを記録する．
-  /// @param[in] dff D-FF
-  /// @param[in] inv 極性
-  /// @param[in] ff_info ピンの割り当て情報
-  /// @param[in] cell セル
-  void
-  set_dff_match(const SbjDff* dff,
-		bool inv,
-		const Cell* cell,
-		const CellFFInfo& ff_info);
-
-  /// @brief ラッチのマッチを記録する．
-  /// @param[in] latch ラッチ
-  /// @param[in] inv 極性
-  /// @param[in] latch_info ピンの割り当て情報
-  /// @param[in] cell セル
-  void
-  set_latch_match(const SbjLatch* latch,
-		  bool inv,
-		  const Cell* cell,
-		  const CellLatchInfo& latch_info);
-
-  /// @brief 論理ゲートのマッチを記録する．
-  /// @param[in] node 該当のノード
-  /// @param[in] inv 極性
-  /// @param[in] match 対応するマッチ
-  /// @param[in] cell セル
-  void
-  set_logic_match(const SbjNode* node,
-		  bool inv,
-		  const Match& match,
-		  const Cell* cell);
-
-  /// @brief インバータのマッチを記録する．
-  /// @param[in] node 該当のノード
-  /// @param[in] inv 極性
-  /// @param[in] cell セル
-  void
-  set_inv_match(const SbjNode* node,
-		bool inv,
-		const Cell* cell);
-
-  /// @brief マッチを取り出す．
-  /// @param[in] node 該当のノード
-  /// @param[in] inv 極性
-  const Match&
-  get_match(const SbjNode* node,
-	    bool inv);
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief マッピング結果を BnNetwork にセットする．
   /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] const0_cell 定数0のセル
-  /// @param[in] const1_cell 定数1のセル
+  /// @param[in] record マッピング結果
   /// @param[out] mapgraph マッピング結果を格納するネットワーク
   void
-  gen_mapgraph(const SbjGraph& sbjgraph,
-	       const Cell* const0_cell,
-	       const Cell* const1_cell,
-	       BnNetwork& mapgraph);
+  generate(const SbjGraph& sbjgraph,
+	   const MapRecord& record,
+	   BnNetwork& mapgraph);
 
 
 private:
@@ -209,7 +150,7 @@ private:
   /// @brief 最終結果を作るためのバックトレースを行う．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
-  CmnNode*
+  BnNode*
   back_trace(const SbjNode* node,
 	     bool inv);
 
@@ -234,7 +175,7 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 対象の CMN
+  // 答えのマップグラフ
   BnNetwork* mMapGraph;
 
   // D-FF の割り当て情報を格納した配列

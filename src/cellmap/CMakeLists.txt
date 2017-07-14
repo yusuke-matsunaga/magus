@@ -11,12 +11,19 @@ include_directories (
 #  ソースファイルの設定
 # ===================================================================
 
-set (cellmap_SOURCES
-  AreaCover.cc
-  CellMap.cc
-  MapRecord.cc
-  Match.cc
-  PatMatcher.cc
+set ( main_SOURCES
+  main/AreaCover.cc
+  main/CellMap.cc
+  )
+
+set ( match_SOURCES
+  match/Cut.cc
+  match/PatMatcher.cc
+  )
+
+set ( mapgen_SOURCES
+  mapgen/MapGen.cc
+  mapgen/MapRecord.cc
   )
 
 
@@ -25,5 +32,7 @@ set (cellmap_SOURCES
 # ===================================================================
 
 ym_add_object_library (magus_cellmap
-  ${cellmap_SOURCES}
+  ${main_SOURCES}
+  ${match_SOURCES}
+  ${mapgen_SOURCES}
   )

@@ -1,31 +1,28 @@
 ﻿
-/// @file cellmap/Match.cc
-/// @brief Match の実装ファイル
+/// @file Cut.cc
+/// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "Match.h"
-#include "YmNetworks/BdnNode.h"
-#include "YmLogic/NpnMap.h"
+#include "Cut.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
 
 //////////////////////////////////////////////////////////////////////
-// クラス Match
+// クラス Cut
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
 // @param[in] nl 葉の数(入力数)
-Match::Match(ymuint nl) :
-  mLeafNum(nl),
-  mInvArray(0U)
+Cut::Cut(ymuint nl) :
+  mLeafNum(nl)
 {
   if ( nl > 0 ) {
-    mLeafArray = new const BdnNode*[nl];
+    mLeafArray = new ympuint[nl];
   }
   else {
     mLeafArray = nullptr;
@@ -33,12 +30,11 @@ Match::Match(ymuint nl) :
 }
 
 // @brief コピーコンストラクタ
-Match::Match(const Match& src) :
-  mLeafNum(src.leaf_num()),
-  mInvArray(src.mInvArray)
+Cut::Cut(const Cut& src) :
+  mLeafNum(src.leaf_num())
 {
   if ( mLeafNum > 0 ) {
-    mLeafArray = new const BdnNode*[mLeafNum];
+    mLeafArray = new ympuint[mLeafNum];
     for (ymuint i = 0; i < mLeafNum; ++ i) {
       mLeafArray[i] = src.mLeafArray[i];
     }
@@ -49,20 +45,19 @@ Match::Match(const Match& src) :
 }
 
 // @brief 代入演算子
-const Match&
-Match::operator=(const Match& src)
+const Cut&
+Cut::operator=(const Cut& src)
 {
   resize(src.leaf_num());
   for (ymuint i = 0; i < mLeafNum; ++ i) {
     mLeafArray[i] = src.mLeafArray[i];
   }
-  mInvArray = src.mInvArray;
 
   return *this;
 }
 
 // @brief デストラクタ
-Match::~Match()
+Cut::~Cut()
 {
   delete [] mLeafArray;
 }

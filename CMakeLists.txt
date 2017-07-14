@@ -112,10 +112,9 @@ add_subdirectory ( ym-udgraph )
 add_subdirectory ( ym-verilog )
 
 add_subdirectory (src/cequiv)
-#add_subdirectory (src/seal)
 add_subdirectory (src/sbjgraph)
 add_subdirectory (src/lutmap)
-#add_subdirectory (src/cellmap)
+add_subdirectory (src/cellmap)
 
 add_subdirectory (magus_tclsh)
 

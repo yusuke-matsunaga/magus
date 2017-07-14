@@ -1,5 +1,5 @@
 ﻿
-/// @file cellmap/PatMatcher.cc
+/// @file PatMatcher.cc
 /// @brief PatMatcher の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -8,10 +8,9 @@
 
 
 #include "PatMatcher.h"
-#include "YmNetworks/BdnNode.h"
-#include "YmCell/CellLibrary.h"
-#include "YmCell/CellPatGraph.h"
-#include "Match.h"
+#include "SbjGraph.h"
+#include "ym/CellPatGraph.h"
+#include "Cut.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -41,9 +40,9 @@ PatMatcher::~PatMatcher()
 // @retval true マッチングが成功した
 // @retval false マッチングが失敗した．
 bool
-PatMatcher::operator()(const BdnNode* sbj_root,
+PatMatcher::operator()(const SbjNode* sbj_root,
 		       const CellPatGraph& pat_graph,
-		       Match& match)
+		       Cut& match)
 {
   // 根のノードを調べる．
   ymuint root_id = pat_graph.root_id();
@@ -81,9 +80,9 @@ PatMatcher::operator()(const BdnNode* sbj_root,
     ymuint to_id = mLibrary.pg_edge_to(edge_id);
     ymuint from_id = mLibrary.pg_edge_from(edge_id);
     ymuint f_pos = mLibrary.pg_edge_pos(edge_id);
-    const BdnNode* to_node = mSbjMap[to_id];
+    const SbjNode* to_node = mSbjMap[to_id];
     ASSERT_COND( to_node->is_logic() );
-    const BdnNode* from_node = to_node->fanin(f_pos);
+    const SbjNode* from_node = to_node->fanin(f_pos);
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
     switch ( mLibrary.pg_node_type(from_id) ) {
@@ -155,7 +154,7 @@ PatMatcher::operator()(const BdnNode* sbj_root,
 // @retval true バインドが成功した．
 // @retval false バインドが失敗した．
 bool
-PatMatcher::bind(const BdnNode* sbj_node,
+PatMatcher::bind(const SbjNode* sbj_node,
 		 ymuint pat_id,
 		 bool inv)
 {
