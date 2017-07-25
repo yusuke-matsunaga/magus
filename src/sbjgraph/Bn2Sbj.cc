@@ -60,7 +60,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   ymuint ni = src_network.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const BnNode* bn_node = src_network.input(i);
-    SbjNode* sbj_node = dst_network.new_input();
+    SbjNode* sbj_node = dst_network.new_input(false);
     node_map.add(bn_node->id(), SbjHandle(sbj_node));
   }
 

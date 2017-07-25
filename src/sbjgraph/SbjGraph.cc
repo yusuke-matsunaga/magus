@@ -116,7 +116,7 @@ SbjGraph::_copy(const SbjGraph& src,
   ymuint ni = src.input_num();
   for (ymuint i = 0; i < ni; ++ i) {
     SbjNode* src_node = src.input(i);
-    SbjNode* dst_node = new_input();
+    SbjNode* dst_node = new_input(src_node->is_bipol());
     nodemap[src_node->id()] = dst_node;
   }
 
@@ -339,7 +339,7 @@ SbjGraph::port_pos(const SbjNode* node) const
 
 // 入力ノードを作る．
 SbjNode*
-SbjGraph::new_input()
+SbjGraph::new_input(bool bipol)
 {
   SbjNode* node = _new_node();
 
@@ -350,7 +350,7 @@ SbjGraph::new_input()
   // ダミーの place-holder を追加
   mInputPortArray.push_back(PortInfo());
 
-  node->set_input(subid);
+  node->set_input(subid, bipol);
 
   return node;
 }

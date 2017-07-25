@@ -38,7 +38,7 @@ public:
 
   /// @brief 面積最小化 DAG covering のヒューリスティック関数
   /// @param[in] cell_library セルライブラリ
-  /// @param[in] sbjgraph サブジェクトグラフを表す Bdn
+  /// @param[in] src_network もとのネットワーク
   /// @param[in] mode モード
   ///  - 0: fanout フロー, resub なし
   ///  - 1: weighted フロー, resub なし
@@ -47,9 +47,9 @@ public:
   /// @param[out] mapnetwork マッピング結果
   void
   area_map(const CellLibrary& cell_library,
-	   const BnNetwork& sbjgraph,
+	   const BnNetwork& src_network,
 	   ymuint mode,
-	   BnBuilder& mapnetwork);
+	   BnNetwork& mapnetwork);
 
 #if 0
   /// @brief 段数最小化 DAG covering のヒューリスティック関数

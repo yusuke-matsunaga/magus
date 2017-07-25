@@ -191,31 +191,25 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
     ASSERT_COND( node->is_input() );
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
-    if ( node->is_port_input() ) {
-      // 外部入力の場合，肯定の極性のみが利用可能
-      p_cost = 0.0;
-      n_cost = DBL_MAX;
-      add_inv(node, true, inv_func, maprec);
-    }
-    else if ( node->is_dff_output() ||
-	      node->is_latch_output() ) {
-      // DFFとラッチの場合，肯定，否定のどちらの極性も利用可能
+    if ( node->is_bipol() ) {
+      // 肯定，否定のどちらの極性も利用可能
       p_cost = 0.0;
       n_cost = 0.0;
     }
     else {
-      ASSERT_NOT_REACHED;
+      // 肯定の極性のみが利用可能
+      p_cost = 0.0;
+      n_cost = DBL_MAX;
+      add_inv(node, true, inv_func, maprec);
     }
   }
 
   // 論理ノードのコストを入力側から計算
   PatMatcher pat_match(cell_library);
   ymuint np = cell_library.pg_pat_num();
-  vector<const SbjNode*> snode_list;
-  sbjgraph.sort(snode_list);
-  for (vector<const SbjNode*>::const_iterator p = snode_list.begin();
-       p != snode_list.end(); ++ p) {
-    const SbjNode* node = *p;
+  ymuint nl = sbjgraph.logic_num();
+  for (ymuint i = 0; i < nl; ++ i) {
+    const SbjNode* node = sbjgraph.logic(i);
     if ( debug ) {
       cout << endl
 	   << "Processing Node[" << node->id() << "]" << endl;
@@ -227,8 +221,8 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
     for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
       const CellPatGraph& pat = cell_library.pg_pat(pat_id);
       ymuint ni = pat.input_num();
-      Match match(ni);
-      if ( pat_match(node, pat, match) ) {
+      Cut cut(ni);
+      if ( pat_match(node, pat, cut) ) {
 	ymuint rep_id = pat.rep_id();
 	if ( debug ) {
 	  cout << "Match with Pat#" << pat_id
@@ -239,17 +233,17 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	for (ymuint g_pos = 0; g_pos < ng; ++ g_pos) {
 	  const CellGroup* group = rep->cell_group(g_pos);
 	  const NpnMapM& npn_map = group->map();
-	  Match c_match(ni);
+	  Cut c_cut(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {
 	    NpnVmap imap = npn_map.imap(VarId(i));
 	    VarId dst_var = imap.var();
 	    ymuint pos = dst_var.val();
-	    const SbjNode* inode = match.leaf_node(pos);
-	    bool iinv = match.leaf_inv(pos);
+	    const SbjNode* inode = cut.leaf_node(pos);
+	    bool iinv = cut.leaf_inv(pos);
 	    if ( imap.inv() ) {
 	      iinv = !iinv;
 	    }
-	    c_match.set_leaf(i, inode, iinv);
+	    c_cut.set_leaf(i, inode, iinv);
 	    mLeafNum[inode->id()] = i;
 	  }
 	  bool root_inv = pat.root_inv();
@@ -261,10 +255,10 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		 << "    Root_inv = " << root_inv << endl;
 	    for (ymuint i = 0; i < ni; ++ i) {
 	      cout << "    Leaf#" << i << ": ";
-	      if ( c_match.leaf_inv(i) ) {
+	      if ( c_cut.leaf_inv(i) ) {
 		cout << "~";
 	      }
-	      cout << "Node[" << c_match.leaf_node(i)->id() << "]" << endl;
+	      cout << "Node[" << c_cut.leaf_node(i)->id() << "]" << endl;
 	    }
 	  }
 
@@ -275,13 +269,13 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	  }
 	  calc_weight(node, 1.0);
 	  for (ymuint i = 0; i < ni; ++ i) {
-	    mLeafNum[c_match.leaf_node(i)->id()] = -1;
+	    mLeafNum[c_cut.leaf_node(i)->id()] = -1;
 	  }
 
 	  double leaf_cost = 0.0;
 	  for (ymuint i = 0; i < ni; ++ i) {
-	    const SbjNode* leaf_node = c_match.leaf_node(i);
-	    bool leaf_inv = c_match.leaf_inv(i);
+	    const SbjNode* leaf_node = c_cut.leaf_node(i);
+	    bool leaf_inv = c_cut.leaf_inv(i);
 	    leaf_cost += cost(leaf_node, leaf_inv) * mWeight[i];
 	  }
 
@@ -295,7 +289,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	    }
 	    if ( c_cost >= cur_cost ) {
 	      c_cost = cur_cost;
-	      maprec.set_logic_match(node, root_inv, c_match, cell);
+	      maprec.set_logic_match(node, root_inv, c_cut, cell);
 	    }
 	  }
 	}
@@ -327,7 +321,7 @@ AreaCover::add_inv(const SbjNode* node,
 		   const CellGroup* inv_func,
 		   MapRecord& maprec)
 {
-  if ( maprec.get_match(node, !inv).leaf_num() == 1 ) {
+  if ( maprec.get_node_match(node, !inv).leaf_num() == 1 ) {
     // 逆極性の解が自分の解＋インバーターだった
     return;
   }

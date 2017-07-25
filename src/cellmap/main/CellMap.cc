@@ -9,6 +9,7 @@
 
 #include "CellMap.h"
 #include "AreaCover.h"
+#include "SbjGraph.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -25,7 +26,7 @@ CellMap::~CellMap()
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数
 // @param[in] cell_library セルライブラリ
-// @param[in] sbjgraph サブジェクトグラフ
+// @param[in] src_network もとのネットワーク
 // @param[in] mode モード
 //  - 0: fanout フロー, resub なし
 //  - 1: weighted フロー, resub なし
@@ -34,12 +35,12 @@ CellMap::~CellMap()
 // @param[out] mapnetwork マッピング結果
 void
 CellMap::area_map(const CellLibrary& cell_library,
-		  const SbjGraph& sbjgraph,
+		  const BnNetwork& src_network,
 		  ymuint mode,
 		  BnNetwork& mapnetwork)
 {
   AreaCover area_cover;
-
+  SbjGraph sbjgraph;
   area_cover(sbjgraph, cell_library, mapnetwork);
 }
 
