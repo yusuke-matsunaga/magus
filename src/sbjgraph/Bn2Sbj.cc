@@ -196,7 +196,8 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       sbj_preset = handle1.node();
     }
 
-    SbjDff* sbj_dff = dst_network.new_dff(sbj_input, sbj_output, sbj_clock, sbj_clear, sbj_preset);
+    SbjDff* sbj_dff = dst_network.new_dff(sbj_input, sbj_output,
+					  sbj_clock, sbj_clear, sbj_preset);
   }
 
   // ラッチノードの生成
@@ -245,7 +246,8 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       sbj_preset = handle1.node();
     }
 
-    SbjLatch* sbj_latch = dst_network.new_latch(sbj_input, sbj_output, sbj_enable, sbj_clear, sbj_preset);
+    SbjLatch* sbj_latch = dst_network.new_latch(sbj_input, sbj_output,
+						sbj_enable, sbj_clear, sbj_preset);
   }
 
   // ポートの生成

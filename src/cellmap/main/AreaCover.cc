@@ -191,7 +191,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
     ASSERT_COND( node->is_input() );
     double& p_cost = cost(node, false);
     double& n_cost = cost(node, true);
-    if ( node->is_port_input() ) {
+    if ( sbjgraph.port(node) != nullptr ) {
       // 外部入力の場合，肯定の極性のみが利用可能
       p_cost = 0.0;
       n_cost = DBL_MAX;
@@ -200,6 +200,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
     else if ( node->is_dff_output() ||
 	      node->is_latch_output() ) {
       // DFFとラッチの場合，肯定，否定のどちらの極性も利用可能
+      #warning "dff/latch の利用可能な出力極性のチェックをする．"
       p_cost = 0.0;
       n_cost = 0.0;
     }

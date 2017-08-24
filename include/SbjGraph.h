@@ -16,6 +16,8 @@
 
 BEGIN_NAMESPACE_YM_SBJ
 
+class SbjIOInfo;
+
 //////////////////////////////////////////////////////////////////////
 /// @class SbjGraph SbjGraph.h "SbjGraph.h"
 /// @brief サブジェクトグラフを表すクラス
@@ -73,11 +75,15 @@ public:
 
   /// @brief 入出力ノードに関連づけられたポートを得る．
   /// @param[in] node 入出力ノード
+  ///
+  /// node がポートに関連付けられていない場合には nullptr を返す．
   const SbjPort*
   port(const SbjNode* node) const;
 
   /// @brief 入出力ノードのポートにおけるビット位置を得る．
   /// @param[in] node 入出力ノード
+  ///
+  /// node がポートに関連付けられていない場合には 0 を返す．
   ymuint
   port_pos(const SbjNode* node) const;
 
@@ -405,21 +411,6 @@ private:
 
 private:
   //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 入出力ノードに関係するポートの情報
-  struct PortInfo
-  {
-    /// @brief ポート
-    SbjPort* mPort;
-    /// @brief ビット位置
-    ymuint32 mPos;
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
@@ -437,15 +428,15 @@ private:
   // 穴はあいていない．
   vector<SbjNode*> mInputArray;
 
-  // 入力番号をキーにしたポート情報の配列
-  vector<PortInfo> mInputPortArray;
+  // 入力番号をキーにしたIO情報の配列
+  vector<IOInfo*> mInputPortArray;
 
   // 出力番号をキーにした出力ノードの配列
   // 穴はあいていない．
   vector<SbjNode*> mOutputArray;
 
-  // 出力番号をキーにしたポート情報の配列
-  vector<PortInfo> mOutputPortArray;
+  // 出力番号をキーにしたIO情報の配列
+  vector<IOInfo*> mOutputPortArray;
 
   // 論理ノードのリスト
   vector<SbjNode*> mLogicList;

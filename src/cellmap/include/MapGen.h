@@ -138,9 +138,6 @@ private:
   // マッピング要求リスト
   vector<MapReq> mMapReqList;
 
-  // back_trace 中に用いる作業領域
-  vector<BnNode*> mTmpFanins;
-
 };
 
 END_NAMESPACE_YM_CELLMAP

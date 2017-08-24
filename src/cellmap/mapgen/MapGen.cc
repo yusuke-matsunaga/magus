@@ -36,7 +36,7 @@ encode(ymuint pos,
 
 END_NONAMESPACE
 
-// @brief マッピング結果を CmnMgr にセットする．
+// @brief マッピング結果を BnNetwork にセットする．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] record マッピング結果
 // @param[out] mapgraph マッピング結果を格納するネットワーク
@@ -209,7 +209,7 @@ MapGen::gen_latch(const BdnLatch* sbj_latch)
 // @brief マッピング要求を追加する．
 void
 MapGen::add_mapreq(const BdnNode* node,
-		      bool inv)
+		   bool inv)
 {
   mMapReqList.push_back(MapReq(node, inv));
 }
@@ -240,18 +240,20 @@ MapGen::back_trace(const SbjNode* node,
     back_trace(inode, iinv);
   }
 
-  mTmpFanins.clear();
-  mTmpFanins.resize(ni);
+  // 生成されたファンインのBnNodeを tmp_fanins に格納する．
+  // ちょっと考えればわかるけど tmp_fanins を上の for
+  // ループで使わないのは再帰呼び出しで多重に生成されることになるから．
+  vector<BnNode*> tmp_fanins(ni);
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);
     NodeInfo& inode_info = get_node_info(inode, iinv);
     BnNode* imapnode = inode_info.mMapNode;
-    mTmpFanins[i] = imapnode;
+    tmp_fanins[i] = imapnode;
   }
 
   // 新しいノードを作り mNodeMap に登録する．
-  mapnode = mMapGraph->new_logic(mTmpFanins, node_info.mCell);
+  mapnode = mMapGraph->new_logic(tmp_fanins, node_info.mCell);
   node_info.mMapNode = mapnode;
 
   return mapnode;
