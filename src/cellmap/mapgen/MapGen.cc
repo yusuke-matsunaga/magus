@@ -9,7 +9,8 @@
 
 #include "MapGen.h"
 #include "MapRecord.h"
-#include "Cut.h"
+#include "ym/BnNetwork.h"
+#include "SbjPort.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -62,18 +63,16 @@ MapGen::generate(const SbjGraph& sbjgraph,
   }
 
   // D-FF の生成
-  const SbjDffList& dff_list = sbjgraph.dff_list();
-  for (SbjDffList::const_iterator p = dff_list.begin();
-       p != dff_list.end(); ++ p) {
-    const SbjDff* sbj_dff = *p;
+  ymuint n_dff = sbjgraph.dff_num();
+  for (ymuint i = 0; i < n_dff; ++ i) {
+    const SbjDff* sbj_dff = sbjgraph.dff(i);
     gen_dff(sbj_dff);
   }
 
   // ラッチの生成
-  const SbjLatchList& latch_list = sbjgraph.latch_list();
-  for (SbjLatchList::const_iterator p = latch_list.begin();
-       p != latch_list.end(); ++ p) {
-    const SbjLatch* sbj_latch = *p;
+  ymuint n_latch = sbjgraph.latch_num();
+  for (ymuint i = 0; i < n_latch; ++ i) {
+    const SbjLatch* sbj_latch = sbjgraph.latch(i);
     gen_latch(sbj_latch);
   }
 
@@ -84,24 +83,27 @@ MapGen::generate(const SbjGraph& sbjgraph,
     bool ext_inv = p->mInv;
     const SbjNode* node = onode->fanin(0);
     bool inv = onode->output_fanin_inv() ^ ext_inv;
-    BnNode* mapnode = nullptr;
+    ymuint mapnode = 0;
     if ( node ) {
       mapnode = back_trace(node, inv);
     }
     else {
+      ymuint node_id = 0;
       if ( inv ) {
 	// 定数1ノードを作る．
+	const Cell* const1_cell = record.const1_cell();
 	ASSERT_COND( const1_cell != nullptr );
-	mapnode = mMapGraph->new_logic(vector<BnNode*>(0), const1_cell);
+	mapnode = mMapGraph->new_primitive(string(), 0, kBnLt_C1, const1_cell);
       }
       else {
 	// 定数0ノードを作る．
+	const Cell* const0_cell = record.const0_cell();
 	ASSERT_COND( const0_cell != nullptr );
-	mapnode = mMapGraph->new_logic(vector<BnNode*>(0), const0_cell);
+	mapnode = mMapGraph->new_primitive(string(), 0, kBnLt_C0, const0_cell);
       }
     }
-    BnNode* omapnode = get_node_info(onode, false).mMapNode;
-    mMapGraph->set_output_fanin(omapnode, mapnode);
+    ymuint omapnode = mNodeInfo[onode->id()].mMapNode;
+    mMapGraph->connect(mapnode, omapnode, 0);
   }
 }
 
@@ -216,29 +218,20 @@ MapGen::add_mapreq(const BdnNode* node,
 
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
-BnNode*
+ymuint
 MapGen::back_trace(const SbjNode* node,
 		   bool inv)
 {
   NodeInfo& node_info = get_node_info(node, inv);
-  BnNode* mapnode = node_info.mMapNode;
-  if ( mapnode ) {
+  ymuint mapnode = node_info.mMapNode;
+  if ( mapnode != kBnNullId ) {
     // すでに生成済みならそのノードを返す．
     return mapnode;
   }
 
-  ASSERT_COND( node_info.mCell != nullptr );
-
   // node を根とするマッチを取り出す．
   const Cut& match = node_info.mMatch;
-
-  // その入力に対応するノードを再帰的に生成する．
   ymuint ni = match.leaf_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* inode = match.leaf_node(i);
-    bool iinv = match.leaf_inv(i);
-    back_trace(inode, iinv);
-  }
 
   // 生成されたファンインのBnNodeを tmp_fanins に格納する．
   // ちょっと考えればわかるけど tmp_fanins を上の for

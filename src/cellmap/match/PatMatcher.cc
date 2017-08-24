@@ -9,6 +9,7 @@
 
 #include "PatMatcher.h"
 #include "SbjGraph.h"
+#include "ym/CellLibrary.h"
 #include "ym/CellPatGraph.h"
 #include "Cut.h"
 

@@ -224,9 +224,10 @@ public:
   /// @{
 
   /// @brief 入力ノードを作る．
+  /// @param[in] bipol 両極性が利用可能な時 true にするフラグ
   /// @return 作成したノードを返す．
   SbjNode*
-  new_input();
+  new_input(bool bipol);
 
   /// @brief 出力ノードを作る．
   /// @param[in] ihandle 入力ハンドル

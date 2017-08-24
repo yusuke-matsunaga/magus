@@ -10,6 +10,8 @@
 
 
 #include "cellmap_nsdef.h"
+#include "SbjGraph.h"
+#include "Cut.h"
 #include "ym/ym_cell.h"
 #include "ym/ym_bnet.h"
 #include "ym/CellFFInfo.h"
@@ -17,6 +19,8 @@
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
+
+class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapGen MapGen.h "MapGen.h"
@@ -59,7 +63,7 @@ private:
     NodeInfo()
     {
       mCell = nullptr;
-      mMapNode = nullptr;
+      mMapNode = kBnNullId;
     }
 
     // マッチ
@@ -69,7 +73,7 @@ private:
     const Cell* mCell;
 
     // マップ結果
-    BnNode* mMapNode;
+    ymuint mMapNode;
 
   };
 
@@ -118,7 +122,7 @@ private:
   /// @brief 最終結果を作るためのバックトレースを行う．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
-  BnNode*
+  ymuint
   back_trace(const SbjNode* node,
 	     bool inv);
 

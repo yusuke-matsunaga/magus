@@ -102,10 +102,13 @@ private:
 /// - 論理ノード
 /// の 3種類がある．
 ///
+/// 入力ノードの場合，どちらの極性も利用可能な場合がある．
+///
 /// 論理ノードの場合，常に2つのファンインを持つ．
 /// ノードの論理タイプが AND と XOR の2種類があり，
 /// さらに2つの入力の極性がある．
 /// ただし，XOR タイプの場合には入力は反転させない．
+///
 /// @sa SbjEdge SbjGraph
 //////////////////////////////////////////////////////////////////////
 class SbjNode
@@ -161,6 +164,12 @@ public:
   /// @brief 入力ノードの時に true を返す．
   bool
   is_input() const;
+
+  /// @brief 両極性が利用可能な入力ノードの時に true を返す．
+  ///
+  /// is_input() == false の時の値は不定
+  bool
+  is_bipol() const;
 
   /// @brief 出力ノードの時に true を返す．
   bool
@@ -255,8 +264,10 @@ private:
 
   /// @brief タイプを入力に設定する．
   /// @param[in] subid 入力番号
+  /// @param[in] bipol 両極性が利用可能な時に true にするフラグ
   void
-  set_input(ymuint subid);
+  set_input(ymuint subid,
+	    bool bipol);
 
   /// @brief タイプを出力に設定する．
   /// @param[in] subidr 出力番号
@@ -308,6 +319,8 @@ private:
   // mFlags の演算で用いる定数
   static
   const int kTypeShift = 0;
+  static
+  const int kBiPolShift = 2;
   static
   const int kOinvShift = 2;
   static
@@ -425,9 +438,12 @@ SbjNode::id() const
 // タイプを入力に設定する．
 inline
 void
-SbjNode::set_input(ymuint subid)
+SbjNode::set_input(ymuint subid,
+		   bool bipol)
 {
-  mFlags = static_cast<ymuint>(kINPUT) | (subid << kSubidShift);
+  mFlags = static_cast<ymuint>(kINPUT) |
+    (static_cast<ymuint>(bipol) << kBiPolShift) |
+    (subid << kSubidShift);
   mLevel = 0;
 }
 
@@ -495,6 +511,16 @@ bool
 SbjNode::is_input() const
 {
   return type() == kINPUT;
+}
+
+// @brief 逆極性も利用可能な入力ノードの時に true を返す．
+//
+// is_input() == false の時の値は不定
+inline
+bool
+SbjNode::is_bipol() const
+{
+  return static_cast<bool>((mFlags >> kBiPolShift) & 1U);
 }
 
 // 出力ノードの時に true を返す．
