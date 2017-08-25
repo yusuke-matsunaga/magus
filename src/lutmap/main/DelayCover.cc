@@ -37,7 +37,7 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 			ymuint slack,
 			MapRecord& maprec)
 {
-  ymuint n = sbjgraph.max_node_id();
+  ymuint n = sbjgraph.node_num();
 
   maprec.init(sbjgraph);
 

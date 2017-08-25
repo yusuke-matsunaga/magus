@@ -10,14 +10,14 @@
 
 
 #include "cellmap_nsdef.h"
+#include "Cut.h"
 #include "SbjDff.h"
 #include "SbjLatch.h"
 #include "SbjNode.h"
+#include "ym/ym_cell.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
-
-class Cut;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapRecord MapRecord.h "MapRecord.h"
@@ -31,6 +31,7 @@ public:
   MapRecord();
 
   /// @brief コピーコンストラクタ
+  /// @param[in] src コピー元のオブジェクト
   MapRecord(const MapRecord& src);
 
   /// @brief デストラクタ
@@ -149,6 +150,16 @@ private:
   // 内部でのみ用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief NodeInfo のアクセッサー
+  NodeInfo&
+  _node_info(const SbjNode* node,
+	     bool inv);
+
+  /// @brief NodeInfo のアクセッサー
+  const NodeInfo&
+  _node_info(const SbjNode* node,
+	     bool inv) const;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -221,8 +232,7 @@ const Cell*
 MapRecord::get_node_cell(const SbjNode* node,
 			 bool inv) const
 {
-  ymuint offset = inv ? 1 : 0;
-  return mNodeInfo[node->id() * 2 + offset].mCell;
+  return _node_info(node, inv).mCell;
 }
 
 // @brief node に対応するマッチ(Cut)を返す．
@@ -231,8 +241,25 @@ const Cut&
 MapRecord::get_node_match(const SbjNode* node,
 			  bool inv) const
 {
+  return _node_info(node, inv).mMatch;
+}
+
+// @brief NodeInfo のアクセッサー
+MapRecord::NodeInfo&
+MapRecord::_node_info(const SbjNode* node,
+		      bool inv)
+{
   ymuint offset = inv ? 1 : 0;
-  return mNodeInfo[node->id() * 2 + offset].mMatch;
+  return mNodeInfo[node->id() * 2 + offset];
+}
+
+// @brief NodeInfo のアクセッサー
+const MapRecord::NodeInfo&
+MapRecord::_node_info(const SbjNode* node,
+		      bool inv) const
+{
+  ymuint offset = inv ? 1 : 0;
+  return mNodeInfo[node->id() * 2 + offset];
 }
 
 END_NAMESPACE_YM_CELLMAP

@@ -9,21 +9,15 @@
 
 #include "MapRecord.h"
 
-#include "YmCell/CellFFInfo.h"
-#include "YmCell/CellLatchInfo.h"
+#include "ym/CellFFInfo.h"
+#include "ym/CellLatchInfo.h"
+#include "ym/BnNetwork.h"
+#include "ym/BnPort.h"
+#include "ym/BnDff.h"
+#include "ym/BnLatch.h"
 
-#include "YmNetworks/BdnMgr.h"
-#include "YmNetworks/BdnPort.h"
-#include "YmNetworks/BdnDff.h"
-#include "YmNetworks/BdnLatch.h"
-#include "YmNetworks/BdnNode.h"
-#include "YmNetworks/CmnMgr.h"
-#include "YmNetworks/CmnPort.h"
-#include "YmNetworks/CmnDff.h"
-#include "YmNetworks/CmnDffCell.h"
-#include "YmNetworks/CmnLatch.h"
-
-#include "Match.h"
+#include "SbjGraph.h"
+#include "SbjPort.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -38,7 +32,7 @@ MapRecord::MapRecord(const MapRecord& src) :
   mConst0(src.mConst0),
   mDffInfo(src.mDffInfo),
   mLatchInfo(src.mLatchInfo),
-  mNodeInfo(mNodeInfo)
+  mNodeInfo(src.mNodeInfo)
 {
 }
 
@@ -50,45 +44,41 @@ MapRecord::~MapRecord()
 // @brief @brief 作業領域を初期化する．
 // @param[in] sbjgraph サブジェクトグラフ
 void
-MapRecord::init(const BdnMgr& sbjgraph)
+MapRecord::init(const SbjGraph& sbjgraph)
 {
   mDffInfo.clear();
-  mDffInfo.resize(sbjgraph.max_dff_id() * 2);
+  mDffInfo.resize(sbjgraph.dff_num() * 2);
   mLatchInfo.clear();
-  mLatchInfo.resize(sbjgraph.max_latch_id() * 2);
+  mLatchInfo.resize(sbjgraph.latch_num() * 2);
   mNodeInfo.clear();
-  mNodeInfo.resize(sbjgraph.max_node_id() * 2);
+  mNodeInfo.resize(sbjgraph.node_num() * 2);
 }
 
 // @brief 定数０セルをセットする．
 void
 MapRecord::set_const0(const Cell* cell)
 {
-  return mConst0 = cell;
+  mConst0 = cell;
 }
 
 // @brief 定数1セルをセットする．
 void
 MapRecord::set_const1(const Cell* cell)
 {
-  return mConst1 = cell;
+  mConst1 = cell;
 }
 
 // @brief D-FF のマッチを記録する．
 // @param[in] dff D-FF
 // @param[in] inv 極性
 // @param[in] cell セル
-// @param[in] ff_info ピンの割り当て情報
 void
-MapRecord::set_dff_match(const BdnDff* dff,
+MapRecord::set_dff_match(const SbjDff* dff,
 			 bool inv,
-			 const Cell* cell,
-			 const CellFFInfo& ff_info)
+			 const Cell* cell)
 {
   ymuint offset = inv ? 1 : 0;
-  DffInfo& dffinfo = mDffInfo[dff->id() * 2 + offset];
-  dffinfo.mCell = cell;
-  dffinfo.mPinInfo = ff_info;
+  mDffInfo[dff->id() * 2 + offset] = cell;
 }
 
 // @brief ラッチのマッチを記録する．
@@ -96,15 +86,12 @@ MapRecord::set_dff_match(const BdnDff* dff,
 // @param[in] latch_info ピンの割り当て情報
 // @param[in] cell セル
 void
-MapRecord::set_latch_match(const BdnLatch* latch,
+MapRecord::set_latch_match(const SbjLatch* latch,
 			   bool inv,
-			   const Cell* cell,
-			   const CellLatchInfo& latch_info)
+			   const Cell* cell)
 {
   ymuint offset = inv ? 1 : 0;
-  LatchInfo& latchinfo = mLatchInfo[latch->id() * 2 + offset];
-  latchinfo.mCell = cell;
-  latchinfo.mPinInfo = latch_info;
+  mLatchInfo[latch->id() * 2 + offset] = cell;
 }
 
 // @brief 論理ゲートのマッチを記録する．
@@ -113,12 +100,12 @@ MapRecord::set_latch_match(const BdnLatch* latch,
 // @param[in] match 対応するマッチ
 // @param[in] cell セル
 void
-MapRecord::set_logic_match(const BdnNode* node,
+MapRecord::set_logic_match(const SbjNode* node,
 			   bool inv,
-			   const Match& match,
+			   const Cut& match,
 			   const Cell* cell)
 {
-  NodeInfo& node_info = get_node_info(node, inv);
+  NodeInfo& node_info = _node_info(node, inv);
   node_info.mMatch = match;
   node_info.mCell = cell;
 }
@@ -128,11 +115,11 @@ MapRecord::set_logic_match(const BdnNode* node,
 // @param[in] inv 極性
 // @param[in] cell セル
 void
-MapRecord::set_inv_match(const BdnNode* node,
+MapRecord::set_inv_match(const SbjNode* node,
 			 bool inv,
 			 const Cell* cell)
 {
-  NodeInfo& node_info = get_node_info(node, inv);
+  NodeInfo& node_info = _node_info(node, inv);
   node_info.mMatch.resize(1);
   node_info.mMatch.set_leaf(0, node, !inv);
   node_info.mCell = cell;

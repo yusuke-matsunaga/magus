@@ -126,7 +126,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
   mapgraph.clear();
   mapgraph.set_name(sbjgraph.name());
 
-  init(sbjgraph.max_node_id());
+  init(sbjgraph.node_num());
 
   ymuint ni = sbjgraph.input_num();
   ymuint no = sbjgraph.output_num();
@@ -407,7 +407,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
   cout << "MapGen::estimate() start" << endl;
 #endif
 
-  init(sbjgraph.max_node_id());
+  init(sbjgraph.node_num());
 
   ymuint ni = sbjgraph.input_num();
   ymuint no = sbjgraph.output_num();

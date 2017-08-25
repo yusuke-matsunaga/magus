@@ -32,7 +32,7 @@ MctState::MctState(const SbjGraph& sbjgraph,
 		   ymuint cut_size) :
   mSbjGraph(sbjgraph),
   mCutSize(cut_size),
-  mMaxNodeId(sbjgraph.max_node_id())
+  mMaxNodeId(sbjgraph.node_num())
 {
   if ( debug ) { // デバッグ用
     SbjDumper dumper;

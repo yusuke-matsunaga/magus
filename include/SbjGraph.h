@@ -5,7 +5,7 @@
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -16,7 +16,7 @@
 
 BEGIN_NAMESPACE_YM_SBJ
 
-class SbjIOInfo;
+class IOInfo;
 
 //////////////////////////////////////////////////////////////////////
 /// @class SbjGraph SbjGraph.h "SbjGraph.h"
@@ -29,8 +29,7 @@ class SbjIOInfo;
 /// 入力ノード，出力ノードは ID 番号とは別に入力 ID 番号，および出力
 /// ID 番号を持っており，それらの ID 番号からノードを取り出すこともできる．
 /// ( @sa input(ymuint id), output(ymuint id) )
-/// 論理ノードを入力からのトポロジカル順で処理するためには sort()
-/// を用いてソートされたノードのベクタを得る．
+/// 論理ノードを入力からのトポロジカル順に並んでいる．
 ///
 /// ノードの DAG の外側にポート，DFF，ラッチを表す SbjPort, SbjDff, SbjLatch
 /// を持つ．
@@ -69,9 +68,9 @@ public:
   port_num() const;
 
   /// @brief ポートを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < port_num() )
+  /// @param[in] id ポートID ( 0 <= id < port_num() )
   const SbjPort*
-  port(ymuint pos) const;
+  port(ymuint id) const;
 
   /// @brief 入出力ノードに関連づけられたポートを得る．
   /// @param[in] node 入出力ノード
@@ -123,15 +122,13 @@ public:
   /// @name ノード関連の情報の取得
   /// @{
 
-  /// @brief ノードIDの最大値 + 1 の取得
-  /// @return ノードIDの最大値 + 1 を返す．
+  /// @brief ノード数を返す．
   ymuint
-  max_node_id() const;
+  node_num() const;
 
   /// @brief ID 番号によるノードの取得
-  /// @param[in] id ID 番号 ( 0 <= id < max_node_id() )
+  /// @param[in] id ID 番号 ( 0 <= id < node_num() )
   /// @return ID 番号が id のノードを返す．
-  /// @note 該当するノードが無い場合には nullptr を返す．
   const SbjNode*
   node(ymuint id) const;
 
@@ -141,7 +138,7 @@ public:
   input_num() const;
 
   /// @brief 入力 ID 番号による入力ノードの取得
-  /// @param[in] id 入力 ID 番号 ( 0 <= id < n_inputs() )
+  /// @param[in] id 入力 ID 番号 ( 0 <= id < input_num() )
   /// @return 入力 ID 番号が id のノードを返す．
   SbjNode*
   input(ymuint id) const;
@@ -151,7 +148,7 @@ public:
   output_num() const;
 
   /// @brief 出力 ID 番号による出力ノードの取得
-  /// @param[in] id 出力 ID 番号 ( 0 <= id < n_outputs() )
+  /// @param[in] id 出力 ID 番号 ( 0 <= id < output_num() )
   /// @return 出力 ID 番号が id のノードを返す．
   SbjNode*
   output(ymuint id) const;
@@ -192,9 +189,42 @@ public:
   dff_num() const;
 
   /// @brief DFFノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < dff_num() )
-  SbjDff*
+  /// @param[in] id DFF番号 ( 0 <= id < dff_num() )
+  const SbjDff*
   dff(ymuint pos) const;
+
+  /// @brief node に関連付けられている DFF を得る．
+  /// @param[in] node 対象のノード
+  ///
+  /// node が DFF に関連付けられていない場合には nullptr を返す．
+  const SbjDff*
+  dff(const SbjNode* node) const;
+
+  /// @brief node がDFFの入力だった時に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_dff_input(const SbjNode* node) const;
+
+  /// @brief node がDFFの出力だった時に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_dff_output(const SbjNode* node) const;
+
+  /// @brief node がDFFのクロック端子だった時に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_dff_clock(const SbjNode* node) const;
+
+  /// @brief node がDFFのクリア端子だった時に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_dff_clear(const SbjNode* node) const;
+
+  /// @brief node がDFFのセット端子だった時に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_dff_preset(const SbjNode* node) const;
+
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -210,9 +240,41 @@ public:
   latch_num() const;
 
   /// @brief ラッチノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < latch_num() )
-  SbjLatch*
-  latch(ymuint pos) const;
+  /// @param[in] id ラッチ番号 ( 0 <= id < latch_num() )
+  const SbjLatch*
+  latch(ymuint id) const;
+
+  /// @brief node に関連付けられているラッチを返す．
+  /// @param[in] node 対象のノード
+  ///
+  /// 関連付けられていないばあいには nullptr を返す．
+  const SbjLatch*
+  latch(const SbjNode* node) const;
+
+  /// @brief node がラッチの入力だった場合に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_latch_input(const SbjNode* node) const;
+
+  /// @brief node がラッチの出力だった場合に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_latch_output(const SbjNode* node) const;
+
+  /// @brief node がラッチのイネーブル端子だった場合に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_latch_enable(const SbjNode* node) const;
+
+  /// @brief node がラッチのクリア端子だった場合に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_latch_clear(const SbjNode* node) const;
+
+  /// @brief node がラッチのセット端子だった場合に true を返す．
+  /// @param[in] node 対象のノード
+  bool
+  is_latch_preset(const SbjNode* node) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -430,14 +492,14 @@ private:
   vector<SbjNode*> mInputArray;
 
   // 入力番号をキーにしたIO情報の配列
-  vector<IOInfo*> mInputPortArray;
+  vector<IOInfo*> mInputInfoArray;
 
   // 出力番号をキーにした出力ノードの配列
   // 穴はあいていない．
   vector<SbjNode*> mOutputArray;
 
   // 出力番号をキーにしたIO情報の配列
-  vector<IOInfo*> mOutputPortArray;
+  vector<IOInfo*> mOutputInfoArray;
 
   // 論理ノードのリスト
   vector<SbjNode*> mLogicList;
@@ -488,12 +550,13 @@ SbjGraph::port_num() const
 }
 
 // @brief ポートを得る．
-// @param[in] pos 位置 ( 0 <= pos < port_num() )
+// @param[in] id ポート番号 ( 0 <= id < port_num() )
 inline
 const SbjPort*
-SbjGraph::port(ymuint pos) const
+SbjGraph::port(ymuint id) const
 {
-  return mPortArray[pos];
+  ASSERT_COND( id < port_num() );
+  return mPortArray[id];
 }
 
 // @brief ポートを追加する(1ビット版)．
@@ -510,7 +573,7 @@ SbjGraph::add_port(const string& name,
 // ノード番号の最大値 + 1 を返す．
 inline
 ymuint
-SbjGraph::max_node_id() const
+SbjGraph::node_num() const
 {
   return mNodeArray.size();
 }
@@ -521,6 +584,7 @@ inline
 const SbjNode*
 SbjGraph::node(ymuint id) const
 {
+  ASSERT_COND( id < node_num() );
   return mNodeArray[id];
 }
 
@@ -537,6 +601,7 @@ inline
 SbjNode*
 SbjGraph::input(ymuint id) const
 {
+  ASSERT_COND( id < input_num() );
   return mInputArray[id];
 }
 
@@ -553,6 +618,7 @@ inline
 SbjNode*
 SbjGraph::output(ymuint id) const
 {
+  ASSERT_COND( id < output_num() );
   return mOutputArray[id];
 }
 
@@ -583,13 +649,13 @@ SbjGraph::dff_num() const
 }
 
 // @brief DFFノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < dff_num() )
+// @param[in] id DFF番号 ( 0 <= id < dff_num() )
 inline
-SbjDff*
-SbjGraph::dff(ymuint pos) const
+const SbjDff*
+SbjGraph::dff(ymuint id) const
 {
-  ASSERT_COND( pos < dff_num() );
-  return mDffList[pos];
+  ASSERT_COND( id < dff_num() );
+  return mDffList[id];
 }
 
 // ラッチノード数を得る．
@@ -601,13 +667,13 @@ SbjGraph::latch_num() const
 }
 
 // @brief ラッチノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < latch_num() )
+// @param[in] id ラッチ番号 ( 0 <= id < latch_num() )
 inline
-SbjLatch*
-SbjGraph::latch(ymuint pos) const
+const SbjLatch*
+SbjGraph::latch(ymuint id) const
 {
-  ASSERT_COND( pos < latch_num() );
-  return mLatchList[pos];
+  ASSERT_COND( id < latch_num() );
+  return mLatchList[id];
 }
 
 // @brief 段数を求める．

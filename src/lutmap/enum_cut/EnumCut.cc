@@ -38,7 +38,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 		    ymuint limit,
 		    EnumCutOp* op)
 {
-  ymuint n = sbjgraph.max_node_id();
+  ymuint n = sbjgraph.node_num();
   mNodeTemp.clear();
   mNodeTemp.resize(n);
 

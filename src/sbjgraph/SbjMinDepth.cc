@@ -87,7 +87,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
   mAlloc(4096),
   mSbjGraph(sbjgraph)
 {
-  ymuint n = sbjgraph.max_node_id();
+  ymuint n = sbjgraph.node_num();
 
   mTfiNodeList.reserve(n);
 

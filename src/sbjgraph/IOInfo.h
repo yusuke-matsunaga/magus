@@ -173,7 +173,7 @@ private:
   SbjPort* mPort;
 
   // ビット位置
-  ymuitn mBit;
+  ymuint mBit;
 
 };
 
@@ -413,7 +413,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] dff 関連付けられているDFF
-  IODffPrsetInfo(SbjDff* dff);
+  IODffPresetInfo(SbjDff* dff);
 
   /// @brief デストラクタ
   virtual

@@ -77,7 +77,7 @@ CutResubImpl::resub(const SbjGraph& sbjgraph,
 		    int slack)
 {
   // 作業領域の初期化(mHeap はあとで)
-  ymuint n = sbjgraph.max_node_id();
+  ymuint n = sbjgraph.node_num();
   mNodeArray.resize(n);
   for (ymuint i = 0; i < n; ++ i) {
     mNodeArray[i] = nullptr;
@@ -114,7 +114,7 @@ CutResubImpl::resub(const SbjGraph& sbjgraph,
     // 現在のカットの根のノードを root_list に格納
     // 代理カットを求める．
     vector<CrNode*> root_list;
-    root_list.reserve(sbjgraph.max_node_id());
+    root_list.reserve(sbjgraph.node_num());
     ymuint max_level = 0;
     for (ymuint i = 0; i < nl; ++ i) {
       const SbjNode* node = sbjgraph.logic(i);

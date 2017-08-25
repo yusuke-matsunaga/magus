@@ -34,7 +34,7 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
 		     const CutHolder& cut_holder,
 		     ymuint cut_size) :
   mState(sbjgraph, cut_size),
-  mInsideNodeMark(sbjgraph.max_node_id(), false)
+  mInsideNodeMark(sbjgraph.node_num(), false)
 {
   LbCalc lbcalc;
   mBaseline = lbcalc.lower_bound(sbjgraph, cut_holder);
@@ -49,7 +49,7 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
   cout << "# of logic nodes   = " << sbjgraph.logic_num() << endl;
   cout << "# of fanout points = " << nf << endl;
 
-  mMinimumLutNum = sbjgraph.max_node_id() + 1;
+  mMinimumLutNum = sbjgraph.node_num() + 1;
 
   mState.init();
   trivial_move();

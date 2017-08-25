@@ -14,6 +14,7 @@
 #include "SbjNode.h"
 #include "SbjHandle.h"
 #include "SbjMinDepth.h"
+#include "IOInfo.h"
 
 #include "ym/Expr.h"
 
@@ -105,7 +106,7 @@ void
 SbjGraph::_copy(const SbjGraph& src,
 		vector<SbjNode*>& nodemap)
 {
-  ymuint n = src.max_node_id();
+  ymuint n = src.node_num();
   nodemap.clear();
   nodemap.resize(n);
 
@@ -155,7 +156,7 @@ SbjGraph::_copy(const SbjGraph& src,
   // DFF の生成
   ymuint nf = src.dff_num();
   for (ymuint i = 0; i < nf; ++ i) {
-    SbjDff* src_dff = src.dff(i);
+    const SbjDff* src_dff = src.dff(i);
 
     const SbjNode* src_input = src_dff->data_input();
     SbjNode* dst_input = nodemap[src_input->id()];
@@ -184,7 +185,7 @@ SbjGraph::_copy(const SbjGraph& src,
   // ラッチの生成
   ymuint nlatch = src.latch_num();
   for (ymuint i = 0; i < nlatch; ++ i) {
-    SbjLatch* src_latch = src.latch(i);
+    const SbjLatch* src_latch = src.latch(i);
 
     const SbjNode* src_input = src_latch->data_input();
     SbjNode* dst_input = nodemap[src_input->id()];
@@ -267,10 +268,20 @@ SbjGraph::clear()
     delete *p;
   }
 
+  for (vector<IOInfo*>::iterator p = mInputInfoArray.begin();
+       p != mInputInfoArray.end(); ++ p) {
+    delete *p;
+  }
+
+  for (vector<IOInfo*>::iterator p = mOutputInfoArray.begin();
+       p != mOutputInfoArray.end(); ++ p) {
+    delete *p;
+  }
+
   mInputArray.clear();
-  mInputPortArray.clear();
+  mInputInfoArray.clear();
   mOutputArray.clear();
-  mOutputPortArray.clear();
+  mOutputInfoArray.clear();
   mLogicList.clear();
   mDffList.clear();
   mLatchList.clear();
@@ -290,14 +301,12 @@ SbjGraph::add_port(const string& name,
   for (ymuint i = 0; i < n; ++ i) {
     SbjNode* node = body[i];
     if ( node->is_input() ) {
-      PortInfo& port_info = mInputPortArray[node->subid()];
-      port_info.mPort = port;
-      port_info.mPos = i;
+      IOInfo* info = new IOPortInfo(port, i);
+      mInputInfoArray[node->subid()] = info;
     }
     else if ( node->is_output() ) {
-      PortInfo& port_info = mOutputPortArray[node->subid()];
-      port_info.mPort = port;
-      port_info.mPos = i;
+      IOInfo* info = new IOPortInfo(port, i);
+      mOutputInfoArray[node->subid()] = info;
     }
     else {
       ASSERT_NOT_REACHED;
@@ -311,10 +320,10 @@ const SbjPort*
 SbjGraph::port(const SbjNode* node) const
 {
   if ( node->is_input() ) {
-    return mInputPortArray[node->subid()].mPort;
+    return mInputInfoArray[node->subid()]->port();
   }
   else if ( node->is_output() ) {
-    return mOutputPortArray[node->subid()].mPort;
+    return mOutputInfoArray[node->subid()]->port();
   }
   else {
     return nullptr;
@@ -327,10 +336,10 @@ ymuint
 SbjGraph::port_pos(const SbjNode* node) const
 {
   if ( node->is_input() ) {
-    return mInputPortArray[node->subid()].mPos;
+    return mInputInfoArray[node->subid()]->port_bitpos();
   }
   else if ( node->is_output() ) {
-    return mOutputPortArray[node->subid()].mPos;
+    return mOutputInfoArray[node->subid()]->port_bitpos();
   }
   else {
     return 0;
@@ -348,7 +357,7 @@ SbjGraph::new_input(bool bipol)
   mInputArray.push_back(node);
 
   // ダミーの place-holder を追加
-  mInputPortArray.push_back(PortInfo());
+  mInputInfoArray.push_back(nullptr);
 
   node->set_input(subid, bipol);
 
@@ -366,7 +375,7 @@ SbjGraph::new_output(SbjHandle ihandle)
   mOutputArray.push_back(node);
 
   // ダミーの place-holder を追加
-  mOutputPortArray.push_back(PortInfo());
+  mOutputInfoArray.push_back(nullptr);
 
   SbjNode* inode = ihandle.node();
   bool inv = ihandle.inv();
@@ -742,7 +751,89 @@ SbjGraph::new_dff(SbjNode* input,
   dff->mId = mDffList.size();
   mDffList.push_back(dff);
 
+  // 端子の情報を作る．
+  mOutputInfoArray[input->subid()] = new IODffInputInfo(dff);
+  mInputInfoArray[output->subid()] = new IODffOutputInfo(dff);
+  mOutputInfoArray[clock->subid()] = new IODffClockInfo(dff);
+  if ( clear != nullptr ) {
+    mOutputInfoArray[clear->subid()] = new IODffClearInfo(dff);
+  }
+  if ( preset != nullptr ) {
+    mOutputInfoArray[preset->subid()] = new IODffPresetInfo(dff);
+  }
+
   return dff;
+}
+
+// @brief node に関連付けられている DFF を得る．
+// @param[in] node 対象のノード
+//
+// node が DFF に関連付けられていない場合には nullptr を返す．
+const SbjDff*
+SbjGraph::dff(const SbjNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputInfoArray[node->subid()]->dff();
+  }
+  else if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->dff();
+  }
+  return nullptr;
+}
+
+// @brief node がDFFの入力だった時に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_dff_input(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_dff_input();
+  }
+  return false;
+}
+
+// @brief node がDFFの出力だった時に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_dff_output(const SbjNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputInfoArray[node->subid()]->is_dff_output();
+  }
+  return false;
+}
+
+// @brief node がDFFのクロック端子だった時に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_dff_clock(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_dff_clock();
+  }
+  return false;
+}
+
+// @brief node がDFFのクリア端子だった時に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_dff_clear(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_dff_clear();
+  }
+  return false;
+}
+
+// @brief node がDFFのセット端子だった時に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_dff_preset(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_dff_preset();
+  }
+  return false;
 }
 
 // ラッチノードを作る．
@@ -759,7 +850,89 @@ SbjGraph::new_latch(SbjNode* input,
   latch->mId = mLatchList.size();
   mLatchList.push_back(latch);
 
+  // 端子の情報を作る．
+  mOutputInfoArray[input->subid()] = new IOLatchInputInfo(latch);
+  mInputInfoArray[output->subid()] = new IOLatchOutputInfo(latch);
+  mOutputInfoArray[enable->subid()] = new IOLatchEnableInfo(latch);
+  if ( clear != nullptr ) {
+    mOutputInfoArray[clear->subid()] = new IOLatchClearInfo(latch);
+  }
+  if ( preset != nullptr ) {
+    mOutputInfoArray[preset->subid()] = new IOLatchPresetInfo(latch);
+  }
+
   return latch;
+}
+
+// @brief node に関連付けられているラッチを返す．
+// @param[in] node 対象のノード
+//
+// 関連付けられていないばあいには nullptr を返す．
+const SbjLatch*
+SbjGraph::latch(const SbjNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputInfoArray[node->subid()]->latch();
+  }
+  else if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->latch();
+  }
+  return nullptr;
+}
+
+// @brief node がラッチの入力だった場合に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_latch_input(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_latch_input();
+  }
+  return false;
+}
+
+// @brief node がラッチの出力だった場合に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_latch_output(const SbjNode* node) const
+{
+  if ( node->is_input() ) {
+    return mInputInfoArray[node->subid()]->is_latch_output();
+  }
+  return false;
+}
+
+// @brief node がラッチのイネーブル端子だった場合に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_latch_enable(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_latch_enable();
+  }
+  return false;
+}
+
+// @brief node がラッチのクリア端子だった場合に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_latch_clear(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_latch_clear();
+  }
+  return false;
+}
+
+// @brief node がラッチのセット端子だった場合に true を返す．
+// @param[in] node 対象のノード
+bool
+SbjGraph::is_latch_preset(const SbjNode* node) const
+{
+  if ( node->is_output() ) {
+    return mOutputInfoArray[node->subid()]->is_latch_preset();
+  }
+  return false;
 }
 
 // 新しいノードを作成する．

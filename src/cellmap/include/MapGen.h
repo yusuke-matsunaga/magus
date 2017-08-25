@@ -108,7 +108,8 @@ private:
 
   /// @brief D-FF の生成を行う．
   void
-  gen_dff(const SbjDff* sbj_dff);
+  gen_dff(const SbjDff* sbj_dff,
+	  const MapRecord& record);
 
   /// @brief ラッチの生成を行う．
   void
@@ -122,9 +123,16 @@ private:
   /// @brief 最終結果を作るためのバックトレースを行う．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
+  /// @param[in] record セルの割当結果
   ymuint
   back_trace(const SbjNode* node,
-	     bool inv);
+	     bool inv,
+	     const MapRecord& record);
+
+  /// @brief node に関係する情報を得る．
+  NodeInfo&
+  node_info(const SbjNode* node,
+	    bool inv);
 
 
 private:
@@ -136,7 +144,7 @@ private:
   BnNetwork* mMapGraph;
 
   // 各ノードの極性ごと作業領域を格納した配列
-  // キーは BdnNode の ID 番号
+  // キーは SbjNode の ID 番号
   vector<NodeInfo> mNodeInfo;
 
   // マッピング要求リスト

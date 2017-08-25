@@ -10,6 +10,12 @@
 #include "MapGen.h"
 #include "MapRecord.h"
 #include "ym/BnNetwork.h"
+#include "ym/BnPort.h"
+#include "ym/BnDff.h"
+#include "ym/BnNode.h"
+#include "ym/Cell.h"
+#include "ym/CellPin.h"
+#include "ym/Expr.h"
 #include "SbjPort.h"
 
 
@@ -66,7 +72,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
   ymuint n_dff = sbjgraph.dff_num();
   for (ymuint i = 0; i < n_dff; ++ i) {
     const SbjDff* sbj_dff = sbjgraph.dff(i);
-    gen_dff(sbj_dff);
+    gen_dff(sbj_dff, record);
   }
 
   // ラッチの生成
@@ -85,7 +91,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
     bool inv = onode->output_fanin_inv() ^ ext_inv;
     ymuint mapnode = 0;
     if ( node ) {
-      mapnode = back_trace(node, inv);
+      mapnode = back_trace(node, inv, record);
     }
     else {
       ymuint node_id = 0;
@@ -102,7 +108,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	mapnode = mMapGraph->new_primitive(string(), 0, kBnLt_C0, const0_cell);
       }
     }
-    ymuint omapnode = mNodeInfo[onode->id()].mMapNode;
+    ymuint omapnode = node_info(onode, false).mMapNode;
     mMapGraph->connect(mapnode, omapnode, 0);
   }
 }
@@ -112,90 +118,91 @@ void
 MapGen::gen_port(const SbjPort* sbj_port)
 {
   ymuint nb = sbj_port->bit_width();
-  vector<ymuint> iovect(nb);
-  sbj_port->get_iovect(iovect);
+  vector<int> iovect(nb);
+  for (ymuint i = 0; i < nb; ++ i) {
+    const SbjNode* sbj_node = sbj_port->bit(i);
+    if ( sbj_node->is_input() ) {
+      iovect[i] = 0;
+    }
+    else {
+      iovect[i] = 1;
+    }
+  }
   BnPort* dst_port = mMapGraph->new_port(sbj_port->name(), iovect);
   for (ymuint j = 0; j < nb; ++ j) {
-    const SbjNode* sbj_input = sbj_port->input(j);
-    if ( sbj_input ) {
-      BnNode* input = dst_port->_input(j);
-      ASSERT_COND( input != nullptr );
-      get_node_info(sbj_input, false).mMapNode = input;
+    const SbjNode* sbj_node = sbj_port->bit(j);
+    const BnNode* node = mMapGraph->node(dst_port->bit(j));
+    if ( sbj_node->is_input() ) {
+      ASSERT_COND( node->is_input() );
+      node_info(sbj_node, false).mMapNode = node->id();
     }
-    const SbjNode* sbj_output = sbj_port->output(j);
-    if ( sbj_output ) {
-      BnNode* output = dst_port->_output(j);
-      ASSERT_COND( output != nullptr );
-      get_node_info(sbj_output, false).mMapNode = output;
-      add_mapreq(sbj_output, false);
+    else if ( sbj_node->is_output() ) {
+      ASSERT_COND( node->is_output() );
+      node_info(sbj_node, false).mMapNode = node->id();
+      add_mapreq(sbj_node, false);
     }
   }
 }
 
 // @brief D-FF の生成を行う．
 void
-MapGen::gen_dff(const SbjDff* sbj_dff)
+MapGen::gen_dff(const SbjDff* sbj_dff,
+		const MapRecord& record)
 {
-  const DffInfo& dff_info0 = get_dff_info(sbj_dff, false);
-  const DffInfo& dff_info1 = get_dff_info(sbj_dff, true);
+  const Cell* dff_cell0 = record.get_dff_cell(sbj_dff, false);
+  const Cell* dff_cell1 = record.get_dff_cell(sbj_dff, true);
   const Cell* cell = nullptr;
-  CellFFInfo pin_info;
   bool inv = false;
-  if ( dff_info0.mCell == nullptr ) {
-    if ( dff_info1.mCell == nullptr ) {
+  if ( dff_cell0 == nullptr ) {
+    if ( dff_cell1 == nullptr ) {
       ASSERT_NOT_REACHED;
     }
-    cell = dff_info1.mCell;
-    pin_info = dff_info1.mPinInfo;
+    cell = dff_cell1;
     inv = true;
   }
   else {
-    cell = dff_info0.mCell;
-    pin_info = dff_info0.mPinInfo;
+    cell = dff_cell0;
   }
-  const CmnDffCell* dff_cell = mMapGraph->dff_cell(cell);
-  if ( dff_cell == nullptr ) {
-    dff_cell = mMapGraph->reg_dff_cell(cell, pin_info);
+  CellFFInfo ff_info = cell->ff_info();
+  BnDff* dff = mMapGraph->new_dff_cell(string(), cell);
 
+  const SbjNode* sbj_output = sbj_dff->data_output();
+  ymuint output1 = dff->output();
+  ASSERT_COND( output1 != kBnNullId );
+  node_info(sbj_output, inv).mMapNode = output1;
+  ymuint output2 = dff->xoutput();
+  if ( output2 != kBnNullId ) {
+    node_info(sbj_output, !inv).mMapNode = output2;
   }
-  CmnDff* dff = mMapGraph->new_dff(dff_cell, sbj_dff->name());
 
-  const SbjNode* sbj_output = sbj_dff->output();
-  BnNode* output1 = dff->_output1();
-  ASSERT_COND( output1 != nullptr );
-  get_node_info(sbj_output, inv).mMapNode = output1;
-  BnNode* output2 = dff->_output2();
-  ASSERT_COND( output2 != nullptr );
-  get_node_info(sbj_output, !inv).mMapNode = output2;
-
-  const SbjNode* sbj_input = sbj_dff->input();
-  BnNode* input = dff->_input();
-  get_node_info(sbj_input, false).mMapNode = input;
+  const SbjNode* sbj_input = sbj_dff->data_input();
+  ymuint input = dff->input();
+  node_info(sbj_input, false).mMapNode = input;
   add_mapreq(sbj_input, inv);
 
   const SbjNode* sbj_clock = sbj_dff->clock();
-  BnNode* clock = dff->_clock();
-  get_node_info(sbj_clock, false).mMapNode = clock;
-  bool clock_inv = (dff_cell->clock_sense() == 2);
+  ymuint clock = dff->clock();
+  node_info(sbj_clock, false).mMapNode = clock;
+  bool clock_inv = (ff_info.clock_sense() == 2);
   add_mapreq(sbj_clock, clock_inv);
 
-  ymuint clear_sense = dff_cell->clear_sense();
+  ymuint clear_sense = ff_info.clear_sense();
   if ( clear_sense != 0 ) {
     const SbjNode* sbj_clear = inv ? sbj_dff->preset() : sbj_dff->clear();
-    BnNode* clear = dff->_clear();
-    ASSERT_COND( clear != nullptr );
-    get_node_info(sbj_clear, false).mMapNode = clear;
+    ymuint clear = dff->clear();
+    ASSERT_COND( clear != kBnNullId );
+    node_info(sbj_clear, false).mMapNode = clear;
     bool clear_inv = (clear_sense == 2);
     // sbj_clear->output_fanin() == nullptr の時もうまくいく．
     add_mapreq(sbj_clear, clear_inv);
   }
 
-  ymuint preset_sense = dff_cell->preset_sense();
+  ymuint preset_sense = ff_info.preset_sense();
   if ( preset_sense != 0 ) {
     const SbjNode* sbj_preset = inv ? sbj_dff->clear() : sbj_dff->preset();
-    BnNode* preset = dff->_preset();
-    ASSERT_COND( preset != nullptr );
-    get_node_info(sbj_preset, false).mMapNode = preset;
+    ymuint preset = dff->preset();
+    ASSERT_COND( preset != kBnNullId );
+    node_info(sbj_preset, false).mMapNode = preset;
     bool preset_inv = (preset_sense == 2);
     // sbj_preset->output_fanin() == nullptr の時もうまくいく．
     add_mapreq(sbj_preset, preset_inv);
@@ -204,25 +211,27 @@ MapGen::gen_dff(const SbjDff* sbj_dff)
 
 // @brief ラッチの生成を行う．
 void
-MapGen::gen_latch(const BdnLatch* sbj_latch)
+MapGen::gen_latch(const SbjLatch* sbj_latch)
 {
+#warning "未完";
 }
 
 // @brief マッピング要求を追加する．
 void
-MapGen::add_mapreq(const BdnNode* node,
+MapGen::add_mapreq(const SbjNode* sbj_node,
 		   bool inv)
 {
-  mMapReqList.push_back(MapReq(node, inv));
+  mMapReqList.push_back(MapReq(sbj_node, inv));
 }
 
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
 ymuint
 MapGen::back_trace(const SbjNode* node,
-		   bool inv)
+		   bool inv,
+		   const MapRecord& record)
 {
-  NodeInfo& node_info = get_node_info(node, inv);
+  NodeInfo& node_info = this->node_info(node, inv);
   ymuint mapnode = node_info.mMapNode;
   if ( mapnode != kBnNullId ) {
     // すでに生成済みならそのノードを返す．
@@ -230,26 +239,31 @@ MapGen::back_trace(const SbjNode* node,
   }
 
   // node を根とするマッチを取り出す．
-  const Cut& match = node_info.mMatch;
+  const Cut& match = record.get_node_match(node, inv);
+  const Cell* cell = record.get_node_cell(node, inv);
   ymuint ni = match.leaf_num();
+  Expr expr = cell->output(0)->function();
 
-  // 生成されたファンインのBnNodeを tmp_fanins に格納する．
-  // ちょっと考えればわかるけど tmp_fanins を上の for
-  // ループで使わないのは再帰呼び出しで多重に生成されることになるから．
-  vector<BnNode*> tmp_fanins(ni);
+  // 新しいノードを作り mNodeMap に登録する．
+  mapnode = mMapGraph->new_expr(string(), ni, expr, cell);
+  node_info.mMapNode = mapnode;
+
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);
-    NodeInfo& inode_info = get_node_info(inode, iinv);
-    BnNode* imapnode = inode_info.mMapNode;
-    tmp_fanins[i] = imapnode;
+    ymuint iid = back_trace(inode, iinv, record);
+    mMapGraph->connect(iid, mapnode, i);
   }
 
-  // 新しいノードを作り mNodeMap に登録する．
-  mapnode = mMapGraph->new_logic(tmp_fanins, node_info.mCell);
-  node_info.mMapNode = mapnode;
-
   return mapnode;
+}
+
+// @brief node に関係する情報を得る．
+MapGen::NodeInfo&
+MapGen::node_info(const SbjNode* node,
+		  bool inv)
+{
+  return mNodeInfo[node->id() * 2 + inv];
 }
 
 END_NAMESPACE_YM_CELLMAP

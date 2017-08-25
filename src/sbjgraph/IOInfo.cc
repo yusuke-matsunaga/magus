@@ -308,7 +308,7 @@ IODffClearInfo::is_dff_clear() const
 
 // @brief コンストラクタ
 // @param[in] dff 関連付けられているDFF
-IODffPresetInfo::IODffPrsetInfo(SbjDff* dff) :
+IODffPresetInfo::IODffPresetInfo(SbjDff* dff) :
   IODffInfo(dff)
 {
 }
@@ -348,7 +348,7 @@ IOLatchInfo::~IOLatchInfo()
 SbjLatch*
 IOLatchInfo::latch() const
 {
-  return latch;
+  return mLatch;
 }
 
 
@@ -454,7 +454,7 @@ IOLatchClearInfo::is_latch_clear() const
 
 // @brief コンストラクタ
 // @param[in] latch 関連付けられているラッチ
-IOLatchPreseInfo::IOLatchPresetInfo(SbjLatch* latch) :
+IOLatchPresetInfo::IOLatchPresetInfo(SbjLatch* latch) :
   IOLatchInfo(latch)
 {
 }

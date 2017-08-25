@@ -40,7 +40,7 @@ CutHolder::all_init(const SbjGraph& sbjgraph,
 		    ymuint limit)
 {
   clear();
-  ymuint n = sbjgraph.max_node_id();
+  ymuint n = sbjgraph.node_num();
   mLimit = limit;
   mCutList = new CutList[n];
 }

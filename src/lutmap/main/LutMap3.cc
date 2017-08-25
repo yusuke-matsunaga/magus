@@ -81,7 +81,7 @@ LutMap3::area_map(const BnNetwork& src_network,
     ymuint depth;
     gen.estimate(sbjgraph, maprec, lut_num, depth);
     const vector<const SbjNode*>& fp_list = gen.fanoutpoint_list();
-    vector<bool> mark(sbjgraph.max_node_id(), false);
+    vector<bool> mark(sbjgraph.node_num(), false);
     for (ymuint i = 0; i < fp_list.size(); ++ i) {
       const SbjNode* node = fp_list[i];
       mark[node->id()] = true;

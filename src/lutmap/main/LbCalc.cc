@@ -39,7 +39,7 @@ ymuint
 LbCalc::lower_bound(const SbjGraph& sbjgraph,
 		    const CutHolder& cut_holder)
 {
-  ymuint node_num = sbjgraph.max_node_id();
+  ymuint node_num = sbjgraph.node_num();
 
   // 作業領域を初期化する．
   mMark.clear();

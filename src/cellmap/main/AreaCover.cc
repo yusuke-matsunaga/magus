@@ -175,7 +175,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       const CellLibrary& cell_library,
 		       MapRecord& maprec)
 {
-  ymuint n = sbjgraph.max_node_id();
+  ymuint n = sbjgraph.node_num();
   mCostArray.resize(n * 2);
   ymuint max_input = cell_library.pg_max_input();
   mWeight.resize(max_input);
@@ -197,8 +197,8 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       n_cost = DBL_MAX;
       add_inv(node, true, inv_func, maprec);
     }
-    else if ( node->is_dff_output() ||
-	      node->is_latch_output() ) {
+    else if ( sbjgraph.is_dff_output(node) ||
+	      sbjgraph.is_latch_output(node) ) {
       // DFFとラッチの場合，肯定，否定のどちらの極性も利用可能
       #warning "dff/latch の利用可能な出力極性のチェックをする．"
       p_cost = 0.0;

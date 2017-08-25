@@ -35,7 +35,7 @@ void
 MapRecord::init(const SbjGraph& sbjgraph)
 {
   mCutArray.clear();
-  mCutArray.resize(sbjgraph.max_node_id(), nullptr);
+  mCutArray.resize(sbjgraph.node_num(), nullptr);
 }
 
 END_NAMESPACE_YM_LUTMAP

@@ -53,7 +53,7 @@ SaSearch::SaSearch(const SbjGraph& sbjgraph,
     }
   }
 
-  mMinimumLutNum = sbjgraph.max_node_id() + 1;
+  mMinimumLutNum = sbjgraph.node_num() + 1;
 }
 
 // @brief デストラクタ

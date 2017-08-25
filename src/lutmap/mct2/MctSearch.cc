@@ -95,7 +95,7 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
     const SbjNode* node = sbjgraph.logic(i);
     if ( node->fanout_num() > 1 ) {
 #if 0
-      vector<bool> mark(sbjgraph.max_node_id(), false);
+      vector<bool> mark(sbjgraph.node_num(), false);
       ymuint ni = dfs(node->fanin(0), mark);
       ni += dfs(node->fanin(1), mark);
       tmp_list.push_back(make_pair(node, ni));
@@ -117,7 +117,7 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
 
   cout << "#logic = " << sbjgraph.logic_num() << ", #fp = " << mFanoutPointList.size() << endl;
 
-  mMinimumLutNum = sbjgraph.max_node_id() + 1;
+  mMinimumLutNum = sbjgraph.node_num() + 1;
   mRootNode = new MctNode(nullptr, 0, false);
 }
 
