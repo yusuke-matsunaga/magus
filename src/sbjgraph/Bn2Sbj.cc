@@ -76,57 +76,53 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       ASSERT_COND( stat );
     }
     SbjHandle sbj_handle;
-    BnLogicType logic_type = bn_node->logic_type();
+    BnNodeType logic_type = bn_node->type();
     switch ( logic_type ) {
-    case kBnLt_NONE:
-      ASSERT_NOT_REACHED;
-      break;
-
-    case kBnLt_C0:
+    case kBnLogic_C0:
       sbj_handle = SbjHandle::make_zero();
       break;
 
-    case kBnLt_C1:
+    case kBnLogic_C1:
       sbj_handle = SbjHandle::make_one();
       break;
 
-    case kBnLt_BUFF:
+    case kBnLogic_BUFF:
       sbj_handle = ihandle_list[0];
       break;
 
-    case kBnLt_NOT:
+    case kBnLogic_NOT:
       sbj_handle = ~ihandle_list[0];
       break;
 
-    case kBnLt_AND:
+    case kBnLogic_AND:
       sbj_handle = dst_network.new_and(ihandle_list);
       break;
 
-    case kBnLt_NAND:
+    case kBnLogic_NAND:
       sbj_handle = ~dst_network.new_and(ihandle_list);
       break;
 
-    case kBnLt_OR:
+    case kBnLogic_OR:
       sbj_handle = dst_network.new_or(ihandle_list);
       break;
 
-    case kBnLt_NOR:
+    case kBnLogic_NOR:
       sbj_handle = ~dst_network.new_or(ihandle_list);
       break;
 
-    case kBnLt_XOR:
+    case kBnLogic_XOR:
       sbj_handle = dst_network.new_xor(ihandle_list);
       break;
 
-    case kBnLt_XNOR:
+    case kBnLogic_XNOR:
       sbj_handle = ~dst_network.new_xor(ihandle_list);
       break;
 
-    case kBnLt_EXPR:
+    case kBnLogic_EXPR:
       sbj_handle = dst_network.new_expr(bn_node->expr(), ihandle_list);
       break;
 
-    case kBnLt_TV:
+    case kBnLogic_TV:
       cerr << "Sorry, truth vector type is not supported!" << endl;
       sbj_handle = SbjHandle::make_zero();
       break;

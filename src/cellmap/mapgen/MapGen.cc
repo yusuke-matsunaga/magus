@@ -99,13 +99,13 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	// 定数1ノードを作る．
 	const Cell* const1_cell = record.const1_cell();
 	ASSERT_COND( const1_cell != nullptr );
-	mapnode = mMapGraph->new_primitive(string(), 0, kBnLt_C1, const1_cell);
+	mapnode = mMapGraph->new_primitive(string(), 0, kBnLogic_C1, const1_cell);
       }
       else {
 	// 定数0ノードを作る．
 	const Cell* const0_cell = record.const0_cell();
 	ASSERT_COND( const0_cell != nullptr );
-	mapnode = mMapGraph->new_primitive(string(), 0, kBnLt_C0, const0_cell);
+	mapnode = mMapGraph->new_primitive(string(), 0, kBnLogic_C0, const0_cell);
       }
     }
     ymuint omapnode = node_info(onode, false).mMapNode;

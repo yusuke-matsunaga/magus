@@ -89,42 +89,42 @@ Bn2FraigConv::node2handle(const BnNode* node)
   }
 
   // 個々の関数タイプに従って fraig を生成する．
-  BnLogicType logic_type = node->logic_type();
+  BnNodeType logic_type = node->type();
   switch ( logic_type ) {
-  case kBnLt_C0:
+  case kBnLogic_C0:
     return mFraigMgr.make_zero();
 
-  case kBnLt_C1:
+  case kBnLogic_C1:
     return mFraigMgr.make_one();
 
-  case kBnLt_BUFF:
+  case kBnLogic_BUFF:
     return fanin_handles[0];
 
-  case kBnLt_NOT:
+  case kBnLogic_NOT:
     return ~fanin_handles[0];
 
-  case kBnLt_AND:
+  case kBnLogic_AND:
     return mFraigMgr.make_and(fanin_handles);
 
-  case kBnLt_NAND:
+  case kBnLogic_NAND:
     return ~mFraigMgr.make_and(fanin_handles);
 
-  case kBnLt_OR:
+  case kBnLogic_OR:
     return mFraigMgr.make_or(fanin_handles);
 
-  case kBnLt_NOR:
+  case kBnLogic_NOR:
     return ~mFraigMgr.make_or(fanin_handles);
 
-  case kBnLt_XOR:
+  case kBnLogic_XOR:
     return mFraigMgr.make_xor(fanin_handles);
 
-  case kBnLt_XNOR:
+  case kBnLogic_XNOR:
     return ~mFraigMgr.make_xor(fanin_handles);
 
-  case kBnLt_EXPR:
+  case kBnLogic_EXPR:
     return mFraigMgr.make_logic(node->expr(), fanin_handles);
 
-  case kBnLt_TV:
+  case kBnLogic_TV:
     {
       TvFunc tv = node->func();
       // 未完
