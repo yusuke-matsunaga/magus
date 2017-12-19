@@ -9,8 +9,6 @@
 
 #include "MapRecord.h"
 
-#include "ym/CellFFInfo.h"
-#include "ym/CellLatchInfo.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnPort.h"
 #include "ym/BnDff.h"
@@ -56,14 +54,14 @@ MapRecord::init(const SbjGraph& sbjgraph)
 
 // @brief 定数０セルをセットする．
 void
-MapRecord::set_const0(const Cell* cell)
+MapRecord::set_const0(const ClibCell* cell)
 {
   mConst0 = cell;
 }
 
 // @brief 定数1セルをセットする．
 void
-MapRecord::set_const1(const Cell* cell)
+MapRecord::set_const1(const ClibCell* cell)
 {
   mConst1 = cell;
 }
@@ -75,7 +73,7 @@ MapRecord::set_const1(const Cell* cell)
 void
 MapRecord::set_dff_match(const SbjDff* dff,
 			 bool inv,
-			 const Cell* cell)
+			 const ClibCell* cell)
 {
   ymuint offset = inv ? 1 : 0;
   mDffInfo[dff->id() * 2 + offset] = cell;
@@ -88,7 +86,7 @@ MapRecord::set_dff_match(const SbjDff* dff,
 void
 MapRecord::set_latch_match(const SbjLatch* latch,
 			   bool inv,
-			   const Cell* cell)
+			   const ClibCell* cell)
 {
   ymuint offset = inv ? 1 : 0;
   mLatchInfo[latch->id() * 2 + offset] = cell;
@@ -103,7 +101,7 @@ void
 MapRecord::set_logic_match(const SbjNode* node,
 			   bool inv,
 			   const Cut& match,
-			   const Cell* cell)
+			   const ClibCell* cell)
 {
   NodeInfo& node_info = _node_info(node, inv);
   node_info.mMatch = match;
@@ -117,7 +115,7 @@ MapRecord::set_logic_match(const SbjNode* node,
 void
 MapRecord::set_inv_match(const SbjNode* node,
 			 bool inv,
-			 const Cell* cell)
+			 const ClibCell* cell)
 {
   NodeInfo& node_info = _node_info(node, inv);
   node_info.mMatch.resize(1);

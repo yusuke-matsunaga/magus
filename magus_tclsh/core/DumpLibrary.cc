@@ -8,7 +8,7 @@
 
 
 #include "DumpLibrary.h"
-#include "ym/CellLibrary.h"
+#include "ym/ClibCellLibrary.h"
 #include "ym/FileODO.h"
 
 
@@ -53,7 +53,7 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  cur_cell_library()->dump(bo);
+  cur_cell_library().dump(bo);
 
   return TCL_OK;
 }

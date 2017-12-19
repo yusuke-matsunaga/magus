@@ -1,42 +1,40 @@
-﻿#ifndef MAGUS_MVNCMD_H
-#define MAGUS_MVNCMD_H
+﻿#ifndef MAGUS_MAGBNETCMD_H
+#define MAGUS_MAGBNETCMD_H
 
-/// @file MvnCmd.h
-/// @brief MvnCmd のヘッダファイル
+/// @file BNetCmd.h
+/// @brief BNetCmd のヘッダファイル
 ///
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: MagCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "NetCmd.h"
-#include "ym/ym_mvn.h"
+#include "ym/bnet.h"
 
 
 BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class MvnCmd MvnCmd.h "MvnCmd.h"
+/// @class BNetCmd BNetCmd.h "BNetCmd.h"
 /// @ingroup MagusGroup
-/// @brief MvNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
+/// @brief BNetwork を操作対象とする Magus のコマンドオブジェクトの基底クラス
 //////////////////////////////////////////////////////////////////////
-class MvnCmd :
+class BNetCmd :
   public NetCmd
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] mgr Magus の管理オブジェクト
-  /// @param[in] new_mvn_enable -new_mvn オプションを使用するとき true
-  MvnCmd(MagMgr* mgr,
-	 bool new_mvn_enable = true);
+  /// @param[in] new_bnet_enable -new_bnet オプションを使用するとき true
+  BNetCmd(MagMgr* mgr,
+	  bool new_bnet_enable = true);
 
   /// @brief デストラクタ
   virtual
-  ~MvnCmd();
+  ~BNetCmd();
 
 
 protected:
@@ -45,8 +43,8 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カレントネットワークの取得
-  /// @note カレントネットワークが MvNetwork でない場合には nullptr を返す．
-  MvnMgr*
+  /// @note カレントネットワークが BNetwork でない場合には nullptr を返す．
+  BnNetwork*
   cur_network() const;
 
 
@@ -79,4 +77,4 @@ protected:
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_MVNCMD_H
+#endif // MAGUS_MAGBNETCMD_H

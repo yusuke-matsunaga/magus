@@ -11,9 +11,9 @@
 
 #include "cellmap_nsdef.h"
 #include "SbjNode.h"
-#include "ym/ym_bnet.h"
-#include "ym/ym_cell.h"
-#include "ym/CellFFInfo.h"
+#include "ym/bnet.h"
+#include "ym/clib.h"
+#include "ym/ClibFFInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -43,7 +43,7 @@ public:
   /// @param[out] mapnetwork マッピング結果
   void
   operator()(const SbjGraph& sbjgraph,
-	     const CellLibrary& cell_library,
+	     const ClibCellLibrary& cell_library,
 	     BnNetwork& mapnetwork);
 
 
@@ -58,7 +58,7 @@ private:
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
   ff_map(const SbjGraph& sbjgraph,
-	 const CellLibrary& cell_library,
+	 const ClibCellLibrary& cell_library,
 	 MapRecord& maprec);
 
   /// @brief best cut の記録を行う．
@@ -67,7 +67,7 @@ private:
   /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
   record_cuts(const SbjGraph& sbjgraph,
-	      const CellLibrary& cell_library,
+	      const ClibCellLibrary& cell_library,
 	      MapRecord& maprec);
 
   /// @brief 逆極性の解にインバーターを付加した解を追加する．
@@ -78,7 +78,7 @@ private:
   void
   add_inv(const SbjNode* node,
 	  bool inv,
-	  const CellGroup* inv_func,
+	  const ClibCellGroup* inv_func,
 	  MapRecord& maprec);
 
   /// @brief node から各入力にいたる経路の重みを計算する．
@@ -106,8 +106,8 @@ private:
     {
     }
 
-    const Cell* mCell;
-    CellFFInfo mPinInfo;
+    const ClibCell* mCell;
+    ClibFFInfo mPinInfo;
   };
 
 

@@ -9,8 +9,8 @@
 
 #include "ReadLibrary.h"
 
-#include "MagMgr.h"
-#include "ym/CellLibrary.h"
+#include "tclsh/MagMgr.h"
+#include "ym/ClibCellLibrary.h"
 #include "ym/MsgMgr.h"
 #include "ym/TclObjMsgHandler.h"
 
@@ -58,7 +58,7 @@ ReadLibrary::cmd_proc(TclObjVector& objv)
   MsgMgr::reg_handler(&mh);
 
   // 実際の読み込みを行う．
-  CellLibrary* lib = CellLibrary::new_obj();
+  ClibCellLibrary& lib = mgr()->cur_cell_library();
   bool stat2 = read_library(ex_file_name, lib);
   if ( !stat2 ) {
     TclObj emsg = mh.msg_obj();
@@ -66,8 +66,6 @@ ReadLibrary::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-
-  mgr()->set_cur_cell_library(lib);
 
   // 正常終了
   return TCL_OK;

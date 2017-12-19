@@ -46,7 +46,7 @@ private:
   virtual
   bool
   read_library(const string& filename,
-	       CellLibrary* library);
+	       ClibCellLibrary& library);
 
 };
 

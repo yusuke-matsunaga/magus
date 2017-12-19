@@ -9,9 +9,9 @@
 /// All rights reserved.
 
 
-#include "NetCmd.h"
+#include "tclsh/NetCmd.h"
+#include "tclsh/NetHandle.h"
 #include "ym/TclPopt.h"
-#include "NetHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS

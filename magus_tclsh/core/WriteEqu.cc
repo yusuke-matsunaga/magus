@@ -1,15 +1,13 @@
 ﻿
-/// @file magus/logbase/BNetIoCmd.cc
-/// @brief BNetIoCmd の実装ファイル
+/// @file WriteEqu.cc
+/// @brief WriteEqu の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "BNetIoCmd.h"
+#include "WriteEqu.h"
 
 #include "YmNetworks/BNetEquWriter.h"
 

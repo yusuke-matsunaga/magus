@@ -15,7 +15,7 @@
 #include "magus_nsdef.h"
 
 #include "ym/TclCmd.h"
-#include "ym/ym_cell.h"
+#include "ym/clib.h"
 #include "NetHandle.h"
 
 
@@ -50,7 +50,7 @@ protected:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カレントセルライブラリの取得
-  const CellLibrary*
+  const ClibCellLibrary&
   cur_cell_library();
 
 

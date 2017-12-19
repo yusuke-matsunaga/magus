@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "NetCmd.h"
+#include "tclsh/NetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS

@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "MagCmd.h"
+#include "tclsh/MagCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -54,7 +54,7 @@ private:
   virtual
   bool
   read_library(const string& filemae,
-	       CellLibrary* library) = 0;
+	       ClibCellLibrary& library) = 0;
 
 };
 

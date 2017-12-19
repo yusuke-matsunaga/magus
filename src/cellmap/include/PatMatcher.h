@@ -11,7 +11,7 @@
 
 #include "cellmap_nsdef.h"
 #include "Cut.h"
-#include "ym/ym_cell.h"
+#include "ym/clib.h"
 #include "ym/HashMap.h"
 
 
@@ -27,7 +27,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] library セルライブラリ
-  PatMatcher(const CellLibrary& library);
+  PatMatcher(const ClibCellLibrary& library);
 
   /// @brief デストラクタ
   ~PatMatcher();
@@ -43,7 +43,7 @@ public:
   /// @retval false マッチングが失敗した．
   bool
   operator()(const SbjNode* sbj_root,
-	     const CellPatGraph& pat_graph,
+	     const ClibPatGraph& pat_graph,
 	     Cut& match);
 
 #if 0
@@ -83,7 +83,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // セルライブラリ
-  const CellLibrary& mLibrary;
+  const ClibCellLibrary& mLibrary;
 
   // パタンノードの ID をキーとしてサブジェクトノードを入れる配列
   vector<const SbjNode*> mSbjMap;

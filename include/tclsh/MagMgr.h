@@ -10,7 +10,8 @@
 
 
 #include "magus_nsdef.h"
-#include "ym/ym_cell.h"
+#include "ym/clib.h"
+#include "ym/ClibCellLibrary.h"
 #include "ym/UnitAlloc.h"
 #include "ym/ItvlMgr.h"
 
@@ -38,14 +39,8 @@ public:
 
 public:
 
-  /// @brief カレントセルライブラリの設定
-  /// @param[in] library 設定するセルライブラリ
-  /// @note 以前のライブラリは破棄される．
-  void
-  set_cur_cell_library(const CellLibrary* library);
-
   /// @brief カレントセルライブラリの取得
-  const CellLibrary*
+  ClibCellLibrary&
   cur_cell_library();
 
   /// @brief 新たな BnNetwork を作成して登録する．
@@ -199,7 +194,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // セルライブラリ
-  const CellLibrary* mCellLibrary;
+  ClibCellLibrary mCellLibrary;
 
   // NetHandle 用のアロケータ
   UnitAlloc mAlloc;

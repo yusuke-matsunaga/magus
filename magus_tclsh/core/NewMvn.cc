@@ -10,7 +10,7 @@
 
 
 #include "NewMvn.h"
-#include "MagMgr.h"
+#include "tclsh/MagMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS

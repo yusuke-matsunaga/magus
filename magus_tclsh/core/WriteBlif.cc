@@ -1,11 +1,9 @@
 ﻿
-/// @file src/core/WriteBlif.cc
+/// @file WriteBlif.cc
 /// @brief WriteBlif の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIoCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 

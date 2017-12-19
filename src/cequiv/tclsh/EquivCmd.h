@@ -1,17 +1,15 @@
-﻿#ifndef MAGUS_EQUIV_EQUIVCMD_H
-#define MAGUS_EQUIV_EQUIVCMD_H
+﻿#ifndef EQUIVCMD_H
+#define EQUIVCMD_H
 
-/// @file magus/equiv/EquivCmd.h
+/// @file EquivCmd.h
 /// @brief EquivCmd のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EquivCmd.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "MagCmd.h"
-#include "NetHandle.h"
+#include "tclsh/MagCmd.h"
+#include "tclsh/NetHandle.h"
 #include "ym/BnNetwork.h"
 
 

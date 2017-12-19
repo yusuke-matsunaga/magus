@@ -10,7 +10,7 @@
 
 
 #include "cec_nsdef.h"
-#include "ym/ym_bnet.h"
+#include "ym/bnet.h"
 #include "FraigMgr.h"
 #include "FraigHandle.h"
 #include "ym/HashMap.h"

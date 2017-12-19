@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "MagMgr.h"
-#include "ym/CellLibrary.h"
-#include "NetHandle.h"
+#include "tclsh/MagMgr.h"
+#include "tclsh/NetHandle.h"
 #include "BNetHandle.h"
 #include "MvnHandle.h"
+#include "ym/ClibCellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -29,8 +29,6 @@ MagMgr::MagMgr() :
 {
   alloc_table(16);
 
-  mCellLibrary = nullptr;
-
   // カレントネットワークは nullptr
   mCurNet = nullptr;
 }
@@ -39,8 +37,6 @@ MagMgr::MagMgr() :
 // 全てのネットワークを破壊する．
 MagMgr::~MagMgr()
 {
-  delete mCellLibrary;
-
   // このオブジェクトの管理しているネットワークを全て破棄する．
   // といってもこのループでは name_list にネットワーク名を入れている
   // だけ．
@@ -57,19 +53,8 @@ MagMgr::~MagMgr()
   }
 }
 
-// @brief カレントセルライブラリの設定
-// @param[in] library 設定するセルライブラリ
-// @note 以前のライブラリは破棄される．
-void
-MagMgr::set_cur_cell_library(const CellLibrary* library)
-{
-  delete mCellLibrary;
-
-  mCellLibrary = library;
-}
-
 // @brief カレントセルライブラリの取得
-const CellLibrary*
+ClibCellLibrary&
 MagMgr::cur_cell_library()
 {
   return mCellLibrary;

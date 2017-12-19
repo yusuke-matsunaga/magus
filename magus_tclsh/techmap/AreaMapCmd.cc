@@ -14,7 +14,7 @@
 
 #include "ym/MvnMgr.h"
 #include "ym/BnNetwork.h"
-#include "ym/BnBuilder.h"
+#include "ym/ClibCellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS_TECHMAP
@@ -73,7 +73,7 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  if ( cur_cell_library() == nullptr ) {
+  if ( cur_cell_library().cell_num() == 0 ) {
     TclObj emsg;
     emsg << "Cell Library is not set.";
     set_result(emsg);
@@ -85,9 +85,9 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      BnBuilder builder;
-      mapper.area_map(*cur_cell_library(), *neth->bnetwork(), 0, builder);
-      neth->_bnetwork()->copy(builder);
+      BnNetwork dst_network;
+      mapper.area_map(cur_cell_library(), *neth->bnetwork(), 0, dst_network);
+      neth->_bnetwork()->copy(dst_network);
     }
     break;
 

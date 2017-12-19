@@ -14,7 +14,7 @@
 #include "SbjDff.h"
 #include "SbjLatch.h"
 #include "SbjNode.h"
-#include "ym/ym_cell.h"
+#include "ym/clib.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -50,11 +50,11 @@ public:
 
   /// @brief 定数０セルをセットする．
   void
-  set_const0(const Cell* cell);
+  set_const0(const ClibCell* cell);
 
   /// @brief 定数1セルをセットする．
   void
-  set_const1(const Cell* cell);
+  set_const1(const ClibCell* cell);
 
   /// @brief D-FF のマッチを記録する．
   /// @param[in] dff D-FF
@@ -63,7 +63,7 @@ public:
   void
   set_dff_match(const SbjDff* dff,
 		bool inv,
-		const Cell* cell);
+		const ClibCell* cell);
 
   /// @brief ラッチのマッチを記録する．
   /// @param[in] latch ラッチ
@@ -72,7 +72,7 @@ public:
   void
   set_latch_match(const SbjLatch* latch,
 		  bool inv,
-		  const Cell* cell);
+		  const ClibCell* cell);
 
   /// @brief 論理ゲートのマッチを記録する．
   /// @param[in] node 該当のノード
@@ -83,7 +83,7 @@ public:
   set_logic_match(const SbjNode* node,
 		  bool inv,
 		  const Cut& match,
-		  const Cell* cell);
+		  const ClibCell* cell);
 
   /// @brief インバータのマッチを記録する．
   /// @param[in] node 該当のノード
@@ -92,28 +92,28 @@ public:
   void
   set_inv_match(const SbjNode* node,
 		bool inv,
-		const Cell* cell);
+		const ClibCell* cell);
 
   /// @brief 定数０セルを返す．
-  const Cell*
+  const ClibCell*
   const0_cell() const;
 
   /// @brief 定数1セルを返す．
-  const Cell*
+  const ClibCell*
   const1_cell() const;
 
   /// @brief D-FF の割り当て情報を取り出す．
-  const Cell*
+  const ClibCell*
   get_dff_cell(const SbjDff* dff,
 	       bool inv) const;
 
   /// @brief ラッチの割り当て情報を取り出す．
-  const Cell*
+  const ClibCell*
   get_latch_cell(const SbjLatch* latch,
 		 bool inv) const;
 
   /// @brief node に対応するセルを返す．
-  const Cell*
+  const ClibCell*
   get_node_cell(const SbjNode* node,
 		bool inv) const;
 
@@ -140,7 +140,7 @@ private:
     Cut mMatch;
 
     // セル
-    const Cell* mCell;
+    const ClibCell* mCell;
 
   };
 
@@ -167,18 +167,18 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 定数０セル
-  const Cell* mConst0;
+  const ClibCell* mConst0;
 
   // 定数1セル
-  const Cell* mConst1;
+  const ClibCell* mConst1;
 
   // D-FF の割り当て情報を格納した配列
   // キーは SbjDff の ID 番号 * 2 + (0/1)
-  vector<const Cell*> mDffInfo;
+  vector<const ClibCell*> mDffInfo;
 
   // ラッチの割り当て情報を格納した配列
   // キーは SbjLatch の ID 番号 * 2 + (0/1)
-  vector<const Cell*> mLatchInfo;
+  vector<const ClibCell*> mLatchInfo;
 
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは SbjNode の ID 番号 * 2 + (0/1)
@@ -193,7 +193,7 @@ private:
 
 // @brief 定数０セルを返す．
 inline
-const Cell*
+const ClibCell*
 MapRecord::const0_cell() const
 {
   return mConst0;
@@ -201,7 +201,7 @@ MapRecord::const0_cell() const
 
 // @brief 定数1セルを返す．
 inline
-const Cell*
+const ClibCell*
 MapRecord::const1_cell() const
 {
   return mConst1;
@@ -209,7 +209,7 @@ MapRecord::const1_cell() const
 
 // @brief D-FF の割り当て情報を取り出す．
 inline
-const Cell*
+const ClibCell*
 MapRecord::get_dff_cell(const SbjDff* dff,
 			bool inv) const
 {
@@ -219,7 +219,7 @@ MapRecord::get_dff_cell(const SbjDff* dff,
 
 // @brief ラッチの割り当て情報を取り出す．
 inline
-const Cell*
+const ClibCell*
 MapRecord::get_latch_cell(const SbjLatch* latch,
 			  bool inv) const
 {
@@ -228,7 +228,8 @@ MapRecord::get_latch_cell(const SbjLatch* latch,
 }
 
 // @brief node に対応するセルを返す．
-const Cell*
+inline
+const ClibCell*
 MapRecord::get_node_cell(const SbjNode* node,
 			 bool inv) const
 {
@@ -245,6 +246,7 @@ MapRecord::get_node_match(const SbjNode* node,
 }
 
 // @brief NodeInfo のアクセッサー
+inline
 MapRecord::NodeInfo&
 MapRecord::_node_info(const SbjNode* node,
 		      bool inv)
@@ -254,6 +256,7 @@ MapRecord::_node_info(const SbjNode* node,
 }
 
 // @brief NodeInfo のアクセッサー
+inline
 const MapRecord::NodeInfo&
 MapRecord::_node_info(const SbjNode* node,
 		      bool inv) const

@@ -17,7 +17,7 @@ set (YM_MAGUS_VERSION_MINOR 0)
 set (YM_MAGUS_VERSION ${YM_MAGUS_VERSION_MAJOR}.${YM_MAGUS_VERSION_MINOR})
 
 # 名前空間
-set (SATPG_NAMESPACE "nsMagus")
+set (MAGUS_NAMESPACE "nsMagus")
 
 # ライブラリのインストールディレクトリ
 set ( YM_INSTALL_LIBDIR "lib/magus" )

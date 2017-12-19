@@ -8,7 +8,7 @@
 
 
 #include "ReadLiberty.h"
-#include "ym/CellLibrary.h"
+#include "ym/ClibCellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -35,9 +35,9 @@ ReadLiberty::~ReadLiberty()
 // @return 読み込みが成功したら true を返す．
 bool
 ReadLiberty::read_library(const string& filename,
-			  CellLibrary* library)
+			  ClibCellLibrary& library)
 {
-  return read_liberty(filename, library);
+  return library.read_liberty(filename);
 }
 
 END_NAMESPACE_MAGUS

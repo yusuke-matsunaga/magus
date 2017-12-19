@@ -1,7 +1,7 @@
-﻿#ifndef YM_CEC_CEC_NSDEF
-#define YM_CEC_CEC_NSDEF
+﻿#ifndef CEC_NSDEF
+#define CEC_NSDEF
 
-/// @file ym_cec/cec_nsdef.h
+/// @file cec_nsdef.h
 /// @brief cec の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -10,7 +10,7 @@
 
 
 #include "ym_config.h"
-#include "ym/ym_bnet.h"
+#include "ym/bnet.h"
 #include "ym/SatBool3.h"
 
 
@@ -62,4 +62,4 @@ using nsCec::check_ceq;
 
 END_NAMESPACE_YM
 
-#endif // YM_CEC_CEC_NSDEF
+#endif // CEC_NSDEF

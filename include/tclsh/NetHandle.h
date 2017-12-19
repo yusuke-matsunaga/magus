@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 #include "magus_nsdef.h"
-#include "ym/ym_bnet.h"
-#include "ym/ym_mvn.h"
+#include "ym/bnet.h"
+#include "ym/mvn.h"
 
 
 BEGIN_NAMESPACE_MAGUS

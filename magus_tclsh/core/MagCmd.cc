@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "MagCmd.h"
-#include "MagMgr.h"
-#include "NetHandle.h"
+#include "tclsh/MagCmd.h"
+#include "tclsh/MagMgr.h"
+#include "tclsh/NetHandle.h"
 #include "BNetHandle.h"
 
 
@@ -43,7 +43,7 @@ MagCmd::mgr() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief カレントセルライブラリの取得
-const CellLibrary*
+const ClibCellLibrary&
 MagCmd::cur_cell_library()
 {
   return mMagMgr->cur_cell_library();

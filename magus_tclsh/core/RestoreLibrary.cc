@@ -8,7 +8,7 @@
 
 
 #include "RestoreLibrary.h"
-#include "ym/CellLibrary.h"
+#include "ym/ClibCellLibrary.h"
 #include "ym/FileIDO.h"
 
 
@@ -36,7 +36,7 @@ RestoreLibrary::~RestoreLibrary()
 // @return 読み込みが成功したら true を返す．
 bool
 RestoreLibrary::read_library(const string& filename,
-			     CellLibrary* library)
+			     ClibCellLibrary& library)
 {
   FileIDO bi;
   if ( !bi.open(filename) ) {
@@ -46,7 +46,7 @@ RestoreLibrary::read_library(const string& filename,
     return false;
   }
 
-  library->restore(bi);
+  library.restore(bi);
 
   return true;
 }

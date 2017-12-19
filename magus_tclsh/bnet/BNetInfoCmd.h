@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "BNetCmd.h"
+#include "tclsh/BNetCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS

@@ -13,8 +13,8 @@
 #include "ym/BnPort.h"
 #include "ym/BnDff.h"
 #include "ym/BnNode.h"
-#include "ym/Cell.h"
-#include "ym/CellPin.h"
+#include "ym/ClibCell.h"
+#include "ym/ClibCellPin.h"
 #include "ym/Expr.h"
 #include "SbjPort.h"
 
@@ -97,15 +97,15 @@ MapGen::generate(const SbjGraph& sbjgraph,
       ymuint node_id = 0;
       if ( inv ) {
 	// 定数1ノードを作る．
-	const Cell* const1_cell = record.const1_cell();
+	const ClibCell* const1_cell = record.const1_cell();
 	ASSERT_COND( const1_cell != nullptr );
-	mapnode = mMapGraph->new_primitive(string(), 0, kBnLogic_C1, const1_cell);
+	mapnode = mMapGraph->new_logic_cell(string(), const1_cell->name());
       }
       else {
 	// 定数0ノードを作る．
-	const Cell* const0_cell = record.const0_cell();
+	const ClibCell* const0_cell = record.const0_cell();
 	ASSERT_COND( const0_cell != nullptr );
-	mapnode = mMapGraph->new_primitive(string(), 0, kBnLogic_C0, const0_cell);
+	mapnode = mMapGraph->new_logic_cell(string(), const0_cell->name());
       }
     }
     ymuint omapnode = node_info(onode, false).mMapNode;
@@ -149,9 +149,9 @@ void
 MapGen::gen_dff(const SbjDff* sbj_dff,
 		const MapRecord& record)
 {
-  const Cell* dff_cell0 = record.get_dff_cell(sbj_dff, false);
-  const Cell* dff_cell1 = record.get_dff_cell(sbj_dff, true);
-  const Cell* cell = nullptr;
+  const ClibCell* dff_cell0 = record.get_dff_cell(sbj_dff, false);
+  const ClibCell* dff_cell1 = record.get_dff_cell(sbj_dff, true);
+  const ClibCell* cell = nullptr;
   bool inv = false;
   if ( dff_cell0 == nullptr ) {
     if ( dff_cell1 == nullptr ) {
@@ -163,8 +163,8 @@ MapGen::gen_dff(const SbjDff* sbj_dff,
   else {
     cell = dff_cell0;
   }
-  CellFFInfo ff_info = cell->ff_info();
-  BnDff* dff = mMapGraph->new_dff_cell(string(), cell);
+  ClibFFInfo ff_info = cell->ff_info();
+  BnDff* dff = mMapGraph->new_dff_cell(string(), cell->name());
 
   const SbjNode* sbj_output = sbj_dff->data_output();
   ymuint output1 = dff->output();
@@ -240,14 +240,13 @@ MapGen::back_trace(const SbjNode* node,
 
   // node を根とするマッチを取り出す．
   const Cut& match = record.get_node_match(node, inv);
-  const Cell* cell = record.get_node_cell(node, inv);
-  ymuint ni = match.leaf_num();
-  Expr expr = cell->output(0)->function();
+  const ClibCell* cell = record.get_node_cell(node, inv);
 
   // 新しいノードを作り mNodeMap に登録する．
-  mapnode = mMapGraph->new_expr(string(), ni, expr, cell);
+  mapnode = mMapGraph->new_logic_cell(string(), cell->name());
   node_info.mMapNode = mapnode;
 
+  ymuint ni = match.leaf_num();
   for (ymuint i = 0; i < ni; ++ i) {
     const SbjNode* inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);

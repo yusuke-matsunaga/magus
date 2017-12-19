@@ -1,11 +1,9 @@
 ﻿
-/// @file src/core/core_init.cc
+/// @file core_init.cc
 /// @brief コアパッケージの初期化を行う．
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: GateObj.cc 347 2007-01-16 02:37:45Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -75,13 +73,16 @@ core_init(Tcl_Interp* interp,
   TclCmdBinder1<ReadBlif, MagMgr*>::reg(interp, mgr,
 					"magus::read_blif");
   TclCmdBinder1<ReadIscas89, MagMgr*>::reg(interp, mgr,
-					"magus::read_iscas89");
+					   "magus::read_iscas89");
 
   // ネットワークのファイル出力を行うコマンド
+#if 0
+  TclCmdBinder1<WriteEqu, MagMgr*>::reg(interp, mgr, "magus::write_equ");
   TclCmdBinder1<WriteBlif, MagMgr*>::reg(interp, mgr,
 					 "magus::write_blif");
   TclCmdBinder1<WriteVerilog, MagMgr*>::reg(interp, mgr,
 					    "magus::write_verilog");
+#endif
 
   // セルライブラリの読み込みを行うコマンド
   TclCmdBinder1<ReadMislib, MagMgr*>::reg(interp, mgr,
@@ -146,6 +147,9 @@ core_init(Tcl_Interp* interp,
     "proc complete(foreach_network) { t s e l p m } { return \"\" }\n"
     "proc complete(read_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(read_iscas89) { t s e l p m } { return \"\" }\n"
+#if 0
+    "proc complete(write_equ) { t s e l p m } { return \"\" }\n"
+#endif
     "proc complete(write_blif) { t s e l p m } { return \"\" }\n"
     "proc complete(write_verilog) { t s e l p m } { return \"\" }\n"
     "proc complete(read_mislib) { t s e l p m } { return \"\" }\n"

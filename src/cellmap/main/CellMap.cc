@@ -34,7 +34,7 @@ CellMap::~CellMap()
 //  - 3: weighted フロー, resub あり
 // @param[out] mapnetwork マッピング結果
 void
-CellMap::area_map(const CellLibrary& cell_library,
+CellMap::area_map(const ClibCellLibrary& cell_library,
 		  const BnNetwork& src_network,
 		  ymuint mode,
 		  BnNetwork& mapnetwork)

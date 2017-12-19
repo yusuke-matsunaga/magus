@@ -8,7 +8,7 @@
 
 
 #include "ReadMislib.h"
-#include "ym/CellLibrary.h"
+#include "ym/ClibCellLibrary.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -35,9 +35,9 @@ ReadMislib::~ReadMislib()
 // @return 読み込みが成功したら true を返す．
 bool
 ReadMislib::read_library(const string& filename,
-			 CellLibrary* library)
+			 ClibCellLibrary& library)
 {
-  return read_mislib(filename, library);
+  return library.read_mislib(filename);
 }
 
 END_NAMESPACE_MAGUS

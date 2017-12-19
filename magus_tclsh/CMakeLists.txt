@@ -3,7 +3,6 @@
 # インクルードパスの設定
 # ===================================================================
 include_directories (
-  include
   ${TCL_INCLUDE_PATH}
   )
 
@@ -13,11 +12,7 @@ include_directories (
 # ===================================================================
 set (bnet_SOURCES
   bnet/BNetCmd.cc
-#  bnet/BNetElimCmd.cc
   bnet/BNetInfoCmd.cc
-#  bnet/BNetIoCmd.cc
-#  bnet/BNetNdCmd.cc
-#  bnet/BNetNodeCmd.cc
   bnet/bnet_init.cc
   )
 
@@ -49,21 +44,6 @@ set (core_SOURCES
   core/WriteBlif.cc
   core/WriteVerilog.cc
   core/core_init.cc
-  )
-
-set (equiv_SOURCES
-  equiv/EquivCmd.cc
-  )
-
-set (lutmap_SOURCES
-  lutmap/AreaMapCmd.cc
-  lutmap/AreaMap2Cmd.cc
-  lutmap/AreaMap3Cmd.cc
-  lutmap/Conv2BNetCmd.cc
-  lutmap/DelayMapCmd.cc
-  lutmap/DumpLutCmd.cc
-  lutmap/LutmapCmd.cc
-  lutmap/WriteVqmCmd.cc
   )
 
 set (misc_SOURCES
@@ -115,12 +95,12 @@ add_executable (magus_tclsh
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-#  ${techmap_SOURCES}
+  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
-#  $<TARGET_OBJECTS:magus_cellmap_a>
+  $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
   $<TARGET_OBJECTS:ym_base_a>
   $<TARGET_OBJECTS:ym_logic_a>
@@ -169,12 +149,12 @@ add_executable (magus_tclsh_p
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-#  ${techmap_SOURCES}
+  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
 #  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
-#  $<TARGET_OBJECTS:magus_cellmap_p>
+  $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
   $<TARGET_OBJECTS:ym_base_p>
   $<TARGET_OBJECTS:ym_logic_p>
@@ -223,12 +203,12 @@ add_executable (magus_tclsh_d
   ${mvn_SOURCES}
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
-#  ${techmap_SOURCES}
+  ${techmap_SOURCES}
   $<TARGET_OBJECTS:magus_cequiv_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
-#  $<TARGET_OBJECTS:magus_cellmap_d>
+  $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
   $<TARGET_OBJECTS:ym_base_d>
   $<TARGET_OBJECTS:ym_logic_d>

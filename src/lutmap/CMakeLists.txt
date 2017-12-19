@@ -4,7 +4,13 @@
 # ===================================================================
 include_directories (
   include
+  ${TCL_INCLUDE_PATH}
   )
+
+
+# ===================================================================
+# サブディレクトリの設定
+# ===================================================================
 
 
 # ===================================================================
@@ -56,6 +62,17 @@ set ( cut_resub_SOURCES
   cut_resub/CutResubImpl.cc
   )
 
+set ( tclsh_SOURCES
+  tclsh/AreaMapCmd.cc
+  tclsh/AreaMap2Cmd.cc
+  tclsh/AreaMap3Cmd.cc
+  tclsh/Conv2BNetCmd.cc
+  tclsh/DelayMapCmd.cc
+  tclsh/DumpLutCmd.cc
+  tclsh/LutmapCmd.cc
+  tclsh/WriteVqmCmd.cc
+  )
+
 
 # ===================================================================
 #  ターゲットの設定
@@ -69,4 +86,5 @@ ym_add_object_library (magus_lutmap
   ${sa_SOURCES}
   ${mapgen_SOURCES}
   ${cut_resub_SOURCES}
+  ${tclsh_SOURCES}
   )

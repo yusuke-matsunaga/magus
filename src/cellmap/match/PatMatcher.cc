@@ -9,8 +9,8 @@
 
 #include "PatMatcher.h"
 #include "SbjGraph.h"
-#include "ym/CellLibrary.h"
-#include "ym/CellPatGraph.h"
+#include "ym/ClibCellLibrary.h"
+#include "ym/ClibPatGraph.h"
 #include "Cut.h"
 
 
@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_YM_CELLMAP
 
 // @brief コンストラクタ
 // @param[in] pat_mgr パタンを管理するクラス
-PatMatcher::PatMatcher(const CellLibrary& cell_library) :
+PatMatcher::PatMatcher(const ClibCellLibrary& cell_library) :
   mLibrary(cell_library),
   mSbjMap(mLibrary.pg_node_num(), nullptr),
   mInvMap(mLibrary.pg_node_num(), false)
@@ -42,24 +42,24 @@ PatMatcher::~PatMatcher()
 // @retval false マッチングが失敗した．
 bool
 PatMatcher::operator()(const SbjNode* sbj_root,
-		       const CellPatGraph& pat_graph,
+		       const ClibPatGraph& pat_graph,
 		       Cut& match)
 {
   // 根のノードを調べる．
   ymuint root_id = pat_graph.root_id();
   switch ( mLibrary.pg_node_type(root_id) ) {
-  case kCellPatInput:
+  case kClibPatInput:
     // これはなんでも OK
     break;
 
-  case kCellPatAnd:
+  case kClibPatAnd:
     if ( !sbj_root->is_and() ) {
       // 型が違う．
       return false;
     }
     break;
 
-  case kCellPatXor:
+  case kClibPatXor:
     if ( !sbj_root->is_xor() ) {
       // 型が違う．
       return false;
@@ -87,13 +87,13 @@ PatMatcher::operator()(const SbjNode* sbj_root,
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
     switch ( mLibrary.pg_node_type(from_id) ) {
-    case kCellPatInput:
+    case kClibPatInput:
       // どんな型でも OK
       // 極性が違っても OK
       inv =  mLibrary.pg_edge_inv(edge_id) ^ iinv;
       break;
 
-    case kCellPatAnd:
+    case kClibPatAnd:
       if ( !from_node->is_and() ) {
 	// 型が違う
 	goto end;
@@ -104,7 +104,7 @@ PatMatcher::operator()(const SbjNode* sbj_root,
       }
       break;
 
-    case kCellPatXor:
+    case kClibPatXor:
       if ( !from_node->is_xor() ) {
 	// 型が違う
 	goto end;

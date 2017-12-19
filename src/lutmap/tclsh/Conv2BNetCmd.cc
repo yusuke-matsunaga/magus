@@ -10,7 +10,7 @@
 
 
 #include "LutmapCmd.h"
-#include "NetHandle.h"
+#include "tclsh/NetHandle.h"
 #include "ym/TclPopt.h"
 
 

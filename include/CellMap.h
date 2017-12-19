@@ -10,8 +10,8 @@
 
 
 #include "cellmap_nsdef.h"
-#include "ym/ym_bnet.h"
-#include "ym/ym_cell.h"
+#include "ym/bnet.h"
+#include "ym/clib.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -46,7 +46,7 @@ public:
   ///  - 3: weighted フロー, resub あり
   /// @param[out] mapnetwork マッピング結果
   void
-  area_map(const CellLibrary& cell_library,
+  area_map(const ClibCellLibrary& cell_library,
 	   const BnNetwork& src_network,
 	   ymuint mode,
 	   BnNetwork& mapnetwork);

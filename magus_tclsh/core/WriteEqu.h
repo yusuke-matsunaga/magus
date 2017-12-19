@@ -1,13 +1,11 @@
-﻿#ifndef MAGUS_LOGBASE_BNETIOCMD_H
-#define MAGUS_LOGBASE_BNETIOCMD_H
+﻿#ifndef WRITE_EQU_H
+#define WRITE_EQU_H
 
-/// @file magus/logbase/BNetIoCmd.h
-/// @brief ネットワーク入出力コマンドのヘッダファイル
+/// @file WriteEqu.h
+/// @brief WriteEqu のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: BNetIoCmd.h 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2017 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -44,4 +42,4 @@ protected:
 
 END_NAMESPACE_MAGUS
 
-#endif // MAGUS_LOGBASE_BNETIOCMD_H
+#endif // WRITE_EQU_H

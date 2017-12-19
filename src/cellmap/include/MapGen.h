@@ -12,10 +12,10 @@
 #include "cellmap_nsdef.h"
 #include "SbjGraph.h"
 #include "Cut.h"
-#include "ym/ym_cell.h"
-#include "ym/ym_bnet.h"
-#include "ym/CellFFInfo.h"
-#include "ym/CellLatchInfo.h"
+#include "ym/clib.h"
+#include "ym/bnet.h"
+#include "ym/ClibFFInfo.h"
+#include "ym/ClibLatchInfo.h"
 
 
 BEGIN_NAMESPACE_YM_CELLMAP
@@ -70,7 +70,7 @@ private:
     Cut mMatch;
 
     // セル
-    const Cell* mCell;
+    const ClibCell* mCell;
 
     // マップ結果
     ymuint mMapNode;

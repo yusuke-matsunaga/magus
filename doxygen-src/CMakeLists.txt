@@ -22,7 +22,6 @@ foreach ( dir
     "ym-tclpp"
     "ym-udgraph"
     "ym-verilog"
-    "magus_tclsh"
     )
   list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/${dir}/include" )
 endforeach ()
