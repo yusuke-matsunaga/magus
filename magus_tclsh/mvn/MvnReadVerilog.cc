@@ -16,6 +16,7 @@
 
 #include "ym/MsgMgr.h"
 #include "ym/MsgHandler.h"
+#include "ym/MsgType.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -40,9 +41,9 @@ int
 MvnReadVerilog::cmd_proc(TclObjVector& objv)
 {
   StreamMsgHandler mh(&cerr);
-  mh.set_mask(kMaskAll);
-  mh.delete_mask(kMsgInfo);
-  mh.delete_mask(kMsgDebug);
+  mh.set_mask(kMsgMaskAll);
+  mh.delete_mask(MsgType::Info);
+  mh.delete_mask(MsgType::Debug);
   MsgMgr::reg_handler(&mh);
 
   MvnVerilogReader reader;

@@ -121,7 +121,7 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
 
   for (ymuint i = 0; i < nl; ++ i) {
     const BnNode* lut = mapgraph.logic(i);
-    ASSERT_COND( lut->type() == kBnLogic_TV );
+    ASSERT_COND( lut->type() == BnNodeType::TvFunc );
     TvFunc tv = lut->func();
     ymuint ni = lut->fanin_num();
     ymuint table_size = 1U << ni;

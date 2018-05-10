@@ -12,7 +12,10 @@
 #include "ym/ClibCellLibrary.h"
 #include "ym/ClibPatGraph.h"
 #include "ym/ClibCellClass.h"
+#include "ym/ClibCellClassList.h"
 #include "ym/ClibCellGroup.h"
+#include "ym/ClibCellGroupList.h"
+#include "ym/ClibCellList.h"
 #include "SbjGraph.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
@@ -68,15 +71,15 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 
   // 定数０のセルを登録する．
   const ClibCell* c0_cell = nullptr;
-  if ( cell_library.const0_func()->cell_num() > 0 ) {
-    c0_cell = cell_library.const0_func()->cell(0);
+  if ( cell_library.const0_func()->cell_list().num() > 0 ) {
+    c0_cell = cell_library.const0_func()->cell_list()[0];
     maprec.set_const0(c0_cell);
   }
 
   // 定数１のセルを登録する．
   const ClibCell* c1_cell = nullptr;
-  if ( cell_library.const1_func()->cell_num() > 0 ) {
-    c1_cell = cell_library.const1_func()->cell(0);
+  if ( cell_library.const1_func()->cell_list().num() > 0 ) {
+    c1_cell = cell_library.const1_func()->cell_list()[0];
     maprec.set_const1(c1_cell);
   }
 
@@ -112,12 +115,8 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
     ClibArea min_area = ClibArea::infty();
     const ClibCellClass* ff_class = cell_library.simple_ff_class(has_clear, has_preset);
     if ( ff_class ) {
-      ymuint ng = ff_class->group_num();
-      for (ymuint g = 0; g < ng; ++ g) {
-	const ClibCellGroup* ff_group = ff_class->cell_group(g);
-	ymuint nc = ff_group->cell_num();
-	for (ymuint i = 0; i < nc; ++ i) {
-	  const ClibCell* cell = ff_group->cell(i);
+      for ( auto ff_group: ff_class->group_list() ) {
+	for ( auto cell: ff_group->cell_list() ) {
 	  ClibArea area = cell->area();
 	  if ( min_area > area ) {
 	    min_area = area;
@@ -236,10 +235,8 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	  cout << "Match with Pat#" << pat_id
 	       << ", Rep#" << rep_id << endl;
 	}
-	const ClibCellClass* rep = cell_library.npn_class(rep_id);
-	ymuint ng = rep->group_num();
-	for (ymuint g_pos = 0; g_pos < ng; ++ g_pos) {
-	  const ClibCellGroup* group = rep->cell_group(g_pos);
+	const ClibCellClass* rep = cell_library.npn_class_list()[rep_id];
+	for ( auto group: rep->group_list() ) {
 	  const NpnMapM& npn_map = group->map();
 	  Cut c_cut(ni);
 	  for (ymuint i = 0; i < ni; ++ i) {
@@ -287,9 +284,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	    leaf_cost += cost(leaf_node, leaf_inv) * mWeight[i];
 	  }
 
-	  ymuint nc = group->cell_num();
-	  for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
-	    const ClibCell* cell = group->cell(c_pos);
+	  for ( auto cell: group->cell_list() ) {
 	    double cur_cost = cell->area().value() + leaf_cost;
 	    if ( debug ) {
 	      cout << "      Cell = " << cell->name()
@@ -336,11 +331,9 @@ AreaCover::add_inv(const SbjNode* node,
 
   double& cur_cost = cost(node, inv);
   double alt_cost = cost(node, !inv);
-  ymuint nc = inv_func->cell_num();
   const ClibCell* inv_cell = nullptr;
   double min_cost = DBL_MAX;
-  for (ymuint c_pos = 0; c_pos < nc; ++ c_pos) {
-    const ClibCell* cell = inv_func->cell(c_pos);
+  for ( auto cell: inv_func->cell_list() ) {
     double cost = cell->area().value();
     if ( min_cost > cost ) {
       min_cost = cost;

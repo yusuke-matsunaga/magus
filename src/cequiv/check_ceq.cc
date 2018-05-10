@@ -86,7 +86,7 @@ check_ceq(const BnNetwork& src_network1,
     FraigHandle h2 = conv2.get_handle(onode2->id());
 
     if ( h1 == h2 ) {
-      stats[i] = kB3True;
+      stats[i] = SatBool3::True;
     }
     else {
       stats[i] = fraig_mgr.check_equiv(h1, h2);

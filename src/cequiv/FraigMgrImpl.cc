@@ -317,11 +317,11 @@ FraigMgrImpl::make_and(FraigHandle handle1,
     if ( !node->check_1mark() ) {
       // 定数0の可能性があるか調べる．
       SatBool3 stat = check_const(node, false);
-      if ( stat == kB3True ) {
+      if ( stat == SatBool3::True ) {
 	node->set_rep(nullptr, false);
 	return make_zero();
       }
-      if ( stat == kB3False ) {
+      if ( stat == SatBool3::False ) {
 	add_pat(node);
 	ASSERT_COND(node->check_1mark() );
 	continue;
@@ -331,11 +331,11 @@ FraigMgrImpl::make_and(FraigHandle handle1,
     else if ( !node->check_0mark() ) {
       // 定数1の可能性があるか調べる．
       SatBool3 stat = check_const(node, true);
-      if ( stat == kB3True ) {
+      if ( stat == SatBool3::True ) {
 	node->set_rep(nullptr, true);
 	return make_one();
       }
-      if ( stat == kB3False ) {
+      if ( stat == SatBool3::False ) {
 	add_pat(node);
 	ASSERT_COND(node->check_0mark() );
 	continue;
@@ -349,11 +349,11 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       if ( compare_pat(node1, node, inv) ) {
 	// node1 と node が等価かどうか調べる．
 	SatBool3 stat = check_equiv(node1, node, inv);
-	if ( stat == kB3True ) {
+	if ( stat == SatBool3::True ) {
 	  node->set_rep(node1, inv);
 	  return FraigHandle(node1, inv);
 	}
-	if ( stat == kB3False ) {
+	if ( stat == SatBool3::False ) {
 	  // 反例をパタンに加えて再ハッシュする．
 	  rehash = true;
 	  node2 = node1;
@@ -404,7 +404,7 @@ FraigMgrImpl::add_pat(FraigNode* node)
     FraigNode* node1 = mAllNodes[i];
     if ( node1->is_input() ) {
       ymuint32 pat = 0U;
-      if ( mModel[node1->varid().val()] == kB3True ) {
+      if ( mModel[node1->varid().val()] == SatBool3::True ) {
 	pat = ~0U;
       }
       else {
@@ -437,7 +437,7 @@ FraigMgrImpl::check_equiv(FraigHandle aig1,
 {
   if ( aig1 == aig2 ) {
     // もっとも簡単なパタン
-    return kB3True;
+    return SatBool3::True;
   }
 
   FraigNode* node1 = aig1.node();
@@ -445,7 +445,7 @@ FraigMgrImpl::check_equiv(FraigHandle aig1,
 
   if ( node1 == node2 ) {
     // ということは逆極性なので絶対に等価ではない．
-    return kB3False;
+    return SatBool3::False;
   }
 
   bool inv1 = aig1.inv();
@@ -591,24 +591,24 @@ FraigMgrImpl::check_const(FraigNode* node,
   SatLiteral lit(id, inv);
 
   // この関数の戻り値
-  SatBool3 code = kB3X;
+  SatBool3 code = SatBool3::X;
 
   // lit = 1 が成り立つか調べる
   SatBool3 stat = check_condition(lit);
-  if ( stat == kB3False ) {
+  if ( stat == SatBool3::False ) {
     // 成り立たないということは lit = 0
     mSolver.add_clause(~lit);
     if ( debug ) {
       cout << "\tSUCCEED" << endl;
     }
-    code = kB3True;
+    code = SatBool3::True;
   }
-  else if ( stat == kB3True ) {
+  else if ( stat == SatBool3::True ) {
     // 成り立ったということは ~lit が常に成り立つわけではない．
     if ( debug ) {
       cout << "\tFAILED" << endl;
     }
-    code = kB3False;
+    code = SatBool3::False;
   }
   else {
     // 分からない．
@@ -646,15 +646,15 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
   SatLiteral lit2(id2, inv);
 
   // この関数の戻り値
-  SatBool3 code = kB3X;
+  SatBool3 code = SatBool3::X;
 
   // 等価でない条件
   // - lit1 = 0 かつ lit2 = 1 が成り立つ
   // - lit0 = 1 かつ lit2 = 0 が成り立つ
   SatBool3 stat = check_condition(~lit1,  lit2);
-  if ( stat == kB3False ) {
+  if ( stat == SatBool3::False ) {
     stat = check_condition( lit1, ~lit2);
-    if ( stat == kB3False ) {
+    if ( stat == SatBool3::False ) {
       // どの条件も成り立たなかったので等しい
       mSolver.add_clause(~lit1,  lit2);
       mSolver.add_clause( lit1, ~lit2);
@@ -662,15 +662,15 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
       if ( debug ) {
 	cout << "\tSUCCEED" << endl;
       }
-      code = kB3True;
+      code = SatBool3::True;
       goto end;
     }
   }
-  if ( stat == kB3True ) {
+  if ( stat == SatBool3::True ) {
     if ( debug ) {
       cout << "\tFAILED" << endl;
     }
-    code = kB3False;
+    code = SatBool3::False;
   }
   else {
     if ( debug ) {
@@ -876,10 +876,10 @@ FraigMgrImpl::SatStat::set_result(SatBool3 code,
   ++ mTotalCount;
 
   ymuint idx = 0;
-  if ( code == kB3True ) {
+  if ( code == SatBool3::True ) {
     idx = 1;
   }
-  else if ( code == kB3False ) {
+  else if ( code == SatBool3::False ) {
     idx = 2;
   }
 

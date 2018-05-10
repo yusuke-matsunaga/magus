@@ -466,9 +466,9 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     for (ymuint i = 0; i < no; ++ i) {
       string str;
       switch ( comp_stats[i] ) {
-      case kB3True:  str = "Equivalent"; break;
-      case kB3False: str = "Not Equivalent"; has_neq = true; break;
-      case kB3X:     str = "Aborted"; has_abt = true; break;
+      case SatBool3::True:  str = "Equivalent"; break;
+      case SatBool3::False: str = "Not Equivalent"; has_neq = true; break;
+      case SatBool3::X:     str = "Aborted"; has_abt = true; break;
       }
       TclObj buf;
       buf << "o" << TclObj(i) << "result";
@@ -479,13 +479,13 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     {
       ymuint no = network1().output_num();
       for (ymuint i = 0; i < no; ++ i) {
-	if ( comp_stats[i] == kB3False ) {
+	if ( comp_stats[i] == SatBool3::False ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
 	}
-	else if ( comp_stats[i] == kB3X ) {
+	else if ( comp_stats[i] == SatBool3::X ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
@@ -573,9 +573,9 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
     for (ymuint i = 0; i < no; ++ i) {
       string str;
       switch ( comp_stats[i] ) {
-      case kB3True:  str = "Equivalent"; break;
-      case kB3False: str = "Not Equivalent"; has_neq = true; break;
-      case kB3X:     str = "Aborted"; has_abt = true; break;
+      case SatBool3::True:  str = "Equivalent"; break;
+      case SatBool3::False: str = "Not Equivalent"; has_neq = true; break;
+      case SatBool3::X:     str = "Aborted"; has_abt = true; break;
       }
       TclObj buf;
       buf << "o" << TclObj(i) << "result";
@@ -586,13 +586,13 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
     {
       ymuint no = network1().output_num();
       for (ymuint i = 0; i < no; ++ i) {
-	if ( comp_stats[i] == kB3False ) {
+	if ( comp_stats[i] == SatBool3::False ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
 	}
-	else if ( comp_stats[i] == kB3X ) {
+	else if ( comp_stats[i] == SatBool3::X ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
