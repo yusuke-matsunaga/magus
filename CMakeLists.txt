@@ -4,8 +4,8 @@
 cmake_minimum_required (VERSION 3.0)
 
 
-# C++11 の指定
-set (CMAKE_CXX_STANDARD 11)
+# C++14 の指定
+set (CMAKE_CXX_STANDARD 14)
 
 
 # ===================================================================
