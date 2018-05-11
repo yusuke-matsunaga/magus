@@ -34,8 +34,7 @@ SbjNode::SbjNode() :
   for ( int i: { 1, 2 } ) {
     SbjEdge& edge = mFanins[i];
     edge.mFrom = nullptr;
-    edge.mTo = this;
-    edge.mIpos = i;
+    edge.mToPos = reinterpret_cast<ympuint>(this) | static_cast<int>(i);
   }
 }
 

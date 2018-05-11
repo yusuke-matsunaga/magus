@@ -83,11 +83,8 @@ private:
   // 入力側のノード
   SbjNode* mFrom;
 
-  // 出力側のノード
-  SbjNode* mTo;
-
-  // 入力位置
-  int mIpos;
+  // 出力側のノード+入力位置
+  ympuint mToPos;
 
 };
 
@@ -363,8 +360,7 @@ private:
 inline
 SbjEdge::SbjEdge() :
   mFrom(nullptr),
-  mTo(nullptr),
-  mIpos(0)
+  mToPos(0ULL)
 {
 }
 
@@ -387,7 +383,7 @@ inline
 const SbjNode*
 SbjEdge::to() const
 {
-  return mTo;
+  return reinterpret_cast<const SbjNode*>(mToPos & ~1ULL);
 }
 
 // 入力側のノードを得る．
@@ -403,7 +399,7 @@ inline
 SbjNode*
 SbjEdge::to()
 {
-  return mTo;
+  return reinterpret_cast<SbjNode*>(mToPos & ~1ULL);
 }
 
 // 出力側のノードの何番目の入力かを示す．
@@ -411,7 +407,7 @@ inline
 int
 SbjEdge::pos() const
 {
-  return mIpos;
+  return static_cast<int>(mToPos & 1ULL);
 }
 
 // @brief 出力ノードに接続している時 true を返す．
