@@ -5,7 +5,7 @@
 /// @brief SbjDff のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -53,7 +53,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を得る．
-  ymuint
+  int
   id() const;
 
   /// @brief データ入力を得る．
@@ -89,7 +89,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  ymuint mId;
+  int mId;
 
   // データ入力
   SbjNode* mDataInput;
@@ -136,7 +136,7 @@ SbjDff::~SbjDff()
 
 // @brief ID番号を得る．
 inline
-ymuint
+int
 SbjDff::id() const
 {
   return mId;

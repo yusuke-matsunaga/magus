@@ -3,7 +3,7 @@
 /// @brief Bn2Sbj の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -54,24 +54,20 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   dst_network.set_name(src_network.name());
 
   // BnNode::id() をキーにして SbjHandle を記録するハッシュ表
-  HashMap<ymuint, SbjHandle> node_map;
+  HashMap<int, SbjHandle> node_map;
 
   // 外部入力ノードの生成
-  ymuint ni = src_network.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BnNode* bn_node = src_network.input(i);
+  for ( auto bn_node: src_network.input_list() ) {
     SbjNode* sbj_node = dst_network.new_input(false);
     node_map.add(bn_node->id(), SbjHandle(sbj_node));
   }
 
   // 論理ノードの生成
-  ymuint nl = src_network.logic_num();
-  for (ymuint i = 0; i < nl; ++ i) {
-    const BnNode* bn_node = src_network.logic(i);
-    ymuint ni = bn_node->fanin_num();
+  for ( auto bn_node: src_network.logic_list() ) {
+    int ni = bn_node->fanin_num();
     vector<SbjHandle> ihandle_list(ni);
-    for (ymuint j = 0; j < ni; ++ j) {
-      ymuint iid = bn_node->fanin(j);
+    for ( int j = 0; j < ni; ++ j ) {
+      int iid = bn_node->fanin(j);
       bool stat = node_map.find(iid, ihandle_list[j]);
       ASSERT_COND( stat );
     }
@@ -135,10 +131,8 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   }
 
   // 外部出力ノードの生成
-  ymuint no = src_network.output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    const BnNode* bn_node = src_network.output(i);
-    ymuint iid = bn_node->fanin();
+  for ( auto bn_node: src_network.output_list() ) {
+    int iid = bn_node->fanin();
     SbjHandle ihandle;
     bool stat = node_map.find(iid, ihandle);
     ASSERT_COND( stat );
@@ -147,32 +141,29 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   }
 
   // DFFノードの生成
-  ymuint ndff = src_network.dff_num();
-  for (ymuint i = 0; i < ndff; ++ i) {
-    const BnDff* bn_dff = src_network.dff(i);
-
-    ymuint iid = bn_dff->input();
+  for ( auto bn_dff: src_network.dff_list() ) {
+    int iid = bn_dff->input();
     SbjHandle ihandle;
     bool stat1 = node_map.find(iid, ihandle);
     ASSERT_COND( stat1 );
     ASSERT_COND( !ihandle.inv() );
     SbjNode* sbj_input = ihandle.node();
 
-    ymuint cid = bn_dff->clock();
+    int cid = bn_dff->clock();
     SbjHandle chandle;
     bool stat2 = node_map.find(cid, chandle);
     ASSERT_COND( stat2 );
     ASSERT_COND( !chandle.inv() );
     SbjNode* sbj_clock = chandle.node();
 
-    ymuint oid = bn_dff->output();
+    int oid = bn_dff->output();
     SbjHandle ohandle;
     bool stat3 = node_map.find(oid, ohandle);
     ASSERT_COND( stat3 );
     ASSERT_COND( !ohandle.inv() );
     SbjNode* sbj_output = ohandle.node();
 
-    ymuint rid = bn_dff->clear();
+    int rid = bn_dff->clear();
     SbjNode* sbj_clear = nullptr;
     if ( rid != kBnNullId ) {
       SbjHandle handle1;
@@ -182,7 +173,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       sbj_clear = handle1.node();
     }
 
-    ymuint pid = bn_dff->preset();
+    int pid = bn_dff->preset();
     SbjNode* sbj_preset = nullptr;
     if ( pid != kBnNullId ) {
       SbjHandle handle1;
@@ -197,32 +188,29 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   }
 
   // ラッチノードの生成
-  ymuint nlatch = src_network.latch_num();
-  for (ymuint i = 0; i < nlatch; ++ i) {
-    const BnLatch* bn_latch = src_network.latch(i);
-
-    ymuint iid = bn_latch->input();
+  for ( auto bn_latch: src_network.latch_list() ) {
+    int iid = bn_latch->input();
     SbjHandle ihandle;
     bool stat1 = node_map.find(iid, ihandle);
     ASSERT_COND( stat1 );
     ASSERT_COND( !ihandle.inv() );
     SbjNode* sbj_input = ihandle.node();
 
-    ymuint eid = bn_latch->enable();
+    int eid = bn_latch->enable();
     SbjHandle chandle;
     bool stat2 = node_map.find(eid, chandle);
     ASSERT_COND( stat2 );
     ASSERT_COND( !chandle.inv() );
     SbjNode* sbj_enable = chandle.node();
 
-    ymuint oid = bn_latch->output();
+    int oid = bn_latch->output();
     SbjHandle ohandle;
     bool stat3 = node_map.find(oid, ohandle);
     ASSERT_COND( stat3 );
     ASSERT_COND( !ohandle.inv() );
     SbjNode* sbj_output = ohandle.node();
 
-    ymuint rid = bn_latch->clear();
+    int rid = bn_latch->clear();
     SbjNode* sbj_clear = nullptr;
     if ( rid != kBnNullId ) {
       SbjHandle handle1;
@@ -232,7 +220,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       sbj_clear = handle1.node();
     }
 
-    ymuint pid = bn_latch->preset();
+    int pid = bn_latch->preset();
     SbjNode* sbj_preset = nullptr;
     if ( pid != kBnNullId ) {
       SbjHandle handle1;
@@ -247,13 +235,11 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   }
 
   // ポートの生成
-  ymuint np = src_network.port_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    const BnPort* bn_port = src_network.port(i);
-    ymuint bw = bn_port->bit_width();
+  for ( auto bn_port: src_network.port_list() ) {
+    int bw = bn_port->bit_width();
     vector<SbjNode*> sbj_bits(bw);
-    for (ymuint j = 0; j < bw; ++ j) {
-      ymuint id = bn_port->bit(j);
+    for ( int j = 0; j < bw; ++ j ) {
+      int id = bn_port->bit(j);
       SbjHandle handle;
       bool stat = node_map.find(id, handle);
       ASSERT_COND( stat );

@@ -5,16 +5,11 @@
 /// @brief SbjPort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "sbj_nsdef.h"
-
-//#include "ym/ym_logic.h"
-//#include "ym/SimpleAlloc.h"
-//#include "ym/FragAlloc.h"
-//#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -55,13 +50,13 @@ public:
   name() const;
 
   /// @brief ビット数を得る．
-  ymuint
+  int
   bit_width() const;
 
   /// @brief pos ビット目の内容を得る．
   /// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
   const SbjNode*
-  bit(ymuint pos) const;
+  bit(int pos) const;
 
 
 private:
@@ -109,7 +104,7 @@ SbjPort::name() const
 
 // @brief ビット数を得る．
 inline
-ymuint
+int
 SbjPort::bit_width() const
 {
   return mBody.size();
@@ -119,8 +114,10 @@ SbjPort::bit_width() const
 // @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
 inline
 const SbjNode*
-SbjPort::bit(ymuint pos) const
+SbjPort::bit(int pos) const
 {
+  ASSERT_COND( pos >= 0 && pos < bit_width() );
+
   return mBody[pos];
 }
 

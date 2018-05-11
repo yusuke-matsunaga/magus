@@ -5,16 +5,11 @@
 /// @brief SbjEdge のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "sbj_nsdef.h"
-
-//#include "ym/ym_logic.h"
-//#include "ym/SimpleAlloc.h"
-//#include "ym/FragAlloc.h"
-//#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -59,7 +54,7 @@ public:
   to();
 
   /// @brief 出力側のノードの何番目の入力かを示す．
-  ymuint
+  int
   pos() const;
 
   /// @brief 出力ノードに接続している時 true を返す．
@@ -86,7 +81,7 @@ private:
   /// @brief to ノードをセットする．
   void
   set_to(SbjNode* to,
-	 ymuint pos);
+	 int pos);
 
 
 private:
@@ -97,11 +92,8 @@ private:
   // 入力側のノード
   SbjNode* mFrom;
 
-  // 出力側のノード
-  SbjNode* mTo;
-
-  // 入力位置
-  ymuint32 mIpos;
+  // 出力側のノード+入力位置
+  ympuint mToPos;
 
 };
 
@@ -114,8 +106,7 @@ private:
 inline
 SbjEdge::SbjEdge() :
   mFrom(nullptr),
-  mTo(nullptr),
-  mIpos(0U)
+  mToPos(0ULL)
 {
 }
 
@@ -138,7 +129,7 @@ inline
 const SbjNode*
 SbjEdge::to() const
 {
-  return mTo;
+  return reinterpret_cast<const SbjNode*>(mToPos & ~1ULL);
 }
 
 // 入力側のノードを得る．
@@ -154,15 +145,15 @@ inline
 SbjNode*
 SbjEdge::to()
 {
-  return mTo;
+  return reinterpret_cast<SbjNode*>(mToPos & ~1ULL);
 }
 
 // 出力側のノードの何番目の入力かを示す．
 inline
-ymuint
+int
 SbjEdge::pos() const
 {
-  return mIpos;
+  return static_cast<int>(mToPos & 1ULL);
 }
 
 // @brief from ノードをセットする．
@@ -177,10 +168,9 @@ SbjEdge::set_from(SbjNode* from)
 inline
 void
 SbjEdge::set_to(SbjNode* to,
-		ymuint pos)
+		int pos)
 {
-  mTo = to;
-  mIpos = pos;
+  mToPos = reinterpret_cast<ympuint>(to) | (static_cast<ympuint>(pos) & 1ULL);
 }
 
 // @brief 出力ノードに接続している時 true を返す．

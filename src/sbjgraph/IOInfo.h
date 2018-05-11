@@ -5,7 +5,7 @@
 /// @brief IOInfo のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2017 Yusuke Matsunaga
+/// Copyright (C) 2017, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "sbj_nsdef.h"
@@ -43,7 +43,7 @@ public:
   ///
   /// is_port_type() == true の時のみ意味のある関数
   virtual
-  ymuint
+  int
   port_bitpos() const;
 
   /// @brief DFFの入力の時 true を返す．
@@ -126,7 +126,7 @@ public:
   /// @param[in] port 関連付けられているポート
   /// @param[in] bit そのビット位置
   IOPortInfo(SbjPort* port,
-	     ymuint bit);
+	     int bit);
 
   /// @brief デストラクタ
   virtual
@@ -154,7 +154,7 @@ public:
   ///
   /// is_port_type() == true の時のみ意味のある関数
   virtual
-  ymuint
+  int
   port_bitpos() const;
 
 
@@ -173,7 +173,7 @@ private:
   SbjPort* mPort;
 
   // ビット位置
-  ymuint mBit;
+  int mBit;
 
 };
 

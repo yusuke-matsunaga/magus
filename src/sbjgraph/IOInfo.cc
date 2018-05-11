@@ -3,7 +3,7 @@
 /// @brief IOInfo の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2017 Yusuke Matsunaga
+/// Copyright (C) 2017, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -40,7 +40,7 @@ IOInfo::port() const
 // @brief 関連付けられているポート上のビット位置を返す．
 //
 // is_port_type() == true の時のみ意味のある関数
-ymuint
+int
 IOInfo::port_bitpos() const
 {
   return 0;
@@ -143,7 +143,7 @@ IOInfo::latch() const
 // @param[in] port 関連付けられているポート
 // @param[in] bit そのビット位置
 IOPortInfo::IOPortInfo(SbjPort* port,
-		       ymuint bit) :
+		       int bit) :
   mPort(port),
   mBit(bit)
 {
@@ -173,7 +173,7 @@ IOPortInfo::port() const
 // @brief 関連付けられているポート上のビット位置を返す．
 //
 // is_port_type() == true の時のみ意味のある関数
-ymuint
+int
 IOPortInfo::port_bitpos() const
 {
   return mBit;

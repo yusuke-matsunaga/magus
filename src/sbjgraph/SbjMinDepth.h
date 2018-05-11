@@ -5,9 +5,7 @@
 /// @brief SbjMinDepth のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: SbjGraph.h 2274 2009-06-10 07:45:29Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -45,9 +43,9 @@ public:
   /// @param[in] k LUT の最大入力数
   /// @param[out] depth_array 各ノードの深さを収める配列
   /// @return 出力の最大深さを返す．
-  ymuint
-  operator()(ymuint k,
-	     vector<ymuint>& depth_array);
+  int
+  operator()(int k,
+	     vector<int>& depth_array);
 
 
 private:
@@ -58,14 +56,14 @@ private:
   // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
   bool
   find_k_cut(SmdNode* node,
-	     ymuint k,
-	     ymuint d);
+	     int k,
+	     int d);
 
   // node およびその TFI に rmark を付ける．
   // depth が d のノードに tmark を付ける．
   void
   mark_tfi(SmdNode* node,
-	   ymuint d);
+	   int d);
 
   // node のファンアウトを探索する．
   bool
@@ -97,7 +95,7 @@ private:
   vector<SmdNode*> mTfiNodeList;
 
   // ノード数
-  ymuint32 mNodeNum;
+  int mNodeNum;
 
   // ノードごとの作業領域
   SmdNode* mNodeArray;

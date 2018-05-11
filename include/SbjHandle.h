@@ -5,16 +5,11 @@
 /// @brief SbjHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "sbj_nsdef.h"
-
-//#include "ym/ym_logic.h"
-//#include "ym/SimpleAlloc.h"
-//#include "ym/FragAlloc.h"
-//#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
@@ -147,7 +142,7 @@ inline
 SbjHandle
 SbjHandle::make_zero()
 {
-  return SbjHandle(static_cast<ympuint>(0UL));
+  return SbjHandle(static_cast<ympuint>(0ULL));
 }
 
 // @brief 定数1を返す．
@@ -155,7 +150,7 @@ inline
 SbjHandle
 SbjHandle::make_one()
 {
-  return SbjHandle(static_cast<ympuint>(1UL));
+  return SbjHandle(static_cast<ympuint>(1ULL));
 }
 
 // @brief ノードを返す．
@@ -163,7 +158,7 @@ inline
 SbjNode*
 SbjHandle::node() const
 {
-  return reinterpret_cast<SbjNode*>(mData & ~1UL);
+  return reinterpret_cast<SbjNode*>(mData & ~1ULL);
 }
 
 // @brief 極性を返す．
@@ -171,7 +166,7 @@ inline
 bool
 SbjHandle::inv() const
 {
-  return static_cast<bool>(mData & 1UL);
+  return static_cast<bool>(mData & 1ULL);
 }
 
 // @brief 定数0を表しているかどうか調べる．
@@ -179,7 +174,7 @@ inline
 bool
 SbjHandle::is_const0() const
 {
-  return mData == 0UL;
+  return mData == 0ULL;
 }
 
 // @brief 定数1を表しているかどうか調べる．
@@ -187,7 +182,7 @@ inline
 bool
 SbjHandle::is_const1() const
 {
-  return mData == 1UL;
+  return mData == 1ULL;
 }
 
 // @brief 極性を反転させた結果を返す．
@@ -195,7 +190,7 @@ inline
 SbjHandle
 SbjHandle::operator~() const
 {
-  return SbjHandle(mData ^ 1UL);
+  return SbjHandle(mData ^ 1ULL);
 }
 
 // @brief 内容を設定する．
@@ -212,7 +207,7 @@ inline
 void
 SbjHandle::invert()
 {
-  mData ^= 1UL;
+  mData ^= 1ULL;
 }
 
 END_NAMESPACE_YM_SBJ

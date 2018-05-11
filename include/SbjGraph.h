@@ -5,7 +5,7 @@
 /// @brief SbjGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016, 2017 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2017, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -64,13 +64,17 @@ public:
   name() const;
 
   /// @brief ポート数を得る．
-  ymuint
+  int
   port_num() const;
 
   /// @brief ポートを得る．
   /// @param[in] id ポートID ( 0 <= id < port_num() )
   const SbjPort*
-  port(ymuint id) const;
+  port(int id) const;
+
+  /// @brief ポートのリストを得る．
+  const vector<SbjPort*>&
+  port_list() const;
 
   /// @brief 入出力ノードに関連づけられたポートを得る．
   /// @param[in] node 入出力ノード
@@ -82,8 +86,8 @@ public:
   /// @brief 入出力ノードのポートにおけるビット位置を得る．
   /// @param[in] node 入出力ノード
   ///
-  /// node がポートに関連付けられていない場合には 0 を返す．
-  ymuint
+  /// node がポートに関連付けられていない場合には -1 を返す．
+  int
   port_pos(const SbjNode* node) const;
 
   /// @}
@@ -123,57 +127,69 @@ public:
   /// @{
 
   /// @brief ノード数を返す．
-  ymuint
+  int
   node_num() const;
 
   /// @brief ID 番号によるノードの取得
   /// @param[in] id ID 番号 ( 0 <= id < node_num() )
   /// @return ID 番号が id のノードを返す．
   const SbjNode*
-  node(ymuint id) const;
+  node(int id) const;
 
   /// @brief 入力ノード数の取得
   /// @return 入力ノード数を返す．
-  ymuint
+  int
   input_num() const;
 
   /// @brief 入力 ID 番号による入力ノードの取得
   /// @param[in] id 入力 ID 番号 ( 0 <= id < input_num() )
   /// @return 入力 ID 番号が id のノードを返す．
-  SbjNode*
-  input(ymuint id) const;
+  const SbjNode*
+  input(int id) const;
+
+  /// @brief 入力ノードのリストを得る．
+  const vector<const SbjNode*>&
+  input_list() const;
 
   /// @brief 出力のノード数を得る．
-  ymuint
+  int
   output_num() const;
 
   /// @brief 出力 ID 番号による出力ノードの取得
   /// @param[in] id 出力 ID 番号 ( 0 <= id < output_num() )
   /// @return 出力 ID 番号が id のノードを返す．
-  SbjNode*
-  output(ymuint id) const;
+  const SbjNode*
+  output(int id) const;
+
+  /// @brief 出力ノードのリストを得る．
+  const vector<const SbjNode*>&
+  output_list() const;
 
   /// @brief 論理ノード数を得る．
-  ymuint
+  int
   logic_num() const;
 
   /// @brief 論理ノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
-  SbjNode*
-  logic(ymuint pos) const;
+  const SbjNode*
+  logic(int pos) const;
+
+  /// @brief 論理ノードのリストを得る．
+  const vector<const SbjNode*>&
+  logic_list() const;
 
   /// @brief 段数を求める．
   /// @note 副作用として各 SbjNode のレベルが設定される．
-  ymuint
+  int
   level() const;
 
   /// @brief 各ノードの minimum depth を求める．
   /// @param[in] k LUT の最大入力数
   /// @param[out] depth_array 各ノードの深さを収める配列
   /// @return 出力の最大深さを返す．
-  ymuint
-  get_min_depth(ymuint k,
-		vector<ymuint>& depth_array) const;
+  int
+  get_min_depth(int k,
+		vector<int>& depth_array) const;
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -185,13 +201,17 @@ public:
   /// @{
 
   /// @brief DFFノード数を得る．
-  ymuint
+  int
   dff_num() const;
 
   /// @brief DFFノードを得る．
   /// @param[in] id DFF番号 ( 0 <= id < dff_num() )
   const SbjDff*
-  dff(ymuint pos) const;
+  dff(int pos) const;
+
+  /// @brief DFFノードのリストを得る．
+  const vector<const SbjDff*>&
+  dff_list() const;
 
   /// @brief node に関連付けられている DFF を得る．
   /// @param[in] node 対象のノード
@@ -236,13 +256,17 @@ public:
   /// @{
 
   /// @brief ラッチノード数を得る．
-  ymuint
+  int
   latch_num() const;
 
   /// @brief ラッチノードを得る．
   /// @param[in] id ラッチ番号 ( 0 <= id < latch_num() )
   const SbjLatch*
-  latch(ymuint id) const;
+  latch(int id) const;
+
+  /// @brief ラッチノードのリストを得る．
+  const vector<const SbjLatch*>&
+  latch_list() const;
 
   /// @brief node に関連付けられているラッチを返す．
   /// @param[in] node 対象のノード
@@ -430,7 +454,7 @@ private:
 	vector<SbjNode*>& nodemap);
 
   /// @brief 論理ノードを作る．
-  /// @param[in] fcode 機能コード
+  /// @param[in] fcode 機能コード (真理値ベクタ)
   /// @param[in] inode1 1番めの入力ノード
   /// @param[in] inode2 2番めの入力ノード
   /// @return 作成したノードを返す．
@@ -445,8 +469,8 @@ private:
   /// @param[in] num 要素数
   SbjHandle
   _new_and(const vector<SbjHandle>& ihandle_list,
-	   ymuint start,
-	   ymuint num);
+	   int start,
+	   int num);
 
   /// @brief new_or の下請け関数
   /// @param[in] ihandle_list 入力ハンドルのリスト
@@ -454,8 +478,8 @@ private:
   /// @param[in] num 要素数
   SbjHandle
   _new_or(const vector<SbjHandle>& ihandle_list,
-	  ymuint start,
-	  ymuint num);
+	  int start,
+	  int num);
 
   /// @brief new_xor の下請け関数
   /// @param[in] ihandle_list 入力ハンドルのリスト
@@ -463,8 +487,8 @@ private:
   /// @param[in] num 要素数
   SbjHandle
   _new_xor(const vector<SbjHandle>& ihandle_list,
-	   ymuint start,
-	   ymuint num);
+	   int start,
+	   int num);
 
   /// @brief 新しいノードを作成し mNodeList に登録する．
   /// @return 作成されたノードを返す．
@@ -489,30 +513,30 @@ private:
 
   // 入力番号をキーにした入力ノードの配列
   // 穴はあいていない．
-  vector<SbjNode*> mInputArray;
+  vector<const SbjNode*> mInputArray;
 
   // 入力番号をキーにしたIO情報の配列
   vector<IOInfo*> mInputInfoArray;
 
   // 出力番号をキーにした出力ノードの配列
   // 穴はあいていない．
-  vector<SbjNode*> mOutputArray;
+  vector<const SbjNode*> mOutputArray;
 
   // 出力番号をキーにしたIO情報の配列
   vector<IOInfo*> mOutputInfoArray;
 
   // 論理ノードのリスト
-  vector<SbjNode*> mLogicList;
+  vector<const SbjNode*> mLogicList;
 
   // DFFノードのリスト
-  vector<SbjDff*> mDffList;
+  vector<const SbjDff*> mDffList;
 
   // ラッチノードのリスト
-  vector<SbjLatch*> mLatchList;
+  vector<const SbjLatch*> mLatchList;
 
   // 最大レベル
   mutable
-  ymuint32 mLevel;
+  int mLevel;
 
   // mLevel および各 SbjNode::mLevel が正しいとき true となるフラグ
   mutable
@@ -543,7 +567,7 @@ SbjGraph::set_name(const string& name)
 
 // @brief ポート数を得る．
 inline
-ymuint
+int
 SbjGraph::port_num() const
 {
   return mPortArray.size();
@@ -553,10 +577,19 @@ SbjGraph::port_num() const
 // @param[in] id ポート番号 ( 0 <= id < port_num() )
 inline
 const SbjPort*
-SbjGraph::port(ymuint id) const
+SbjGraph::port(int id) const
 {
-  ASSERT_COND( id < port_num() );
+  ASSERT_COND( id >= 0 && id < port_num() );
+
   return mPortArray[id];
+}
+
+// @brief ポートのリストを得る．
+inline
+const vector<SbjPort*>&
+SbjGraph::port_list() const
+{
+  return mPortArray;
 }
 
 // @brief ポートを追加する(1ビット版)．
@@ -572,7 +605,7 @@ SbjGraph::add_port(const string& name,
 
 // ノード番号の最大値 + 1 を返す．
 inline
-ymuint
+int
 SbjGraph::node_num() const
 {
   return mNodeArray.size();
@@ -582,15 +615,16 @@ SbjGraph::node_num() const
 // 該当するノードが無い場合には nullptr を返す．
 inline
 const SbjNode*
-SbjGraph::node(ymuint id) const
+SbjGraph::node(int id) const
 {
-  ASSERT_COND( id < node_num() );
+  ASSERT_COND( id >= 0 && id < node_num() );
+
   return mNodeArray[id];
 }
 
 // 入力ノード数を得る．
 inline
-ymuint
+int
 SbjGraph::input_num() const
 {
   return mInputArray.size();
@@ -598,16 +632,25 @@ SbjGraph::input_num() const
 
 // ID 番号が id の入力ノードを取り出す．
 inline
-SbjNode*
-SbjGraph::input(ymuint id) const
+const SbjNode*
+SbjGraph::input(int id) const
 {
-  ASSERT_COND( id < input_num() );
+  ASSERT_COND( id >= 0 && id < input_num() );
+
   return mInputArray[id];
+}
+
+// @brief 入力ノードのリストを得る．
+inline
+const vector<const SbjNode*>&
+SbjGraph::input_list() const
+{
+  return mInputArray;
 }
 
 // 出力のノード数を得る．
 inline
-ymuint
+int
 SbjGraph::output_num() const
 {
   return mOutputArray.size();
@@ -615,16 +658,25 @@ SbjGraph::output_num() const
 
 // ID 番号が id の出力ノードを取り出す．
 inline
-SbjNode*
-SbjGraph::output(ymuint id) const
+const SbjNode*
+SbjGraph::output(int id) const
 {
-  ASSERT_COND( id < output_num() );
+  ASSERT_COND( id >= 0 && id < output_num() );
+
   return mOutputArray[id];
+}
+
+// @brief 出力ノードのリストを得る．
+inline
+const vector<const SbjNode*>&
+SbjGraph::output_list() const
+{
+  return mOutputArray;
 }
 
 // 論理ノード数を得る．
 inline
-ymuint
+int
 SbjGraph::logic_num() const
 {
   return mLogicList.size();
@@ -633,16 +685,25 @@ SbjGraph::logic_num() const
 // @brief 論理ノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < logic_num() )
 inline
-SbjNode*
-SbjGraph::logic(ymuint pos) const
+const SbjNode*
+SbjGraph::logic(int pos) const
 {
-  ASSERT_COND( pos < logic_num() );
+  ASSERT_COND( pos >= 0 && pos < logic_num() );
+
   return mLogicList[pos];
+}
+
+// @brief 論理ノードのリストを得る．
+inline
+const vector<const SbjNode*>&
+SbjGraph::logic_list() const
+{
+  return mLogicList;
 }
 
 // DFFノード数を得る．
 inline
-ymuint
+int
 SbjGraph::dff_num() const
 {
   return mDffList.size();
@@ -652,15 +713,24 @@ SbjGraph::dff_num() const
 // @param[in] id DFF番号 ( 0 <= id < dff_num() )
 inline
 const SbjDff*
-SbjGraph::dff(ymuint id) const
+SbjGraph::dff(int id) const
 {
-  ASSERT_COND( id < dff_num() );
+  ASSERT_COND( id >= 0 && id < dff_num() );
+
   return mDffList[id];
+}
+
+// @brief DFFノードのリストを得る．
+inline
+const vector<const SbjDff*>&
+SbjGraph::dff_list() const
+{
+  return mDffList;
 }
 
 // ラッチノード数を得る．
 inline
-ymuint
+int
 SbjGraph::latch_num() const
 {
   return mLatchList.size();
@@ -670,15 +740,24 @@ SbjGraph::latch_num() const
 // @param[in] id ラッチ番号 ( 0 <= id < latch_num() )
 inline
 const SbjLatch*
-SbjGraph::latch(ymuint id) const
+SbjGraph::latch(int id) const
 {
-  ASSERT_COND( id < latch_num() );
+  ASSERT_COND( id >= 0 && id < latch_num() );
+
   return mLatchList[id];
+}
+
+// @brief ラッチノードのリストを得る．
+inline
+const vector<const SbjLatch*>&
+SbjGraph::latch_list() const
+{
+  return mLatchList;
 }
 
 // @brief 段数を求める．
 inline
-ymuint
+int
 SbjGraph::level() const
 {
   return mLevel;

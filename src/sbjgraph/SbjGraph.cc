@@ -3,7 +3,7 @@
 /// @brief SbjGraph の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -31,7 +31,7 @@ SbjNode::SbjNode() :
   mFlags(0U),
   mMark(0)
 {
-  for (ymuint i = 0; i < 2; ++ i) {
+  for ( int i: { 1, 2 } ) {
     SbjEdge& edge = mFanins[i];
     edge.mFrom = nullptr;
     edge.mTo = this;
@@ -106,7 +106,7 @@ void
 SbjGraph::_copy(const SbjGraph& src,
 		vector<SbjNode*>& nodemap)
 {
-  ymuint n = src.node_num();
+  int n = src.node_num();
   nodemap.clear();
   nodemap.resize(n);
 
@@ -114,18 +114,13 @@ SbjGraph::_copy(const SbjGraph& src,
   mName = src.mName;
 
   // 外部入力の生成
-  ymuint ni = src.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
-    SbjNode* src_node = src.input(i);
+  for ( auto src_node: src.input_list() ) {
     SbjNode* dst_node = new_input(src_node->is_bipol());
     nodemap[src_node->id()] = dst_node;
   }
 
   // 論理ノードの生成
-  ymuint nlogic = src.logic_num();
-  for (ymuint i = 0; i < nlogic; ++ i) {
-    const SbjNode* src_node = src.logic(i);
-
+  for ( auto src_node: src.logic_list() ) {
     const SbjNode* src_inode0 = src_node->fanin(0);
     SbjNode* input0 = nodemap[src_inode0->id()];
     ASSERT_COND( input0 );
@@ -141,9 +136,7 @@ SbjGraph::_copy(const SbjGraph& src,
   }
 
   // 外部出力の生成
-  ymuint no = src.output_num();
-  for (ymuint i = 0; i < no; ++ i) {
-    const SbjNode* src_onode = src.output(i);
+  for ( auto src_onode: src.output_list() ) {
     const SbjNode* src_inode = src_onode->output_fanin();
     SbjNode* dst_inode = nullptr;
     if ( src_inode ) {
@@ -154,10 +147,7 @@ SbjGraph::_copy(const SbjGraph& src,
   }
 
   // DFF の生成
-  ymuint nf = src.dff_num();
-  for (ymuint i = 0; i < nf; ++ i) {
-    const SbjDff* src_dff = src.dff(i);
-
+  for ( auto src_dff: src.dff_list() ) {
     const SbjNode* src_input = src_dff->data_input();
     SbjNode* dst_input = nodemap[src_input->id()];
 
@@ -183,10 +173,7 @@ SbjGraph::_copy(const SbjGraph& src,
   }
 
   // ラッチの生成
-  ymuint nlatch = src.latch_num();
-  for (ymuint i = 0; i < nlatch; ++ i) {
-    const SbjLatch* src_latch = src.latch(i);
-
+  for ( auto src_latch: src.latch_list() ) {
     const SbjNode* src_input = src_latch->data_input();
     SbjNode* dst_input = nodemap[src_input->id()];
 
@@ -212,12 +199,10 @@ SbjGraph::_copy(const SbjGraph& src,
   }
 
   // ポートの複製
-  ymuint np = src.port_num();
-  for (ymuint i = 0; i < np; ++ i) {
-    const SbjPort* src_port = src.port(i);
-    ymuint nb = src_port->bit_width();
+  for ( auto src_port: src.port_list() ) {
+    int nb = src_port->bit_width();
     vector<SbjNode*> tmp(nb);
-    for (ymuint j = 0; j < nb; ++ j) {
+    for ( int j = 0; j < nb; ++ j ) {
       const SbjNode* src_node = src_port->bit(j);
       SbjNode* dst_node = nodemap[src_node->id()];
       tmp[j] = dst_node;
@@ -233,49 +218,36 @@ SbjGraph::_copy(const SbjGraph& src,
 void
 SbjGraph::clear()
 {
-  for (vector<SbjNode*>::iterator p = mInputArray.begin();
-       p != mInputArray.end(); ++ p) {
-    SbjNode* node = *p;
+  for ( auto node: mInputArray ) {
     delete node;
   }
 
-  for (vector<SbjNode*>::iterator p = mLogicList.begin();
-       p != mLogicList.end(); ++ p) {
-    SbjNode* node = *p;
+  for ( auto node: mLogicList ) {
     delete node;
   }
 
-  for (vector<SbjNode*>::iterator p = mOutputArray.begin();
-       p != mOutputArray.end(); ++ p) {
-    SbjNode* node = *p;
+  for ( auto node: mOutputArray ) {
     delete node;
   }
 
-  for (vector<SbjDff*>::iterator p = mDffList.begin();
-       p != mDffList.end(); ++ p) {
-    SbjDff* dff = *p;
+  for ( auto dff: mDffList ) {
     delete dff;
   }
 
-  for (vector<SbjLatch*>::iterator p = mLatchList.begin();
-       p != mLatchList.end(); ++ p) {
-    SbjLatch* latch = *p;
+  for ( auto latch: mLatchList ) {
     delete latch;
   }
 
-  for (vector<SbjPort*>::iterator p = mPortArray.begin();
-       p != mPortArray.end(); ++ p) {
-    delete *p;
+  for ( auto port: mPortArray ) {
+    delete port;
   }
 
-  for (vector<IOInfo*>::iterator p = mInputInfoArray.begin();
-       p != mInputInfoArray.end(); ++ p) {
-    delete *p;
+  for ( auto info: mInputInfoArray ) {
+    delete info;
   }
 
-  for (vector<IOInfo*>::iterator p = mOutputInfoArray.begin();
-       p != mOutputInfoArray.end(); ++ p) {
-    delete *p;
+  for ( auto info: mOutputInfoArray ) {
+    delete info;
   }
 
   mInputArray.clear();
@@ -297,8 +269,8 @@ SbjGraph::add_port(const string& name,
 {
   SbjPort* port = new SbjPort(name, body);
   mPortArray.push_back(port);
-  ymuint n = body.size();
-  for (ymuint i = 0; i < n; ++ i) {
+  int n = body.size();
+  for ( int i = 0; i < n; ++ i ) {
     SbjNode* node = body[i];
     if ( node->is_input() ) {
       IOInfo* info = new IOPortInfo(port, i);
@@ -332,7 +304,7 @@ SbjGraph::port(const SbjNode* node) const
 
 // @brief 入出力ノードのポートにおけるビット位置を得る．
 // @param[in] node 入出力ノード
-ymuint
+int
 SbjGraph::port_pos(const SbjNode* node) const
 {
   if ( node->is_input() ) {
@@ -342,7 +314,7 @@ SbjGraph::port_pos(const SbjNode* node) const
     return mOutputInfoArray[node->subid()]->port_bitpos();
   }
   else {
-    return 0;
+    return -1;
   }
 }
 
@@ -353,7 +325,7 @@ SbjGraph::new_input(bool bipol)
   SbjNode* node = _new_node();
 
   // 入力ノード配列に登録
-  ymuint subid = mInputArray.size();
+  int subid = mInputArray.size();
   mInputArray.push_back(node);
 
   // ダミーの place-holder を追加
@@ -371,7 +343,7 @@ SbjGraph::new_output(SbjHandle ihandle)
   SbjNode* node = _new_node();
 
   // 出力ノード配列に登録
-  ymuint subid = mOutputArray.size();
+  int subid = mOutputArray.size();
   mOutputArray.push_back(node);
 
   // ダミーの place-holder を追加
@@ -416,9 +388,9 @@ SbjGraph::new_expr(const Expr& expr,
 
   ASSERT_COND( expr.is_op() );
 
-  ymuint nc = expr.child_num();
+  int nc = expr.child_num();
   vector<SbjHandle> tmp_list(nc);
-  for (ymuint i = 0;i < nc; ++ i) {
+  for ( int i = 0;i < nc; ++ i ) {
     tmp_list[i] = new_expr(expr.child(i), ihandle_list);
   }
 
@@ -493,10 +465,10 @@ SbjGraph::new_and(SbjHandle ihandle1,
 SbjHandle
 SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
 {
-  ymuint n = ihandle_list.size();
+  int n = ihandle_list.size();
   vector<SbjHandle> tmp_list;
   tmp_list.reserve(n);
-  for (ymuint i = 0; i < n; ++ i) {
+  for ( int i = 0; i < n; ++ i ) {
     SbjHandle h = ihandle_list[i];
     if ( h.is_const0() ) {
       return SbjHandle::make_zero();
@@ -517,15 +489,15 @@ SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
 // @param[in] num 要素数
 SbjHandle
 SbjGraph::_new_and(const vector<SbjHandle>& ihandle_list,
-		   ymuint start,
-		   ymuint num)
+		   int start,
+		   int num)
 {
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
 
-  ymuint h = num / 2;
+  int h = num / 2;
   SbjHandle l = _new_and(ihandle_list, start, h);
   SbjHandle r = _new_and(ihandle_list, start + h, num - h);
   return new_and(l, r);
@@ -586,10 +558,10 @@ SbjGraph::new_or(SbjHandle ihandle1,
 SbjHandle
 SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
 {
-  ymuint n = ihandle_list.size();
+  int n = ihandle_list.size();
   vector<SbjHandle> tmp_list;
   tmp_list.reserve(n);
-  for (ymuint i = 0; i < n; ++ i) {
+  for ( int i = 0; i < n; ++ i ) {
     SbjHandle h = ihandle_list[i];
     if ( h.is_const1() ) {
       return SbjHandle::make_one();
@@ -610,15 +582,15 @@ SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
 // @param[in] num 要素数
 SbjHandle
 SbjGraph::_new_or(const vector<SbjHandle>& ihandle_list,
-		  ymuint start,
-		  ymuint num)
+		  int start,
+		  int num)
 {
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
 
-  ymuint h = num / 2;
+  int h = num / 2;
   SbjHandle l = _new_or(ihandle_list, start, h);
   SbjHandle r = _new_or(ihandle_list, start + h, num - h);
   return new_or(l, r);
@@ -675,11 +647,11 @@ SbjGraph::new_xor(SbjHandle ihandle1,
 SbjHandle
 SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
 {
-  ymuint n = ihandle_list.size();
+  int n = ihandle_list.size();
   vector<SbjHandle> tmp_list;
   tmp_list.reserve(n);
   bool inv = false;
-  for (ymuint i = 0; i < n; ++ i) {
+  for ( int i = 0; i < n; ++ i ) {
     SbjHandle h = ihandle_list[i];
     if ( h.is_const1() ) {
       inv = !inv;
@@ -703,15 +675,15 @@ SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
 // @param[in] num 要素数
 SbjHandle
 SbjGraph::_new_xor(const vector<SbjHandle>& ihandle_list,
-		   ymuint start,
-		   ymuint num)
+		   int start,
+		   int num)
 {
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
 
-  ymuint h = num / 2;
+  int h = num / 2;
   SbjHandle l = _new_xor(ihandle_list, start, h);
   SbjHandle r = _new_xor(ihandle_list, start + h, num - h);
   return new_xor(l, r);
@@ -952,9 +924,9 @@ SbjGraph::_new_node()
 // @param[in] k LUT の最大入力数
 // @param[out] depth_array 各ノードの深さを収める配列
 // @return 出力の最大深さを返す．
-ymuint
-SbjGraph::get_min_depth(ymuint k,
-			vector<ymuint>& depth_array) const
+int
+SbjGraph::get_min_depth(int k,
+			vector<int>& depth_array) const
 {
   SbjMinDepth smd(*this);
 

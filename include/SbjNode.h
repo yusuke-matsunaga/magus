@@ -5,7 +5,7 @@
 /// @brief SbjNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -54,7 +54,7 @@ public:
   to();
 
   /// @brief 出力側のノードの何番目の入力かを示す．
-  ymuint
+  int
   pos() const;
 
   /// @brief 出力ノードに接続している時 true を返す．
@@ -87,7 +87,7 @@ private:
   SbjNode* mTo;
 
   // 入力位置
-  ymuint32 mIpos;
+  int mIpos;
 
 };
 
@@ -149,7 +149,7 @@ public:
   /// @return ID 番号を返す．
   /// @note ID 番号はノードの生成時に SbjGraph により自動的に割り振られる．
   /// @sa SbjGraph
-  ymuint
+  int
   id() const;
 
   /// @brief ID を表す文字列の取得
@@ -189,7 +189,7 @@ public:
 
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
-  ymuint
+  int
   subid() const;
 
   /// @brief 出力ノードの場合のファンインを得る．
@@ -221,12 +221,12 @@ public:
   ///
   /// 該当するファンインがなければ nullptr を返す．
   const SbjNode*
-  fanin(ymuint pos) const;
+  fanin(int pos) const;
 
   /// @brief ファンインの反転属性を得る．
   /// @param[in] pos 入力番号 (0 or 1)
   bool
-  fanin_inv(ymuint pos) const;
+  fanin_inv(int pos) const;
 
   /// @brief ファンインの枝を得る．
   /// @param[in] pos 入力番号(0 or 1)
@@ -234,23 +234,23 @@ public:
   ///
   /// 該当するファンインの枝がなければ nullptr を返す．
   const SbjEdge*
-  fanin_edge(ymuint pos) const;
+  fanin_edge(int pos) const;
 
   /// @brief ファンアウト数を得る．
-  ymuint
+  int
   fanout_num() const;
 
   /// @brief ファンアウトの枝を返す．
   /// @param[in] pos 位置番号
   const SbjEdge*
-  fanout_edge(ymuint pos) const;
+  fanout_edge(int pos) const;
 
   /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
   pomark() const;
 
   /// @brief レベルを得る．
-  ymuint
+  int
   level() const;
 
   /// @}
@@ -266,7 +266,7 @@ private:
   /// @param[in] subid 入力番号
   /// @param[in] bipol 両極性が利用可能な時に true にするフラグ
   void
-  set_input(ymuint subid,
+  set_input(int subid,
 	    bool bipol);
 
   /// @brief タイプを出力に設定する．
@@ -274,7 +274,7 @@ private:
   /// @param[in] inv 反転属性
   /// @param[in] inode 入力ノード
   void
-  set_output(ymuint subid,
+  set_output(int subid,
 	     bool inv,
 	     SbjNode* inode);
 
@@ -293,7 +293,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID 番号
-  ymuint32 mId;
+  int mId;
 
   // タイプ (+ 入力/出力番号/機能コード)
   ymuint32 mFlags;
@@ -308,7 +308,7 @@ private:
   ymuint32 mMark;
 
   // レベル
-  ymuint32 mLevel;
+  int mLevel;
 
 
 private:
@@ -364,7 +364,7 @@ inline
 SbjEdge::SbjEdge() :
   mFrom(nullptr),
   mTo(nullptr),
-  mIpos(0U)
+  mIpos(0)
 {
 }
 
@@ -408,7 +408,7 @@ SbjEdge::to()
 
 // 出力側のノードの何番目の入力かを示す．
 inline
-ymuint
+int
 SbjEdge::pos() const
 {
   return mIpos;
@@ -429,7 +429,7 @@ SbjEdge::is_poedge() const
 
 // ID 番号を得る．
 inline
-ymuint
+int
 SbjNode::id() const
 {
   return mId;
@@ -438,26 +438,26 @@ SbjNode::id() const
 // タイプを入力に設定する．
 inline
 void
-SbjNode::set_input(ymuint subid,
+SbjNode::set_input(int subid,
 		   bool bipol)
 {
   mFlags = static_cast<ymuint>(kINPUT) |
     (static_cast<ymuint>(bipol) << kBiPolShift) |
-    (subid << kSubidShift);
+    (static_cast<ymuint>(subid) << kSubidShift);
   mLevel = 0;
 }
 
 // タイプを出力に設定する．
 inline
 void
-SbjNode::set_output(ymuint subid,
+SbjNode::set_output(int subid,
 		    bool inv,
 		    SbjNode* inode)
 {
   ASSERT_COND( inode != nullptr );
 
   mFlags = static_cast<ymuint>(kOUTPUT) |
-    (subid << kSubidShift) |
+    (static_cast<ymuint>(subid) << kSubidShift) |
     (inv << kOinvShift);
 
   SbjEdge& edge = mFanins[0];
@@ -561,11 +561,12 @@ SbjNode::is_xor() const
 
 // @brief サブID (入力／出力番号)を得る．
 inline
-ymuint
+int
 SbjNode::subid() const
 {
   ASSERT_COND( is_input() || is_output() );
-  return mFlags >> kSubidShift;
+
+  return static_cast<int>(mFlags >> kSubidShift);
 }
 
 // @brief 出力ノードの場合のファンインを得る．
@@ -583,6 +584,7 @@ bool
 SbjNode::output_fanin_inv() const
 {
   ASSERT_COND( is_output() );
+
   return static_cast<bool>((mFlags >> kOinvShift) & 1U);
 }
 
@@ -597,10 +599,11 @@ SbjNode::fcode() const
 // @brief ファンインのノードを得る．
 inline
 const SbjNode*
-SbjNode::fanin(ymuint pos) const
+SbjNode::fanin(int pos) const
 {
   ASSERT_COND( is_logic() );
-  ASSERT_COND( pos < 2 );
+  ASSERT_COND( pos == 0 || pos == 1 );
+
   return mFanins[pos].from();
 }
 
@@ -608,26 +611,28 @@ SbjNode::fanin(ymuint pos) const
 // @param[in] pos 入力番号 (0 or 1)
 inline
 bool
-SbjNode::fanin_inv(ymuint pos) const
+SbjNode::fanin_inv(int pos) const
 {
   ASSERT_COND( is_logic() );
-  ASSERT_COND( pos < 2 );
+  ASSERT_COND( pos == 0 || pos == 1 );
+
   return static_cast<bool>((mFlags >> (pos + kFcodeShift)) & 1U);
 }
 
 // ファンインの枝を得る．
 inline
 const SbjEdge*
-SbjNode::fanin_edge(ymuint pos) const
+SbjNode::fanin_edge(int pos) const
 {
   ASSERT_COND( is_logic() );
-  ASSERT_COND( pos < 2 );
+  ASSERT_COND( pos == 0 || pos == 1 );
+
   return &mFanins[pos];
 }
 
 // ファンアウト数を得る．
 inline
-ymuint
+int
 SbjNode::fanout_num() const
 {
   return mFanoutList.size();
@@ -637,9 +642,10 @@ SbjNode::fanout_num() const
 // @param[in] pos 位置番号
 inline
 const SbjEdge*
-SbjNode::fanout_edge(ymuint pos) const
+SbjNode::fanout_edge(int pos) const
 {
-  ASSERT_COND( pos < fanout_num() );
+  ASSERT_COND( pos >= 0 && pos < fanout_num() );
+
   return mFanoutList[pos];
 }
 
@@ -653,7 +659,7 @@ SbjNode::pomark() const
 
 // @brief レベルを得る．
 inline
-ymuint
+int
 SbjNode::level() const
 {
   return mLevel;

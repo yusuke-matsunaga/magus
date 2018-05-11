@@ -5,7 +5,7 @@
 /// @brief SmdNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -36,7 +36,7 @@ public:
   to();
 
   /// @brief 出力側のノードのファンイン番号 ( 0 or 1 ) を得る．
-  ymuint
+  int
   pos();
 
 
@@ -70,7 +70,7 @@ private:
   SmdNode* mTo;
 
   // ファンイン番号＋ flow フラグ
-  ymuint32 mFlags;
+  ymuint mFlags;
 
 };
 
@@ -96,7 +96,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号の取得
-  ymuint
+  int
   id() const;
 
   /// @brief 入力ノードの時に true を返す．
@@ -124,15 +124,15 @@ public:
   fanin1_edge();
 
   /// @brief ファンアウト数を得る．
-  ymuint
+  int
   fanout_num();
 
   /// @brief pos 番目のファンアウトの枝を取り出す．
   SmdEdge*
-  fanout_edge(ymuint pos);
+  fanout_edge(int pos);
 
   /// @brief 深さを得る．
-  ymuint
+  int
   depth() const;
 
 
@@ -145,7 +145,7 @@ public:
   /// @param[in] id ID番号
   /// @param[in] input 入力ノードの時 true にセットするフラグ
   void
-  set_id(ymuint id,
+  set_id(int id,
 	 bool input = false);
 
   /// @brief 1つ目のファンインを設定する．
@@ -158,12 +158,12 @@ public:
 
   /// @brief ファンアウト数を設定する．
   void
-  set_fanout_num(ymuint n,
+  set_fanout_num(int n,
 		 void* p);
 
   /// @brief pos 番目のファンアウトを設定する．
   void
-  set_fanout(ymuint pos,
+  set_fanout(int pos,
 	     SmdEdge* edge);
 
 
@@ -217,7 +217,7 @@ public:
 
   /// @brief 深さを設定する．
   void
-  set_depth(ymuint depth);
+  set_depth(int depth);
 
 
 private:
@@ -226,7 +226,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号 + 入力/論理フラグ
-  ymuint32 mId;
+  int mId;
 
   // 1つ目のファンインの枝
   SmdEdge mFanin0;
@@ -235,16 +235,16 @@ private:
   SmdEdge mFanin1;
 
   // ファンアウト数
-  ymuint32 mFanoutNum;
+  int mFanoutNum;
 
   // ファンアウトの枝のポインタの配列
   SmdEdge** mFanoutArray;
 
   // get_min_depth() 用の作業領域
-  ymuint32 mMark;
+  ymuint mMark;
 
   // 深さ
-  ymuint32 mDepth;
+  int mDepth;
 
 
 private:
@@ -304,7 +304,7 @@ SmdEdge::to()
 
 // @brief 出力側のノードのファンイン番号 ( 0 or 1 ) を得る．
 inline
-ymuint
+int
 SmdEdge::pos()
 {
   return (mFlags & 1U);
@@ -336,7 +336,7 @@ SmdEdge::clear_flow()
 
 // @brief ID番号の取得
 inline
-ymuint
+int
 SmdNode::id() const
 {
   return (mId >> 1);
@@ -392,7 +392,7 @@ SmdNode::fanin1_edge()
 
 // @brief ファンアウト数を得る．
 inline
-ymuint
+int
 SmdNode::fanout_num()
 {
   return mFanoutNum;
@@ -401,14 +401,16 @@ SmdNode::fanout_num()
 // @brief pos 番目のファンアウトの枝を取り出す．
 inline
 SmdEdge*
-SmdNode::fanout_edge(ymuint pos)
+SmdNode::fanout_edge(int pos)
 {
+  ASSERT_COND( pos >=0 && pos < fanout_num() );
+
   return mFanoutArray[pos];
 }
 
 // @brief 深さを得る．
 inline
-ymuint
+int
 SmdNode::depth() const
 {
   return mDepth;
@@ -479,7 +481,7 @@ inline
 bool
 SmdNode::check_vmark1()
 {
-  ymuint32 old_mark = mMark;
+  ymuint old_mark = mMark;
   mMark |= kV1Mask;
   return static_cast<bool>((old_mark >> kV1Shift) & 1U);
 }
@@ -490,7 +492,7 @@ inline
 bool
 SmdNode::check_vmark2()
 {
-  ymuint32 old_mark = mMark;
+  ymuint old_mark = mMark;
   mMark |= kV2Mask;
   return static_cast<bool>((old_mark >> kV2Shift) & 1U);
 }
@@ -506,7 +508,7 @@ SmdNode::clear_vmark()
 // @brief 深さを設定する．
 inline
 void
-SmdNode::set_depth(ymuint depth)
+SmdNode::set_depth(int depth)
 {
   mDepth = depth;
 }
