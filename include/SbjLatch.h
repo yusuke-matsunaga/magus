@@ -37,7 +37,8 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  SbjLatch(SbjNode* input,
+  SbjLatch(int id,
+	   SbjNode* input,
 	   SbjNode* output,
 	   SbjNode* enable,
 	   SbjNode* clear,
@@ -115,11 +116,13 @@ private:
 
 // @brief コンストラクタ
 inline
-SbjLatch::SbjLatch(SbjNode* input,
+SbjLatch::SbjLatch(int id,
+		   SbjNode* input,
 		   SbjNode* output,
 		   SbjNode* enable,
 		   SbjNode* clear,
 		   SbjNode* preset) :
+  mId(id),
   mDataInput(input),
   mEnable(enable),
   mClear(clear),

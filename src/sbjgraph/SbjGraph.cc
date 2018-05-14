@@ -26,8 +26,8 @@ BEGIN_NAMESPACE_YM_SBJ
 ///////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-SbjNode::SbjNode() :
-  mId(0),
+SbjNode::SbjNode(int id) :
+  mId(id),
   mFlags(0U),
   mMark(0)
 {
@@ -716,10 +716,10 @@ SbjGraph::new_dff(SbjNode* input,
 		  SbjNode* clear,
 		  SbjNode* preset)
 {
-  SbjDff* dff = new SbjDff(input, output, clock, clear, preset);
+  int id = mDffList.size();
+  SbjDff* dff = new SbjDff(id, input, output, clock, clear, preset);
 
   // DFFリストに登録
-  dff->mId = mDffList.size();
   mDffList.push_back(dff);
 
   // 端子の情報を作る．
@@ -815,10 +815,10 @@ SbjGraph::new_latch(SbjNode* input,
 		    SbjNode* clear,
 		    SbjNode* preset)
 {
-  SbjLatch* latch = new SbjLatch(input, output, enable, clear, preset);
+  int id = mLatchList.size();
+  SbjLatch* latch = new SbjLatch(id, input, output, enable, clear, preset);
 
   // ラッチリストに登録
-  latch->mId = mLatchList.size();
   mLatchList.push_back(latch);
 
   // 端子の情報を作る．
@@ -911,9 +911,9 @@ SbjGraph::is_latch_preset(const SbjNode* node) const
 SbjNode*
 SbjGraph::_new_node()
 {
-  SbjNode* node = new SbjNode;
+  int id = mNodeArray.size();
+  SbjNode* node = new SbjNode(id);
 
-  node->mId = mNodeArray.size();
   mNodeArray.push_back(node);
 
   return node;

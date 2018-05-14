@@ -29,15 +29,20 @@ BEGIN_NAMESPACE_YM_SBJ
 //////////////////////////////////////////////////////////////////////
 class SbjDff
 {
-  friend class SbjGraph;
-
-private:
+public:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ/デストラクタ
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  SbjDff(SbjNode* input,
+  /// @param[in] id ID番号
+  /// @param[in] input データ入力ノード
+  /// @param[in] output データ出力ノード
+  /// @param[in] clock クロックノード
+  /// @param[in] clear クリア端子ノード
+  /// @param[in] preset プリセット端子ノード
+  SbjDff(int id,
+	 SbjNode* input,
 	 SbjNode* output,
 	 SbjNode* clock,
 	 SbjNode* clear,
@@ -115,11 +120,13 @@ private:
 
 // @brief コンストラクタ
 inline
-SbjDff::SbjDff(SbjNode* input,
+SbjDff::SbjDff(int id,
+	       SbjNode* input,
 	       SbjNode* output,
 	       SbjNode* clock,
 	       SbjNode* clear,
 	       SbjNode* preset) :
+  mId(id),
   mDataInput(input),
   mClock(clock),
   mClear(clear),
