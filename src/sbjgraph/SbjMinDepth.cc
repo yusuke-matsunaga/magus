@@ -38,7 +38,7 @@ void
 SmdNode::set_id(int id,
 		bool logic)
 {
-  mId = (id << 1) | static_cast<ymuint>(logic);
+  mId = (id << 1) | static_cast<int>(logic);
 }
 
 // @brief 1つ目のファンインを設定する．
@@ -59,21 +59,16 @@ SmdNode::set_fanin1(SmdNode* from)
   mFanin1.mFlags = 1U;
 }
 
-// @brief ファンアウト数を設定する．
+// @brief ファンアウト配列を設定する．
 void
-SmdNode::set_fanout_num(int n,
-			void* p)
+SmdNode::set_fanout_array(const vector<SmdEdge*>& foedge_list,
+			  Alloc& alloc)
 {
-  mFanoutNum = n;
-  mFanoutArray = new (p) SmdEdge*[n];
-}
-
-// @brief pos 番目のファンアウトを設定する．
-void
-SmdNode::set_fanout(int pos,
-		    SmdEdge* edge)
-{
-  mFanoutArray[pos] = edge;
+  mFanoutNum = foedge_list.size();
+  mFanoutArray = alloc.get_array<SmdEdge*>(mFanoutNum);
+  for ( int i = 0; i < mFanoutNum; ++ i ) {
+    mFanoutArray[i] = foedge_list[i];
+  }
 }
 
 
@@ -92,12 +87,10 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
   mTfiNodeList.reserve(n);
 
   mNodeNum = n;
-  void* p = mAlloc.get_memory(sizeof(SmdNode) * n);
-  mNodeArray = new (p) SmdNode[n];
+  mNodeArray = mAlloc.get_array<SmdNode>(n);
 
   // sbjgraph の構造を SmdNode にコピーする．
-  int npi = sbjgraph.input_num();
-  mInputList.reserve(npi);
+  mInputList.reserve(sbjgraph.input_list().size());
   for ( auto sbjnode: sbjgraph.input_list() ) {
     int id = sbjnode->id();
     SmdNode* node = &mNodeArray[id];
@@ -105,53 +98,46 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
     mInputList.push_back(node);
   }
 
-  int nlogic = sbjgraph.logic_num();
-  mLogicNodeList.reserve(nlogic);
+  mLogicNodeList.reserve(sbjgraph.logic_num());
   for ( auto sbjnode: sbjgraph.logic_list() ) {
     int id = sbjnode->id();
     SmdNode* node = &mNodeArray[id];
-    mLogicNodeList.push_back(node);
     node->set_id(id, true);
+    mLogicNodeList.push_back(node);
+
     const SbjNode* isbjnode0 = sbjnode->fanin(0);
     SmdNode* inode0 = &mNodeArray[isbjnode0->id()];
     node->set_fanin0(inode0);
+
     const SbjNode* isbjnode1 = sbjnode->fanin(1);
     SmdNode* inode1 = &mNodeArray[isbjnode1->id()];
     node->set_fanin1(inode1);
   }
-  for ( int i = 0; i < n; ++ i) {
-    const SbjNode* sbjnode = sbjgraph.node(i);
-    if ( sbjnode == nullptr ) continue;
+
+  for ( auto sbjnode: sbjgraph.logic_list() ) {
     SmdNode* node = &mNodeArray[sbjnode->id()];
     int nfo0 = sbjnode->fanout_num();
+    vector<SmdEdge*> foedge_list;
+    foedge_list.reserve(nfo0);
     int nfo = 0;
     for ( int j = 0; j < nfo0; ++ j ) {
       const SbjEdge* sbjedge = sbjnode->fanout_edge(j);
       const SbjNode* sbjfonode = sbjedge->to();
       if ( !sbjfonode->is_output() ) {
-	++nfo;
+	SmdNode* fonode = &mNodeArray[sbjfonode->id()];
+	SmdEdge* edge = nullptr;
+	if ( sbjedge->pos() == 0 ) {
+	  edge = fonode->fanin0_edge();
+	}
+	else {
+	  edge = fonode->fanin1_edge();
+	}
+	ASSERT_COND( edge->to() == fonode );
+	ASSERT_COND( edge->from() == node );
+	foedge_list.push_back(edge);
       }
     }
-    void* p = mAlloc.get_memory(sizeof(SmdEdge*) * nfo);
-    node->set_fanout_num(nfo, p);
-    int pos = 0;
-    for ( int j = 0; j < nfo0; ++ j ) {
-      const SbjEdge* sbjedge = sbjnode->fanout_edge(j);
-      const SbjNode* sbjfonode = sbjedge->to();
-      if ( sbjfonode->is_output() ) continue;
-      SmdNode* fonode = &mNodeArray[sbjfonode->id()];
-      ASSERT_COND( fonode->id() == sbjfonode->id() );
-      SmdEdge* edge = nullptr;
-      if ( sbjedge->pos() == 0 ) {
-	edge = fonode->fanin0_edge();
-      }
-      else {
-	edge = fonode->fanin1_edge();
-      }
-      ASSERT_COND( edge->to() == fonode );
-      ASSERT_COND( edge->from() == node );
-      node->set_fanout(pos, edge);
-    }
+    node->set_fanout_array(foedge_list, mAlloc);
   }
 }
 

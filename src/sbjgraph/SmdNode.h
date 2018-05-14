@@ -156,15 +156,10 @@ public:
   void
   set_fanin1(SmdNode* from);
 
-  /// @brief ファンアウト数を設定する．
+  /// @brief ファンアウト配列を設定する．
   void
-  set_fanout_num(int n,
-		 void* p);
-
-  /// @brief pos 番目のファンアウトを設定する．
-  void
-  set_fanout(int pos,
-	     SmdEdge* edge);
+  set_fanout_array(const vector<SmdEdge*>& foedge_list,
+		   Alloc& alloc);
 
 
 public:
