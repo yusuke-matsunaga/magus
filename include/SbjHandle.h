@@ -74,6 +74,14 @@ public:
   SbjHandle
   operator~() const;
 
+  /// @brief 反転属性を持たないハンドルを返す．
+  SbjHandle
+  normalize() const;
+
+  /// @brief 等価比較演算子
+  bool
+  operator==(const SbjHandle& right) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -108,6 +116,12 @@ private:
   ympuint mData;
 
 };
+
+/// @relates SbjHandle
+/// @brief 非等価比較演算子
+bool
+operator!=(const SbjHandle& left,
+	   const SbjHandle& right);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -193,6 +207,14 @@ SbjHandle::operator~() const
   return SbjHandle(mData ^ 1ULL);
 }
 
+// @brief 反転属性を持たないハンドルを返す．
+inline
+SbjHandle
+SbjHandle::normalize() const
+{
+  return SbjHandle(mData & ~1ULL);
+}
+
 // @brief 内容を設定する．
 inline
 void
@@ -208,6 +230,24 @@ void
 SbjHandle::invert()
 {
   mData ^= 1ULL;
+}
+
+// @brief 等価比較演算子
+inline
+bool
+SbjHandle::operator==(const SbjHandle& right) const
+{
+  return mData == right.mData;
+}
+
+// @relates SbjHandle
+// @brief 非等価比較演算子
+inline
+bool
+operator!=(const SbjHandle& left,
+	   const SbjHandle& right)
+{
+  return !left.operator==(right);
 }
 
 END_NAMESPACE_YM_SBJ

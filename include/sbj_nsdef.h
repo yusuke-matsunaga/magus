@@ -25,6 +25,8 @@ END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_YM_SBJ
 
+enum class SbjNodeType;
+
 class Bn2Sbj;
 
 class SbjGraph;

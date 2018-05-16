@@ -8,7 +8,7 @@
 
 
 #include "ym/BnNetwork.h"
-#include "ym/BNetBlifReader.h"
+#include "Bn2Sbj.h"
 #include "SbjGraph.h"
 #include "SbjDumper.h"
 
@@ -73,25 +73,20 @@ main(int argc,
     MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
     MsgMgr::reg_handler(msg_handler);
 
-    BNetBlifReader reader;
+    BnNetwork network;
 
-    BNetwork network;
-
-    if ( !reader.read(filename, network) ) {
+    if ( !read_blif(network, filename) ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }
 
-    decomp(network, 2);
+    //decomp(network, 2);
 
-    BNet2Sbj bnet2sbj;
+    Bn2Sbj bn2sbj;
 
     SbjGraph sbjgraph;
 
-    if ( !bnet2sbj(network, sbjgraph, cerr) ) {
-      cerr << "Error occured in BNet2Sbj()" << endl;
-      return 5;
-    }
+    bn2sbj.convert(network, sbjgraph);
 
     SbjDumper dumper;
 

@@ -47,7 +47,7 @@ public:
   SbjGraph(const SbjGraph& src);
 
   /// @brief 代入演算子
-  const SbjGraph&
+  SbjGraph&
   operator=(const SbjGraph& src);
 
   /// @brief デストラクタ
@@ -453,47 +453,41 @@ private:
   _copy(const SbjGraph& src,
 	vector<SbjNode*>& nodemap);
 
-  /// @brief 論理ノードを作る．
-  /// @param[in] fcode 機能コード (真理値ベクタ)
-  /// @param[in] inode1 1番めの入力ノード
-  /// @param[in] inode2 2番めの入力ノード
-  /// @return 作成したノードを返す．
-  SbjNode*
-  _new_logic(ymuint fcode,
-	     SbjNode* inode1,
-	     SbjNode* inode2);
-
   /// @brief new_and の下請け関数
   /// @param[in] ihandle_list 入力ハンドルのリスト
   /// @param[in] start 開始位置
   /// @param[in] num 要素数
   SbjHandle
-  _new_and(const vector<SbjHandle>& ihandle_list,
-	   int start,
-	   int num);
+  _new_and_tree(const vector<SbjHandle>& ihandle_list,
+		int start,
+		int num);
 
   /// @brief new_or の下請け関数
   /// @param[in] ihandle_list 入力ハンドルのリスト
   /// @param[in] start 開始位置
   /// @param[in] num 要素数
   SbjHandle
-  _new_or(const vector<SbjHandle>& ihandle_list,
-	  int start,
-	  int num);
+  _new_or_tree(const vector<SbjHandle>& ihandle_list,
+	       int start,
+	       int num);
 
   /// @brief new_xor の下請け関数
   /// @param[in] ihandle_list 入力ハンドルのリスト
   /// @param[in] start 開始位置
   /// @param[in] num 要素数
   SbjHandle
-  _new_xor(const vector<SbjHandle>& ihandle_list,
-	   int start,
-	   int num);
+  _new_xor_tree(const vector<SbjHandle>& ihandle_list,
+		int start,
+		int num);
 
-  /// @brief 新しいノードを作成し mNodeList に登録する．
-  /// @return 作成されたノードを返す．
+  /// @brief 新しい論理ノードを作る．
+  /// @param[in] type ノードのタイプ
+  /// @param[in] ihandle1 1番めのファンインのハンドル
+  /// @param[in] ihandle2 2番めのファンインのハンドル
   SbjNode*
-  _new_node();
+  _new_logic_node(SbjNodeType type,
+		  SbjHandle ihandle1,
+		  SbjHandle ihandle2);
 
 
 private:

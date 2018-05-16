@@ -15,54 +15,12 @@
 #include "SbjHandle.h"
 #include "SbjMinDepth.h"
 #include "IOInfo.h"
+#include "SbjDumper.h"
 
 #include "ym/Expr.h"
 
 
 BEGIN_NAMESPACE_YM_SBJ
-
-///////////////////////////////////////////////////////////////////////
-// クラス SbjNode
-///////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-SbjNode::SbjNode(int id) :
-  mId(id),
-  mFlags(0U),
-  mMark(0)
-{
-  for ( int i: { 1, 2 } ) {
-    SbjEdge& edge = mFanins[i];
-    edge.mFrom = nullptr;
-    edge.mToPos = reinterpret_cast<ympuint>(this) | static_cast<int>(i);
-  }
-}
-
-// デストラクタ
-SbjNode::~SbjNode()
-{
-}
-
-// @brief ID を表す文字列の取得
-string
-SbjNode::id_str() const
-{
-  ostringstream buf;
-  if ( is_input() ) {
-    buf << "I" << id();
-  }
-  else if ( is_output() ) {
-    buf << "O" << id();
-  }
-  else if ( is_logic() ) {
-    buf << "L" << id();
-  }
-  else {
-    buf << "X" << id();
-  }
-  return buf.str();
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // クラス SbjGraph
@@ -83,7 +41,7 @@ SbjGraph::SbjGraph(const SbjGraph& src)
 }
 
 // 代入演算子
-const SbjGraph&
+SbjGraph&
 SbjGraph::operator=(const SbjGraph& src)
 {
   if ( &src != this ) {
@@ -91,6 +49,7 @@ SbjGraph::operator=(const SbjGraph& src)
     vector<SbjNode*> nodemap;
     _copy(src, nodemap);
   }
+
   return *this;
 }
 
@@ -120,17 +79,17 @@ SbjGraph::_copy(const SbjGraph& src,
 
   // 論理ノードの生成
   for ( auto src_node: src.logic_list() ) {
-    const SbjNode* src_inode0 = src_node->fanin(0);
+    const SbjNode* src_inode0 = src_node->fanin0();
     SbjNode* input0 = nodemap[src_inode0->id()];
     ASSERT_COND( input0 );
+    SbjHandle ihandle0(input0, src_node->fanin0_inv());
 
-    const SbjNode* src_inode1 = src_node->fanin(1);
+    const SbjNode* src_inode1 = src_node->fanin1();
     SbjNode* input1 = nodemap[src_inode1->id()];
     ASSERT_COND( input1 );
+    SbjHandle ihandle1(input1, src_node->fanin1_inv());
 
-    SbjNode* dst_node = _new_logic(src_node->fcode(), input0, input1);
-    dst_node->mMark = src_node->mMark;
-    dst_node->mLevel = src_node->mLevel;
+    SbjNode* dst_node = _new_logic_node(src_node->type(), ihandle0, ihandle1);
     nodemap[src_node->id()] = dst_node;
   }
 
@@ -321,16 +280,18 @@ SbjGraph::port_pos(const SbjNode* node) const
 SbjNode*
 SbjGraph::new_input(bool bipol)
 {
-  SbjNode* node = _new_node();
+  int id = mNodeArray.size();
+  int subid = mInputArray.size();
+  SbjNode* node = new SbjNode(id, bipol, subid);
+
+  // ノードリストの登録
+  mNodeArray.push_back(node);
 
   // 入力ノード配列に登録
-  int subid = mInputArray.size();
   mInputArray.push_back(node);
 
   // ダミーの place-holder を追加
   mInputInfoArray.push_back(nullptr);
-
-  node->set_input(subid, bipol);
 
   return node;
 }
@@ -339,21 +300,21 @@ SbjGraph::new_input(bool bipol)
 SbjNode*
 SbjGraph::new_output(SbjHandle ihandle)
 {
-  SbjNode* node = _new_node();
+  int id = mNodeArray.size();
+  int subid = mOutputArray.size();
+  SbjNode* node = new SbjNode(id, subid, ihandle);
+
+  // ノードリストの登録
+  mNodeArray.push_back(node);
 
   // 出力ノード配列に登録
-  int subid = mOutputArray.size();
   mOutputArray.push_back(node);
 
   // ダミーの place-holder を追加
   mOutputInfoArray.push_back(nullptr);
 
-  SbjNode* inode = ihandle.node();
-  bool inv = ihandle.inv();
-  node->set_output(subid, inv, inode);
-
-  if ( mLevel < node->mLevel ) {
-    mLevel = node->mLevel;
+  if ( mLevel < node->level() ) {
+    mLevel = node->level();
   }
 
   return node;
@@ -445,14 +406,7 @@ SbjGraph::new_and(SbjHandle ihandle1,
     }
   }
 
-  ymuint fcode = 0U;
-  if ( ihandle1.inv() ) {
-    fcode |= 1U;
-  }
-  if ( ihandle2.inv() ) {
-    fcode |= 2U;
-  }
-  SbjNode* sbjnode = _new_logic(fcode, ihandle1.node(), ihandle2.node());
+  SbjNode* sbjnode = _new_logic_node(SbjNodeType::LogicAnd, ihandle1, ihandle2);
   return SbjHandle(sbjnode, false);
 }
 
@@ -479,7 +433,7 @@ SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
   if ( tmp_list.empty() ) {
     return SbjHandle::make_one();
   }
-  return _new_and(tmp_list, 0, tmp_list.size());
+  return _new_and_tree(tmp_list, 0, tmp_list.size());
 }
 
 // @brief new_and の下請け関数
@@ -487,9 +441,9 @@ SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
 // @param[in] start 開始位置
 // @param[in] num 要素数
 SbjHandle
-SbjGraph::_new_and(const vector<SbjHandle>& ihandle_list,
-		   int start,
-		   int num)
+SbjGraph::_new_and_tree(const vector<SbjHandle>& ihandle_list,
+			int start,
+			int num)
 {
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
@@ -497,8 +451,8 @@ SbjGraph::_new_and(const vector<SbjHandle>& ihandle_list,
   }
 
   int h = num / 2;
-  SbjHandle l = _new_and(ihandle_list, start, h);
-  SbjHandle r = _new_and(ihandle_list, start + h, num - h);
+  SbjHandle l = _new_and_tree(ihandle_list, start, h);
+  SbjHandle r = _new_and_tree(ihandle_list, start + h, num - h);
   return new_and(l, r);
 }
 
@@ -511,43 +465,7 @@ SbjHandle
 SbjGraph::new_or(SbjHandle ihandle1,
 		 SbjHandle ihandle2)
 {
-  if ( ihandle1.is_const0() ) {
-    // 入力1が0固定
-    return ihandle2;
-  }
-  if ( ihandle1.is_const1() ) {
-    // 入力1が1固定
-    return SbjHandle::make_one();
-  }
-  if ( ihandle2.is_const0() ) {
-    // 入力2が0固定
-    return ihandle1;
-  }
-  if ( ihandle2.is_const1() ) {
-    // 入力2が1固定
-    return SbjHandle::make_one();
-  }
-
-  if ( ihandle1.node() == ihandle2.node() ) {
-    if ( ihandle1.inv() == ihandle2.inv() ) {
-      // 同じ入力
-      return ihandle1;
-    }
-    else {
-      // 同じノードで逆相
-      return SbjHandle::make_one();
-    }
-  }
-
-  ymuint fcode = 0U;
-  if ( !ihandle1.inv() ) {
-    fcode |= 1U;
-  }
-  if ( !ihandle2.inv() ) {
-    fcode |= 2U;
-  }
-  SbjNode* sbjnode = _new_logic(fcode, ihandle1.node(), ihandle2.node());
-  return SbjHandle(sbjnode, true);
+  return ~new_and(~ihandle1, ~ihandle2);
 }
 
 // @brief ORノードを作る．
@@ -572,7 +490,7 @@ SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
   if ( tmp_list.empty() ) {
     return SbjHandle::make_zero();
   }
-  return _new_or(tmp_list, 0, tmp_list.size());
+  return _new_or_tree(tmp_list, 0, tmp_list.size());
 }
 
 // @brief new_or の下請け関数
@@ -580,9 +498,9 @@ SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
 // @param[in] start 開始位置
 // @param[in] num 要素数
 SbjHandle
-SbjGraph::_new_or(const vector<SbjHandle>& ihandle_list,
-		  int start,
-		  int num)
+SbjGraph::_new_or_tree(const vector<SbjHandle>& ihandle_list,
+		       int start,
+		       int num)
 {
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
@@ -590,8 +508,8 @@ SbjGraph::_new_or(const vector<SbjHandle>& ihandle_list,
   }
 
   int h = num / 2;
-  SbjHandle l = _new_or(ihandle_list, start, h);
-  SbjHandle r = _new_or(ihandle_list, start + h, num - h);
+  SbjHandle l = _new_or_tree(ihandle_list, start, h);
+  SbjHandle r = _new_or_tree(ihandle_list, start + h, num - h);
   return new_or(l, r);
 }
 
@@ -634,7 +552,8 @@ SbjGraph::new_xor(SbjHandle ihandle1,
   }
 
   bool inv = ihandle1.inv() ^ ihandle2.inv();
-  SbjNode* node = _new_logic(4U, ihandle1.node(), ihandle2.node());
+  SbjNode* node = _new_logic_node(SbjNodeType::LogicXor,
+				  ihandle1.normalize(), ihandle2.normalize());
   return SbjHandle(node, inv);
 }
 
@@ -665,7 +584,7 @@ SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
   if ( inv ) {
     tmp_list[0].invert();
   }
-  return _new_xor(tmp_list, 0, tmp_list.size());
+  return _new_xor_tree(tmp_list, 0, tmp_list.size());
 }
 
 // @brief new_xor の下請け関数
@@ -673,9 +592,9 @@ SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
 // @param[in] start 開始位置
 // @param[in] num 要素数
 SbjHandle
-SbjGraph::_new_xor(const vector<SbjHandle>& ihandle_list,
-		   int start,
-		   int num)
+SbjGraph::_new_xor_tree(const vector<SbjHandle>& ihandle_list,
+			int start,
+			int num)
 {
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
@@ -683,27 +602,29 @@ SbjGraph::_new_xor(const vector<SbjHandle>& ihandle_list,
   }
 
   int h = num / 2;
-  SbjHandle l = _new_xor(ihandle_list, start, h);
-  SbjHandle r = _new_xor(ihandle_list, start + h, num - h);
+  SbjHandle l = _new_xor_tree(ihandle_list, start, h);
+  SbjHandle r = _new_xor_tree(ihandle_list, start + h, num - h);
   return new_xor(l, r);
 }
 
-// @brief 論理ノードを作る．
-// @param[in] fcode 機能コード
-// @param[in] inode1 1番めの入力ノード
-// @param[in] inode2 2番めの入力ノード
-// @return 作成したノードを返す．
+// @brief 新しい論理ノードを作る．
+// @param[in] type ノードのタイプ
+// @param[in] ihandle1 1番めのファンインのハンドル
+// @param[in] ihandle2 2番めのファンインのハンドル
+inline
 SbjNode*
-SbjGraph::_new_logic(ymuint fcode,
-		     SbjNode* inode0,
-		     SbjNode* inode1)
+SbjGraph::_new_logic_node(SbjNodeType type,
+			  SbjHandle ihandle1,
+			  SbjHandle ihandle2)
 {
-  SbjNode* node = _new_node();
+  int id = mNodeArray.size();
+  SbjNode* node = new SbjNode(id, type, ihandle1, ihandle2);
+
+  // ノードリストに登録
+  mNodeArray.push_back(node);
 
   // 論理ノードリストに登録
   mLogicList.push_back(node);
-
-  node->set_logic(fcode, inode0, inode1);
 
   return node;
 }
@@ -904,19 +825,6 @@ SbjGraph::is_latch_preset(const SbjNode* node) const
     return mOutputInfoArray[node->subid()]->is_latch_preset();
   }
   return false;
-}
-
-// 新しいノードを作成する．
-// 作成されたノードを返す．
-SbjNode*
-SbjGraph::_new_node()
-{
-  int id = mNodeArray.size();
-  SbjNode* node = new SbjNode(id);
-
-  mNodeArray.push_back(node);
-
-  return node;
 }
 
 // @brief 各ノードの minimum depth を求める．

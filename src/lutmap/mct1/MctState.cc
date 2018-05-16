@@ -112,10 +112,8 @@ MctState::get_cut_candidates()
   for (ymuint rpos = 0; rpos < mQueue.size(); ++ rpos) {
     const SbjNode* node = mQueue[rpos];
     const vector<const SbjNode*>& inputs1 = mNodeInfo[node->id()].mInputs;
-    ymuint nfo = node->fanout_num();
-    for (ymuint j = 0; j < nfo; ++ j) {
-      const SbjEdge* e = node->fanout_edge(j);
-      const SbjNode* to = e->to();
+    for ( auto e: node->fanout_list() ) {
+      const SbjNode* to = e.to();
       if ( to->is_output() ) {
 	// 出力ノードは除外する．
 	continue;
@@ -136,7 +134,7 @@ MctState::get_cut_candidates()
       ymuint to_id = to->id();
 
       // 反対側のファンインを求める．
-      const SbjNode* inode0 = to->fanin(e->pos() ^ 1);
+      const SbjNode* inode0 = to->fanin(e.pos() ^ 1);
       const vector<const SbjNode*>& inputs0 = mNodeInfo[inode0->id()].mInputs;
       if ( inputs0.empty() ) {
 	// 対象ではなかった．
@@ -303,12 +301,12 @@ MctState::update(const SbjNode* root)
       continue;
     }
 
-    const SbjNode* inode0 = node->fanin(0);
+    const SbjNode* inode0 = node->fanin0();
     if ( !mark[inode0->id()] ) {
       mark[inode0->id()] = true;
       node_list.push_back(inode0);
     }
-    const SbjNode* inode1 = node->fanin(1);
+    const SbjNode* inode1 = node->fanin1();
     if ( !mark[inode1->id()] ) {
       mark[inode1->id()] = true;
       node_list.push_back(inode1);
@@ -340,11 +338,9 @@ MctState::update(const SbjNode* root)
       continue;
     }
 
-    const SbjNode* inode0 = node->fanin(0);
-    ymuint nfo0 = inode0->fanout_num();
-    for (ymuint i = 0; i < nfo0; ++ i) {
-      const SbjEdge* e = inode0->fanout_edge(i);
-      const SbjNode* to = e->to();
+    const SbjNode* inode0 = node->fanin0();
+    for ( auto e: inode0->fanout_list() ) {
+      const SbjNode* to = e.to();
       if ( !is_selected(to) && mark[to->id()] ) {
 	// まだ未処理のファンアウトがあった．
 	goto next0;
@@ -353,11 +349,9 @@ MctState::update(const SbjNode* root)
     node_list.push_back(inode0);
 
   next0:
-    const SbjNode* inode1 = node->fanin(1);
-    ymuint nfo1 = inode1->fanout_num();
-    for (ymuint i = 0; i < nfo1; ++ i) {
-      const SbjEdge* e = inode1->fanout_edge(i);
-      const SbjNode* to = e->to();
+    const SbjNode* inode1 = node->fanin1();
+    for ( auto e: inode1->fanout_list() ) {
+      const SbjNode* to = e.to();
       if ( !is_selected(to) && mark[to->id()] ) {
 	// まだ未処理のファンアウトがあった．
 	goto next1;
@@ -371,8 +365,7 @@ MctState::update(const SbjNode* root)
   ASSERT_COND( node_list.size() == n0 );
 
   // node_list に含まれるノードで root を経由せずに外部出力へ到達可能かどうか調べる．
-  for (ymuint i = 0; i < node_list.size(); ++ i) {
-    const SbjNode* node = node_list[i];
+  for ( auto node: node_list ) {
     check_blocked(node);
   }
 
@@ -449,11 +442,9 @@ MctState::check_blocked(const SbjNode* node)
   if ( debug ) {
     cout << " checking for " << node->id_str() << endl;
   }
-  ymuint nfo = node->fanout_num();
   bool blocked = true;
-  for (ymuint i = 0; i < nfo; ++ i) {
-    const SbjEdge* e = node->fanout_edge(i);
-    const SbjNode* to = e->to();
+  for ( auto e: node->fanout_list() ) {
+    const SbjNode* to = e.to();
     if ( to->is_output() ) {
       if ( is_selected(node) ) {
 	// 出力は無視
@@ -498,11 +489,9 @@ MctState::check_cover()
 void
 MctState::check_cover_node(const SbjNode* node)
 {
-  ymuint nfo = node->fanout_num();
   if ( is_blocked(node) ) {
-    for (ymuint i = 0; i < nfo; ++ i) {
-      const SbjEdge* e = node->fanout_edge(i);
-      const SbjNode* to = e->to();
+    for ( auto e: node->fanout_list() ) {
+      const SbjNode* to = e.to();
       if ( to->is_output() ) {
 	if ( is_selected(node) ) {
 	  continue;
@@ -524,9 +513,8 @@ MctState::check_cover_node(const SbjNode* node)
   }
   else {
     bool blocked = true;
-    for (ymuint i = 0; i < nfo; ++ i) {
-      const SbjEdge* e = node->fanout_edge(i);
-      const SbjNode* to = e->to();
+    for ( auto e: node->fanout_list() ) {
+      const SbjNode* to = e.to();
       if ( to->is_output() ) {
 	// 外部出力はスキップ
 	if ( is_selected(node) ) {

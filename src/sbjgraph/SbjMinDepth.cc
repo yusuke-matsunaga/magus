@@ -89,6 +89,8 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
   mNodeNum = n;
   mNodeArray = mAlloc.get_array<SmdNode>(n);
 
+  vector<vector<SmdEdge*> > foedge_list_array(n);
+
   // sbjgraph の構造を SmdNode にコピーする．
   mInputList.reserve(sbjgraph.input_list().size());
   for ( auto sbjnode: sbjgraph.input_list() ) {
@@ -105,39 +107,22 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
     node->set_id(id, true);
     mLogicNodeList.push_back(node);
 
-    const SbjNode* isbjnode0 = sbjnode->fanin(0);
+    const SbjNode* isbjnode0 = sbjnode->fanin0();
     SmdNode* inode0 = &mNodeArray[isbjnode0->id()];
     node->set_fanin0(inode0);
+    SmdEdge* edge0 = node->fanin0_edge();
+    foedge_list_array[inode0->id()].push_back(edge0);
 
-    const SbjNode* isbjnode1 = sbjnode->fanin(1);
+    const SbjNode* isbjnode1 = sbjnode->fanin1();
     SmdNode* inode1 = &mNodeArray[isbjnode1->id()];
     node->set_fanin1(inode1);
+    SmdEdge* edge1 = node->fanin1_edge();
+    foedge_list_array[inode1->id()].push_back(edge1);
   }
 
-  for ( auto sbjnode: sbjgraph.logic_list() ) {
-    SmdNode* node = &mNodeArray[sbjnode->id()];
-    int nfo0 = sbjnode->fanout_num();
-    vector<SmdEdge*> foedge_list;
-    foedge_list.reserve(nfo0);
-    int nfo = 0;
-    for ( int j = 0; j < nfo0; ++ j ) {
-      const SbjEdge* sbjedge = sbjnode->fanout_edge(j);
-      const SbjNode* sbjfonode = sbjedge->to();
-      if ( !sbjfonode->is_output() ) {
-	SmdNode* fonode = &mNodeArray[sbjfonode->id()];
-	SmdEdge* edge = nullptr;
-	if ( sbjedge->pos() == 0 ) {
-	  edge = fonode->fanin0_edge();
-	}
-	else {
-	  edge = fonode->fanin1_edge();
-	}
-	ASSERT_COND( edge->to() == fonode );
-	ASSERT_COND( edge->from() == node );
-	foedge_list.push_back(edge);
-      }
-    }
-    node->set_fanout_array(foedge_list, mAlloc);
+  for ( int i = 0; i < n; ++ i ) {
+    SmdNode* node = &mNodeArray[i];
+    node->set_fanout_array(foedge_list_array[node->id()], mAlloc);
   }
 }
 
