@@ -5,7 +5,7 @@
 /// @brief LbCalc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -41,7 +41,7 @@ public:
   /// @breif 下界の計算をする．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_holder カットを保持するオブジェクト
-  ymuint
+  int
   lower_bound(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder);
 

@@ -82,8 +82,8 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
 
   LutMap lutmap;
 
-  ymuint lut_num;
-  ymuint depth;
+  int lut_num;
+  int depth;
 
   NetHandle* neth = cur_nethandle();
   switch ( neth->type() ) {

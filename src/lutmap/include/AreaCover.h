@@ -5,7 +5,7 @@
 /// @brief AreCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -31,7 +31,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] mode モード
-  AreaCover(ymuint mode);
+  AreaCover(int mode);
 
   /// @brief デストラクタ
   ~AreaCover();
@@ -94,7 +94,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // モード
-  ymuint mMode;
+  int mMode;
 
   // 各ノードのベスト値を記録する配列．
   vector<double> mBestCost;

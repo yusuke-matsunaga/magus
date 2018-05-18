@@ -3,7 +3,7 @@
 /// @brief CutHolder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -37,17 +37,17 @@ CutHolder::clear()
 // 最初に呼ばれる関数
 void
 CutHolder::all_init(const SbjGraph& sbjgraph,
-		    ymuint limit)
+		    int limit)
 {
   clear();
-  ymuint n = sbjgraph.node_num();
+  int n = sbjgraph.node_num();
   mLimit = limit;
   mCutList = new CutList[n];
 }
 
 void
 CutHolder::node_init(const SbjNode* node,
-		     ymuint pos)
+		     int pos)
 {
 }
 
@@ -58,7 +58,7 @@ CutHolder::found(const SbjNode* root)
 
 void
 CutHolder::found(const SbjNode* root,
-		 ymuint ni,
+		 int ni,
 		 const SbjNode* inputs[])
 {
   Cut* cut = mMgr.new_cut(root, ni, inputs);
@@ -67,15 +67,15 @@ CutHolder::found(const SbjNode* root,
 
 void
 CutHolder::node_end(const SbjNode* node,
-		    ymuint pos,
-		    ymuint ncuts)
+		    int pos,
+		    int ncuts)
 {
 }
 
 // 最後に呼ばれる関数
 void
 CutHolder::all_end(const SbjGraph& sbjgraph,
-		   ymuint limit)
+		   int limit)
 {
 }
 

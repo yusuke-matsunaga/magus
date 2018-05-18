@@ -3,7 +3,7 @@
 /// @brief AreCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,7 +18,7 @@
 BEGIN_NAMESPACE_YM_LUTMAP
 
 // コンストラクタ
-AreaCover::AreaCover(ymuint mode)
+AreaCover::AreaCover(int mode)
 {
   mMode = mode;
 }
@@ -67,7 +67,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       const vector<const SbjNode*>& dupnode_list,
 		       MapRecord& maprec)
 {
-  ymuint n = sbjgraph.node_num();
+  int n = sbjgraph.node_num();
 
   // 作業領域の初期化
   mBestCost.clear();
@@ -76,11 +76,11 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   // 境界マークをつける．
   mBoundaryMark.clear();
   mBoundaryMark.resize(n, 0);
-  for (ymuint i = 0; i < boundary_list.size(); ++ i) {
+  for ( int i = 0; i < boundary_list.size(); ++ i ) {
     const SbjNode* node = boundary_list[i];
     mBoundaryMark[node->id()] = 1;
   }
-  for (ymuint i = 0; i < dupnode_list.size(); ++ i) {
+  for ( int i = 0; i < dupnode_list.size(); ++ i ) {
     const SbjNode* node = dupnode_list[i];
     if ( mBoundaryMark[node->id()] == 0 ) {
       mBoundaryMark[node->id()] = 2;
@@ -92,28 +92,24 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   maprec.init(sbjgraph);
 
   // 入力のコストを設定
-  ymuint ni = sbjgraph.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
+  int ni = sbjgraph.input_num();
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* node = sbjgraph.input(i);
     maprec.set_cut(node, nullptr);
     mBestCost[node->id()] = 0.0;
   }
 
   // 論理ノードのコストを入力側から計算
-  ymuint nl = sbjgraph.logic_num();
-  for (ymuint i = 0; i < nl; ++ i) {
+  int nl = sbjgraph.logic_num();
+  for ( int i = 0; i < nl; ++ i ) {
     const SbjNode* node = sbjgraph.logic(i);
 
     double min_cost = DBL_MAX;
     const Cut* best_cut = nullptr;
-    const CutList& cut_list = cut_holder.cut_list(node);
-    for (CutListIterator p = cut_list.begin();
-	 p != cut_list.end(); ++ p) {
-      const Cut* cut = *p;
-
-      ymuint ni = cut->input_num();
+    for ( auto cut: cut_holder.cut_list(node) ) {
+      int ni = cut->input_num();
       bool ng = false;
-      for (ymuint i = 0; i < ni; ++ i) {
+      for ( int i = 0; i < ni; ++ i ) {
 	const SbjNode* inode = cut->input(i);
 	if ( mBestCost[inode->id()] == DBL_MAX ) {
 	  ng = true;
@@ -124,7 +120,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
       if ( mMode & 1 ) {
 	// ファンアウトモード
-	for (ymuint i = 0; i < ni; ++ i) {
+	for ( int i = 0; i < ni; ++ i)  {
 	  const SbjNode* inode = cut->input(i);
 	  switch ( mBoundaryMark[inode->id()] ) {
 	  case 0:
@@ -143,11 +139,11 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       }
       else {
 	// フローモード
-	for (ymuint i = 0; i < ni; ++ i) {
+	for ( int i = 0; i < ni; ++ i ) {
 	  mWeight[i] = 0.0;
 	}
 	calc_weight(node, cut, 1.0);
-	for (ymuint i = 0; i < ni; ++ i) {
+	for ( int i = 0; i < ni; ++ i ) {
 	  const SbjNode* inode = cut->input(i);
 	  switch ( mBoundaryMark[inode->id()] ) {
 	  case 0:
@@ -165,7 +161,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       }
 
       double cur_cost = 1.0;
-      for (ymuint i = 0; i < ni; ++ i) {
+      for ( int i = 0; i < ni; ++ i ) {
 	const SbjNode* inode = cut->input(i);
 	cur_cost += mBestCost[inode->id()] * mWeight[i];
       }
@@ -187,7 +183,7 @@ AreaCover::calc_weight(const SbjNode* node,
 		       double cur_weight)
 {
   for ( ; ; ) {
-    for (ymuint i = 0; i < cut->input_num(); ++ i) {
+    for ( int i = 0; i < cut->input_num(); ++ i ) {
       if ( cut->input(i) == node ) {
 	// node は cut の葉だった．
 	if  ( !node->pomark() ) {

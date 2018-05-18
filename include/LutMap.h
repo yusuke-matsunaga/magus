@@ -48,11 +48,11 @@ public:
   /// @param[out] depth 段数
   void
   area_map(const BnNetwork& sbjgraph,
-	   ymuint limit,
-	   ymuint mode,
+	   int limit,
+	   int mode,
 	   BnNetwork& mapnetwork,
-	   ymuint& lut_num,
-	   ymuint& depth);
+	   int& lut_num,
+	   int& depth);
 
   /// @brief 段数最小化 DAG covering のヒューリスティック関数
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -68,12 +68,12 @@ public:
   /// @param[out] depth 段数
   void
   delay_map(const BnNetwork& sbjgraph,
-	    ymuint limit,
-	    ymuint slack,
-	    ymuint mode,
+	    int limit,
+	    int slack,
+	    int mode,
 	    BnNetwork& mapnetwork,
-	    ymuint& lut_num,
-	    ymuint& depth);
+	    int& lut_num,
+	    int& depth);
 
 };
 

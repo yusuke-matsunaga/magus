@@ -5,7 +5,7 @@
 /// @brief CutMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -41,7 +41,7 @@ public:
   /// @param[in] inputs カットの入力のノードの配列
   Cut*
   new_cut(const SbjNode* root,
-	  ymuint ni,
+	  int ni,
 	  const SbjNode* inputs[]);
 
   /// @brief このオブジェクトが管理しているすべてのカットを削除する．
@@ -90,10 +90,10 @@ CutMgr::~CutMgr()
 inline
 Cut*
 CutMgr::new_cut(const SbjNode* root,
-		ymuint ni,
+		int ni,
 		const SbjNode* inputs[])
 {
-  ymuint size = sizeof(Cut) + (ni - 1) * sizeof(const SbjNode*);
+  SizeType size = sizeof(Cut) + (ni - 1) * sizeof(const SbjNode*);
   void* p = mAlloc.get_memory(size);
   return new (p) Cut(root, ni, inputs);
 }

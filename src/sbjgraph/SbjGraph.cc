@@ -28,8 +28,7 @@ BEGIN_NAMESPACE_YM_SBJ
 
 // コンストラクタ
 SbjGraph::SbjGraph() :
-  mLevel(0),
-  mLevelValid(false)
+  mLevel(0)
 {
 }
 
@@ -169,7 +168,6 @@ SbjGraph::_copy(const SbjGraph& src,
   }
 
   mLevel = src.mLevel;
-  mLevelValid = src.mLevelValid;
 }
 
 // 空にする．

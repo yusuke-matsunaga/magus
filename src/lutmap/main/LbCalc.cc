@@ -3,7 +3,7 @@
 /// @brief LbCalc の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -35,11 +35,11 @@ LbCalc::~LbCalc()
 // @breif 下界の計算をする．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cut_holder カットを保持するオブジェクト
-ymuint
+int
 LbCalc::lower_bound(const SbjGraph& sbjgraph,
 		    const CutHolder& cut_holder)
 {
-  ymuint node_num = sbjgraph.node_num();
+  int node_num = sbjgraph.node_num();
 
   // 作業領域を初期化する．
   mMark.clear();
@@ -47,24 +47,21 @@ LbCalc::lower_bound(const SbjGraph& sbjgraph,
 
   DgGraph dg(node_num);
 
-  vector<ymuint> max_value(node_num, 0);
-  for (ymuint i = 0; i < node_num; ++ i) {
+  vector<int> max_value(node_num, 0);
+  for ( int i = 0; i < node_num; ++ i ) {
     const SbjNode* node = sbjgraph.node(i);
     if ( !node->is_logic() ) {
       DgNode* dgnode = dg.node(node->id());
       dgnode->inactivate();
     }
 
-    const CutList& cut_list = cut_holder.cut_list(node);
-    for (CutListIterator p = cut_list.begin(); p != cut_list.end(); ++ p) {
-      const Cut* cut = *p;
+    for ( auto cut: cut_holder.cut_list(node) ) {
       // カットがカバーしているノードを求める．
       vector<const SbjNode*> node_list;
       get_node_list(cut, node_list);
-      ymuint n = node_list.size();
+      int n = node_list.size();
       // ノード数をこのカットの価値とする．
-      for (ymuint j = 0; j < n; ++ j) {
-	const SbjNode* node1 = node_list[j];
+      for ( auto node1: node_list ) {
 	// カバーしているカットの価値の最大値を求める．
 	if ( max_value[node1->id()] < n ) {
 	  max_value[node1->id()] = n;
@@ -72,10 +69,10 @@ LbCalc::lower_bound(const SbjGraph& sbjgraph,
       }
 
       // このカットでカバーされているノード対を隣接リストに入れる．
-      for (ymuint j1 = 0; j1 < n - 1; ++ j1) {
-	ymuint id1 = node_list[j1]->id();
-	for (ymuint j2 = j1 + 1; j2 < n; ++ j2) {
-	  ymuint id2 = node_list[j2]->id();
+      for ( int j1 = 0; j1 < n - 1; ++ j1 ) {
+	int id1 = node_list[j1]->id();
+	for ( int j2 = j1 + 1; j2 < n; ++ j2 ) {
+	  int id2 = node_list[j2]->id();
 	  dg.connect(id1, id2);
 	}
       }
@@ -84,19 +81,19 @@ LbCalc::lower_bound(const SbjGraph& sbjgraph,
 
   // 各ノードの最大値の逆数が下界となる．
   double d_lb1 = 0.0;
-  for (ymuint i = 0; i < node_num; ++ i) {
-    ymuint n = max_value[i];
+  for ( int i = 0; i < node_num; ++ i ) {
+    int n = max_value[i];
     if ( n == 0 ) {
       continue;
     }
     double l = 1.0 / n;
     d_lb1 += l;
   }
-  ymuint lb1 = static_cast<ymuint>(ceil(d_lb1));
+  int lb1 = static_cast<int>(ceil(d_lb1));
 
-  ymuint lb2 = dg.get_mis_size();
+  int lb2 = dg.get_mis_size();
 
-  ymuint lb = lb1 > lb2 ? lb1 : lb2;
+  int lb = lb1 > lb2 ? lb1 : lb2;
 
   return lb;
 }
@@ -112,12 +109,12 @@ LbCalc::get_node_list(const Cut* cut,
   mMark[root->id()] = true;
 
   // inputs[] のノードに印をつけておく．
-  ymuint ni = cut->input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
+  int ni = cut->input_num();
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* node = cut->input(i);
     mMark[node->id()] = true;
   }
-  for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
+  for ( int rpos = 0; rpos < node_list.size(); ++ rpos ) {
     const SbjNode* node = node_list[rpos];
     ASSERT_COND( node->is_logic() );
 
@@ -135,11 +132,10 @@ LbCalc::get_node_list(const Cut* cut,
   }
 
   // マークを消しておく．
-  for (ymuint i = 0; i < node_list.size(); ++ i) {
-    const SbjNode* node = node_list[i];
+  for ( auto node: node_list ) {
     mMark[node->id()] = false;
   }
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* node = cut->input(i);
     mMark[node->id()] = false;
   }

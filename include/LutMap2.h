@@ -49,13 +49,13 @@ public:
   /// @param[out] depth 段数
   void
   area_map(const BnNetwork& sbjgraph,
-	   ymuint limit,
-	   ymuint mode,
-	   ymuint count,
+	   int limit,
+	   int mode,
+	   int count,
 	   bool verbose,
 	   BnNetwork& mapnetwork,
-	   ymuint& lut_num,
-	   ymuint& depth);
+	   int& lut_num,
+	   int& depth);
 
 #if 0
   /// @brief 段数最小化 DAG covering のヒューリスティック関数

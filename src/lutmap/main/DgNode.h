@@ -5,7 +5,7 @@
 /// @brief DgNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -36,7 +36,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を返す．
-  ymuint
+  int
   id() const;
 
   /// @brief 隣接リストを返す．
@@ -64,7 +64,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  ymuint mId;
+  int mId;
 
   // 隣接ノードのリスト
   vector<DgNode*> mAdjLink;
@@ -93,7 +93,7 @@ DgNode::~DgNode()
 
 // @brief ID番号を返す．
 inline
-ymuint
+int
 DgNode::id() const
 {
   return mId;

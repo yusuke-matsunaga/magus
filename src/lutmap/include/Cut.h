@@ -5,7 +5,7 @@
 /// @brief Cut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -46,7 +46,7 @@ private:
   /// @param[in] ni カットの入力数
   /// @param[in] inputs カットの入力のノードの配列
   Cut(const SbjNode* root,
-      ymuint ni,
+      int ni,
       const SbjNode* inputs[]);
 
   /// @brief デストラクタ
@@ -63,12 +63,12 @@ public:
   root() const;
 
   /// @brief 入力のサイズを得る．
-  ymuint
+  int
   input_num() const;
 
   /// @brief pos 番目の入力を得る．
   const SbjNode*
-  input(ymuint pos) const;
+  input(int pos) const;
 
   /// @brief 論理シミュレーションを行う．
   /// @param[in] vals 葉のノードの値
@@ -111,7 +111,7 @@ private:
   Cut* mLink;
 
   // 入力数
-  ymuint32 mNi;
+  int mNi;
 
   // 入力のノード配列
   const SbjNode* mInputs[1];
@@ -129,13 +129,13 @@ private:
 // @param[in] inputs カットの入力のノードの配列
 inline
 Cut::Cut(const SbjNode* root,
-	 ymuint ni,
+	 int ni,
 	 const SbjNode* inputs[]) :
   mRoot(root),
   mLink(nullptr),
   mNi(ni)
 {
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     mInputs[i] = inputs[i];
   }
 }
@@ -156,7 +156,7 @@ Cut::root() const
 
 // 入力のサイズを得る．
 inline
-ymuint
+int
 Cut::input_num() const
 {
   return mNi;
@@ -165,7 +165,7 @@ Cut::input_num() const
 // pos 番目の入力を得る．
 inline
 const SbjNode*
-Cut::input(ymuint pos) const
+Cut::input(int pos) const
 {
   return mInputs[pos];
 }

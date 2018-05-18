@@ -3,7 +3,7 @@
 /// @brief DgGraph の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -19,11 +19,11 @@ BEGIN_NAMESPACE_YM_LUTMAP
 
 // @brief コンストラクタ
 // @param[in] node_num ノード数
-DgGraph::DgGraph(ymuint node_num) :
+DgGraph::DgGraph(int node_num) :
   mNodeNum(node_num)
 {
   mNodeArray = new DgNode[mNodeNum];
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
+  for ( int i = 0; i < mNodeNum; ++ i ) {
     mNodeArray[i].mId = i;
     mNodeArray[i].mActive = true;
   }
@@ -38,24 +38,25 @@ DgGraph::~DgGraph()
 // @brief ノードを得る．
 // @param[in] pos 位置番号 ( 0 <= pos < node_num() )
 DgNode*
-DgGraph::node(ymuint pos)
+DgGraph::node(int pos)
 {
-  ASSERT_COND( pos < node_num() );
+  ASSERT_COND( pos >= 0 && pos < node_num() );
+
   return &mNodeArray[pos];
 }
 
 // @brief 枝を張nる．
 // @param[in] id1, id2 両端のノード番号
 void
-DgGraph::connect(ymuint id1,
-		 ymuint id2)
+DgGraph::connect(int id1,
+		 int id2)
 {
-  ASSERT_COND( id1 < mNodeNum );
-  ASSERT_COND( id2 < mNodeNum );
+  ASSERT_COND( id1 >= 0 && id1 < mNodeNum );
+  ASSERT_COND( id2 >= 0 && id2 < mNodeNum );
 
   // 正規化する．
   if ( id1 > id2 ) {
-    ymuint tmp = id1;
+    int tmp = id1;
     id1 = id2;
     id2 = tmp;
   }
@@ -65,8 +66,8 @@ DgGraph::connect(ymuint id1,
 
   // 2つの ID からインデックスを作る．
   // 実はオーバーフローするかもしれない．
-  ymuint index = id1 * mNodeNum + id2;
-  ymuint pos = 0;
+  int index = id1 * mNodeNum + id2;
+  int pos = 0;
   bool exists = false;
   if ( mEdgeHash.find(index, pos) ) {
     // 本当に重複しているか調べる．
@@ -99,19 +100,19 @@ struct Lt
 END_NONAMESPACE
 
 // @brief maximal independent set のサイズを求める．
-ymuint
+int
 DgGraph::get_mis_size()
 {
   // DgNode を隣接数の昇順に並べる．
   vector<DgNode*> node_list(mNodeNum);
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
+  for ( int i = 0; i < mNodeNum; ++ i ) {
     node_list[i] = &mNodeArray[i];
   }
   sort(node_list.begin(), node_list.end(), Lt());
 
   // 先頭から取り出して MIS を求める．
-  ymuint n = 0;
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
+  int n = 0;
+  for ( int i = 0; i < mNodeNum; ++ i ) {
     DgNode* node = node_list[i];
     if ( !node->is_active() ) {
       continue;
@@ -119,9 +120,7 @@ DgGraph::get_mis_size()
     ++ n;
 
     // node に隣接しているノードを inactive にする．
-    const vector<DgNode*>& adj_link = node->adj_link();
-    for (ymuint j = 0; j < adj_link.size(); ++ j) {
-      DgNode* node1 = adj_link[j];
+    for ( auto node1: node->adj_link() ) {
       node1->inactivate();
     }
   }

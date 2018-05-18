@@ -47,11 +47,11 @@ LutMap::~LutMap()
 // @param[out] depth 段数
 void
 LutMap::area_map(const BnNetwork& src_network,
-		 ymuint limit,
-		 ymuint mode,
+		 int limit,
+		 int mode,
 		 BnNetwork& map_network,
-		 ymuint& lut_num,
-		 ymuint& depth)
+		 int& lut_num,
+		 int& depth)
 {
 
   SbjGraph sbjgraph;
@@ -93,12 +93,12 @@ LutMap::area_map(const BnNetwork& src_network,
 // @param[out] depth 段数
 void
 LutMap::delay_map(const BnNetwork& src_network,
-		  ymuint limit,
-		  ymuint slack,
-		  ymuint mode,
+		  int limit,
+		  int slack,
+		  int mode,
 		  BnNetwork& map_network,
-		  ymuint& lut_num,
-		  ymuint& depth)
+		  int& lut_num,
+		  int& depth)
 {
 
   SbjGraph sbjgraph;

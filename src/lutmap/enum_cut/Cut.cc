@@ -3,7 +3,7 @@
 /// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 //
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -20,7 +20,7 @@ BEGIN_NONAMESPACE
 // その時の node の値を計算する．
 ymuint64
 eval_node(const SbjNode* node,
-	  HashMap<ymuint, ymuint64>& valmap)
+	  HashMap<int, ymuint64>& valmap)
 {
   if ( node == nullptr ) {
     return 0ULL;
@@ -64,10 +64,11 @@ ymuint64
 eval_cut(const Cut* cut,
 	 const vector<ymuint64>& vals)
 {
-  ymuint ni = cut->input_num();
+  int ni = cut->input_num();
   ASSERT_COND( ni == vals.size() );
-  HashMap<ymuint, ymuint64> valmap;
-  for (ymuint i = 0; i < ni; ++ i) {
+
+  HashMap<int, ymuint64> valmap;
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
     valmap.add(inode->id(), vals[i]);
   }
@@ -85,13 +86,13 @@ END_NONAMESPACE
 ymuint64
 Cut::eval(const vector<ymuint64>& vals) const
 {
-  ymuint ni = input_num();
+  int ni = input_num();
   ASSERT_COND( ni == vals.size() );
 
   // ノードの ID 番号をキーにして値を保持するハッシュ表
-  HashMap<ymuint, ymuint64> valmap;
+  HashMap<int, ymuint64> valmap;
   // 葉のノードの値を登録する．
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     valmap.add(input(i)->id(), vals[i]);
   }
 
@@ -114,8 +115,8 @@ TvFunc
 Cut::make_tv(bool oinv,
 	     const vector<bool>& iinv) const
 {
-  ymuint ni = input_num();
-  ymuint np = 1 << ni;
+  int ni = input_num();
+  int np = 1 << ni;
 
   vector<int> tv(np);
 
@@ -126,15 +127,12 @@ Cut::make_tv(bool oinv,
 
   // 真理値表の各変数の値を表すビットベクタ
   // 6入力以上の場合には1語に収まらないので複数回にわけて処理する．
-  vector<ymuint64> vals(ni);
-  for (ymuint i = 0; i < ni; ++ i) {
-    vals[i] = 0ULL;
-  }
+  vector<ymuint64> vals(ni, 0ULL);
 
   ymuint64 s = 1ULL;
-  ymuint p0 = 0;
-  for (ymuint p = 0; p < np; ++ p) {
-    for (ymuint i = 0; i < ni; ++ i) {
+  int p0 = 0;
+  for ( int p = 0; p < np; ++ p ) {
+    for ( int i = 0; i < ni; ++ i ) {
       ymuint mask = 1U << i;
       ymuint mask1 = iinv[i] ? 0U : mask;
       if ( (p & mask) == mask1 ) {
@@ -145,7 +143,7 @@ Cut::make_tv(bool oinv,
     if ( s == 0ULL ) {
       // 64 パタン目
       ymuint64 tmp = eval_cut(this, vals);
-      for (ymuint p1 = p0; p1 < p; ++ p1) {
+      for ( int p1 = p0; p1 < p; ++ p1 ) {
 	if ( tmp & (1ULL << (p1 - p0)) ) {
 	  tv[p1] = v1;
 	}
@@ -155,7 +153,7 @@ Cut::make_tv(bool oinv,
       }
       s = 1ULL;
       p0 = p + 1;
-      for (ymuint i = 0; i < ni; ++ i) {
+      for ( int i = 0; i < ni; ++ i ) {
 	vals[i] = 0ULL;
       }
     }
@@ -163,7 +161,7 @@ Cut::make_tv(bool oinv,
   if ( s != 1ULL ) {
     // 処理されていない残りがあった．
     ymuint64 tmp = eval_cut(this, vals);
-    for (ymuint p1 = p0; p1 < np; ++ p1) {
+    for ( int p1 = p0; p1 < np; ++ p1 ) {
       if ( tmp & (1ULL << (p1 - p0)) ) {
 	tv[p1] = v1;
       }
@@ -187,7 +185,7 @@ Cut::print(ostream& s) const
   else {
     s << "Node[" << root()->id() << "] : ";
     string comma = "";
-    for (ymuint i = 0; i < input_num(); i ++) {
+    for ( int i = 0; i < input_num(); i ++ ) {
       const SbjNode* node = mInputs[i];
       s << comma << "Node[" << node->id() << "]";
       comma = ", ";

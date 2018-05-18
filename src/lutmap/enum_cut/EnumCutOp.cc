@@ -3,7 +3,7 @@
 /// @brief EnumCutOp の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -33,9 +33,9 @@ EnumCutOp::~EnumCutOp()
 // @param[in] 対象のサブジェクトグラフ
 // @param[in] limit 入力数の制限
 // @return 全 cut 数を返す．
-ymuint
+int
 EnumCutOp::enum_cut(const SbjGraph& sbjgraph,
-		    ymuint limit)
+		    int limit)
 {
   EnumCut ec;
   return ec(sbjgraph, limit, this);
@@ -47,7 +47,7 @@ EnumCutOp::enum_cut(const SbjGraph& sbjgraph,
 // @note デフォルトの実装ではなにもしない．
 void
 EnumCutOp::all_init(const SbjGraph& sbjgraph,
-		    ymuint limit)
+		    int limit)
 {
 }
 
@@ -57,7 +57,7 @@ EnumCutOp::all_init(const SbjGraph& sbjgraph,
 // @note デフォルトの実装ではなにもしない．
 void
 EnumCutOp::node_init(const SbjNode* node,
-		     ymuint cur_pos)
+		     int cur_pos)
 {
 }
 
@@ -76,7 +76,7 @@ EnumCutOp::found(const SbjNode* root)
 // @note デフォルトの実装ではなにもしない．
 void
 EnumCutOp::found(const SbjNode* root,
-		 ymuint ni,
+		 int ni,
 		 const SbjNode* inputs[])
 {
 }
@@ -88,8 +88,8 @@ EnumCutOp::found(const SbjNode* root,
 // @note デフォルトの実装ではなにもしない．
 void
 EnumCutOp::node_end(const SbjNode* node,
-		    ymuint cur_pos,
-		    ymuint ncuts)
+		    int cur_pos,
+		    int ncuts)
 {
 }
 
@@ -97,7 +97,7 @@ EnumCutOp::node_end(const SbjNode* node,
 // @note デフォルトの実装ではなにもしない．
 void
 EnumCutOp::all_end(const SbjGraph& sbjgraph,
-		   ymuint limit)
+		   int limit)
 {
 }
 

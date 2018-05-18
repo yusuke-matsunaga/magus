@@ -50,13 +50,13 @@ LutMap3::~LutMap3()
 // @param[out] depth 段数
 void
 LutMap3::area_map(const BnNetwork& src_network,
-		  ymuint limit,
-		  ymuint mode,
-		  ymuint count,
+		  int limit,
+		  int mode,
+		  int count,
 		  bool verbose,
 		  BnNetwork& map_network,
-		  ymuint& lut_num,
-		  ymuint& depth)
+		  int& lut_num,
+		  int& depth)
 {
 
   SbjGraph sbjgraph;
@@ -77,8 +77,8 @@ LutMap3::area_map(const BnNetwork& src_network,
     dumper.dump(cout, sbjgraph);
 
     MapGen gen;
-    ymuint lut_num;
-    ymuint depth;
+    int lut_num;
+    int depth;
     gen.estimate(sbjgraph, maprec, lut_num, depth);
     const vector<const SbjNode*>& fp_list = gen.fanoutpoint_list();
     vector<bool> mark(sbjgraph.node_num(), false);

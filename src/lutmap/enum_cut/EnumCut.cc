@@ -3,7 +3,7 @@
 /// @brief EnumCut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -33,12 +33,12 @@ EnumCut::~EnumCut()
 }
 
 // 入力数が limit 以下のクラスタを列挙する．
-ymuint
+int
 EnumCut::operator()(const SbjGraph& sbjgraph,
-		    ymuint limit,
+		    int limit,
 		    EnumCutOp* op)
 {
-  ymuint n = sbjgraph.node_num();
+  int n = sbjgraph.node_num();
   mNodeTemp.clear();
   mNodeTemp.resize(n);
 
@@ -51,19 +51,17 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
   mInputs = new const SbjNode*[limit];
 
-  ymuint ni = sbjgraph.input_num();
-  ymuint nl = sbjgraph.logic_num();
+  int ni = sbjgraph.input_num();
+  int nl = sbjgraph.logic_num();
 
-  mInodeStack = new ymuint32[nl];
+  mInodeStack = new int[nl];
   mIsPos = &mInodeStack[0];
 
   // 外部入力用の(ダミーの)クラスタを作る．
   mNall = ni + nl;
   mNcAll = 0;
   mCurPos = 0;
-  for (ymuint i = 0; i < ni; ++ i) {
-    const SbjNode* node = sbjgraph.input(i);
-
+  for ( auto node: sbjgraph.input_list() ) {
     mNcCur = 0;
 
     mOp->node_init(node, mCurPos);
@@ -82,12 +80,10 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   }
 
   // 入力側から内部ノード用のクラスタを作る．
-  for (ymuint i = 0; i < nl; ++ i) {
-    const SbjNode* node = sbjgraph.logic(i);
-
+  for ( auto node: sbjgraph.logic_list() ) {
     mMarkedNodesLast = 0;
 
-    for (ymuint i = 0; i < 2; ++ i) {
+    for ( int i: {0, 1} ) {
       // ファンインの cut に含まれるノードに c1mark をつける．
       const SbjNode* inode = node->fanin(i);
       mark_cnode(inode);
@@ -96,11 +92,11 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     // 自分に c1mark がついており，ファンインには c1mark がついていない
     // ノードに c2mark をつける．
     // c2mark のついたノードが境界ノードとなる．
-    for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
+    for ( int i = 0; i < mMarkedNodesLast; ++ i ) {
       const SbjNode* node = mMarkedNodes[i];
       if ( temp1mark(node) ) {
 	if ( node->is_logic() ) {
-	  for (ymuint i = 0; i < 2; ++ i) {
+	  for ( int i: {0, 1} ) {
 	    const SbjNode* inode = node->fanin(i);
 	    if ( !temp1mark(inode) ) {
 	      set_temp2mark(node);
@@ -140,7 +136,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
     ++ mCurPos;
 
     // マークを消しておく
-    for (ymuint i = 0; i < mMarkedNodesLast; ++ i) {
+    for ( int i = 0; i < mMarkedNodesLast; ++ i ) {
       const SbjNode* node = mMarkedNodes[i];
       clear_tempmark(node);
     }
@@ -158,10 +154,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 void
 EnumCut::mark_cnode(const SbjNode* node)
 {
-  const vector<const SbjNode*>& cnode_list1 = cnode_list(node);
-  for (vector<const SbjNode*>::const_iterator p = cnode_list1.begin();
-       p != cnode_list1.end(); ++ p) {
-    const SbjNode* node = *p;
+  for ( auto node: cnode_list(node) ) {
     if ( !temp1mark(node) ) {
       set_temp1mark(node);
       mMarkedNodes[mMarkedNodesLast] = node;
@@ -189,10 +182,7 @@ EnumCut::mark_cnode2(const SbjNode* node)
 void
 EnumCut::mark_cnode3(const SbjNode* node)
 {
-  const vector<const SbjNode*>& cnode_list1 = cnode_list(node);
-  for (vector<const SbjNode*>::const_iterator p = cnode_list1.begin();
-       p != cnode_list1.end(); ++ p) {
-    const SbjNode* node = *p;
+  for ( auto node: cnode_list(node) ) {
     if ( !temp1mark(node) ) {
       set_temp1mark(node);
       mMarkedNodes[mMarkedNodesLast] = node;
@@ -208,7 +198,7 @@ EnumCut::mark_cnode3(const SbjNode* node)
 // root_depth よりも小さな depth を持つノードを frontier stack に積む．
 void
 EnumCut::get_frontier(const SbjNode* node,
-		      ymuint root_depth)
+		      int root_depth)
 {
   if ( state(node) ) {
     return;
@@ -295,7 +285,7 @@ EnumCut::enum_recur()
     cout << "FRONTIER IS EMPTY" << endl;
 #endif
 
-    for (ymuint i = 0; i < mInputPos; ++ i) {
+    for ( int i = 0; i < mInputPos; ++ i ) {
       set_cmark(mInputs[i]);
     }
     if ( mInputPos > 1 ) {
@@ -341,7 +331,7 @@ EnumCut::enum_recur()
     }
 
     const SbjNode** old_fs_pos = mFsPos;
-    ymuint old_input_pos = mInputPos;
+    int old_input_pos = mInputPos;
     bool recur = true;
     bool inode0_stat = false;
     const SbjNode* inode0 = node->fanin(0);

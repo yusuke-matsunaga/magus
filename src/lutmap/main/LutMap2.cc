@@ -48,13 +48,13 @@ LutMap2::~LutMap2()
 // @param[out] depth 段数
 void
 LutMap2::area_map(const BnNetwork& src_network,
-		  ymuint limit,
-		  ymuint mode,
-		  ymuint count,
+		  int limit,
+		  int mode,
+		  int count,
 		  bool verbose,
 		  BnNetwork& map_network,
-		  ymuint& lut_num,
-		  ymuint& depth)
+		  int& lut_num,
+		  int& depth)
 {
 
   SbjGraph sbjgraph;

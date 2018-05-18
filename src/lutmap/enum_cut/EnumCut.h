@@ -5,7 +5,7 @@
 /// @brief EnumCut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -38,9 +38,9 @@ public:
   /// @param[in] limit 入力数の制限
   /// @param[in] op カットが列挙される時に呼ばれるクラス
   /// @return 全 cut 数を返す．
-  ymuint
+  int
   operator()(const SbjGraph& sbjgraph,
-	     ymuint limit,
+	     int limit,
 	     EnumCutOp* op);
 
 
@@ -69,7 +69,7 @@ private:
   // root_depth よりも小さな depth を持つノードを frontier stack に積む．
   void
   get_frontier(const SbjNode* node,
-	       ymuint root_depth);
+	       int root_depth);
 
   // get_frontier で付けた印を消す．
   void
@@ -258,25 +258,25 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数の最大値
-  ymuint32 mLimit;
+  int mLimit;
 
   // 全ノード数
-  ymuint32 mNall;
+  int mNall;
 
   // 現在処理中のノード番号
-  ymuint32 mCurPos;
+  int mCurPos;
 
   // 全 cut 数
-  ymuint32 mNcAll;
+  int mNcAll;
 
   // 現在処理中のノードの cut 数
-  ymuint32 mNcCur;
+  int mNcCur;
 
   // 根のノード
   const SbjNode* mRoot;
 
   // mFrontierStack のサイズ
-  ymuint32 mFsSize;
+  int mFsSize;
 
   // 最前線ノードのスタック
   const SbjNode** mFrontierStack;
@@ -288,13 +288,13 @@ private:
   const SbjNode** mInputs;
 
   // mInputs の次の書き込み位置
-  ymuint32 mInputPos;
+  int mInputPos;
 
   // 内部ノードのスタック
-  ymuint32* mInodeStack;
+  int* mInodeStack;
 
   // 内部ノードスタックのスタックポインタ
-  ymuint32* mIsPos;
+  int* mIsPos;
 
   // 各ノードごとの作業領域
   vector<NodeTemp> mNodeTemp;
@@ -303,7 +303,7 @@ private:
   vector<const SbjNode*> mMarkedNodes;
 
   // mMarkedNodes の末尾
-  ymuint32 mMarkedNodesLast;
+  int mMarkedNodesLast;
 
   // カットが列挙されたときに呼ばれるクラス
   EnumCutOp* mOp;

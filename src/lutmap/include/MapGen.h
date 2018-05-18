@@ -5,7 +5,7 @@
 /// @brief MapGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -48,8 +48,8 @@ public:
   generate(const SbjGraph& sbjgraph,
 	   const MapRecord& record,
 	   BnNetwork& mapgraph,
-	   ymuint& lut_num,
-	   ymuint& depth);
+	   int& lut_num,
+	   int& depth);
 
   /// @brief マッピング結果から見積もりを行う．
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -59,8 +59,8 @@ public:
   void
   estimate(const SbjGraph& sbjgraph,
 	   const MapRecord& record,
-	   ymuint& lut_num,
-	   ymuint& depth);
+	   int& lut_num,
+	   int& depth);
 
   /// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
   const vector<const SbjNode*>&
@@ -92,13 +92,13 @@ private:
     /// @param[in] depth 段数
     /// @param[in] inv 反転フラグ
     void
-    set_map(ymuint node_id,
+    set_map(int node_id,
 	    int depth,
 	    bool inv = false);
 
     /// @brief 参照回数を返す．
     /// @param[in] inv 反転フラグ
-    ymuint
+    int
     ref_count(bool inv = false) const;
 
     /// @brief 負極性しか作らないときに true を返す．
@@ -107,7 +107,7 @@ private:
 
     /// @brief マップ結果を返す．
     /// @param[in] inv 反転フラグ
-    ymuint
+    int
     map_node(bool inv = false) const;
 
     /// @brief 段数を返す．
@@ -123,11 +123,11 @@ private:
 
     // 使われている回数
     // 正極性と負極性の2通りを保持する．
-    ymuint mRefCount[2];
+    int mRefCount[2];
 
     // マップ結果
     // 正極性と負極性の2通りを保持する．
-    ymuint mMapNode[2];
+    int mMapNode[2];
 
     // 段数
     // 正極性と負極性の2通りを保持する．
@@ -144,7 +144,7 @@ private:
   /// @brief 作業領域の初期化を行う．
   /// @param[in] node_num ノード数
   void
-  init(ymuint node_num);
+  init(int node_num);
 
   /// @brief generate 用のバックトレースを行う．
   /// @param[in] node 対象のノード
@@ -152,7 +152,7 @@ private:
   /// @param[in] record マッピング結果
   /// @param[out] mapnetwork マッピング結果のネットワーク
   /// @return (node, inv) を実現するノード番号を返す．
-  ymuint
+  int
   gen_back_trace(const SbjNode* node,
 		 bool inv,
 		 const MapRecord& record,
@@ -177,13 +177,13 @@ private:
   vector<NodeInfo> mNodeInfo;
 
   // 定数0のノード番号
-  ymuint mConst0;
+  int mConst0;
 
   // 定数1のノード番号
-  ymuint mConst1;
+  int mConst1;
 
   // LUT数の見積もりに使う作業領域
-  ymuint mLutNum;
+  int mLutNum;
 
   // ファンアウトポイントのリスト
   vector<const SbjNode*> mFanoutPointList;
@@ -223,7 +223,7 @@ inline
 void
 MapGen::NodeInfo::inc_ref(bool inv)
 {
-  ymuint idx = inv ? 1 : 0;
+  int idx = inv ? 1 : 0;
   ++ mRefCount[idx];
 }
 
@@ -233,11 +233,11 @@ MapGen::NodeInfo::inc_ref(bool inv)
 // @param[in] inv 反転フラグ
 inline
 void
-MapGen::NodeInfo::set_map(ymuint node_id,
+MapGen::NodeInfo::set_map(int node_id,
 			  int depth,
 			  bool inv)
 {
-  ymuint idx = inv ? 1 : 0;
+  int idx = inv ? 1 : 0;
   mMapNode[idx] = node_id;
   mDepth[idx] = depth;
 }
@@ -245,10 +245,10 @@ MapGen::NodeInfo::set_map(ymuint node_id,
 // @brief 参照回数を返す．
 // @param[in] inv 反転フラグ
 inline
-ymuint
+int
 MapGen::NodeInfo::ref_count(bool inv) const
 {
-  ymuint idx = inv ? 1 : 0;
+  int idx = inv ? 1 : 0;
   return mRefCount[idx];
 }
 
@@ -263,10 +263,10 @@ MapGen::NodeInfo::inv_req() const
 // @brief マップ結果を返す．
 // @param[in] inv 反転フラグ
 inline
-ymuint
+int
 MapGen::NodeInfo::map_node(bool inv) const
 {
-  ymuint idx = inv ? 1 : 0;
+  int idx = inv ? 1 : 0;
   return mMapNode[idx];
 }
 
@@ -276,7 +276,7 @@ inline
 int
 MapGen::NodeInfo::depth(bool inv) const
 {
-  ymuint idx = inv ? 1 : 0;
+  int idx = inv ? 1 : 0;
   return mDepth[idx];
 }
 

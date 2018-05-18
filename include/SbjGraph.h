@@ -25,10 +25,10 @@ class IOInfo;
 /// 入力ノード，出力ノード，論理ノードを分けてリストで持つ
 /// ( @sa input_list(), output_list(), lnode_list() )．
 /// また，すべてのノードに唯一な ID 番号を割り振っており，その ID 番号
-/// からノードを取り出すこともできる( @sa node(ymuint id) )．
+/// からノードを取り出すこともできる( @sa node(int id) )．
 /// 入力ノード，出力ノードは ID 番号とは別に入力 ID 番号，および出力
 /// ID 番号を持っており，それらの ID 番号からノードを取り出すこともできる．
-/// ( @sa input(ymuint id), output(ymuint id) )
+/// ( @sa input(int id), output(int id) )
 /// 論理ノードを入力からのトポロジカル順に並んでいる．
 ///
 /// ノードの DAG の外側にポート，DFF，ラッチを表す SbjPort, SbjDff, SbjLatch
@@ -529,12 +529,7 @@ private:
   vector<const SbjLatch*> mLatchList;
 
   // 最大レベル
-  mutable
   int mLevel;
-
-  // mLevel および各 SbjNode::mLevel が正しいとき true となるフラグ
-  mutable
-  bool mLevelValid;
 
 };
 

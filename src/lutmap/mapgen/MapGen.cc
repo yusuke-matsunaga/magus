@@ -93,7 +93,7 @@ MapGen::~MapGen()
 // @brief 作業領域の初期化を行う．
 // @param[in] node_num ノード数
 void
-MapGen::init(ymuint node_num)
+MapGen::init(int node_num)
 {
   // 作業領域の初期化
   // 具体的な初期化は NodeInfo のコンストラクタが行っている．
@@ -116,8 +116,8 @@ void
 MapGen::generate(const SbjGraph& sbjgraph,
 		 const MapRecord& record,
 		 BnNetwork& mapgraph,
-		 ymuint& lut_num,
-		 ymuint& depth)
+		 int& lut_num,
+		 int& depth)
 {
 #if LUTMAP_DEBUG_MAPGEN
   cout << "MapGen::generate() start" << endl;
@@ -128,11 +128,11 @@ MapGen::generate(const SbjGraph& sbjgraph,
 
   init(sbjgraph.node_num());
 
-  ymuint ni = sbjgraph.input_num();
-  ymuint no = sbjgraph.output_num();
+  int ni = sbjgraph.input_num();
+  int no = sbjgraph.output_num();
 
   // 外部出力から要求されている極性を記録する．
-  for (ymuint i = 0; i < no; ++ i) {
+  for ( int i = 0; i < no; ++ i ) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
     if ( node ) {
@@ -141,25 +141,25 @@ MapGen::generate(const SbjGraph& sbjgraph,
   }
 
   // ポートの生成
-  ymuint np = sbjgraph.port_num();
-  for (ymuint i = 0; i < np; ++ i) {
+  int np = sbjgraph.port_num();
+  for ( int i = 0; i < np; ++ i ) {
     const SbjPort* sbjport = sbjgraph.port(i);
-    ymuint nb = sbjport->bit_width();
+    int nb = sbjport->bit_width();
     vector<int> dir_vect(nb);
-    for (ymuint j = 0; j < nb; ++ j) {
+    for ( int j = 0; j < nb; ++ j ) {
       const SbjNode* sbjnode = sbjport->bit(j);
       dir_vect[j] = sbjnode->is_input() ? 0 : 1;
     }
     BnPort* bn_port = mapgraph.new_port(sbjport->name(), dir_vect);
-    for (ymuint j = 0; j < nb; ++ j) {
+    for ( int j = 0; j < nb; ++ j ) {
       const SbjNode* sbjnode = sbjport->bit(j);
       mNodeInfo[sbjnode->id()].set_map(bn_port->bit(j), 0);
     }
   }
 
   // DFFの生成
-  ymuint nf = sbjgraph.dff_num();
-  for (ymuint i = 0; i < nf; ++ i) {
+  int nf = sbjgraph.dff_num();
+  for ( int i = 0; i < nf; ++ i ) {
     const SbjDff* dff = sbjgraph.dff(i);
     const SbjNode* input = dff->data_input();
     const SbjNode* output = dff->data_output();
@@ -184,8 +184,8 @@ MapGen::generate(const SbjGraph& sbjgraph,
   }
 
   // ラッチの生成
-  ymuint nlatch = sbjgraph.latch_num();
-  for (ymuint i = 0; i < nlatch; ++ i) {
+  int nlatch = sbjgraph.latch_num();
+  for ( int i = 0; i < nlatch; ++ i ) {
     const SbjLatch* latch = sbjgraph.latch(i);
     const SbjNode* input = latch->data_input();
     const SbjNode* output = latch->data_output();
@@ -210,14 +210,14 @@ MapGen::generate(const SbjGraph& sbjgraph,
   }
 
   // 外部入力の生成
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* node = sbjgraph.input(i);
     NodeInfo& node_info = mNodeInfo[node->id()];
-    ymuint node_id = node_info.map_node();
+    int node_id = node_info.map_node();
     if ( node_info.inv_req() ) {
       // NOT ゲートを表す LUT を作る．
       TvFunc tv = TvFunc::nega_literal(1, VarId(0));
-      ymuint inv_id = mapgraph.new_tv(string(), 1, tv);
+      int inv_id = mapgraph.new_tv(string(), 1, tv);
       mapgraph.connect(node_id, inv_id, 0);
 
       ++ mLutNum;
@@ -232,11 +232,11 @@ MapGen::generate(const SbjGraph& sbjgraph,
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   int max_depth = 0;
-  for (ymuint i = 0; i < no; ++ i) {
+  for ( int i = 0; i < no; ++ i ) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
     bool inv = onode->output_fanin_inv();
-    ymuint node_id;
+    int node_id;
     int depth;
     if ( node ) {
       node_id = gen_back_trace(node, inv, record, mapgraph);
@@ -276,7 +276,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       }
       depth = 0;
     }
-    ymuint onode_id = mNodeInfo[onode->id()].map_node();
+    int onode_id = mNodeInfo[onode->id()].map_node();
     mapgraph.connect(node_id, onode_id, 0);
     // depth の設定のため
     mNodeInfo[onode->id()].set_map(onode_id, depth);
@@ -289,8 +289,8 @@ MapGen::generate(const SbjGraph& sbjgraph,
   depth = max_depth;
 
   // ファンアウトポイントを記録する．
-  ymuint nl = sbjgraph.logic_num();
-  for (ymuint i = 0; i < nl; ++ i) {
+  int nl = sbjgraph.logic_num();
+  for ( int i = 0; i < nl; ++ i ) {
     const SbjNode* node = sbjgraph.logic(i);
     const NodeInfo& node_info = mNodeInfo[node->id()];
     if ( node_info.ref_count(false) > 1 || node_info.ref_count(true) > 1 ) {
@@ -309,7 +309,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
 // @param[in] record マッピング結果
 // @param[out] mapnetwork マッピング結果のネットワーク
 // @return (node, inv) を実現するノード番号を返す．
-ymuint
+int
 MapGen::gen_back_trace(const SbjNode* node,
 		       bool output_inv,
 		       const MapRecord& record,
@@ -320,7 +320,7 @@ MapGen::gen_back_trace(const SbjNode* node,
 #endif
   NodeInfo& node_info = mNodeInfo[node->id()];
 
-  ymuint node_id = node_info.map_node(output_inv);
+  int node_id = node_info.map_node(output_inv);
   if ( node_id != kBnNullId ) {
     // すでに生成済みならそのノードを返す．
     return node_id;
@@ -338,9 +338,9 @@ MapGen::gen_back_trace(const SbjNode* node,
   }
 
   // その入力に対応するノードを再帰的に生成する．
-  ymuint ni = cut->input_num();
+  int ni = cut->input_num();
   int depth = 0;
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
     NodeInfo& inode_info = mNodeInfo[inode->id()];
     bool iinv = inode_info.inv_req();
@@ -361,7 +361,7 @@ MapGen::gen_back_trace(const SbjNode* node,
   // gen_back_trace() の再帰のたびにスタック上に input_inv が作られる
   // ことになるのであえてここで行う．
   vector<bool> input_inv(ni, false);
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
     const NodeInfo& inode_info = mNodeInfo[inode->id()];
     input_inv[i] = inode_info.inv_req();
@@ -374,11 +374,11 @@ MapGen::gen_back_trace(const SbjNode* node,
   ++ mLutNum;
 
   // 入力側のノードとの接続を行う．
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
     const NodeInfo& inode_info = mNodeInfo[inode->id()];
-    ymuint iinv = inode_info.inv_req();
-    ymuint src_id = inode_info.map_node(iinv);
+    int iinv = inode_info.inv_req();
+    int src_id = inode_info.map_node(iinv);
     mapnetwork.connect(src_id, node_id, i);
   }
 
@@ -400,8 +400,8 @@ MapGen::gen_back_trace(const SbjNode* node,
 void
 MapGen::estimate(const SbjGraph& sbjgraph,
 		 const MapRecord& record,
-		 ymuint& lut_num,
-		 ymuint& depth)
+		 int& lut_num,
+		 int& depth)
 {
 #if LUTMAP_DEBUG_MAPEST
   cout << "MapGen::estimate() start" << endl;
@@ -409,11 +409,11 @@ MapGen::estimate(const SbjGraph& sbjgraph,
 
   init(sbjgraph.node_num());
 
-  ymuint ni = sbjgraph.input_num();
-  ymuint no = sbjgraph.output_num();
+  int ni = sbjgraph.input_num();
+  int no = sbjgraph.output_num();
 
   // 外部出力から要求されている極性を記録する．
-  for (ymuint i = 0; i < no; ++ i) {
+  for ( int i = 0; i < no; ++ i ) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
     if ( node ) {
@@ -422,7 +422,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
   }
 
   // 外部入力の生成
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* node = sbjgraph.input(i);
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.set_map(1, 0);
@@ -439,7 +439,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   lut_num = 0;
   int max_depth = 0;
-  for (ymuint i = 0; i < no; ++ i) {
+  for ( int i = 0; i < no; ++ i ) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
     bool inv = onode->output_fanin_inv();
@@ -480,8 +480,8 @@ MapGen::estimate(const SbjGraph& sbjgraph,
   depth = max_depth;
 
   // ファンアウトポイントを記録する．
-  ymuint nl = sbjgraph.logic_num();
-  for (ymuint i = 0; i < nl; ++ i) {
+  int nl = sbjgraph.logic_num();
+  for ( int i = 0; i < nl; ++ i ) {
     const SbjNode* node = sbjgraph.logic(i);
     const NodeInfo& node_info = mNodeInfo[node->id()];
     if ( node_info.ref_count(false) > 1 || node_info.ref_count(true) > 1 ) {
@@ -509,7 +509,7 @@ MapGen::est_back_trace(const SbjNode* node,
 
   NodeInfo& node_info = mNodeInfo[node->id()];
 
-  ymuint node_id = node_info.map_node(inv);
+  int node_id = node_info.map_node(inv);
   if ( node_id ) {
     return;
   }
@@ -527,9 +527,9 @@ MapGen::est_back_trace(const SbjNode* node,
 #endif
 
   // その入力に対応するノードを再帰的に生成する．
-  ymuint ni = cut->input_num();
+  int ni = cut->input_num();
   int depth = 0;
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
     NodeInfo& inode_info = mNodeInfo[inode->id()];
     bool iinv = inode_info.inv_req();

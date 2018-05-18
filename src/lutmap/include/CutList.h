@@ -5,7 +5,7 @@
 /// @brief CutList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -126,7 +126,7 @@ public:
   end() const;
 
   /// @brief 要素数を返す．
-  ymuint
+  int
   size() const;
 
   /// @brief 空のとき true を返す．
@@ -146,7 +146,7 @@ private:
   Cut* mTail;
 
   // 要素数
-  ymuint32 mNum;
+  int mNum;
 
 };
 
@@ -272,7 +272,7 @@ CutList::end() const
 
 // @brief 要素数を返す．
 inline
-ymuint
+int
 CutList::size() const
 {
   return mNum;

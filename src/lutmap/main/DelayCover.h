@@ -5,7 +5,7 @@
 /// @brief DelayCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -32,7 +32,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  DelayCover(ymuint mode);
+  DelayCover(int mode);
 
   /// @brief デストラクタ
   ~DelayCover();
@@ -51,7 +51,7 @@ public:
   void
   record_cuts(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder,
-	      ymuint slack,
+	      int slack,
 	      MapRecord& maprec);
 
 
@@ -105,7 +105,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // モード
-  ymuint mMode;
+  int mMode;
 
   // マッピング用の作業領域
   vector<NodeInfo> mNodeInfo;

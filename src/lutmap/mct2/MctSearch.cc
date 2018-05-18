@@ -285,8 +285,8 @@ MctSearch::default_policy(MctNode* node)
 #endif
 
   MapGen gen;
-  ymuint lut_num;
-  ymuint depth;
+  int lut_num;
+  int depth;
   gen.estimate(mSbjGraph, record, lut_num, depth);
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;

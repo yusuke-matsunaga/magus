@@ -130,8 +130,8 @@ SaSearch::evaluate(const vector<bool>& state)
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, dupnode_list, record);
 
   MapGen gen;
-  ymuint lut_num;
-  ymuint depth;
+  int lut_num;
+  int depth;
   gen.estimate(mSbjGraph, record, lut_num, depth);
 
   if ( mMinimumLutNum > lut_num ) {
@@ -162,8 +162,8 @@ SaSearch::evaluate(const vector<bool>& state)
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
 
   MapGen gen;
-  ymuint lut_num;
-  ymuint depth;
+  int lut_num;
+  int depth;
   gen.estimate(mSbjGraph, record, lut_num, depth);
 
   if ( mMinimumLutNum > lut_num ) {
