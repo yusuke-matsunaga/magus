@@ -16,12 +16,6 @@
 [submodule "ym-bnet"]
 	path = ym-bnet
 	url = git@github.com:yusuke-matsunaga/ym-bnet.git
-[submodule "ym-mincov"]
-	path = ym-mincov
-	url = git@github.com:yusuke-matsunaga/ym-mincov
-[submodule "ym-udgraph"]
-	path = ym-udgraph
-	url = git@github.com:yusuke-matsunaga/ym-udgraph
 [submodule "ym-sat"]
 	path = ym-sat
 	url = git@github.com:yusuke-matsunaga/ym-sat
@@ -31,3 +25,6 @@
 [submodule "ym-base"]
 	path = ym-base
 	url = git@github.com:yusuke-matsunaga/ym-base.git
+[submodule "ym-combopt"]
+	path = ym-combopt
+	url = git@github.com:yusuke-matsunaga/ym-combopt.git
