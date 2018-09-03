@@ -107,7 +107,6 @@ add_subdirectory ( ym-bnet )
 add_subdirectory ( ym-mvn )
 add_subdirectory ( ym-sat )
 add_subdirectory ( ym-tclpp )
-add_subdirectory ( ym-udgraph )
 add_subdirectory ( ym-verilog )
 
 add_subdirectory (src/cequiv)
