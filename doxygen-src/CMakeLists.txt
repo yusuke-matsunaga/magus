@@ -14,13 +14,12 @@ foreach ( dir
     "."
     "ym-bnet"
     "ym-cell"
+    "ym-combopt"
     "ym-common"
     "ym-logic"
-    "ym-mincov"
     "ym-mvn"
     "ym-sat"
     "ym-tclpp"
-    "ym-udgraph"
     "ym-verilog"
     )
   list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/${dir}/include" )
