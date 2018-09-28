@@ -168,12 +168,12 @@ FraigNode::set_fanin(FraigHandle handle1,
 // @param[in] end 終了位置
 // @param[in] pat パタンのベクタ
 void
-FraigNode::set_pat(ymuint start,
-		   ymuint end,
+FraigNode::set_pat(int start,
+		   int end,
 		   const vector<ymuint32>& pat)
 {
-  ymuint n = end - start;
-  for (ymuint i = 0; i < n; ++ i) {
+  int n = end - start;
+  for ( int i = 0; i < n; ++ i ) {
     mPat[start + i] = pat[i];
   }
   calc_hash(start, end);
@@ -183,8 +183,8 @@ FraigNode::set_pat(ymuint start,
 // @param[in] start 開始位置
 // @param[in] end 終了位置
 void
-FraigNode::calc_hash(ymuint start,
-		     ymuint end)
+FraigNode::calc_hash(int start,
+		     int end)
 {
   if ( start == 0 ) {
     // 極性を決める．

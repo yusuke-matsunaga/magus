@@ -93,7 +93,7 @@ public:
 
   /// @brief 外部入力ノードへのハンドルのとき，入力番号を返す．
   /// @note is_input() の時のみ意味を持つ．
-  ymuint
+  int
   input_id() const;
 
   /// @brief ANDノードへのハンドルのとき true を返す．
@@ -104,7 +104,7 @@ public:
   /// @note pos は 0 か 1 でなければならない．
   /// @note is_and() の時のみ意味を持つ．
   FraigHandle
-  fanin_handle(ymuint pos) const;
+  fanin_handle(int pos) const;
 
   /// @brief fanin0 のハンドルを得る．
   /// @note is_and() の時のみ意味を持つ．
@@ -121,7 +121,7 @@ public:
   rep_handle() const;
 
   /// @brief ハッシュ値を返す．
-  ymuint32
+  SizeType
   hash_func() const;
 
 
@@ -274,10 +274,10 @@ FraigHandle::is_const() const
 
 // @brief ハッシュ値を返す．
 inline
-ymuint32
+SizeType
 FraigHandle::hash_func() const
 {
-  return static_cast<ymuint32>(mPackedData);
+  return static_cast<SizeType>(mPackedData);
 }
 
 // @relates FraigHandle
@@ -307,7 +307,7 @@ BEGIN_NAMESPACE_YM
 template <>
 struct HashFunc<nsCec::FraigHandle>
 {
-  ymuint
+  SizeType
   operator()(nsCec::FraigHandle aig) const
   {
     return aig.hash_func();

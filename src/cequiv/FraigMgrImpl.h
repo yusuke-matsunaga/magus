@@ -32,7 +32,7 @@ public:
   /// @brief コンストラクタ
   /// @param[in] pat_size 初期パタンのサイズ
   /// @param[in] solver_type SAT-solver の種類を表す文字列
-  FraigMgrImpl(ymuint pat_size,
+  FraigMgrImpl(int pat_size,
 	       const SatSolverType& solver_type);
 
   /// @brief デストラクタ
@@ -45,24 +45,24 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力ノード数を得る．
-  ymuint
+  int
   input_num() const;
 
   /// @brief 入力ノードを取り出す．
   /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
   FraigNode*
-  input_node(ymuint pos) const;
+  input_node(int pos) const;
 
   /// @brief ノード数を得る．
   /// @note ANDノードの他に入力ノードも含まれる．
-  ymuint
+  int
   node_num() const;
 
   /// @brief ノードを取り出す．
   /// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
   /// @note ANDノードの他に入力ノードも含まれる．
   FraigNode*
-  node(ymuint pos) const;
+  node(int pos) const;
 
   /// @brief 定数0関数をつくる．
   FraigHandle
@@ -108,7 +108,7 @@ public:
   /// @brief ランダムシミュレーション制御用のパラメータを設定する．
   /// @param[in] loop_limit 変化のない状態がこの回数連続したら止める．
   void
-  set_loop_limit(ymuint loop_limit);
+  set_loop_limit(int loop_limit);
 
   /// @brief 統計情報を出力する．
   void
@@ -126,7 +126,7 @@ private:
 
   /// @brief 全ノードのシミュレーションパタン用配列を拡大する．
   void
-  resize_pat(ymuint size);
+  resize_pat(int size);
 
   /// @brief シミュレーションパタンが等しいか調べる．
   bool
@@ -177,7 +177,7 @@ private:
 
   /// @brief FraigNode のハッシュ関数
   static
-  ymuint
+  SizeType
   hash_func(FraigHandle handle1,
 	    FraigHandle handle2);
 
@@ -189,12 +189,12 @@ private:
   {
 
     // 試行回数
-    ymuint32 mTotalCount;
+    int mTotalCount;
 
     struct
     {
       // 回数
-      ymuint32 mCount;
+      int mCount;
 
       // 計算時間の総和
       double mTotalTime;
@@ -203,7 +203,7 @@ private:
       double mMaxTime;
 
       // restart 回数
-      ymuint32 mRestart;
+      int mRestart;
 
       // コンフリクト数
       ymuint64 mConflictNum;
@@ -255,13 +255,13 @@ private:
   FraigHash mHashTable1;
 
   // 各ノードのシミュレーションパタンのサイズ
-  ymuint32 mPatSize;
+  int mPatSize;
 
   // 初期パタン数
-  ymuint32 mPatInit;
+  int mPatInit;
 
   // 使用しているパタン数
-  ymuint32 mPatUsed;
+  int mPatUsed;
 
   // パタンハッシュ
   FraigHash mHashTable2;
@@ -276,7 +276,7 @@ private:
   vector<SatBool3> mModel;
 
   // sat_sweep 中のシミュレーション回数
-  ymuint32 mSimCount;
+  int mSimCount;
 
   // シミュレーションに要した時間
   double mSimTime;
@@ -297,7 +297,7 @@ private:
   ostream* mLogStream;
 
   // シミュレーションのループ回数
-  ymuint32 mLoopLimit;
+  int mLoopLimit;
 
 };
 
@@ -308,7 +308,7 @@ private:
 
 // @brief 入力ノード数を得る．
 inline
-ymuint
+int
 FraigMgrImpl::input_num() const
 {
   return mInputNodes.size();
@@ -318,14 +318,16 @@ FraigMgrImpl::input_num() const
 // @param[in] pos 入力番号 ( 0 <= pos < input_num() )
 inline
 FraigNode*
-FraigMgrImpl::input_node(ymuint pos) const
+FraigMgrImpl::input_node(int pos) const
 {
+  ASSERT_COND( pos >= 0 && pos < input_num() );
+
   return mInputNodes[pos];
 }
 
 // @brief ノード数を得る．
 inline
-ymuint
+int
 FraigMgrImpl::node_num() const
 {
   return mAllNodes.size();
@@ -336,14 +338,16 @@ FraigMgrImpl::node_num() const
 // @note ANDノードの他に入力ノードも含まれる．
 inline
 FraigNode*
-FraigMgrImpl::node(ymuint pos) const
+FraigMgrImpl::node(int pos) const
 {
+  ASSERT_COND( pos >= 0 && pos < node_num() );
+
   return mAllNodes[pos];
 }
 
 // FraigNode のハッシュ関数
 inline
-ymuint
+SizeType
 FraigMgrImpl::hash_func(FraigHandle handle1,
 			FraigHandle handle2)
 {

@@ -32,7 +32,7 @@ BEGIN_NAMESPACE_YM_CEC
 
 BEGIN_NONAMESPACE
 
-const ymuint debug = DEBUG_FLAG;
+const int debug = DEBUG_FLAG;
 
 END_NONAMESPACE
 
@@ -87,7 +87,7 @@ FraigHandle::is_input() const
 
 // @brief 外部入力ノードへのハンドルのとき，入力番号を返す．
 // @note is_input() の時のみ意味を持つ．
-ymuint
+int
 FraigHandle::input_id() const
 {
   FraigNode* n = node();
@@ -146,7 +146,7 @@ FraigHash::~FraigHash()
 
 // @brief ハッシュ表を確保する．
 void
-FraigHash::alloc_table(ymuint req_size)
+FraigHash::alloc_table(int req_size)
 {
   delete [] mTable;
 
@@ -158,7 +158,7 @@ FraigHash::alloc_table(ymuint req_size)
   }
 
   mTable = new FraigNode*[mHashSize];
-  for (ymuint i = 0; i < mHashSize; ++ i) {
+  for ( int i = 0; i < mHashSize; ++ i ) {
     mTable[i] = nullptr;
   }
 
@@ -177,7 +177,7 @@ FraigHash::alloc_table(ymuint req_size)
 // @param[in] sat_type SAT-solver の種類を表す文字列
 // @param[in] sat_opt SAT-solver に渡すオプション文字列
 // @param[in] sat_log ログの出力用ストリーム
-FraigMgrImpl::FraigMgrImpl(ymuint pat_size,
+FraigMgrImpl::FraigMgrImpl(int pat_size,
 			   const SatSolverType& solver_type) :
   mAlloc(4096),
   mPatSize(pat_size * 2),
@@ -219,11 +219,11 @@ FraigHandle
 FraigMgrImpl::make_input()
 {
   FraigNode* node = new_node();
-  ymuint iid = mInputNodes.size();
+  int iid = mInputNodes.size();
   node->set_input(iid);
   mInputNodes.push_back(node);
   vector<ymuint32> tmp(mPatUsed);
-  for (ymuint i = 0; i < mPatUsed; ++ i) {
+  for ( int i = 0; i < mPatUsed; ++ i ) {
     tmp[i] = mRandGen.int32();
   }
   node->set_pat(0, mPatUsed, tmp);
@@ -262,7 +262,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
   }
 
   // 同じ構造を持つノードが既にないか調べる．
-  ymuint pos1 = hash_func(handle1, handle2);
+  SizeType pos1 = hash_func(handle1, handle2);
   for (FraigNode* node1 = mHashTable1.elem(pos1);
        node1; node1 = node1->mLink1) {
     if ( node1->fanin0_handle() == handle1 &&
@@ -274,10 +274,10 @@ FraigMgrImpl::make_and(FraigHandle handle1,
 
   if ( mHashTable1.need_expand() ) {
     // 再ハッシュする．
-    ymuint n = node_num();
-    for (ymuint i = 0; i < n; ++ i) {
+    int n = node_num();
+    for ( int i = 0; i < n; ++ i ) {
       FraigNode* node1 = mAllNodes[i];
-      ymuint pos1 = hash_func(node1->fanin0_handle(), node1->fanin1_handle());
+      SizeType pos1 = hash_func(node1->fanin0_handle(), node1->fanin1_handle());
       mHashTable1.add_elem(pos1, node1, node1->mLink1);
     }
   }
@@ -339,7 +339,7 @@ FraigMgrImpl::make_and(FraigHandle handle1,
       }
       break;
     }
-    ymuint pos2 = node->pat_hash();
+    SizeType pos2 = node->pat_hash();
     for (FraigNode* node1 = mHashTable2.elem(pos2);
 	 node1; node1 = node1->mLink2) {
       bool inv = node1->pat_hash_inv() ^ inv0;
@@ -372,14 +372,14 @@ FraigMgrImpl::make_and(FraigHandle handle1,
   // パタンハッシュ表に登録する．
   if ( mHashTable2.need_expand() ) {
     // 再ハッシュする．
-    ymuint n = node_num() - 1; // ！-1 するのは node を除外するため！
-    for (ymuint i = 0; i < n; ++ i) {
+    int n = node_num() - 1; // ！-1 するのは node を除外するため！
+    for ( int i = 0; i < n; ++ i ) {
       FraigNode* node1 = mAllNodes[i];
-      ymuint pos2 = node1->pat_hash();
+      SizeType pos2 = node1->pat_hash();
       mHashTable2.add_elem(pos2, node1, node1->mLink2);
     }
   }
-  ymuint pos2 = node->pat_hash();
+  SizeType pos2 = node->pat_hash();
   mHashTable2.add_elem(pos2, node, node->mLink2);
 
   return FraigHandle(node, false);
@@ -396,8 +396,8 @@ FraigMgrImpl::add_pat(FraigNode* node)
 
   // 反例をパタンに加える．
   vector<ymuint32> tmp(1);
-  ymuint nn = node_num();
-  for (ymuint i = 0; i < nn; ++ i) {
+  int nn = node_num();
+  for ( int i = 0; i < nn; ++ i ) {
     FraigNode* node1 = mAllNodes[i];
     if ( node1->is_input() ) {
       ymuint32 pat = 0U;
@@ -407,7 +407,7 @@ FraigMgrImpl::add_pat(FraigNode* node)
       else {
 	pat = 0U;
       }
-      for (ymuint b = 1; b < 32; ++ b) {
+      for ( int b = 1; b < 32; ++ b ) {
 	if ( (mRandGen.int32() % 100) <= 3 ) {
 	  pat ^= (1U << b);
 	}
@@ -420,7 +420,7 @@ FraigMgrImpl::add_pat(FraigNode* node)
     }
 
     if ( node1 != node ) {
-      ymuint pos2 = node1->pat_hash();
+      SizeType pos2 = node1->pat_hash();
       mHashTable2.add_elem(pos2, node1, node1->mLink2);
     }
   }
@@ -493,7 +493,7 @@ FraigMgrImpl::set_logstream(ostream* out)
 
 // @brief ランダムシミュレーション制御用のパラメータを設定する．
 void
-FraigMgrImpl::set_loop_limit(ymuint val)
+FraigMgrImpl::set_loop_limit(int val)
 {
   mLoopLimit = val;
 }
@@ -508,14 +508,14 @@ FraigMgrImpl::init_pat(FraigNode* node)
 
 // @brief 全ノードのシミュレーションパタン用配列を拡大する．
 void
-FraigMgrImpl::resize_pat(ymuint size)
+FraigMgrImpl::resize_pat(int size)
 {
-  ymuint n = mAllNodes.size();
-  for (ymuint i = 0; i < n; ++ i) {
+  int n = mAllNodes.size();
+  for ( int i = 0; i < n; ++ i ) {
     FraigNode* node = mAllNodes[i];
     ymuint32* old_array = node->mPat;
     node->mPat = new ymuint32[size];
-    for (ymuint j = 0; j < mPatUsed; ++ j) {
+    for ( int j = 0; j < mPatUsed; ++ j ) {
       node->mPat[j] = old_array[j];
     }
     delete [] old_array;
@@ -690,9 +690,7 @@ FraigMgrImpl::check_condition(SatLiteral lit1)
 
 #if defined(VERIFY_SATSOLVER)
   SatSolver solver(nullptr, "minisat");
-  for (vector<FraigNode*>::iterator p = mAllNodes.begin();
-       p != mAllNodes.end(); ++ p) {
-    FraigNode* node = *p;
+  for ( auto node: mAllNodes ) {
     SatVarId id = solver.new_variable();
     ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
@@ -711,9 +709,7 @@ FraigMgrImpl::check_condition(SatLiteral lit1)
     cout << " ans1 = " << ans1 << endl;
     cout << " ans2 = " << ans2 << endl;
     cout << " clauses" << endl;
-    for (vector<FraigNode*>::iterator p = mAllNodes.begin();
-	 p != mAllNodes.end(); ++ p) {
-      FraigNode* node = *p;
+    for ( auto node: mAllNodes ) {
       if ( node->is_and() ) {
 	SatVarId id = node->varid();
 	SatLiteral lito(id, false);
@@ -741,9 +737,7 @@ FraigMgrImpl::check_condition(SatLiteral lit1,
 
 #if defined(VERIFY_SATSOLVER)
   SatSolver solver(nullptr, "minisat");
-  for (vector<FraigNode*>::iterator p = mAllNodes.begin();
-       p != mAllNodes.end(); ++ p) {
-    FraigNode* node = *p;
+  for ( auto node: mAllNodes ) {
     SatVarId id = solver.new_variable();
     ASSERT_COND(id == node->varid() );
     if ( node->is_and() ) {
@@ -763,9 +757,7 @@ FraigMgrImpl::check_condition(SatLiteral lit1,
     cout << " ans1 = " << ans1 << endl;
     cout << " ans2 = " << ans2 << endl;
     cout << " clauses" << endl;
-    for (vector<FraigNode*>::iterator p = mAllNodes.begin();
-	 p != mAllNodes.end(); ++ p) {
-      FraigNode* node = *p;
+    for ( auto node: mAllNodes ) {
       if ( node->is_and() ) {
 	SatVarId id = node->varid();
 	SatLiteral lito(id, false);
@@ -799,7 +791,7 @@ FraigMgrImpl::fraig2literal(FraigHandle aig)
 void
 FraigMgrImpl::dump_eqgroup(ostream& s) const
 {
-  for (ymuint i = 0; i < mNodeNum; ++ i) {
+  for ( int i = 0; i < mNodeNum; ++ i ) {
     SweepNode* snode = &mNodeArray[i];
     if ( snode->mAigNode == nullptr ) continue;
     if ( snode->rep_node() != snode ) continue;
@@ -816,7 +808,7 @@ FraigMgrImpl::dump_eqgroup(ostream& s) const
       cout << "   ";
     }
     cout << " {";
-    for (SweepNode* snode1 = snode; snode1; snode1 = snode1->next_eqnode()) {
+    for ( SweepNode* snode1 = snode; snode1; snode1 = snode1->next_eqnode() ) {
       cout << " ";
       if ( snode1->eq_inv() ) {
 	cout << "~";
@@ -859,7 +851,7 @@ FraigMgrImpl::dump_stats(ostream& s) const
 FraigMgrImpl::SatStat::SatStat()
 {
   mTotalCount = 0;
-  for (ymuint i = 0; i < 3; ++ i) {
+  for ( auto i: { 0, 1, 2 } ) {
     mTimeStat[i].mCount = 0;
     mTimeStat[i].mTotalTime = 0.0;
     mTimeStat[i].mMaxTime = 0.0;
@@ -872,7 +864,7 @@ FraigMgrImpl::SatStat::set_result(SatBool3 code,
 {
   ++ mTotalCount;
 
-  ymuint idx = 0;
+  int idx = 0;
   if ( code == SatBool3::True ) {
     idx = 1;
   }

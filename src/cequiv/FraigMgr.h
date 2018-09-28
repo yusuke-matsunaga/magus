@@ -31,7 +31,7 @@ class FraigMgr
   /// @brief コンストラクタ
   /// @brief sig_size シグネチャのサイズ
   /// @param[in] solver_type SAT-solver の種類を表すオブジェクト
-  FraigMgr(ymuint sig_size,
+  FraigMgr(int sig_size,
 	   const SatSolverType& solver_type = SatSolverType());
 
 
@@ -45,23 +45,23 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 入力ノード数を得る．
-  ymuint
+  int
   input_num() const;
 
   /// @brief 入力ノードを取り出す．
   /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
   FraigNode*
-  input_node(ymuint pos) const;
+  input_node(int pos) const;
 
   /// @brief ノード数を得る．
-  ymuint
+  int
   node_num() const;
 
   /// @brief ノードを取り出す．
   /// @param[in] pos ノード番号 ( 0 <= pos < input_num() )
   /// @note ANDノードの他に入力ノードも含まれる．
   FraigNode*
-  node(ymuint pos) const;
+  node(int pos) const;
 
 
 public:
@@ -127,7 +127,7 @@ public:
   /// @param[in] inv 反転フラグ
   FraigHandle
   make_cofactor(FraigHandle edge,
-		ymuint input_id,
+		int input_id,
 		bool inv);
 
 
@@ -152,7 +152,7 @@ public:
   /// @brief ランダムシミュレーション制御用のパラメータを設定する．
   /// @param[in] loop_limit 変化のない状態がこの回数連続したら止める．
   void
-  set_loop_limit(ymuint loop_limit);
+  set_loop_limit(int loop_limit);
 
   /// @brief 内部の統計情報を出力する．
   void
@@ -175,8 +175,8 @@ private:
   /// なので常に end_pos > start_pos が成り立つと仮定する．
   FraigHandle
   _make_and(const vector<FraigHandle>& edge_list,
-	    ymuint start_pos,
-	    ymuint end_pos,
+	    int start_pos,
+	    int end_pos,
 	    bool iinv);
 
   /// @brief 複数のノードの XOR を取る．
@@ -189,8 +189,8 @@ private:
   /// なので常に end_pos > start_pos が成り立つと仮定する．
   FraigHandle
   _make_xor(const vector<FraigHandle>& edge_list,
-	    ymuint start_pos,
-	    ymuint end_pos);
+	    int start_pos,
+	    int end_pos);
 
 
 private:
@@ -199,7 +199,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際の処理を行う実装クラス
-  std::auto_ptr<FraigMgrImpl> mImpl;
+  unique_ptr<FraigMgrImpl> mImpl;
 
 };
 
@@ -214,7 +214,7 @@ inline
 FraigHandle
 FraigMgr::make_and(const vector<FraigHandle>& edge_list)
 {
-  ymuint n = edge_list.size();
+  int n = edge_list.size();
   ASSERT_COND( n > 0 );
   return _make_and(edge_list, 0, n, false);
 }
@@ -235,7 +235,7 @@ inline
 FraigHandle
 FraigMgr::make_or(const vector<FraigHandle>& edge_list)
 {
-  ymuint n = edge_list.size();
+  int n = edge_list.size();
   ASSERT_COND( n > 0 );
   return ~_make_and(edge_list, 0, n, true);
 }
@@ -258,7 +258,7 @@ inline
 FraigHandle
 FraigMgr::make_xor(const vector<FraigHandle>& edge_list)
 {
-  ymuint n = edge_list.size();
+  int n = edge_list.size();
   ASSERT_COND( n > 0 );
   return _make_xor(edge_list, 0, n);
 }

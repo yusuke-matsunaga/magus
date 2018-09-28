@@ -52,12 +52,12 @@ public:
   is_input() const;
 
   /// @brief 入力番号を返す．
-  ymuint
+  int
   input_id() const;
 
   /// @brief 入力番号をセットする．
   void
-  set_input(ymuint id);
+  set_input(int id);
 
 
 public:
@@ -71,7 +71,7 @@ public:
 
   /// @brief ファンインを得る．
   FraigNode*
-  fanin(ymuint pos) const;
+  fanin(int pos) const;
 
   /// @brief 最初のファンインを得る．
   FraigNode*
@@ -82,8 +82,9 @@ public:
   fanin1() const;
 
   /// @brief ファンインの極性を得る．
+  /// @param[in] pos 位置 ( 0 or 1 )
   bool
-  fanin_inv(ymuint pos) const;
+  fanin_inv(int pos) const;
 
   /// @brief 最初のファンインの極性を得る．
   bool
@@ -94,8 +95,9 @@ public:
   fanin1_inv() const;
 
   /// @brief ファンインのハンドルを得る．
+  /// @param[in] pos 位置 ( 0 or 1 )
   FraigHandle
-  fanin_handle(ymuint pos) const;
+  fanin_handle(int pos) const;
 
   /// @brief 最初のファンインのハンドルを得る．
   FraigHandle
@@ -121,8 +123,8 @@ public:
   /// @param[in] end 終了位置
   /// @param[in] pat パタンのベクタ
   void
-  set_pat(ymuint start,
-	  ymuint end,
+  set_pat(int start,
+	  int end,
 	  const vector<ymuint32>& pat);
 
   /// @brief パタンを計算する．
@@ -130,8 +132,8 @@ public:
   /// @param[in] end 終了位置
   /// @note ANDノード用
   void
-  calc_pat(ymuint start,
-	   ymuint end);
+  calc_pat(int start,
+	   int end);
 
   /// @brief 0 の値を取るとき true を返す．
   bool
@@ -206,8 +208,8 @@ private:
   /// @param[in] start 開始位置
   /// @param[in] end 終了位置
   void
-  calc_hash(ymuint start,
-	    ymuint end);
+  calc_hash(int start,
+	    int end);
 
   /// @brief 0 の値を取ったことを記録する．
   void
@@ -326,7 +328,7 @@ FraigNode::is_input() const
 
 // @brief 入力番号を返す．
 inline
-ymuint
+int
 FraigNode::input_id() const
 {
   return reinterpret_cast<ympuint>(mFanins[0]);
@@ -335,7 +337,7 @@ FraigNode::input_id() const
 // @brief 入力番号をセットする．
 inline
 void
-FraigNode::set_input(ymuint id)
+FraigNode::set_input(int id)
 {
   mFlags |= (1U << kSftI);
   mFanins[0] = reinterpret_cast<FraigNode*>(id);
@@ -352,8 +354,10 @@ FraigNode::is_and() const
 // @brief ファンインを得る．
 inline
 FraigNode*
-FraigNode::fanin(ymuint pos) const
+FraigNode::fanin(int pos) const
 {
+  // 安全のため pos の値を補正しておく．
+  pos %= 2;
   return mFanins[pos];
 }
 
@@ -376,8 +380,10 @@ FraigNode::fanin1() const
 // @brief ファンインの極性を得る．
 inline
 bool
-FraigNode::fanin_inv(ymuint pos) const
+FraigNode::fanin_inv(int pos) const
 {
+  // 安全のため pos の値を補正しておく．
+  pos %= 2;
   return static_cast<bool>((mFlags >> (kSftP0 + pos)) & 1U);
 }
 
@@ -400,8 +406,10 @@ FraigNode::fanin1_inv() const
 // @brief ファンインのハンドルを得る．
 inline
 FraigHandle
-FraigNode::fanin_handle(ymuint pos) const
+FraigNode::fanin_handle(int pos) const
 {
+  // 安全のため pos の値を補正しておく．
+  pos %= 2;
   return FraigHandle(fanin(pos), fanin_inv(pos));
 }
 
@@ -559,8 +567,8 @@ FraigNode::set_dmark()
 // @brief パタンを計算する．
 inline
 void
-FraigNode::calc_pat(ymuint start,
-		    ymuint end)
+FraigNode::calc_pat(int start,
+		    int end)
 {
   ymuint32* dst = mPat + start;
   ymuint32* dst_end = mPat + end;

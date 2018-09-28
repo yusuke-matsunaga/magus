@@ -25,7 +25,7 @@ BEGIN_NAMESPACE_YM_CEC
 // @brief コンストラクタ
 // @brief sig_size シグネチャのサイズ
 // @param[in] solver_type SAT-solver の種類を表すオブジェクト
-FraigMgr::FraigMgr(ymuint sig_size,
+FraigMgr::FraigMgr(int sig_size,
 		   const SatSolverType& solver_type) :
   mImpl(new FraigMgrImpl(sig_size, solver_type))
 {
@@ -37,7 +37,7 @@ FraigMgr::~FraigMgr()
 }
 
 // @brief 入力ノード数を得る．
-ymuint
+int
 FraigMgr::input_num() const
 {
   return mImpl->input_num();
@@ -46,13 +46,13 @@ FraigMgr::input_num() const
 // @brief 入力ノードを取り出す．
 // @param[in] pos 入力番号 ( 0 <= pos < input_num() )
 FraigNode*
-FraigMgr::input_node(ymuint pos) const
+FraigMgr::input_node(int pos) const
 {
   return mImpl->input_node(pos);
 }
 
 // @brief ノード数を得る．
-ymuint
+int
 FraigMgr::node_num() const
 {
   return mImpl->node_num();
@@ -62,7 +62,7 @@ FraigMgr::node_num() const
 // @param[in] pos ノード番号 ( 0 <= pos < input_num() )
 // @note ANDノードの他に入力ノードも含まれる．
 FraigNode*
-FraigMgr::node(ymuint pos) const
+FraigMgr::node(int pos) const
 {
   return mImpl->node(pos);
 }
@@ -122,13 +122,13 @@ FraigMgr::make_and(FraigHandle edge1,
 // なので常に end_pos > start_pos が成り立つと仮定する．
 FraigHandle
 FraigMgr::_make_and(const vector<FraigHandle>& edge_list,
-		    ymuint start_pos,
-		    ymuint end_pos,
+		    int start_pos,
+		    int end_pos,
 		    bool iinv)
 {
   ASSERT_COND( start_pos < end_pos );
 
-  ymuint n = end_pos - start_pos;
+  int n = end_pos - start_pos;
   if ( n == 1 ) {
     FraigHandle h = edge_list[start_pos];
     if ( iinv ) {
@@ -137,7 +137,7 @@ FraigMgr::_make_and(const vector<FraigHandle>& edge_list,
     return h;
   }
   // n >= 2
-  ymuint mid_pos = start_pos + (n + 1) / 2;
+  int mid_pos = start_pos + (n + 1) / 2;
   FraigHandle h0 = _make_and(edge_list, start_pos, mid_pos, iinv);
   FraigHandle h1 = _make_and(edge_list, mid_pos, end_pos, iinv);
   return make_and(h0, h1);
@@ -153,17 +153,17 @@ FraigMgr::_make_and(const vector<FraigHandle>& edge_list,
 // なので常に end_pos > start_pos が成り立つと仮定する．
 FraigHandle
 FraigMgr::_make_xor(const vector<FraigHandle>& edge_list,
-		    ymuint start_pos,
-		    ymuint end_pos)
+		    int start_pos,
+		    int end_pos)
 {
   ASSERT_COND( start_pos < end_pos );
 
-  ymuint n = end_pos - start_pos;
+  int n = end_pos - start_pos;
   if ( n == 1 ) {
     return edge_list[start_pos];
   }
   // n >= 2
-  ymuint mid_pos = start_pos + (n + 1) / 2;
+  int mid_pos = start_pos + (n + 1) / 2;
   FraigHandle h0 = _make_xor(edge_list, start_pos, mid_pos);
   FraigHandle h1 = _make_xor(edge_list, mid_pos, end_pos);
   return make_xor(h0, h1);
@@ -184,36 +184,36 @@ FraigMgr::make_logic(const Expr& expr,
   }
   if ( expr.is_posiliteral() ) {
     VarId var = expr.varid();
-    ymuint id = var.val();
+    int id = var.val();
     ASSERT_COND(id < inputs.size() );
     return inputs[id];
   }
   if ( expr.is_negaliteral() ) {
     VarId var = expr.varid();
-    ymuint id = var.val();
+    int id = var.val();
     ASSERT_COND(id < inputs.size() );
     return ~inputs[id];
   }
   if ( expr.is_and() ) {
-    ymuint n = expr.child_num();
+    int n = expr.child_num();
     vector<FraigHandle> edge_list(n);
-    for (ymuint i = 0; i < n; ++ i) {
+    for ( int i = 0; i < n; ++ i ) {
       edge_list[i] = make_logic(expr.child(i), inputs);
     }
     return _make_and(edge_list, 0, n, false);
   }
   if ( expr.is_or() ) {
-    ymuint n = expr.child_num();
+    int n = expr.child_num();
     vector<FraigHandle> edge_list(n);
-    for (ymuint i = 0; i < n; ++ i) {
+    for ( int i = 0; i < n; ++ i ) {
       edge_list[i] = make_logic(expr.child(i), inputs);
     }
     return ~_make_and(edge_list, 0, n, true);
   }
   if ( expr.is_xor() ) {
-    ymuint n = expr.child_num();
+    int n = expr.child_num();
     vector<FraigHandle> edge_list(n);
-    for (ymuint i = 0; i < n; ++ i) {
+    for ( int i = 0; i < n; ++ i ) {
       edge_list[i] = make_logic(expr.child(i), inputs);
     }
     return _make_xor(edge_list, 0, n);
@@ -229,7 +229,7 @@ FraigMgr::make_logic(const Expr& expr,
 // @param[in] pol 極性
 FraigHandle
 FraigMgr::make_cofactor(FraigHandle edge,
-			ymuint input_id,
+			int input_id,
 			bool inv)
 {
   if ( edge.is_const() ) {
@@ -291,7 +291,7 @@ FraigMgr::set_logstream(ostream* out)
 
 // @brief ランダムシミュレーション制御用のパラメータを設定する．
 void
-FraigMgr::set_loop_limit(ymuint val)
+FraigMgr::set_loop_limit(int val)
 {
   mImpl->set_loop_limit(val);
 }

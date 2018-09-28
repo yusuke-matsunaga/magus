@@ -34,16 +34,17 @@ public:
 public:
 
   /// @brief 要素数を得る．
-  ymuint
+  int
   num() const;
 
   /// @brief テーブルサイズを得る．
-  ymuint
+  int
   table_size() const;
 
   /// @brief 先頭の要素を得る．
+  /// @param[in] hash_val ハッシュ値
   FraigNode*
-  elem(ymuint hash_val) const;
+  elem(SizeType hash_val) const;
 
   /// @brief 拡張が必要か調べる．
   bool
@@ -56,7 +57,7 @@ public:
 
   /// @brief 要素を追加する．
   void
-  add_elem(ymuint hash_val,
+  add_elem(SizeType hash_val,
 	   FraigNode* node,
 	   FraigNode*& link);
 
@@ -68,7 +69,7 @@ private:
 
   /// @brief ハッシュ表を確保する．
   void
-  alloc_table(ymuint req_size);
+  alloc_table(int req_size);
 
 
 private:
@@ -77,13 +78,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 要素数
-  ymuint32 mNum;
+  int mNum;
 
   // mHashTable のサイズ
-  ymuint32 mHashSize;
+  int mHashSize;
 
   // ハッシュ表を拡大する目安
-  ymuint32 mNextLimit;
+  int mNextLimit;
 
   // ハッシュ表
   FraigNode** mTable;
@@ -97,7 +98,7 @@ private:
 
 // @brief 要素数を得る．
 inline
-ymuint
+int
 FraigHash::num() const
 {
   return mNum;
@@ -105,7 +106,7 @@ FraigHash::num() const
 
 // @brief テーブルサイズを得る．
 inline
-ymuint
+int
 FraigHash::table_size() const
 {
   return mHashSize;
@@ -114,7 +115,7 @@ FraigHash::table_size() const
 // @brief 先頭の要素を得る．
 inline
 FraigNode*
-FraigHash::elem(ymuint hash_val) const
+FraigHash::elem(SizeType hash_val) const
 {
   return mTable[hash_val % mHashSize];
 }
@@ -137,7 +138,7 @@ inline
 void
 FraigHash::clear()
 {
-  for (ymuint i = 0; i < mHashSize; ++ i) {
+  for ( int i = 0; i < mHashSize; ++ i ) {
     mTable[i] = nullptr;
   }
   mNum = 0;
@@ -146,11 +147,11 @@ FraigHash::clear()
 // @brief 要素を追加する．
 inline
 void
-FraigHash::add_elem(ymuint hash_val,
+FraigHash::add_elem(SizeType hash_val,
 		    FraigNode* node,
 		    FraigNode*& link)
 {
-  ymuint idx = hash_val % mHashSize;
+  SizeType idx = hash_val % mHashSize;
   link = mTable[idx];
   mTable[idx] = node;
   ++ mNum;
