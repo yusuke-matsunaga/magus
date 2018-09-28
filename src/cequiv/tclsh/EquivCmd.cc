@@ -144,12 +144,13 @@ EquivCmdBase::prologue(TclObjVector& objv)
   }
 
   if ( mPoptSat->is_specified() ) {
-    mSatType = mPoptSat->val();
+    mSatType = SatSolverType(mPoptSat->val());
   }
   else {
-    mSatType = "ymsat";
+    ; // デフォルト
   }
 
+#if 0
   mSatOut = nullptr;
   if ( mPoptSatlog->is_specified() ) {
     mSatType = "satlog";
@@ -167,6 +168,7 @@ EquivCmdBase::prologue(TclObjVector& objv)
       mSatOut = &mSatLogFile;
     }
   }
+#endif
 
   ymuint objc = objv.size();
   if ( objc != 2 && objc != 3 ) {
@@ -454,7 +456,7 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     nsYm::nsCec::check_ceq(network1(), network2(),
 			   input_match(), output_match(),
 			   log_level(), &cout,
-			   sat_type(), sat_option(), sat_out(),
+			   sat_type(),
 			   sigsize,
 			   comp_stats);
 

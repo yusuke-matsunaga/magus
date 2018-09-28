@@ -34,9 +34,7 @@ check_ceq(const BnNetwork& src_network1,
 	  const vector<pair<ymuint, ymuint> >& oassoc,
 	  ymint log_level,
 	  ostream* log_out,
-	  const string& sat_type,
-	  const string& sat_option,
-	  ostream* sat_out,
+	  const SatSolverType& sat_type,
 	  ymuint sigsize,
 	  vector<SatBool3>& stats);
 

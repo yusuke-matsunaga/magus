@@ -13,6 +13,7 @@
 #include "FraigHandle.h"
 #include "ym/Expr.h"
 #include "ym/SatBool3.h"
+#include "ym/SatSolverType.h"
 
 
 BEGIN_NAMESPACE_YM_CEC
@@ -29,13 +30,10 @@ class FraigMgr
 
   /// @brief コンストラクタ
   /// @brief sig_size シグネチャのサイズ
-  /// @param[in] sat_type SAT-solver の種類を表す文字列
-  /// @param[in] sat_option SAT-solver 生成用オプション文字列
-  /// @param[in] sat_log ログの出力用ストリーム
+  /// @param[in] solver_type SAT-solver の種類を表すオブジェクト
   FraigMgr(ymuint sig_size,
-	   const string& sat_type = string(),
-	   const string& sat_option = string(),
-	   ostream* sat_log = NULL);
+	   const SatSolverType& solver_type = SatSolverType());
+
 
   /// @brief デストラクタ
   ~FraigMgr();
@@ -201,7 +199,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際の処理を行う実装クラス
-  FraigMgrImpl* mImpl;
+  std::auto_ptr<FraigMgrImpl> mImpl;
 
 };
 

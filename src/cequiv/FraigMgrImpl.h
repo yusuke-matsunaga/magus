@@ -31,13 +31,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] pat_size 初期パタンのサイズ
-  /// @param[in] sat_type SAT-solver の種類を表す文字列
-  /// @param[in] sat_opt SAT-solver に渡すオプション文字列
-  /// @param[in] sat_log ログの出力用ストリーム
+  /// @param[in] solver_type SAT-solver の種類を表す文字列
   FraigMgrImpl(ymuint pat_size,
-	       const string& sat_type,
-	       const string& sat_opt,
-	       ostream* sat_log);
+	       const SatSolverType& solver_type);
 
   /// @brief デストラクタ
   ~FraigMgrImpl();

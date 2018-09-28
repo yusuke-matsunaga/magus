@@ -24,13 +24,11 @@ check_ceq(const BnNetwork& src_network1,
 	  const vector<pair<ymuint, ymuint> >& oassoc,
 	  ymint log_level,
 	  ostream* log_out,
-	  const string& sat_type,
-	  const string& sat_option,
-	  ostream* sat_out,
+	  const SatSolverType& solver_type,
 	  ymuint sigsize,
 	  vector<SatBool3>& stats)
 {
-  FraigMgr fraig_mgr(sigsize, sat_type, sat_option, sat_out);
+  FraigMgr fraig_mgr(sigsize, solver_type);
 
   // オプションを設定する．
   fraig_mgr.set_loglevel(log_level);

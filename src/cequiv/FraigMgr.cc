@@ -24,21 +24,16 @@ BEGIN_NAMESPACE_YM_CEC
 
 // @brief コンストラクタ
 // @brief sig_size シグネチャのサイズ
-// @param[in] sat_type SAT-solver の種類を表す文字列
-// @param[in] sat_option SAT-solver 生成用オプション文字列
-// @param[in] sat_log ログの出力用ストリーム
+// @param[in] solver_type SAT-solver の種類を表すオブジェクト
 FraigMgr::FraigMgr(ymuint sig_size,
-		   const string& sat_type,
-		   const string& sat_option,
-		   ostream* sat_log) :
-  mImpl(new FraigMgrImpl(sig_size, sat_type, sat_option, sat_log))
+		   const SatSolverType& solver_type) :
+  mImpl(new FraigMgrImpl(sig_size, solver_type))
 {
 }
 
 // @brief デストラクタ
 FraigMgr::~FraigMgr()
 {
-  delete mImpl;
 }
 
 // @brief 入力ノード数を得る．

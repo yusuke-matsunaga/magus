@@ -11,6 +11,7 @@
 #include "tclsh/MagCmd.h"
 #include "tclsh/NetHandle.h"
 #include "ym/BnNetwork.h"
+#include "ym/SatSolverType.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -50,17 +51,9 @@ protected:
   int
   time_limit() const;
 
-  /// @brief 使用する SAT-Solver の種類を表す文字列を返す．
-  string
+  /// @brief 使用する SAT-Solver の種類を表すオブジェクト
+  SatSolverType
   sat_type() const;
-
-  /// @brief 使用する SAT-Solver に渡すオプション文字列を返す．
-  string
-  sat_option() const;
-
-  /// @brief SAT-Solver のログ出力用ストリームを返す．
-  ostream*
-  sat_out() const;
 
   /// @brief ネットワーク1を返す．
   const BnNetwork&
@@ -83,7 +76,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // 内部で用いられる下請け関数
   //////////////////////////////////////////////////////////////////////
-
 
   /// @brief 時間を指定した文字列から時間を取り出す．
   /// @return エラーが起きたら TCL_ERROR を返す．
@@ -147,13 +139,7 @@ private:
   int mTimeLimit;
 
   // SAT-Solver のタイプ
-  string mSatType;
-
-  // SAT-Solver のオプション
-  string mSatOption;
-
-  // SAT-Solver のログ出力用ストリーム
-  ostream* mSatOut;
+  SatSolverType mSatType;
 
   // SAT-Solver のログをファイルに出力する時のストリーム
   ofstream mSatLogFile;
@@ -273,25 +259,10 @@ EquivCmdBase::time_limit() const
 
 // @brief 使用する SAT-Solver の種類を表す文字列を返す．
 inline
-string
+SatSolverType
 EquivCmdBase::sat_type() const
 {
   return mSatType;
-}
-
-// @brief 使用する SAT-Solver に渡すオプション文字列を返す．
-string
-EquivCmdBase::sat_option() const
-{
-  return mSatOption;
-}
-
-// @brief SAT-Solver のログ出力用ストリームを返す．
-inline
-ostream*
-EquivCmdBase::sat_out() const
-{
-  return mSatOut;
 }
 
 // @brief 検証対象のネットワーク1を返す．

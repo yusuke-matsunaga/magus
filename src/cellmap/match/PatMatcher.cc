@@ -48,18 +48,18 @@ PatMatcher::operator()(const SbjNode* sbj_root,
   // 根のノードを調べる．
   ymuint root_id = pat_graph.root_id();
   switch ( mLibrary.pg_node_type(root_id) ) {
-  case kClibPatInput:
+  case ClibPatType::Input:
     // これはなんでも OK
     break;
 
-  case kClibPatAnd:
+  case ClibPatType::And:
     if ( !sbj_root->is_and() ) {
       // 型が違う．
       return false;
     }
     break;
 
-  case kClibPatXor:
+  case ClibPatType::Xor:
     if ( !sbj_root->is_xor() ) {
       // 型が違う．
       return false;
@@ -87,13 +87,13 @@ PatMatcher::operator()(const SbjNode* sbj_root,
     bool iinv = to_node->fanin_inv(f_pos);
     bool inv = false;
     switch ( mLibrary.pg_node_type(from_id) ) {
-    case kClibPatInput:
+    case ClibPatType::Input:
       // どんな型でも OK
       // 極性が違っても OK
       inv =  mLibrary.pg_edge_inv(edge_id) ^ iinv;
       break;
 
-    case kClibPatAnd:
+    case ClibPatType::And:
       if ( !from_node->is_and() ) {
 	// 型が違う
 	goto end;
@@ -104,7 +104,7 @@ PatMatcher::operator()(const SbjNode* sbj_root,
       }
       break;
 
-    case kClibPatXor:
+    case ClibPatType::Xor:
       if ( !from_node->is_xor() ) {
 	// 型が違う
 	goto end;

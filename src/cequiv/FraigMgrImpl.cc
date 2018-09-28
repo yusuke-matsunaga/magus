@@ -178,17 +178,14 @@ FraigHash::alloc_table(ymuint req_size)
 // @param[in] sat_opt SAT-solver に渡すオプション文字列
 // @param[in] sat_log ログの出力用ストリーム
 FraigMgrImpl::FraigMgrImpl(ymuint pat_size,
-			   const string& sat_type,
-			   const string& sat_opt,
-			   ostream* sat_log) :
+			   const SatSolverType& solver_type) :
   mAlloc(4096),
   mPatSize(pat_size * 2),
   mPatInit(pat_size),
   mPatUsed(pat_size),
-  mSolver(sat_type, sat_opt),
+  mSolver(solver_type),
   mSimCount(0),
   mSimTime(0.0),
-  mOutP(sat_log),
   mLogLevel(0),
   mLogStream(new ofstream("/dev/null")),
   mLoopLimit(1000)
