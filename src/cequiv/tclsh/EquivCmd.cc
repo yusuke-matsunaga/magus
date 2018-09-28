@@ -170,7 +170,7 @@ EquivCmdBase::prologue(TclObjVector& objv)
   }
 #endif
 
-  ymuint objc = objv.size();
+  int objc = objv.size();
   if ( objc != 2 && objc != 3 ) {
     print_usage();
     return TCL_ERROR;
@@ -201,10 +201,10 @@ EquivCmdBase::prologue(TclObjVector& objv)
   conv_to_bnet(neth2, mNetwork2);
 
   // 最も簡単な比較．入力，出力数を調べる．
-  ymuint ni1 = mNetwork1.input_num();
-  ymuint no1 = mNetwork1.output_num();
-  ymuint ni2 = mNetwork2.input_num();
-  ymuint no2 = mNetwork2.output_num();
+  int ni1 = mNetwork1.input_num();
+  int no1 = mNetwork1.output_num();
+  int ni2 = mNetwork2.input_num();
+  int no2 = mNetwork2.output_num();
 
   if ( ni1 != ni2 ) {
     TclObj result_obj = "The numbers of inputs differ.";
@@ -289,25 +289,25 @@ EquivCmdBase::get_time(const string& str,
 void
 EquivCmdBase::assoc_by_order(const BnNetwork& network1,
 			     const BnNetwork& network2,
-			     vector<pair<ymuint, ymuint> >& iassoc,
-			     vector<pair<ymuint, ymuint> >& oassoc)
+			     vector<pair<int, int> >& iassoc,
+			     vector<pair<int, int> >& oassoc)
 {
   iassoc.clear();
   oassoc.clear();
 
   // まずは外部入力ノードの対応関係を取る．
-  ymuint ni = network1.input_num();
+  int ni = network1.input_num();
   ASSERT_COND( network2.input_num() == ni );
-  for (ymuint i = 0; i < ni; ++ i) {
+  for ( int i = 0; i < ni; ++ i ) {
     const BnNode* node1 = network1.input(i);
     const BnNode* node2 = network2.input(i);
     iassoc.push_back(make_pair(node1->id(), node2->id()));
   }
 
   // 次は外部出力ノードの対応関係を取る．
-  ymuint no = network1.output_num();
+  int no = network1.output_num();
   ASSERT_COND( network2.output_num() == no );
-  for (ymuint i = 0; i < no; ++ i) {
+  for ( int i = 0; i < no; ++ i ) {
     const BnNode* node1 = network1.output(i);
     const BnNode* node2 = network2.output(i);
     oassoc.push_back(make_pair(node1->id(), node2->id()));
@@ -318,14 +318,14 @@ EquivCmdBase::assoc_by_order(const BnNetwork& network1,
 bool
 EquivCmdBase::assoc_by_name(const BnNetwork& network1,
 			    const BnNetwork& network2,
-			    vector<pair<ymuint, ymuint> >& iassoc,
-			    vector<pair<ymuint, ymuint> >& oassoc)
+			    vector<pair<int, int> >& iassoc,
+			    vector<pair<int, int> >& oassoc)
 {
   iassoc.clear();
   oassoc.clear();
 
-  ymuint np1 = network1.port_num();
-  ymuint np2 = network2.port_num();
+  int np1 = network1.port_num();
+  int np2 = network2.port_num();
   if ( np1 != np2 ) {
     TclObj emsg;
     emsg << "Number of ports is different";
@@ -333,17 +333,17 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
     return false;
   }
 
-  for (ymuint i = 0; i < np1; ++ i) {
+  for ( int i = 0; i < np1; ++ i ) {
     const BnPort* port1 = network1.port(i);
-    ymuint bw1 = port1->bit_width();
+    int bw1 = port1->bit_width();
 
     // とりあえず単純な線形探索
     bool found = false;
-    for (ymuint j = 0; j < np2; ++ j) {
+    for ( int j = 0; j < np2; ++ j ) {
       const BnPort* port2 = network2.port(j);
       if ( port1->name() == port2->name() ) {
 	found = true;
-	ymuint bw2 = port2->bit_width();
+	int bw2 = port2->bit_width();
 	if ( bw1 != bw2 ) {
 	  TclObj emsg;
 	  emsg << "bitwidth of port '" << port1->name()
@@ -352,7 +352,7 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
 	  return false;
 	}
 
-	for (ymuint k = 0; k < bw1; ++ k) {
+	for ( int k = 0; k < bw1; ++ k ) {
 	  const BnNode* node1 = network1.node(port1->bit(k));
 	  const BnNode* node2 = network2.node(port2->bit(k));
 	  if ( node1->type() != node2->type() ) {
@@ -446,8 +446,10 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     return stat1;
   }
 
+#if 0
   try {
-    ymuint sigsize = 1;
+#endif
+    int sigsize = 1;
     if ( mPoptSigSize->is_specified() ) {
       sigsize = mPoptSigSize->val();
     }
@@ -464,8 +466,8 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     bool has_abt = false;
     // statistics を Tcl 変数にセットする．
     // 本当はエラーチェックをする必要があるがここでは無視する．
-    ymuint no = network1().output_num();
-    for (ymuint i = 0; i < no; ++ i) {
+    int no = network1().output_num();
+    for ( int i = 0; i < no; ++ i ) {
       string str;
       switch ( comp_stats[i] ) {
       case SatBool3::True:  str = "Equivalent"; break;
@@ -479,8 +481,8 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     }
 #if defined(DEBUG_OUTPUTS)
     {
-      ymuint no = network1().output_num();
-      for (ymuint i = 0; i < no; ++ i) {
+      int no = network1().output_num();
+      for ( int i = 0; i < no; ++ i ) {
 	if ( comp_stats[i] == SatBool3::False ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);
@@ -509,6 +511,7 @@ EquivCmd::cmd_proc(TclObjVector& objv)
       result_obj = "Equivalent";
     }
     set_result(result_obj);
+#if 0
   }
   catch (AssertError x) {
     cerr << x << endl;
@@ -517,7 +520,7 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     set_result(emsg);
     return TCL_ERROR;
   }
-
+#endif
   return TCL_OK;
 }
 
@@ -553,7 +556,7 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
   }
 
   try {
-    ymuint sigsize = 1;
+    int sigsize = 1;
     if ( mPoptSigSize->is_specified() ) {
       sigsize = mPoptSigSize->val();
     }
@@ -571,8 +574,8 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
     bool has_abt = false;
     // statistics を Tcl 変数にセットする．
     // 本当はエラーチェックをする必要があるがここでは無視する．
-    ymuint no = network1().output_num();
-    for (ymuint i = 0; i < no; ++ i) {
+    int no = network1().output_num();
+    for ( int i = 0; i < no; ++ i ) {
       string str;
       switch ( comp_stats[i] ) {
       case SatBool3::True:  str = "Equivalent"; break;
@@ -586,8 +589,8 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
     }
 #if defined(DEBUG_OUTPUTS)
     {
-      ymuint no = network1().output_num();
-      for (ymuint i = 0; i < no; ++ i) {
+      int no = network1().output_num();
+      for ( int i = 0; i < no; ++ i ) {
 	if ( comp_stats[i] == SatBool3::False ) {
 	  const BnNode* node1 = network1().output(i);
 	  const BnNode* node2 = network2().output(i);

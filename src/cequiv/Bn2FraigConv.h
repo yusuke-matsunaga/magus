@@ -41,15 +41,15 @@ public:
 
   /// @brief ネットワークの構造に対応する Fraig を作る．
   /// @param[in] src_network 元となるネットワーク
-  /// @param[in] inputs 外部入力のハンドルのリスト
+  /// @param[in] input_handles 入力のノード番号と対応するハンドルの対のリスト
   void
   convert(const BnNetwork& src_network,
-	  const vector<FraigHandle>& inputs);
+	  const vector<pair<int, FraigHandle>>& input_handles);
 
   /// @brief ノード番号に対応するハンドルを返す．
   /// @param[in] node_id ノード番号
   FraigHandle
-  get_handle(ymuint node_id);
+  get_handle(int node_id);
 
 
 private:
@@ -71,10 +71,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // FraigMgr
-  FraigMgr mFraigMgr;
+  FraigMgr& mFraigMgr;
 
   // BnNode::id() をキーとして対応する FraigHandle を記録するハッシュ表
-  HashMap<ymuint, FraigHandle> mHandleMap;
+  HashMap<int, FraigHandle> mHandleMap;
 
 };
 

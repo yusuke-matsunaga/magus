@@ -86,7 +86,7 @@ private:
   ymuint32 mNextLimit;
 
   // ハッシュ表
-  FraigNode** mHashTable;
+  FraigNode** mTable;
 
 };
 
@@ -116,7 +116,7 @@ inline
 FraigNode*
 FraigHash::elem(ymuint hash_val) const
 {
-  return mHashTable[hash_val % mHashSize];
+  return mTable[hash_val % mHashSize];
 }
 
 // @brief 拡張が必要か調べる．
@@ -138,7 +138,7 @@ void
 FraigHash::clear()
 {
   for (ymuint i = 0; i < mHashSize; ++ i) {
-    mHashTable[i] = nullptr;
+    mTable[i] = nullptr;
   }
   mNum = 0;
 }
@@ -151,8 +151,8 @@ FraigHash::add_elem(ymuint hash_val,
 		    FraigNode*& link)
 {
   ymuint idx = hash_val % mHashSize;
-  link = mHashTable[idx];
-  mHashTable[idx] = node;
+  link = mTable[idx];
+  mTable[idx] = node;
   ++ mNum;
 }
 

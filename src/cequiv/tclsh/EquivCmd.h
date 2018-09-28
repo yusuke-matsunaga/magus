@@ -64,11 +64,11 @@ protected:
   network2() const;
 
   /// @brief 入力の対応関係を返す．
-  const vector<pair<ymuint, ymuint> >&
+  const vector<pair<int, int> >&
   input_match() const;
 
   /// @brief 出力の対応関係を返す．
-  const vector<pair<ymuint, ymuint> >&
+  const vector<pair<int, int> >&
   output_match() const;
 
 
@@ -87,16 +87,16 @@ private:
   void
   assoc_by_order(const BnNetwork& network1,
 		 const BnNetwork& network2,
-		 vector<pair<ymuint, ymuint> >& iassoc,
-		 vector<pair<ymuint, ymuint> >& oassoc);
+		 vector<pair<int, int> >& iassoc,
+		 vector<pair<int, int> >& oassoc);
 
   /// @brief 名前で対応をとり, ID番号のペアのリストを作る．
   /// @return エラーが起きたら TCL_ERROR を返す．
   bool
   assoc_by_name(const BnNetwork& network1,
 		const BnNetwork& network2,
-		vector<pair<ymuint, ymuint> >& iassoc,
-		vector<pair<ymuint, ymuint> >& oassoc);
+		vector<pair<int, int> >& iassoc,
+		vector<pair<int, int> >& oassoc);
 
   /// @brief 対象のネットワークを BDN に変換する．
   /// @param[in] net_handle ネットワークハンドル
@@ -151,10 +151,10 @@ private:
   BnNetwork mNetwork2;
 
   // 入力の対応関係
-  vector<pair<ymuint, ymuint> > mInputMatch;
+  vector<pair<int, int> > mInputMatch;
 
   // 出力の対応関係
-  vector<pair<ymuint, ymuint> > mOutputMatch;
+  vector<pair<int, int> > mOutputMatch;
 
 };
 
@@ -283,7 +283,7 @@ EquivCmdBase::network2() const
 
 // @brief 入力の対応関係を返す．
 inline
-const vector<pair<ymuint, ymuint> >&
+const vector<pair<int, int> >&
 EquivCmdBase::input_match() const
 {
   return mInputMatch;
@@ -291,7 +291,7 @@ EquivCmdBase::input_match() const
 
 // @brief 出力の対応関係を返す．
 inline
-const vector<pair<ymuint, ymuint> >&
+const vector<pair<int, int> >&
 EquivCmdBase::output_match() const
 {
   return mOutputMatch;

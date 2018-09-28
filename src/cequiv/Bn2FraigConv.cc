@@ -29,31 +29,31 @@ Bn2FraigConv::~Bn2FraigConv()
 
 // @brief ネットワークの構造に対応する Fraig を作る．
 // @param[in] src_network 元となるネットワーク
-// @param[in] inputs 外部入力のハンドルのリスト
+// @param[in] input_handles 入力のノード番号と対応するハンドルの対のリスト
 void
 Bn2FraigConv::convert(const BnNetwork& src_network,
-		      const vector<FraigHandle>& inputs)
+		      const vector<pair<int, FraigHandle>>& input_handles)
 {
-  ymuint ni = src_network.input_num();
-  ymuint nl = src_network.logic_num();
+  int ni = src_network.input_num();
+  int nl = src_network.logic_num();
 
-  ASSERT_COND( ni == inputs.size() );
+  ASSERT_COND( ni == input_handles.size() );
 
   mHandleMap.clear();
 
   //////////////////////////////////////////////////////////////////////
   // 外部入力のマップを作成する．
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BnNode* bnnode = src_network.input(i);
-    FraigHandle h = inputs[i];
-    mHandleMap.add(bnnode->id(), h);
+  for ( int i = 0; i < ni; ++ i ) {
+    auto node_id = input_handles[i].first;
+    auto h = input_handles[i].second;
+    mHandleMap.add(node_id, h);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 論理ノードを作成する．
   //////////////////////////////////////////////////////////////////////
-  for (ymuint i = 0; i < nl; ++ i) {
+  for ( int i = 0; i < nl; ++ i ) {
     const BnNode* bnnode = src_network.logic(i);
     FraigHandle h = node2handle(bnnode);
     mHandleMap.add(bnnode->id(), h);
@@ -63,7 +63,7 @@ Bn2FraigConv::convert(const BnNetwork& src_network,
 // @brief ノード番号に対応するハンドルを返す．
 // @param[in] node_id ノード番号
 FraigHandle
-Bn2FraigConv::get_handle(ymuint node_id)
+Bn2FraigConv::get_handle(int node_id)
 {
   FraigHandle handle;
   if ( mHandleMap.find(node_id, handle) ) {
@@ -80,10 +80,10 @@ FraigHandle
 Bn2FraigConv::node2handle(const BnNode* node)
 {
   // ファンインのノードに対応するハンドルを求める．
-  ymuint ni = node->fanin_num();
+  int ni = node->fanin_num();
   vector<FraigHandle> fanin_handles(ni);
-  for (ymuint i = 0; i < ni; ++ i) {
-    ymuint inode_id = node->fanin(i);
+  for ( int i = 0; i < ni; ++ i ) {
+    int inode_id = node->fanin(i);
     FraigHandle ih = get_handle(inode_id);
     fanin_handles[i] = ih;
   }

@@ -133,7 +133,7 @@ operator<<(ostream& s,
 FraigHash::FraigHash() :
   mNum(0),
   mHashSize(0),
-  mHashTable(nullptr)
+  mTable(nullptr)
 {
   alloc_table(1024);
 }
@@ -141,14 +141,14 @@ FraigHash::FraigHash() :
 // @brief デストラクタ
 FraigHash::~FraigHash()
 {
-  delete [] mHashTable;
+  delete [] mTable;
 }
 
 // @brief ハッシュ表を確保する．
 void
 FraigHash::alloc_table(ymuint req_size)
 {
-  delete [] mHashTable;
+  delete [] mTable;
 
   if ( mHashSize == 0 ) {
     mHashSize = 1024;
@@ -157,9 +157,9 @@ FraigHash::alloc_table(ymuint req_size)
     mHashSize <<= 1;
   }
 
-  mHashTable = new FraigNode*[mHashSize];
+  mTable = new FraigNode*[mHashSize];
   for (ymuint i = 0; i < mHashSize; ++ i) {
-    mHashTable[i] = nullptr;
+    mTable[i] = nullptr;
   }
 
   mNum = 0;
