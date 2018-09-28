@@ -13,7 +13,7 @@
 #include "SbjDumper.h"
 
 #include "ym/MsgMgr.h"
-#include "ym/MsgHandler.h"
+#include "ym/StreamMsgHandler.h"
 
 
 BEGIN_NONAMESPACE
@@ -70,8 +70,8 @@ main(int argc,
   string filename = argv[fpos];
 
   try {
-    MsgHandler* msg_handler = new StreamMsgHandler(&cerr);
-    MsgMgr::reg_handler(msg_handler);
+    StreamMsgHandler msg_handler(&cerr);
+    MsgMgr::attach_handler(&msg_handler);
 
     BnNetwork network;
 

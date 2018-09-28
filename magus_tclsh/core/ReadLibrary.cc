@@ -55,7 +55,7 @@ ReadLibrary::cmd_proc(TclObjVector& objv)
   }
 
   TclObjMsgHandler mh;
-  MsgMgr::reg_handler(&mh);
+  MsgMgr::attach_handler(&mh);
 
   // 実際の読み込みを行う．
   ClibCellLibrary& lib = mgr()->cur_cell_library();

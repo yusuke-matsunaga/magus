@@ -15,7 +15,7 @@
 #include "ym/MvnVlMap.h"
 
 #include "ym/MsgMgr.h"
-#include "ym/MsgHandler.h"
+#include "ym/StreamMsgHandler.h"
 #include "ym/MsgType.h"
 
 
@@ -44,7 +44,7 @@ MvnReadVerilog::cmd_proc(TclObjVector& objv)
   mh.set_mask(kMsgMaskAll);
   mh.delete_mask(MsgType::Info);
   mh.delete_mask(MsgType::Debug);
-  MsgMgr::reg_handler(&mh);
+  MsgMgr::attach_handler(&mh);
 
   MvnVerilogReader reader;
 
