@@ -38,7 +38,7 @@ list ( APPEND CMAKE_MODULE_PATH
 include (FindDoxygen)
 
 # Python のバージョン指定
-set( Python_ADDITIONAL_VERSIONS 3.6 3.5 3.4 3.3 3.2 3.1 )
+set( Python_ADDITIONAL_VERSIONS 3.7 3.6 3.5 3.4 3.3 3.2 3.1 )
 include( FindPythonInterp )
 include( FindPythonLibs )
 
@@ -109,7 +109,7 @@ add_subdirectory ( ym-sat )
 add_subdirectory ( ym-tclpp )
 add_subdirectory ( ym-verilog )
 
-add_subdirectory (src/cequiv)
+add_subdirectory (src/equiv)
 add_subdirectory (src/sbjgraph)
 add_subdirectory (src/lutmap)
 add_subdirectory (src/cellmap)

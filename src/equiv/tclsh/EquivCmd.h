@@ -59,17 +59,25 @@ protected:
   const BnNetwork&
   network1() const;
 
+  /// @brief ネットワーク1の入力リストを返す．
+  const vector<int>&
+  input1_list() const;
+
+  /// @brief ネットワーク1の出力リストを返す．
+  const vector<int>&
+  output1_list() const;
+
   /// @brief ネットワーク2を返す．
   const BnNetwork&
   network2() const;
 
-  /// @brief 入力の対応関係を返す．
-  const vector<pair<int, int> >&
-  input_match() const;
+  /// @brief ネットワーク2の入力リストを返す．
+  const vector<int>&
+  input2_list() const;
 
-  /// @brief 出力の対応関係を返す．
-  const vector<pair<int, int> >&
-  output_match() const;
+  /// @brief ネットワーク2の出力リストを返す．
+  const vector<int>&
+  output2_list() const;
 
 
 private:
@@ -85,18 +93,12 @@ private:
 
   /// @brief 順番で対応をとり，ID番号のペアのリストを作る．
   void
-  assoc_by_order(const BnNetwork& network1,
-		 const BnNetwork& network2,
-		 vector<pair<int, int> >& iassoc,
-		 vector<pair<int, int> >& oassoc);
+  assoc_by_order();
 
   /// @brief 名前で対応をとり, ID番号のペアのリストを作る．
   /// @return エラーが起きたら TCL_ERROR を返す．
   bool
-  assoc_by_name(const BnNetwork& network1,
-		const BnNetwork& network2,
-		vector<pair<int, int> >& iassoc,
-		vector<pair<int, int> >& oassoc);
+  assoc_by_name();
 
   /// @brief 対象のネットワークを BDN に変換する．
   /// @param[in] net_handle ネットワークハンドル
@@ -147,14 +149,20 @@ private:
   // 検証対象のネットワーク1
   BnNetwork mNetwork1;
 
+  // ネットワーク1の入力リスト
+  vector<int> mInput1List;
+
+  // ネットワーク1の出力リスト
+  vector<int> mOutput1List;
+
   // 検証対象のネットワーク2
   BnNetwork mNetwork2;
 
-  // 入力の対応関係
-  vector<pair<int, int> > mInputMatch;
+  // ネットワーク2の入力リスト
+  vector<int> mInput2List;
 
-  // 出力の対応関係
-  vector<pair<int, int> > mOutputMatch;
+  // ネットワーク2の出力リスト
+  vector<int> mOutput2List;
 
 };
 
@@ -273,6 +281,22 @@ EquivCmdBase::network1() const
   return mNetwork1;
 }
 
+// @brief ネットワーク1の入力リストを返す．
+inline
+const vector<int>&
+EquivCmdBase::input1_list() const
+{
+  return mInput1List;
+}
+
+// @brief ネットワーク1の出力リストを返す．
+inline
+const vector<int>&
+EquivCmdBase::output1_list() const
+{
+  return mOutput1List;
+}
+
 // @brief 検証対象のネットワーク2を返す．
 inline
 const BnNetwork&
@@ -281,20 +305,20 @@ EquivCmdBase::network2() const
   return mNetwork2;
 }
 
-// @brief 入力の対応関係を返す．
+// @brief ネットワーク2の入力リストを返す．
 inline
-const vector<pair<int, int> >&
-EquivCmdBase::input_match() const
+const vector<int>&
+EquivCmdBase::input2_list() const
 {
-  return mInputMatch;
+  return mInput2List;
 }
 
-// @brief 出力の対応関係を返す．
+// @brief ネットワーク2の出力リストを返す．
 inline
-const vector<pair<int, int> >&
-EquivCmdBase::output_match() const
+const vector<int>&
+EquivCmdBase::output2_list() const
 {
-  return mOutputMatch;
+  return mOutput2List;
 }
 
 END_NAMESPACE_MAGUS

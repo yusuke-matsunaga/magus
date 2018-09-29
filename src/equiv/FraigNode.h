@@ -1,19 +1,19 @@
-﻿#ifndef LIBYM_CEC_FRAIGNODE_H
-#define LIBYM_CEC_FRAIGNODE_H
+﻿#ifndef FRAIGNODE_H
+#define FRAIGNODE_H
 
-/// @file libym_cec/FraigNode.h
+/// @file FraigNode.h
 /// @brief FraigNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "cec_nsdef.h"
+#include "equiv.h"
 #include "FraigHandle.h"
 
 
-BEGIN_NAMESPACE_YM_CEC
+BEGIN_NAMESPACE_EQUIV
 
 //////////////////////////////////////////////////////////////////////
 /// @class FraigNode FraigNode.h "FraigNode.h"
@@ -21,7 +21,9 @@ BEGIN_NAMESPACE_YM_CEC
 //////////////////////////////////////////////////////////////////////
 class FraigNode
 {
-  friend class FraigMgrImpl;
+  friend class FraigMgr;
+  friend class StructHash;
+  friend class PatHash;
 
 public:
 
@@ -34,7 +36,24 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // ID 番号に関するアクセス関数
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief 入力番号をセットする．
+  void
+  set_input(int id);
+
+  /// @brief ファンインをセットする．
+  /// @param[in] handle1, handle2 ファンインのハンドル
+  void
+  set_fanin(FraigHandle handle1,
+	    FraigHandle handle2);
+
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 変数番号に関するアクセス関数
   //////////////////////////////////////////////////////////////////////
 
   /// @brief CNF 上の変数番号を返す．
@@ -55,10 +74,6 @@ public:
   int
   input_id() const;
 
-  /// @brief 入力番号をセットする．
-  void
-  set_input(int id);
-
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -70,10 +85,11 @@ public:
   is_and() const;
 
   /// @brief ファンインを得る．
+  /// @param[in] pos 位置 ( 0 or 1 )
   FraigNode*
   fanin(int pos) const;
 
-  /// @brief 最初のファンインを得る．
+  /// @brief 1番めのファンインを得る．
   FraigNode*
   fanin0() const;
 
@@ -86,7 +102,7 @@ public:
   bool
   fanin_inv(int pos) const;
 
-  /// @brief 最初のファンインの極性を得る．
+  /// @brief 1番めのファンインの極性を得る．
   bool
   fanin0_inv() const;
 
@@ -99,18 +115,13 @@ public:
   FraigHandle
   fanin_handle(int pos) const;
 
-  /// @brief 最初のファンインのハンドルを得る．
+  /// @brief 1番め初のファンインのハンドルを得る．
   FraigHandle
   fanin0_handle() const;
 
   /// @brief 2番めのファンインのハンドルを得る．
   FraigHandle
   fanin1_handle() const;
-
-  /// @brief ファンインをセットする．
-  void
-  set_fanin(FraigHandle handle1,
-	    FraigHandle handle2);
 
 
 public:
@@ -144,7 +155,7 @@ public:
   check_1mark() const;
 
   /// @brief パタンのハッシュ値を返す．
-  ymuint32
+  SizeType
   pat_hash() const;
 
   /// @brief ハッシュ値の極性を返す．
@@ -199,6 +210,15 @@ public:
   set_dmark();
 
 
+public:
+  //////////////////////////////////////////////////////////////////////
+  // ハッシュ用のリンクアクセス関数
+  //////////////////////////////////////////////////////////////////////
+
+  FraigNode*&
+  link(int link_pos);
+
+
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
@@ -238,7 +258,7 @@ private:
   ymuint32* mPat;
 
   // mPat のハッシュ値
-  ymuint32 mHash;
+  SizeType mHash;
 
   // 構造ハッシュ用のリンクポインタ
   FraigNode* mLink1;
@@ -357,7 +377,7 @@ FraigNode*
 FraigNode::fanin(int pos) const
 {
   // 安全のため pos の値を補正しておく．
-  pos %= 2;
+  pos &= 1;
   return mFanins[pos];
 }
 
@@ -383,7 +403,7 @@ bool
 FraigNode::fanin_inv(int pos) const
 {
   // 安全のため pos の値を補正しておく．
-  pos %= 2;
+  pos &= 1;
   return static_cast<bool>((mFlags >> (kSftP0 + pos)) & 1U);
 }
 
@@ -409,7 +429,7 @@ FraigHandle
 FraigNode::fanin_handle(int pos) const
 {
   // 安全のため pos の値を補正しておく．
-  pos %= 2;
+  pos &= 1;
   return FraigHandle(fanin(pos), fanin_inv(pos));
 }
 
@@ -447,7 +467,7 @@ FraigNode::check_1mark() const
 
 // @brief パタンのハッシュ値を返す．
 inline
-ymuint32
+SizeType
 FraigNode::pat_hash() const
 {
   return mHash;
@@ -601,6 +621,13 @@ FraigNode::calc_pat(int start,
   calc_hash(start, end);
 }
 
-END_NAMESPACE_YM_CEC
+inline
+FraigNode*&
+FraigNode::link(int link_pos)
+{
+  return link_pos == 0 ? mLink1 : mLink2;
+}
 
-#endif // LIBYM_CEC_FRAIGNODE_H
+END_NAMESPACE_EQUIV
+
+#endif // FRAIGNODE_H

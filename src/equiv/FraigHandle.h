@@ -1,32 +1,33 @@
-﻿#ifndef LIBYM_CEC_FRAIGHANDLE_H
-#define LIBYM_CEC_FRAIGHANDLE_H
+﻿#ifndef FRAIGHANDLE_H
+#define FRAIGHANDLE_H
 
-/// @file libym_cec/FraigHandle.h
+/// @file FraigHandle.h
 /// @brief FraigHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "cec_nsdef.h"
+#include "equiv.h"
 #include "ym/SatVarId.h"
 #include "ym/HashFunc.h"
 #include "ym/HashSet.h"
 
 
-BEGIN_NAMESPACE_YM_CEC
+BEGIN_NAMESPACE_EQUIV
 
 class FraigNode;
 
 //////////////////////////////////////////////////////////////////////
 /// @class FraigHandle FraigHandle.h "ym_cec/FraigHandle.h"
-/// @brief 枝を表すクラス
+/// @brief Fraig の枝を表すクラス
 //////////////////////////////////////////////////////////////////////
 class FraigHandle
 {
-  friend class FraigMgrImpl;
+  //friend class FraigMgr;
   friend class FraigNode;
+  friend class StructHash;
 
 public:
   //////////////////////////////////////////////////////////////////////
@@ -44,6 +45,12 @@ public:
 
   /// @brief デストラクタ
   ~FraigHandle();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 内容を設定する関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を設定する．
   /// @param[in] node ノード
@@ -66,9 +73,13 @@ public:
   FraigNode*
   node() const;
 
-  /// @brief ノードの通し番号を得る．
+  /// @brief ノードの変数番号を得る．
   SatVarId
   varid() const;
+
+  /// @brief 対応するリテラルを得る．
+  SatLiteral
+  literal() const;
 
   /// @brief 極性を得る．
   /// @return 反転しているとき true を返す．
@@ -84,6 +95,8 @@ public:
   is_one() const;
 
   /// @brief 定数を指しているとき true を返す．
+  ///
+  /// = is_zero() || is_one()
   bool
   is_const() const;
 
@@ -92,7 +105,8 @@ public:
   is_input() const;
 
   /// @brief 外部入力ノードへのハンドルのとき，入力番号を返す．
-  /// @note is_input() の時のみ意味を持つ．
+  ///
+  /// is_input() == true の時のみ意味を持つ．
   int
   input_id() const;
 
@@ -101,18 +115,21 @@ public:
   is_and() const;
 
   /// @brief pos で指示されたファンインのハンドルを得る．
-  /// @note pos は 0 か 1 でなければならない．
-  /// @note is_and() の時のみ意味を持つ．
+  /// @param[in] pos 位置 ( 0 or 1 )
+  ///
+  /// is_and() == true の時のみ意味を持つ．
   FraigHandle
   fanin_handle(int pos) const;
 
   /// @brief fanin0 のハンドルを得る．
-  /// @note is_and() の時のみ意味を持つ．
+  ///
+  /// is_and() == true の時のみ意味を持つ．
   FraigHandle
   fanin0_handle() const;
 
   /// @brief fanin1 のハンドルを得る．
-  /// @note is_and() の時のみ意味を持つ．
+  ///
+  /// is_and() == true の時のみ意味を持つ．
   FraigHandle
   fanin1_handle() const;
 
@@ -137,6 +154,9 @@ public:
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる関数
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を直接指定したコンストラクタ
   explicit
@@ -155,28 +175,32 @@ private:
 
 /// @relates FraigHandle
 /// @brief 等価比較演算
+/// @param[in] src1, src2 オペランド
 bool
 operator==(FraigHandle src1,
 	   FraigHandle src2);
 
 /// @relates FraigHandle
 /// @brief 非等価比較演算
+/// @param[in] src1, src2 オペランド
 bool
 operator!=(FraigHandle src1,
 	   FraigHandle src2);
 
 /// @relates FraigHandle
 /// @brief 内容をダンプする関数
+/// @param[in] s 出力先のストリーム
 /// @param[in] src 根の枝
 /// @param[in] mark すでに処理したノードの番号を保持するマーク
-/// @param[in] s 出力先のストリーム
 void
-dump_handle(FraigHandle src,
-	    HashSet<ymuint>& mark,
-	    ostream& s);
+dump_handle(ostream& s,
+	    FraigHandle src,
+	    HashSet<int>& mark);
 
 /// @relates FraigHandle
 /// @brief 内容を出力する関数
+/// @param[in] s 出力先のストリーム
+/// @param[in] src ハンドル
 ostream&
 operator<<(ostream& s,
 	   FraigHandle src);
@@ -300,19 +324,21 @@ operator!=(FraigHandle src1,
   return !operator==(src1, src2);
 }
 
-END_NAMESPACE_YM_CEC
+END_NAMESPACE_EQUIV
 
 BEGIN_NAMESPACE_YM
+
 // FraigHandleをキーにしたハッシュ関数クラスの定義
 template <>
-struct HashFunc<nsCec::FraigHandle>
+struct HashFunc<nsEquiv::FraigHandle>
 {
   SizeType
-  operator()(nsCec::FraigHandle aig) const
+  operator()(nsEquiv::FraigHandle handle) const
   {
-    return aig.hash_func();
+    return handle.hash_func();
   }
 };
+
 END_NAMESPACE_YM
 
-#endif // LIBYM_CEC_FRAIGHANDLE_H
+#endif // FRAIGHANDLE_H

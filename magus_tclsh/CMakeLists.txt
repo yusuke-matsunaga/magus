@@ -96,7 +96,7 @@ add_executable (magus_tclsh
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
-  $<TARGET_OBJECTS:magus_cequiv_a>
+  $<TARGET_OBJECTS:magus_equiv_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
   $<TARGET_OBJECTS:magus_lutmap_a>
@@ -149,7 +149,7 @@ add_executable (magus_tclsh_p
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
-  $<TARGET_OBJECTS:magus_cequiv_p>
+  $<TARGET_OBJECTS:magus_equiv_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
 #  $<TARGET_OBJECTS:magus_seal_p>
   $<TARGET_OBJECTS:magus_lutmap_p>
@@ -202,7 +202,7 @@ add_executable (magus_tclsh_d
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
-  $<TARGET_OBJECTS:magus_cequiv_d>
+  $<TARGET_OBJECTS:magus_equiv_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
   $<TARGET_OBJECTS:magus_lutmap_d>

@@ -3,16 +3,14 @@
 /// @brief FraigNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: FraigNode.cc 2203 2009-04-16 05:04:40Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "FraigNode.h"
 
 
-BEGIN_NAMESPACE_YM_CEC
+BEGIN_NAMESPACE_EQUIV
 
 // 本当は 1 は素数ではないがここの目的としては可
 ymuint32 FraigNode::mPrimes[] = {
@@ -229,4 +227,4 @@ FraigNode::calc_hash(int start,
   }
 }
 
-END_NAMESPACE_YM_CEC
+END_NAMESPACE_EQUIV

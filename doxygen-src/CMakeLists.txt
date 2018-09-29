@@ -10,8 +10,8 @@ foreach ( dir
     )
   list ( APPEND YM_DOXY_SRCS ${dir} )
 endforeach ()
+list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/include" )
 foreach ( dir
-    "."
     "ym-bnet"
     "ym-cell"
     "ym-combopt"

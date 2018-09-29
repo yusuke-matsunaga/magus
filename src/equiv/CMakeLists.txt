@@ -16,15 +16,15 @@ include_directories (
 #  ソースファイルの設定
 # ===================================================================
 
-set ( main_SOURCES
+set ( equiv_SOURCES
+  EquivMgr.cc
   FraigMgr.cc
-  FraigMgrImpl.cc
+  FraigHandle.cc
+  FraigHash.cc
   FraigNode.cc
+  PatHash.cc
+  StructHash.cc
   Bn2FraigConv.cc
-  check_ceq.cc
-  )
-
-set ( tclsh_SOURCES
   tclsh/EquivCmd.cc
   )
 
@@ -33,7 +33,6 @@ set ( tclsh_SOURCES
 # ターゲットの設定
 # ===================================================================
 
-ym_add_object_library (magus_cequiv
-  ${main_SOURCES}
-  ${tclsh_SOURCES}
+ym_add_object_library (magus_equiv
+  ${equiv_SOURCES}
   )

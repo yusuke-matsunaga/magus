@@ -3,14 +3,12 @@
 /// @brief EquivCmd の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// $Id: EquivCmd.cc 2507 2009-10-17 16:24:02Z matsunaga $
-///
-/// Copyright (C) 2005-2010 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "EquivCmd.h"
-#include "cec_nsdef.h"
+#include "EquivMgr.h"
 #include "ym/BnNode.h"
 #include "ym/BnPort.h"
 #include "ym/TclPopt.h"
@@ -25,10 +23,10 @@ BEGIN_NAMESPACE_MAGUS
 BEGIN_NONAMESPACE
 
 // 2つのネットワークの入力，出力間の対応関係を取るための方法
-enum tAssoc {
-  kAssocNone,   // 指定されていない
-  kAssocOrder,  // 回路記述順
-  kAssocName    // 名前
+enum Assoc {
+  None,   // 指定されていない
+  Order,  // 回路記述順
+  Name    // 名前
 };
 
 END_NONAMESPACE
@@ -74,7 +72,7 @@ EquivCmdBase::~EquivCmdBase()
 int
 EquivCmdBase::prologue(TclObjVector& objv)
 {
-  tAssoc assoc_mode = kAssocNone;
+  Assoc assoc_mode = Assoc::None;
 
   if ( mPoptLoglevel->is_specified() ) {
     mLogLevel = mPoptLoglevel->val();
@@ -96,10 +94,10 @@ EquivCmdBase::prologue(TclObjVector& objv)
   }
 
   if ( mPoptOrder->is_specified() ) {
-    assoc_mode = kAssocOrder;
+    assoc_mode = Assoc::Order;
   }
   else if ( mPoptName->is_specified() ) {
-    assoc_mode = kAssocName;
+    assoc_mode = Assoc::Name;
   }
   else {
     TclObj obj = var("magus::default", "equiv_assoc_mode",
@@ -109,10 +107,10 @@ EquivCmdBase::prologue(TclObjVector& objv)
     }
     string val = obj;
     if ( val == "name" ) {
-      assoc_mode = kAssocName;
+      assoc_mode = Assoc::Name;
     }
     else if ( val == "order" ) {
-      assoc_mode = kAssocOrder;
+      assoc_mode = Assoc::Order;
     }
     else {
       TclObj emsg;
@@ -223,15 +221,13 @@ EquivCmdBase::prologue(TclObjVector& objv)
 
   // 外部入力/外部出力の対応をとる．
   switch ( assoc_mode ) {
-  case kAssocOrder:
+  case Assoc::Order:
     // これは必ず成功する．
-    assoc_by_order(mNetwork1, mNetwork2,
-		   mInputMatch, mOutputMatch);
+    assoc_by_order();
     break;
 
-  case kAssocName:
-    if ( !assoc_by_name(mNetwork1, mNetwork2,
-			mInputMatch, mOutputMatch) ) {
+  case Assoc::Name:
+    if ( !assoc_by_name() ) {
       // 名前の対応がとれなかった．
       // エラーメッセージは assoc_by_name() 中で出力されている．
       return TCL_OK;
@@ -287,45 +283,43 @@ EquivCmdBase::get_time(const string& str,
 
 // ネットワーク中に現われる入力，出力の順番で対応を取る．
 void
-EquivCmdBase::assoc_by_order(const BnNetwork& network1,
-			     const BnNetwork& network2,
-			     vector<pair<int, int> >& iassoc,
-			     vector<pair<int, int> >& oassoc)
+EquivCmdBase::assoc_by_order()
 {
-  iassoc.clear();
-  oassoc.clear();
-
   // まずは外部入力ノードの対応関係を取る．
-  int ni = network1.input_num();
-  ASSERT_COND( network2.input_num() == ni );
+  int ni = mNetwork1.input_num();
+  ASSERT_COND( mNetwork2.input_num() == ni );
+  mInput1List.clear();
+  mInput1List.resize(ni);
+  mInput2List.clear();
+  mInput2List.resize(ni);
   for ( int i = 0; i < ni; ++ i ) {
-    const BnNode* node1 = network1.input(i);
-    const BnNode* node2 = network2.input(i);
-    iassoc.push_back(make_pair(node1->id(), node2->id()));
+    const BnNode* node1 = mNetwork1.input(i);
+    mInput1List[i] = node1->id();
+    const BnNode* node2 = mNetwork2.input(i);
+    mInput2List[i] = node2->id();
   }
 
   // 次は外部出力ノードの対応関係を取る．
-  int no = network1.output_num();
-  ASSERT_COND( network2.output_num() == no );
+  int no = mNetwork1.output_num();
+  ASSERT_COND( mNetwork2.output_num() == no );
+  mOutput1List.clear();
+  mOutput1List.resize(no);
+  mOutput2List.clear();
+  mOutput2List.resize(no);
   for ( int i = 0; i < no; ++ i ) {
-    const BnNode* node1 = network1.output(i);
-    const BnNode* node2 = network2.output(i);
-    oassoc.push_back(make_pair(node1->id(), node2->id()));
+    const BnNode* node1 = mNetwork1.output(i);
+    mOutput1List[i] = node1->id();
+    const BnNode* node2 = mNetwork2.output(i);
+    mOutput2List[i] = node2->id();
   }
 }
 
 // 名前で対応を取る．
 bool
-EquivCmdBase::assoc_by_name(const BnNetwork& network1,
-			    const BnNetwork& network2,
-			    vector<pair<int, int> >& iassoc,
-			    vector<pair<int, int> >& oassoc)
+EquivCmdBase::assoc_by_name()
 {
-  iassoc.clear();
-  oassoc.clear();
-
-  int np1 = network1.port_num();
-  int np2 = network2.port_num();
+  int np1 = mNetwork1.port_num();
+  int np2 = mNetwork2.port_num();
   if ( np1 != np2 ) {
     TclObj emsg;
     emsg << "Number of ports is different";
@@ -333,14 +327,28 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
     return false;
   }
 
+  int ni = mNetwork1.input_num();
+  ASSERT_COND( mNetwork2.input_num() == ni );
+  mInput1List.clear();
+  mInput1List.reserve(ni);
+  mInput2List.clear();
+  mInput2List.reserve(ni);
+
+  int no = mNetwork1.output_num();
+  ASSERT_COND( mNetwork2.output_num() == no );
+  mOutput1List.clear();
+  mOutput1List.reserve(no);
+  mOutput2List.clear();
+  mOutput2List.reserve(no);
+
   for ( int i = 0; i < np1; ++ i ) {
-    const BnPort* port1 = network1.port(i);
+    const BnPort* port1 = mNetwork1.port(i);
     int bw1 = port1->bit_width();
 
     // とりあえず単純な線形探索
     bool found = false;
     for ( int j = 0; j < np2; ++ j ) {
-      const BnPort* port2 = network2.port(j);
+      const BnPort* port2 = mNetwork2.port(j);
       if ( port1->name() == port2->name() ) {
 	found = true;
 	int bw2 = port2->bit_width();
@@ -353,8 +361,8 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
 	}
 
 	for ( int k = 0; k < bw1; ++ k ) {
-	  const BnNode* node1 = network1.node(port1->bit(k));
-	  const BnNode* node2 = network2.node(port2->bit(k));
+	  const BnNode* node1 = mNetwork1.node(port1->bit(k));
+	  const BnNode* node2 = mNetwork2.node(port2->bit(k));
 	  if ( node1->type() != node2->type() ) {
 	    TclObj emsg;
 	    emsg
@@ -365,10 +373,12 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
 	    return false;
 	  }
 	  if ( node1->is_input() ) {
-	    iassoc.push_back(make_pair(node1->id(), node2->id()));
+	    mInput1List.push_back(node1->id());
+	    mInput2List.push_back(node2->id());
 	  }
 	  if ( node1->is_output() ) {
-	    oassoc.push_back(make_pair(node1->id(), node2->id()));
+	    mOutput1List.push_back(node1->id());
+	    mOutput2List.push_back(node2->id());
 	  }
 	}
 	break;
@@ -391,7 +401,7 @@ EquivCmdBase::assoc_by_name(const BnNetwork& network1,
 // @param[out] dst_network 変換したネットワークを格納する変数
 void
 EquivCmdBase::conv_to_bnet(const NetHandle* net_handle,
-			  BnNetwork& dst_network)
+			   BnNetwork& dst_network)
 {
   switch ( net_handle->type() ) {
   case NetHandle::kMagBn:
@@ -454,13 +464,16 @@ EquivCmd::cmd_proc(TclObjVector& objv)
       sigsize = mPoptSigSize->val();
     }
 
+    nsYm::nsEquiv::EquivMgr equiv_mgr(sigsize, sat_type());
+
     vector<SatBool3> comp_stats;
-    nsYm::nsCec::check_ceq(network1(), network2(),
-			   input_match(), output_match(),
-			   log_level(), &cout,
-			   sat_type(),
-			   sigsize,
-			   comp_stats);
+    equiv_mgr.check(network1(),
+		    input1_list(),
+		    output1_list(),
+		    network2(),
+		    input2_list(),
+		    output2_list(),
+		    comp_stats);
 
     bool has_neq = false;
     bool has_abt = false;
@@ -483,15 +496,15 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     {
       int no = network1().output_num();
       for ( int i = 0; i < no; ++ i ) {
+	auto oid1 = output1_list()[i];
+	auto oid2 = output2_list()[i];
+	const BnNode* node1 = network1().node(oid1);
+	const BnNode* node2 = network2().node(oid2);
 	if ( comp_stats[i] == SatBool3::False ) {
-	  const BnNode* node1 = network1().output(i);
-	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
 	}
 	else if ( comp_stats[i] == SatBool3::X ) {
-	  const BnNode* node1 = network1().output(i);
-	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are unknown" << endl;
 	}
