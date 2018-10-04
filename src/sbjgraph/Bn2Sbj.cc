@@ -57,13 +57,14 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   HashMap<int, SbjHandle> node_map;
 
   // 外部入力ノードの生成
-  for ( auto bn_node: src_network.input_list() ) {
+  for ( auto id: src_network.input_id_list() ) {
     SbjNode* sbj_node = dst_network.new_input(false);
-    node_map.add(bn_node->id(), SbjHandle(sbj_node));
+    node_map.add(id, SbjHandle(sbj_node));
   }
 
   // 論理ノードの生成
-  for ( auto bn_node: src_network.logic_list() ) {
+  for ( auto id: src_network.logic_id_list() ) {
+    auto bn_node = src_network.node(id);
     int ni = bn_node->fanin_num();
     vector<SbjHandle> ihandle_list(ni);
     for ( int j = 0; j < ni; ++ j ) {
@@ -127,17 +128,18 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       ASSERT_NOT_REACHED;
       break;
     }
-    node_map.add(bn_node->id(), sbj_handle);
+    node_map.add(id, sbj_handle);
   }
 
   // 外部出力ノードの生成
-  for ( auto bn_node: src_network.output_list() ) {
+  for ( auto id: src_network.output_id_list() ) {
+    auto bn_node = src_network.node(id);
     int iid = bn_node->fanin();
     SbjHandle ihandle;
     bool stat = node_map.find(iid, ihandle);
     ASSERT_COND( stat );
     SbjNode* sbj_node = dst_network.new_output(ihandle);
-    node_map.add(bn_node->id(), SbjHandle(sbj_node));
+    node_map.add(id, SbjHandle(sbj_node));
   }
 
   // DFFノードの生成

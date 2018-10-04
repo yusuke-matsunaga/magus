@@ -27,8 +27,10 @@ class Bn2FraigConv
 public:
 
   /// @brief コンストラクタ
+  /// @param[in] src_network 元となるネットワーク
   /// @param[in] mgr FraigMgr
-  Bn2FraigConv(FraigMgr& mgr);
+  Bn2FraigConv(const BnNetwork& src_network,
+	       FraigMgr& mgr);
 
   /// @brief デストラクタ
   ~Bn2FraigConv();
@@ -40,14 +42,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ネットワークの構造に対応する Fraig を作る．
-  /// @param[in] src_network 元となるネットワーク
   /// @param[in] input_list 入力ノード番号のリスト
   /// @param[in] output_list 出力ノード番号のリスト
   /// @param[in] input_handles 入力のハンドルのリスト
   /// @param[out] output_handles 出力のハンドルのリスト
   void
-  operator()(const BnNetwork& src_network,
-	     const vector<int>& input_list,
+  operator()(const vector<int>& input_list,
 	     const vector<int>& output_list,
 	     const vector<FraigHandle>& input_handles,
 	     vector<FraigHandle>& output_handles);
@@ -59,12 +59,12 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief BnNode に対応するハンドルを作る．
-  /// @param[in] node 対象のノード
+  /// @param[in] node_id ノード番号
   /// @return 生成したハンドルを返す．
   ///
   /// node のファンイン側の構造は Fraig 化されていると仮定する．
   FraigHandle
-  make_handle(const BnNode* node);
+  make_handle(int node_id);
 
   /// @brief ノード番号に対応するハンドルを登録する．
   /// @param[in] node_id ノード番号
@@ -86,6 +86,9 @@ private:
 
   // FraigMgr
   FraigMgr& mMgr;
+
+  // 元のネットワーク
+  const BnNetwork& mSrcNetwork;
 
   // BnNode::id() をキーとして対応する FraigHandle を記録する配列
   vector<FraigHandle> mHandleMap;

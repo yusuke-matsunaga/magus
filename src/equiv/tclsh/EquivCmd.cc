@@ -293,10 +293,10 @@ EquivCmdBase::assoc_by_order()
   mInput2List.clear();
   mInput2List.resize(ni);
   for ( int i = 0; i < ni; ++ i ) {
-    const BnNode* node1 = mNetwork1.input(i);
-    mInput1List[i] = node1->id();
-    const BnNode* node2 = mNetwork2.input(i);
-    mInput2List[i] = node2->id();
+    int id1 = mNetwork1.input_id(i);
+    mInput1List[i] = id1;
+    int id2 = mNetwork2.input_id(i);
+    mInput2List[i] = id2;
   }
 
   // 次は外部出力ノードの対応関係を取る．
@@ -307,10 +307,10 @@ EquivCmdBase::assoc_by_order()
   mOutput2List.clear();
   mOutput2List.resize(no);
   for ( int i = 0; i < no; ++ i ) {
-    const BnNode* node1 = mNetwork1.output(i);
-    mOutput1List[i] = node1->id();
-    const BnNode* node2 = mNetwork2.output(i);
-    mOutput2List[i] = node2->id();
+    int id1 = mNetwork1.output_id(i);
+    mOutput1List[i] = id1;
+    int id2 = mNetwork2.output_id(i);
+    mOutput2List[i] = id2;
   }
 }
 
@@ -604,15 +604,15 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
     {
       int no = network1().output_num();
       for ( int i = 0; i < no; ++ i ) {
+	int id1 = network1().output_id(i);
+	const BnNode* node1 = network1().node(id1);
+	int id2 = network2().output_id(i);
+	const BnNode* node2 = network2().node(id2);
 	if ( comp_stats[i] == SatBool3::False ) {
-	  const BnNode* node1 = network1().output(i);
-	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
 	}
 	else if ( comp_stats[i] == SatBool3::X ) {
-	  const BnNode* node1 = network1().output(i);
-	  const BnNode* node2 = network2().output(i);
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are unknown" << endl;
 	}

@@ -44,34 +44,29 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
   fout << "module " << net_name << "(" << endl;
   fout << " clk ," << endl;
 
-  ymuint ni = mapgraph.input_num();
   const char* comma = "";
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BnNode* pi = mapgraph.input(i);
-    fout << comma << " pi_" << pi->id();
+  for ( auto id: mapgraph.input_id_list() ) {
+    fout << comma << " pi_" << id;
     comma = ", ";
   }
-  ymuint no = mapgraph.output_num();
-  for (ymuint i = 0; i < no; ++ i) {
+  for ( auto id: mapgraph.output_id_list() ) {
     fout << " ," << endl;
-    const BnNode* po = mapgraph.output(i);
+    auto po = mapgraph.node(id);
     fout << " po_" << po->fanin();
   }
   fout << endl
        << ");" << endl;
 
   fout << " input clk ;" << endl;
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BnNode* pi = mapgraph.output(i);
-    fout << " input pi_" << pi->id() << " ;" << endl;
+  for ( auto id: mapgraph.input_id_list() ) {
+    fout << " input pi_" << id << " ;" << endl;
   }
-  for (ymuint i = 0; i < no; ++ i) {
-    const BnNode* po = mapgraph.output(i);
+  for ( auto id: mapgraph.output_id_list() ) {
+    auto po = mapgraph.node(id);
     fout << " output po_" << po->fanin() << " ;" << endl;
   }
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BnNode* pi = mapgraph.input(i);
-    fout << " wire w_" << pi->id() << " ;" << endl;
+  for ( auto id: mapgraph.input_id_list() ) {
+    fout << " wire w_" << id << " ;" << endl;
   }
 #if 0
   for (ymuint i = 0; i < no; ++ i) {
@@ -82,10 +77,8 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
     }
   }
 #endif
-  ymuint nl = mapgraph.logic_num();
-  for (ymuint i = 0; i < nl; ++ i) {
-    const BnNode* lut = mapgraph.logic(i);
-    fout << " wire w_" << lut->id() << " ;" << endl;
+  for ( auto id: mapgraph.logic_id_list() ) {
+    fout << " wire w_" << id << " ;" << endl;
   }
   fout << " wire w_one ;" << endl;
   fout << " wire w_gnd ;" << endl;
@@ -94,13 +87,12 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
   fout << "assign w_gnd = 1'b0 ;" << endl;
   fout << endl;
 
-  for (ymuint i = 0; i < ni; ++ i) {
-    const BnNode* pi = mapgraph.input(i);
-    fout << " DFFE FI" << pi->id()
-	 << "( .Q(w_" << pi->id() << ")"
+  for ( auto id: mapgraph.input_id_list() ) {
+    fout << " DFFE FI" << id
+	 << "( .Q(w_" << id << ")"
 	 << ", .CLK(clk), .ENA(w_one)"
-	 << ", .D(pi_" << pi->id() << ")"
-	 << ", .CLRN(w_one),　.PRN(w_one));" << endl;
+	 << ", .D(pi_" << id << ")"
+	 << ", .CLRN(w_one), .PRN(w_one));" << endl;
   }
 #if 0
   for (ymuint i = 0; i < no; ++ i) {
@@ -119,17 +111,17 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
   lut_in[2] = "datac";
   lut_in[3] = "datad";
 
-  for (ymuint i = 0; i < nl; ++ i) {
-    const BnNode* lut = mapgraph.logic(i);
+  for ( auto id: mapgraph.logic_id_list() ) {
+    auto lut = mapgraph.node(id);
     ASSERT_COND( lut->type() == BnNodeType::TvFunc );
-    TvFunc tv = lut->func();
-    ymuint ni = lut->fanin_num();
-    ymuint table_size = 1U << ni;
+    const TvFunc& tv = mapgraph.func(lut->func_id());
+    int ni = lut->fanin_num();
+    int table_size = 1U << ni;
 
     fout << endl;
 
     if ( ni == 0 ){
-      fout << "assign w_" << lut->id() << " = "
+      fout << "assign w_" << id << " = "
 	   << tv.value(0) << endl << endl;
     }
     else {

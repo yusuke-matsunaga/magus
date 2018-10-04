@@ -82,15 +82,16 @@ EquivMgr::check(const BnNetwork& network1,
     input_handles[i] = fraig_mgr.make_input();
   }
 
-  Bn2FraigConv convert(fraig_mgr);
 
   // network1 に対応する Fraig を作る．
+  Bn2FraigConv convert1(network1, fraig_mgr);
   vector<FraigHandle> output_handles1(no);
-  convert(network1, input1_list, output1_list, input_handles, output_handles1);
+  convert1(input1_list, output1_list, input_handles, output_handles1);
 
   // network2 に対応する Fraig を作る．
+  Bn2FraigConv convert2(network2, fraig_mgr);
   vector<FraigHandle> output_handles2(no);
-  convert(network2, input2_list, output2_list, input_handles, output_handles2);
+  convert2(input2_list, output2_list, input_handles, output_handles2);
 
   // 各出力の等価検証を行う．
   eq_stats.clear();
