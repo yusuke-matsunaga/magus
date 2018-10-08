@@ -212,8 +212,13 @@ public:
   int
   fanout_num() const;
 
+  /// @brief ファンアウトのノードを得る．
+  /// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
+  const SbjNode*
+  fanout(int pos) const;
+
   /// @brief ファンアウトリストを得る．
-  const list<SbjEdge>&
+  const vector<SbjEdge>&
   fanout_list() const;
 
   /// @brief 出力ノードにファンアウトしているとき true を返す．
@@ -250,7 +255,7 @@ private:
   SbjHandle mFanins[2];
 
   // ファンアウトのリスト
-  list<SbjEdge> mFanoutList;
+  vector<SbjEdge> mFanoutList;
 
 
 private:
@@ -504,9 +509,19 @@ SbjNode::fanout_num() const
   return mFanoutList.size();
 }
 
+// @brief ファンアウトのノードを得る．
+// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
+inline
+const SbjNode*
+SbjNode::fanout(int pos) const
+{
+  ASSERT_COND( pos >= 0 && pos < fanout_num() );
+  return mFanoutList[pos].to();
+}
+
 // @brief ファンアウトリストを得る．
 inline
-const list<SbjEdge>&
+const vector<SbjEdge>&
 SbjNode::fanout_list() const
 {
   return mFanoutList;
