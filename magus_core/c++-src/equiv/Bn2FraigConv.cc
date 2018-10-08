@@ -94,6 +94,7 @@ Bn2FraigConv::make_handle(int node_id)
   if ( node->is_output() ) {
     auto h = get_handle(node->fanin());
     put_handle(node->id(), h);
+    return h;
   }
 
   // ファンインのノードに対応するハンドルを求める．

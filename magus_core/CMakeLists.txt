@@ -25,6 +25,9 @@ add_subdirectory (c++-src/cellmap)
 add_subdirectory ( cython-src )
 add_subdirectory ( debug )
 
+add_subdirectory ( py-test )
+
+
 # ===================================================================
 #  ソースファイルの設定
 # ===================================================================
