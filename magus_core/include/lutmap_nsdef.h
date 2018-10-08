@@ -10,6 +10,7 @@
 
 
 #include "magus.h"
+#include "ym/bnet.h"
 
 
 /// @brief lutmap 用の名前空間の開始
@@ -25,17 +26,27 @@ END_NAMESPACE_MAGUS
 
 BEGIN_NAMESPACE_LUTMAP
 
-class LutMap;
-class LutMap2;
-class LutMap3;
+/// @brief DAG covering のヒューリスティック関数
+/// @param[in] src_network もとのネットワーク
+/// @param[in] limit カットサイズ
+/// @param[in] mode モードを表す文字列
+/// @param[out] dat_network マッピング結果
+/// @param[out] lut_num LUT数
+/// @param[out] depth 段数
+extern
+void
+lutmap(const BnNetwork& src_network,
+       int limit,
+       const string& mode,
+       BnNetwork& dst_network,
+       int& lut_num,
+       int& depth);
 
 END_NAMESPACE_LUTMAP
 
 BEGIN_NAMESPACE_MAGUS
 
-using nsLutmap::LutMap;
-using nsLutmap::LutMap2;
-using nsLutmap::LutMap3;
+using nsLutmap::lutmap;
 
 END_NAMESPACE_MAGUS
 

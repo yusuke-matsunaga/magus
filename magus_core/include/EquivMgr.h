@@ -43,6 +43,20 @@ public:
 
   /// @brief 2つの回路が等価かどうか調べる．
   /// @param[in] network1 対象の回路1
+  /// @param[in] network2 対象の回路2
+  /// @param[out] eq_stats 各出力ごとの等価検証の結果
+  /// @retval SatBool3::True 等価
+  /// @retval SatBool3::False 非等価
+  /// @retval SatBool3::X アボート(不明)
+  ///
+  /// 入力と出力の対応関係は順序で対応させる．
+  SatBool3
+  check(const BnNetwork& network1,
+	const BnNetwork& network2,
+	vector<SatBool3>& eq_stats);
+
+  /// @brief 2つの回路が等価かどうか調べる．
+  /// @param[in] network1 対象の回路1
   /// @param[in] input1_list 入力ノード番号のリスト
   /// @param[in] output1_list 出力ノード番号のリスト
   /// @param[in] network2 対象の回路2

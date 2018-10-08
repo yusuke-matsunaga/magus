@@ -53,7 +53,6 @@ LutMap::area_map(const BnNetwork& src_network,
 		 int& lut_num,
 		 int& depth)
 {
-
   SbjGraph sbjgraph;
   Bn2Sbj bn2sbj;
   bn2sbj.convert(src_network, sbjgraph);

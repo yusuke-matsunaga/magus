@@ -41,6 +41,48 @@ EquivMgr::~EquivMgr()
 
 // @brief 2つの回路が等価かどうか調べる．
 // @param[in] network1 対象の回路1
+// @param[in] network2 対象の回路2
+// @param[out] eq_stats 各出力ごとの等価検証の結果
+// @retval SatBool3::True 等価
+// @retval SatBool3::False 非等価
+// @retval SatBool3::X アボート(不明)
+//
+// 入力と出力の対応関係は順序で対応させる．
+SatBool3
+EquivMgr::check(const BnNetwork& network1,
+		const BnNetwork& network2,
+		vector<SatBool3>& eq_stats)
+{
+  int ni = network1.input_num();
+  if ( network2.input_num() != ni ) {
+    return SatBool3::False;
+  }
+  int no = network1.output_num();
+  if ( network2.output_num() != no ) {
+    return SatBool3::False;
+  }
+
+  vector<int> input1_list(ni);
+  vector<int> input2_list(ni);
+  for ( int i: Range(ni) ) {
+    input1_list[i] = network1.input_id(i);
+    input2_list[i] = network2.input_id(i);
+  }
+
+  vector<int> output1_list(no);
+  vector<int> output2_list(no);
+  for ( int i: Range(no) ) {
+    output1_list[i] = network1.output_id(i);
+    output2_list[i] = network2.output_id(i);
+  }
+
+  return check(network1, input1_list, output1_list,
+	       network2, input2_list, output2_list,
+	       eq_stats);
+}
+
+// @brief 2つの回路が等価かどうか調べる．
+// @param[in] network1 対象の回路1
 // @param[in] input1_list 入力ノード番号のリスト
 // @param[in] output1_list 出力ノード番号のリスト
 // @param[in] network2 対象の回路2
