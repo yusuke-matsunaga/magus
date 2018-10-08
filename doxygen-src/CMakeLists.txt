@@ -10,7 +10,8 @@ foreach ( dir
     )
   list ( APPEND YM_DOXY_SRCS ${dir} )
 endforeach ()
-list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/include" )
+list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_core/include" )
+list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_tclsh/include" )
 foreach ( dir
     "ym-bnet"
     "ym-cell"

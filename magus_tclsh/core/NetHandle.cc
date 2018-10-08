@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "tclsh/NetHandle.h"
+#include "NetHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS

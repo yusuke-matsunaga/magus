@@ -10,7 +10,7 @@
 
 
 #include "ChgNetwork.h"
-#include "tclsh/NetHandle.h"
+#include "NetHandle.h"
 #include "ym/TclPopt.h"
 
 

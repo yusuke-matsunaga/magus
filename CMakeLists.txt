@@ -12,12 +12,12 @@ set (CMAKE_CXX_STANDARD 14)
 # プロジェクト名，バージョンの設定
 # ===================================================================
 project (ym-magus)
-set (YM_MAGUS_VERSION_MAJOR 1)
-set (YM_MAGUS_VERSION_MINOR 0)
-set (YM_MAGUS_VERSION ${YM_MAGUS_VERSION_MAJOR}.${YM_MAGUS_VERSION_MINOR})
+set (VERSION_MAJOR 1)
+set (VERSION_MINOR 0)
+set (VERSION ${VERSION_MAJOR}.${VERSION_MINOR})
 
 # 名前空間
-set (MAGUS_NAMESPACE "nsMagus")
+set (MAGUS_NSNAME "nsMagus")
 
 # ライブラリのインストールディレクトリ
 set ( YM_INSTALL_LIBDIR "lib/magus" )
@@ -79,7 +79,6 @@ configure_file(
 # インクルードパスの設定
 # ===================================================================
 include_directories (
-  ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/ym-base/include
   ${PROJECT_SOURCE_DIR}/ym-bnet/include
   ${PROJECT_SOURCE_DIR}/ym-cell/include
@@ -109,11 +108,7 @@ add_subdirectory ( ym-sat )
 add_subdirectory ( ym-tclpp )
 add_subdirectory ( ym-verilog )
 
-add_subdirectory (src/equiv)
-add_subdirectory (src/sbjgraph)
-add_subdirectory (src/lutmap)
-add_subdirectory (src/cellmap)
-
+add_subdirectory ( magus_core )
 add_subdirectory (magus_tclsh)
 
 if (DOXYGEN_FOUND)

@@ -3,6 +3,8 @@
 # インクルードパスの設定
 # ===================================================================
 include_directories (
+  ${PROJECT_SOURCE_DIR}/magus_core/include
+  include
   ${TCL_INCLUDE_PATH}
   )
 
@@ -44,6 +46,21 @@ set (core_SOURCES
   core/WriteBlif.cc
   core/WriteVerilog.cc
   core/core_init.cc
+  )
+
+set (equiv_SOURCES
+  equiv/EquivCmd.cc
+  )
+
+set ( lutmap_SOURCES
+  lutmap/AreaMapCmd.cc
+  lutmap/AreaMap2Cmd.cc
+  lutmap/AreaMap3Cmd.cc
+  lutmap/Conv2BNetCmd.cc
+  lutmap/DelayMapCmd.cc
+  lutmap/DumpLutCmd.cc
+  lutmap/LutmapCmd.cc
+  lutmap/WriteVqmCmd.cc
   )
 
 set (misc_SOURCES

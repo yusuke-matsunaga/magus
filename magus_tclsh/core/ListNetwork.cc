@@ -10,7 +10,7 @@
 
 
 #include "ListNetwork.h"
-#include "tclsh/MagMgr.h"
+#include "MagMgr.h"
 #include "ym/TclPopt.h"
 
 

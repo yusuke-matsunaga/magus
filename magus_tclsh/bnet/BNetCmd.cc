@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 
-#include "tclsh/BNetCmd.h"
+#include "BNetCmd.h"
 #include "ym/TclPopt.h"
 
 

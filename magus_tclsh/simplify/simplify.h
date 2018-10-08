@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "magus_nsdef.h"
+#include "magus.h"
 
 /// @brief simplify 用の名前空間の開始
 #define BEGIN_NAMESPACE_MAGUS_SIMPLIFY \

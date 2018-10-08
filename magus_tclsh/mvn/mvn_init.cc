@@ -11,7 +11,7 @@
 
 #include <tcl.h>
 
-#include "tclsh/MagMgr.h"
+#include "MagMgr.h"
 #include "MvnReadVerilog.h"
 
 

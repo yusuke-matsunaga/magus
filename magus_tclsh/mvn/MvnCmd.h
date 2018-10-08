@@ -10,7 +10,7 @@
 /// All rights reserved.
 
 
-#include "tclsh/NetCmd.h"
+#include "NetCmd.h"
 #include "ym/mvn.h"
 
 

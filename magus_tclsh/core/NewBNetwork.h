@@ -11,7 +11,7 @@
 /// All rights reserved.
 
 
-#include "tclsh/MagCmd.h"
+#include "MagCmd.h"
 
 
 BEGIN_NAMESPACE_MAGUS

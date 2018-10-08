@@ -10,7 +10,7 @@
 
 
 #include "ForNetwork.h"
-#include "tclsh/MagMgr.h"
+#include "MagMgr.h"
 
 
 BEGIN_NAMESPACE_MAGUS

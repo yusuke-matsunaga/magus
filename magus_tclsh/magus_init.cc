@@ -10,7 +10,7 @@
 
 
 #include <tcl.h>
-#include "tclsh/MagMgr.h"
+#include "MagMgr.h"
 
 //#define USE_TEST_PACKAGE
 
@@ -134,12 +134,10 @@ magus_init(Tcl_Interp* interp)
   }
 #endif
 
-  const char* MAGUS_VERSION = "1.0";
-
   //////////////////////////////////////////////////////////////////////
   // パッケージ宣言
   //////////////////////////////////////////////////////////////////////
-  if ( Tcl_PkgProvide(interp, "Magus", MAGUS_VERSION) != TCL_OK ) {
+  if ( Tcl_PkgProvide(interp, "Magus", MAGUS_VERSION_STR) != TCL_OK ) {
     return TCL_ERROR;
   }
 

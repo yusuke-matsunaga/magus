@@ -10,7 +10,7 @@
 
 
 #include "CopyNetwork.h"
-#include "tclsh/NetHandle.h"
+#include "NetHandle.h"
 
 
 BEGIN_NAMESPACE_MAGUS

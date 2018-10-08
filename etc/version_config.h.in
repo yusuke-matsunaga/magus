@@ -5,13 +5,19 @@
 //////////////////////////////////////////////////////////////////////
 
 /// @brief プロジェクトの major バージョン
-#define MAGUS_VERSION_MAJIR @YM_MAGUS_VERSION_MAJOR@
+#define MAGUS_VERSION_MAJIR @VERSION_MAJOR@
 
 /// @brief プロジェクトの minor バージョン
-#define MAGUS_VERSION_MINOR @YM_MAGUS_VERSION_MINOR@
+#define MAGUS_VERSION_MINOR @VERSION_MINOR@
 
 /// @brief プロジェクトのバージョン
-#define MAGUS_VERSION @YM_MAGUS_VERSION@
+#define MAGUS_VERSION @VERSION@
 
-/// @brief プロジェクトの名前空間
-#define MAGUS_NAMESPACE @YM_MAGUS_NAMESPACE@
+/// @brief プロジェクトのバージョンの文字列
+#define MAGUS_VERSION_STR "@VERSION@"
+
+/// @brief magus プロジェクトの名前空間名
+#define MAGUS_NSNAME @MAGUS_NSNAME@
+
+/// @brief magus プロジェクトの名前空間名の文字列
+#define MAGUS_NSNAME_STR "@MAGUS_NSNAME@"

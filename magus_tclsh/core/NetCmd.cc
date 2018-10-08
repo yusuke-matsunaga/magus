@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "tclsh/NetCmd.h"
-#include "tclsh/NetHandle.h"
+#include "NetCmd.h"
+#include "NetHandle.h"
 #include "ym/TclPopt.h"
 
 

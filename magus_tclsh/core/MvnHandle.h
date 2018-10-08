@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "tclsh/NetHandle.h"
+#include "NetHandle.h"
 #include "ym/MvnMgr.h"
 
 

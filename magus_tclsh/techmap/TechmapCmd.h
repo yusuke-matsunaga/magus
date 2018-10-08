@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "tclsh/MagCmd.h"
+#include "MagCmd.h"
 
 
 /// @brief techmap 用の名前空間の開始

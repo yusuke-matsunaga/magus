@@ -7,9 +7,9 @@
 /// All rights reserved.
 
 
-#include "tclsh/MagCmd.h"
-#include "tclsh/MagMgr.h"
-#include "tclsh/NetHandle.h"
+#include "MagCmd.h"
+#include "MagMgr.h"
+#include "NetHandle.h"
 #include "BNetHandle.h"
 
 

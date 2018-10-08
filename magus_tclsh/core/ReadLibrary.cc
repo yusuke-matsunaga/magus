@@ -9,7 +9,7 @@
 
 #include "ReadLibrary.h"
 
-#include "tclsh/MagMgr.h"
+#include "MagMgr.h"
 #include "ym/ClibCellLibrary.h"
 #include "ym/MsgMgr.h"
 #include "ym/TclObjMsgHandler.h"

@@ -7,8 +7,8 @@
 /// All rights reserved.
 
 
-#include "tclsh/MagMgr.h"
-#include "tclsh/NetHandle.h"
+#include "MagMgr.h"
+#include "NetHandle.h"
 #include "BNetHandle.h"
 #include "MvnHandle.h"
 #include "ym/ClibCellLibrary.h"

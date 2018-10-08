@@ -14,7 +14,7 @@
 // 実はこのパッケージは Magus には依存していないので汎用である．
 
 
-#include "magus_nsdef.h"
+#include "magus.h"
 #include "ym/TclCmd.h"
 
 
