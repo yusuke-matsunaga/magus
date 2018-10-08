@@ -17,6 +17,24 @@ from magus_core import SatBool3
 class EquivTest(unittest.TestCase) :
 
     def runTest(self) :
+        self.test1()
+        self.test2()
+
+    def test1(self) :
+        TESTDATA_DIR = os.environ.get('TESTDATA_DIR')
+
+        filename1 = os.path.join(TESTDATA_DIR, 'C499.blif')
+        network1 = BnNetwork.read_blif(filename1)
+        filename2 = os.path.join(TESTDATA_DIR, 'C1355.blif')
+        network2 = BnNetwork.read_blif(filename2)
+
+        eqmgr = EquivMgr(1000)
+        stat, stat_list = eqmgr.check_by_order(network1, network2)
+        self.assertEqual( stat, SatBool3._True )
+        for stat1 in stat_list :
+            self.assertEqual( stat1, SatBool3._True )
+
+    def test2(self) :
         TESTDATA_DIR = os.environ.get('TESTDATA_DIR')
 
         filename1 = os.path.join(TESTDATA_DIR, 'C499.blif')

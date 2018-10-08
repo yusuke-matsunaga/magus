@@ -25,6 +25,16 @@ cdef class EquivMgr :
             del self._thisptr
 
     ### @brief 等価検証を行う．
+    def check_by_order(self, BnNetwork network1, BnNetwork network2) :
+        cdef int no = network1.output_num
+        cdef vector[CXX_SatBool3] c_eq_stats
+        cdef CXX_SatBool3 c_stat
+        c_eq_stats.resize(network1.output_num)
+        c_stat = self._thisptr.check(network1._this, network2._this, c_eq_stats)
+        eq_stats = [ to_SatBool3(c_eq_stats[i]) for i in range(no) ]
+        return to_SatBool3(c_stat), eq_stats
+
+    ### @brief 等価検証を行う．
     def check(self,
               BnNetwork network1, input1_list, output1_list,
               BnNetwork network2, input2_list, output2_list) :

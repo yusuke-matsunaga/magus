@@ -17,6 +17,9 @@ cdef extern from "EquivMgr.h" namespace "nsYm::nsMagus" :
     cdef cppclass EquivMgr :
         EquivMgr(int, const SatSolverType&)
         SatBool3 check(const BnNetwork&,
+                       const BnNetwork&,
+                       vector[SatBool3]& eq_stats)
+        SatBool3 check(const BnNetwork&,
                        const vector[int]&,
                        const vector[int]&,
                        const BnNetwork&,
