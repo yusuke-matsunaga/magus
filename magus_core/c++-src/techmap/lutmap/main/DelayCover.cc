@@ -16,9 +16,13 @@
 BEGIN_NAMESPACE_LUTMAP
 
 // コンストラクタ
-DelayCover::DelayCover(int mode)
+// @param[in] fanout_mode ファンアウトモードの時に true にするフラグ
+// @param[in] slack 最小段数に対するスラック
+DelayCover::DelayCover(bool fanout_mode,
+		       int slack) :
+  DagCover(fanout_mode),
+  mSlack(slack)
 {
-  mMode = mode;
 }
 
 // デストラクタ
@@ -29,12 +33,10 @@ DelayCover::~DelayCover()
 // @brief best cut の記録を行う．
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-// @param[in] slack 最小段数に対するスラック
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
 DelayCover::record_cuts(const SbjGraph& sbjgraph,
 			const CutHolder& cut_holder,
-			int slack,
 			MapRecord& maprec)
 {
   int n = sbjgraph.node_num();
@@ -87,9 +89,8 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   }
 
   // それに slack を足したものが制約となる．
-  min_depth += slack;
-  for ( int i = 0; i < onode_list.size(); ++ i ) {
-    const SbjNode* node = onode_list[i];
+  min_depth += mSlack;
+  for ( auto node: onode_list ) {
     mNodeInfo[node->id()].mReqDepth = min_depth;
   }
 
@@ -110,7 +111,7 @@ DelayCover::record(const SbjNode* node,
   for ( auto cut: cut_holder.cut_list(node) ) {
     int ni = cut->input_num();
 
-    if ( mMode & 1 ) {
+    if ( fanout_mode() ) {
       // ファンアウトモード
       for ( int i = 0; i < ni; ++ i ) {
 	const SbjNode* inode = cut->input(i);

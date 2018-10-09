@@ -54,8 +54,6 @@ set (equiv_SOURCES
 
 set ( lutmap_SOURCES
   lutmap/AreaMapCmd.cc
-  lutmap/AreaMap2Cmd.cc
-  lutmap/AreaMap3Cmd.cc
   lutmap/Conv2BNetCmd.cc
   lutmap/DelayMapCmd.cc
   lutmap/DumpLutCmd.cc

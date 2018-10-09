@@ -9,20 +9,19 @@
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
-#include "sbj_nsdef.h"
+#include "DagCover.h"
 
 
 BEGIN_NAMESPACE_LUTMAP
 
 class Cut;
-class CutHolder;
-class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
+/// @class AreaCover AreaCover.h "AreaCover.h"
 /// @brief 面積モードの DAG covering のヒューリスティック
 //////////////////////////////////////////////////////////////////////
-class AreaCover
+class AreaCover :
+  public DagCover
 {
 public:
   //////////////////////////////////////////////////////////////////////
@@ -30,8 +29,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] mode モード
-  AreaCover(int mode);
+  /// @param[in] fanout_mode ファンアウトモード
+  AreaCover(bool fanout_mode);
 
   /// @brief デストラクタ
   ~AreaCover();
@@ -49,7 +48,7 @@ public:
   void
   record_cuts(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder,
-	      MapRecord& maprec);
+	      MapRecord& maprec) override;
 
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
@@ -92,9 +91,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // モード
-  int mMode;
 
   // 各ノードのベスト値を記録する配列．
   vector<double> mBestCost;

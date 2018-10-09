@@ -1,31 +1,28 @@
-﻿#ifndef AREACOVER_MCT2_H
-#define AREACOVER_MCT2_H
+﻿#ifndef DAGCOVER_H
+#define DAGCOVER_H
 
-/// @file AreaCover_MCT1.h
-/// @brief AreaCover_MCT1 のヘッダファイル
+/// @file DagCover.h
+/// @brief AreCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "mct2_nsdef.h"
-#include "DagCover.h"
+#include "lutmap_nsdef.h"
+#include "sbj_nsdef.h"
 
 
 BEGIN_NAMESPACE_LUTMAP
 
-class Cut;
-
-END_NAMESPACE_LUTMAP
-
-BEGIN_NAMESPACE_LUTMAP_MCT2
+class CutHolder;
+class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
-/// @brief 面積モードの DAG covering のヒューリスティック
+/// @class DagCover DagCover.h "DagCover.h"
+/// @brief DAG covering のヒューリスティックを表すクラス
 //////////////////////////////////////////////////////////////////////
-class AreaCover_MCT2 :
-  public DagCover
+class DagCover
 {
 public:
   //////////////////////////////////////////////////////////////////////
@@ -34,14 +31,11 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] fanout_mode ファンアウトモード
-  /// @param[in] count 試行回数
-  /// @param[in] verbose verbose フラグ
-  AreaCover_MCT2(bool fanout_mode,
-		 int count,
-		 bool verbose);
+  DagCover(bool fanout_mode);
 
   /// @brief デストラクタ
-  ~AreaCover_MCT2();
+  virtual
+  ~DagCover() { }
 
 
 public:
@@ -52,12 +46,16 @@ public:
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[in] count 試行回数
   /// @param[out] maprec マッピング結果を記録するオブジェクト
+  virtual
   void
   record_cuts(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder,
-	      MapRecord& maprec) override;
+	      MapRecord& maprec) = 0;
+
+  /// @brief ファンアウトモードの時 true を返す．
+  bool
+  fanout_mode();
 
 
 private:
@@ -71,14 +69,32 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 試行回数
-  int mCount;
-
-  // verbose フラグ
-  bool mVerbose;
+  // ファンアウトモードを使う時 true にするフラグ
+  bool mFoMode;
 
 };
 
-END_NAMESPACE_LUTMAP_MCT2
 
-#endif // AREACOVER_MCT2_H
+//////////////////////////////////////////////////////////////////////
+// インライン関数の定義
+//////////////////////////////////////////////////////////////////////
+
+// @brief コンストラクタ
+// @param[in] fanout_mode ファンアウトモード
+inline
+DagCover::DagCover(bool fanout_mode) :
+  mFoMode(fanout_mode)
+{
+}
+
+// @brief ファンアウトモードの時 true を返す．
+inline
+bool
+DagCover::fanout_mode()
+{
+  return mFoMode;
+}
+
+END_NAMESPACE_LUTMAP
+
+#endif // DAGCOVER_H

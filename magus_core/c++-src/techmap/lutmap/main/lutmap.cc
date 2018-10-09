@@ -83,9 +83,9 @@ lutmap(const BnNetwork& src_network,
     }
   }
   else {
-    DelayCover delay_cover(flow_mode);
+    DelayCover delay_cover(flow_mode, slack);
     MapRecord maprec;
-    delay_cover.record_cuts(sbjgraph, cut_holder, slack, maprec);
+    delay_cover.record_cuts(sbjgraph, cut_holder, maprec);
   }
 
   if ( do_cut_resub ) {

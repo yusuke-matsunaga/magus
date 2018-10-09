@@ -18,9 +18,9 @@
 BEGIN_NAMESPACE_LUTMAP
 
 // コンストラクタ
-AreaCover::AreaCover(int mode)
+AreaCover::AreaCover(bool fanout_mode) :
+  DagCover(fanout_mode)
 {
-  mMode = mode;
 }
 
 // デストラクタ
@@ -76,12 +76,10 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   // 境界マークをつける．
   mBoundaryMark.clear();
   mBoundaryMark.resize(n, 0);
-  for ( int i = 0; i < boundary_list.size(); ++ i ) {
-    const SbjNode* node = boundary_list[i];
+  for ( auto node: boundary_list ) {
     mBoundaryMark[node->id()] = 1;
   }
-  for ( int i = 0; i < dupnode_list.size(); ++ i ) {
-    const SbjNode* node = dupnode_list[i];
+  for ( auto node: dupnode_list ) {
     if ( mBoundaryMark[node->id()] == 0 ) {
       mBoundaryMark[node->id()] = 2;
     }
@@ -118,7 +116,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       }
       if ( ng ) continue;
 
-      if ( mMode & 1 ) {
+      if ( fanout_mode() ) {
 	// ファンアウトモード
 	for ( int i = 0; i < ni; ++ i)  {
 	  const SbjNode* inode = cut->input(i);

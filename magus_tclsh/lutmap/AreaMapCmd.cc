@@ -12,7 +12,7 @@
 #include "AreaMapCmd.h"
 #include "ym/TclPopt.h"
 
-#include "lutmap_nsdef.h"
+#include "LutMap.h"
 
 #include "ym/MvnMgr.h"
 
@@ -88,7 +88,10 @@ AreaMapCmd::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      lutmap(*neth->bnetwork(), limit, -1, mode_str, *neth->_bnetwork(), lut_num, depth);
+      nsLutmap::LutMap lutmap(limit, mode_str);
+      lutmap.area_map(*neth->bnetwork(), *neth->_bnetwork());
+      lut_num = lutmap.lut_num();
+      depth = lutmap.depth();
     }
     break;
 

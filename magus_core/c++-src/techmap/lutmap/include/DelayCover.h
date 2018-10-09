@@ -9,22 +9,20 @@
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
-#include "sbj_nsdef.h"
+#include "DagCover.h"
 #include "ADCost.h"
 
 
 BEGIN_NAMESPACE_LUTMAP
 
 class Cut;
-class CutHolder;
-class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DelayCover DelayCover.h "DelayCover.h"
 /// @brief depth/area optimal cover を求めるためのクラス
 //////////////////////////////////////////////////////////////////////
-class DelayCover
+class DelayCover :
+  public DagCover
 {
 public:
   //////////////////////////////////////////////////////////////////////
@@ -32,7 +30,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  DelayCover(int mode);
+  /// @param[in] fanout_mode ファンアウトモードの時に true にするフラグ
+  /// @param[in] slack 最小段数に対するスラック
+  DelayCover(bool fanout_mode,
+	     int slack);
 
   /// @brief デストラクタ
   ~DelayCover();
@@ -46,12 +47,11 @@ public:
   /// @brief best cut の記録を行う．
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[in] slack 最小段数に対するスラック
   /// @param[out] maprec マッピング結果を記録するオブジェクト
+  virtual
   void
   record_cuts(const SbjGraph& sbjgraph,
 	      const CutHolder& cut_holder,
-	      int slack,
 	      MapRecord& maprec);
 
 
@@ -104,8 +104,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // モード
-  int mMode;
+  // スラックの値
+  int mSlack;
 
   // マッピング用の作業領域
   vector<NodeInfo> mNodeInfo;
@@ -117,7 +117,7 @@ private:
   ADCostMgr<double> mCostMgr;
 
   // カットの葉の ADCost の反復子を格納する配列
-  vector<ADCostIterator<double> > mIcostLists;
+  vector<ADCostIterator<double>> mIcostLists;
 
 };
 
