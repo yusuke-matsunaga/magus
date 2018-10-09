@@ -37,7 +37,7 @@ target_compile_options ( equiv_test
   )
 
 target_compile_definitions ( equiv_test
-  PRIVATE "-DDATAPATH=\"${CMAKE_CURRENT_SOURCE_DIR}/../testdata/\""
+  PRIVATE "-DDATAPATH=\"${PROJECT_SOURCE_DIR}/magus_core/testdata/\""
   )
 
 target_link_libraries ( equiv_test
