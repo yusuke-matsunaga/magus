@@ -9,19 +9,8 @@
 /// All rights reserved.
 
 
-#include "magus.h"
+#include "lutmap_nsdef.h"
 #include "ym/bnet.h"
-
-
-/// @brief lutmap 用の名前空間の開始
-#define BEGIN_NAMESPACE_LUTMAP \
-BEGIN_NAMESPACE_MAGUS \
-BEGIN_NAMESPACE(nsLutmap)
-
-/// @brief lutmap 用の名前空間の終了
-#define END_NAMESPACE_LUTMAP \
-END_NAMESPACE(nsLutmap) \
-END_NAMESPACE_MAGUS
 
 
 BEGIN_NAMESPACE_LUTMAP

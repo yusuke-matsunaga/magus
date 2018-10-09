@@ -26,31 +26,13 @@ END_NAMESPACE_MAGUS
 
 BEGIN_NAMESPACE_LUTMAP
 
-/// @brief DAG covering のヒューリスティック関数
-/// @param[in] src_network もとのネットワーク
-/// @param[in] limit カットサイズ
-/// @param[in] slack 最小段数に対するスラック
-/// @param[in] mode モードを表す文字列
-/// @param[out] dat_network マッピング結果
-/// @param[out] lut_num 結果のLUT数
-/// @param[out] depth 結果の段数
-///
-/// slack が -1 の時は面積最小モードになる．
-extern
-void
-lutmap(const BnNetwork& src_network,
-       int limit,
-       int slack,
-       const string& mode,
-       BnNetwork& dst_network,
-       int& lut_num,
-       int& depth);
+class LutMap;
 
 END_NAMESPACE_LUTMAP
 
 BEGIN_NAMESPACE_MAGUS
 
-using nsLutmap::lutmap;
+using nsLutmap::LutMap;
 
 END_NAMESPACE_MAGUS
 

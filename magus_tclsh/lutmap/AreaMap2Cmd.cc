@@ -95,7 +95,7 @@ AreaMap2Cmd::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      nsLutmap::LutMap lutmap(limit, mode_str);
+      LutMap lutmap(limit, mode_str);
       lutmap.area_map(*neth->bnetwork(), *neth->_bnetwork());
       lut_num = lutmap.lut_num();
       depth = lutmap.depth();
