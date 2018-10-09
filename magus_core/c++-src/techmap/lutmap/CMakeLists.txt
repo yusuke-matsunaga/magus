@@ -28,6 +28,7 @@ set ( main_SOURCES
   main/DelayCover.cc
   main/LbCalc.cc
   main/DgGraph.cc
+  main/lutmap.cc
   )
 
 set ( mct1_SOURCES

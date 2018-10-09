@@ -25,15 +25,15 @@ BEGIN_NAMESPACE_LUTMAP
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cut_holder カットフォルダー
 // @param[in] cut_size カットサイズ
-// @param[in] mode area_cover のモード
+// @param[in] flow_mode area_cover のモード
 SaSearch::SaSearch(const SbjGraph& sbjgraph,
 		   const CutHolder& cut_holder,
 		   ymuint cut_size,
-		   ymuint mode) :
+		   bool flow_mode) :
   mSbjGraph(sbjgraph),
   mCutHolder(cut_holder),
   mCutSize(cut_size),
-  mAreaCover(mode),
+  mAreaCover(flow_mode),
   mVerbose(false)
 {
   mInitTemp  = 5.0;

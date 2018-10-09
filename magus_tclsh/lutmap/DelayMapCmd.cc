@@ -12,7 +12,7 @@
 #include "DelayMapCmd.h"
 #include "ym/TclPopt.h"
 
-#include "LutMap.h"
+#include "lutmap_nsdef.h"
 
 #include "ym/MvnMgr.h"
 
@@ -92,7 +92,7 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
     return code;
   }
 
-  LutMap lutmap;
+  string mode_str;
 
   int lut_num;
   int depth;
@@ -101,8 +101,8 @@ DelayMapCmd::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      lutmap.delay_map(*neth->bnetwork(), limit, slack, mode,
-		       *neth->_bnetwork(), lut_num, depth);
+      lutmap(*neth->bnetwork(), limit, slack, mode_str,
+	     *neth->_bnetwork(), lut_num, depth);
     }
     break;
 

@@ -33,11 +33,11 @@ public:
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_holder カットフォルダー
   /// @param[in] cut_size カットサイズ
-  /// @param[in] mode area_cover のモード
+  /// @param[in] flow_mode area_cover のモード
   SaSearch(const SbjGraph& sbjgraph,
-	    const CutHolder& cut_holder,
-	    ymuint cut_size,
-	    ymuint mode);
+	   const CutHolder& cut_holder,
+	   ymuint cut_size,
+	   bool flow_mode);
 
   /// @brief デストラクタ
   ~SaSearch();
