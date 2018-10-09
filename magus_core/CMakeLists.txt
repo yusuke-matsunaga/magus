@@ -18,14 +18,13 @@ include_directories (
 # ===================================================================
 
 add_subdirectory (c++-src/equiv)
-add_subdirectory (c++-src/sbjgraph)
-add_subdirectory (c++-src/lutmap)
-add_subdirectory (c++-src/cellmap)
+add_subdirectory (c++-src/techmap)
 
 add_subdirectory ( cython-src )
 add_subdirectory ( debug )
 
-add_subdirectory ( c++-test )
+add_subdirectory ( c++-test/equiv )
+add_subdirectory ( c++-test/techmap/sbjgraph )
 add_subdirectory ( py-test )
 
 
