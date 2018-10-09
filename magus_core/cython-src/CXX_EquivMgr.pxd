@@ -21,6 +21,7 @@ cdef extern from "EquivMgr.h" namespace "nsYm::nsMagus" :
 
     ### @brief EquivMgr の cython バージョン
     cdef cppclass EquivMgr :
+        EquivMgr()
         EquivMgr(int, const SatSolverType&)
         EquivResult check(const BnNetwork&,
                           const BnNetwork&)
@@ -31,4 +32,4 @@ cdef extern from "EquivMgr.h" namespace "nsYm::nsMagus" :
         void set_signature_size(int sig_size)
         void set_sat_solver_type(const SatSolverType& solver_type)
         void set_loglevel(int level)
-        void set_loop_lomit(int loop_limit)
+        void set_loop_limit(int loop_limit)
