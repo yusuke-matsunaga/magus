@@ -59,25 +59,17 @@ protected:
   const BnNetwork&
   network1() const;
 
-  /// @brief ネットワーク1の入力リストを返す．
-  const vector<int>&
-  input1_list() const;
-
-  /// @brief ネットワーク1の出力リストを返す．
-  const vector<int>&
-  output1_list() const;
-
   /// @brief ネットワーク2を返す．
   const BnNetwork&
   network2() const;
 
-  /// @brief ネットワーク2の入力リストを返す．
-  const vector<int>&
-  input2_list() const;
+  /// @brief 入力のノード番号のペアのリストを返す．
+  const vector<pair<int, int>>&
+  input_pair_list() const;
 
-  /// @brief ネットワーク2の出力リストを返す．
-  const vector<int>&
-  output2_list() const;
+  /// @brief 出力のノード番号のペアのリストを返す．
+  const vector<pair<int, int>>&
+  output_pair_list() const;
 
 
 private:
@@ -149,20 +141,14 @@ private:
   // 検証対象のネットワーク1
   BnNetwork mNetwork1;
 
-  // ネットワーク1の入力リスト
-  vector<int> mInput1List;
-
-  // ネットワーク1の出力リスト
-  vector<int> mOutput1List;
-
   // 検証対象のネットワーク2
   BnNetwork mNetwork2;
 
-  // ネットワーク2の入力リスト
-  vector<int> mInput2List;
+  // 入力のノード番号の対のリスト
+  vector<pair<int, int>> mInputPairList;
 
-  // ネットワーク2の出力リスト
-  vector<int> mOutput2List;
+  // 出力のノード番号の対のリスト
+  vector<pair<int, int>> mOutputPairList;
 
 };
 
@@ -281,22 +267,6 @@ EquivCmdBase::network1() const
   return mNetwork1;
 }
 
-// @brief ネットワーク1の入力リストを返す．
-inline
-const vector<int>&
-EquivCmdBase::input1_list() const
-{
-  return mInput1List;
-}
-
-// @brief ネットワーク1の出力リストを返す．
-inline
-const vector<int>&
-EquivCmdBase::output1_list() const
-{
-  return mOutput1List;
-}
-
 // @brief 検証対象のネットワーク2を返す．
 inline
 const BnNetwork&
@@ -305,20 +275,20 @@ EquivCmdBase::network2() const
   return mNetwork2;
 }
 
-// @brief ネットワーク2の入力リストを返す．
+// @brief 入力のノード番号の対のリストを返す．
 inline
-const vector<int>&
-EquivCmdBase::input2_list() const
+const vector<pair<int, int>>&
+EquivCmdBase::input_pair_list() const
 {
-  return mInput2List;
+  return mInputPairList;
 }
 
-// @brief ネットワーク2の出力リストを返す．
+// @brief 出力のノード番号の対のリストを返す．
 inline
-const vector<int>&
-EquivCmdBase::output2_list() const
+const vector<pair<int, int>>&
+EquivCmdBase::output_pair_list() const
 {
-  return mOutput2List;
+  return mOutputPairList;
 }
 
 END_NAMESPACE_MAGUS

@@ -42,14 +42,13 @@ class EquivTest(unittest.TestCase) :
         filename2 = os.path.join(TESTDATA_DIR, 'C1355.blif')
         network2 = BnNetwork.read_blif(filename2)
 
-        input1_list = network1.input_id_list
-        input2_list = network2.input_id_list
-        output1_list = network1.output_id_list
-        output2_list = network2.output_id_list
+        ni = network1.input_num
+        no = network1.output_num
+        input_pair_list = [ (network1.input_id_list[i], network2.input_id_list[i]) for i in range(ni) ]
+        output_pair_list = [ (network1.output_id_list[i], network2.output_id_list[i]) for i in range(no) ]
 
         eqmgr = EquivMgr(1000)
-        stat, stat_list = eqmgr.check(network1, input1_list, output1_list,
-                                      network2, input2_list, output2_list)
+        stat, stat_list = eqmgr.check(network1, network2, input_pair_list, output_pair_list)
         self.assertEqual( stat, SatBool3._True )
         for stat1 in stat_list :
             self.assertEqual( stat1, SatBool3._True )

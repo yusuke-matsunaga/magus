@@ -136,7 +136,7 @@ public:
   void
   set_pat(int start,
 	  int end,
-	  const vector<ymuint32>& pat);
+	  const vector<ymuint64>& pat);
 
   /// @brief パタンを計算する．
   /// @param[in] start 開始位置
@@ -255,7 +255,7 @@ private:
   ymuint32 mFlags;
 
   // シミュレーションパタン
-  ymuint32* mPat;
+  ymuint64* mPat;
 
   // mPat のハッシュ値
   SizeType mHash;
@@ -283,7 +283,7 @@ private:
 
   // ハッシュ用の素数配列
   static
-  ymuint32 mPrimes[];
+  ymuint64 mPrimes[];
 
 
 private:
@@ -590,10 +590,10 @@ void
 FraigNode::calc_pat(int start,
 		    int end)
 {
-  ymuint32* dst = mPat + start;
-  ymuint32* dst_end = mPat + end;
-  ymuint32* src1 = mFanins[0]->mPat + start;
-  ymuint32* src2 = mFanins[1]->mPat + start;
+  ymuint64* dst = mPat + start;
+  ymuint64* dst_end = mPat + end;
+  ymuint64* src1 = mFanins[0]->mPat + start;
+  ymuint64* src2 = mFanins[1]->mPat + start;
   if ( fanin0_inv() ) {
     if ( fanin1_inv() ) {
       for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {

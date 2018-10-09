@@ -43,15 +43,11 @@ EquivMgr::~EquivMgr()
 // @param[in] network1 対象の回路1
 // @param[in] network2 対象の回路2
 // @param[out] eq_stats 各出力ごとの等価検証の結果
-// @retval SatBool3::True 等価
-// @retval SatBool3::False 非等価
-// @retval SatBool3::X アボート(不明)
 //
 // 入力と出力の対応関係は順序で対応させる．
-SatBool3
+EquivResult
 EquivMgr::check(const BnNetwork& network1,
-		const BnNetwork& network2,
-		vector<SatBool3>& eq_stats)
+		const BnNetwork& network2)
 {
   int ni = network1.input_num();
   if ( network2.input_num() != ni ) {
@@ -62,60 +58,44 @@ EquivMgr::check(const BnNetwork& network1,
     return SatBool3::False;
   }
 
-  vector<int> input1_list(ni);
-  vector<int> input2_list(ni);
+  vector<pair<int, int>> input_pair_list(ni);
   for ( int i: Range(ni) ) {
-    input1_list[i] = network1.input_id(i);
-    input2_list[i] = network2.input_id(i);
+    int id1 = network1.input_id(i);
+    int id2 = network2.input_id(i);
+    input_pair_list[i] = make_pair(id1, id2);
   }
 
-  vector<int> output1_list(no);
-  vector<int> output2_list(no);
+  vector<pair<int, int>> output_pair_list(no);
   for ( int i: Range(no) ) {
-    output1_list[i] = network1.output_id(i);
-    output2_list[i] = network2.output_id(i);
+    int id1 = network1.output_id(i);
+    int id2 = network2.output_id(i);
+    output_pair_list[i] = make_pair(id1, id2);
   }
 
-  return check(network1, input1_list, output1_list,
-	       network2, input2_list, output2_list,
-	       eq_stats);
+  return check(network1, network2, input_pair_list, output_pair_list);
 }
 
 // @brief 2つの回路が等価かどうか調べる．
 // @param[in] network1 対象の回路1
-// @param[in] input1_list 入力ノード番号のリスト
-// @param[in] output1_list 出力ノード番号のリスト
 // @param[in] network2 対象の回路2
-// @param[in] input2_list 入力ノード番号のリスト
-// @param[in] output2_list 出力ノード番号のリスト
-// @param[out] eq_stats 各出力ごとの等価検証の結果
-// @retval SatBool3::True 等価
-// @retval SatBool3::False 非等価
-// @retval SatBool3::X アボート(不明)
-SatBool3
+// @param[in] input_pair_list 入力ノード番号の対のリスト
+// @param[in] output_pair_list 出力ノード番号の対のリスト
+EquivResult
 EquivMgr::check(const BnNetwork& network1,
-		const vector<int>& input1_list,
-		const vector<int>& output1_list,
 		const BnNetwork& network2,
-		const vector<int>& input2_list,
-		const vector<int>& output2_list,
-		vector<SatBool3>& eq_stats)
+		const vector<pair<int, int>>& input_pair_list,
+		const vector<pair<int, int>>& output_pair_list)
 {
   using namespace nsEquiv;
 
   // 最初に入出力数が等しいか調べる．
-  int ni = input1_list.size();
-  {
-    ASSERT_COND( input2_list.size() == ni );
-    ASSERT_COND( network1.input_num() == ni );
-    ASSERT_COND( network2.input_num() == ni );
-  }
-  int no = output1_list.size();
-  {
-    ASSERT_COND( output2_list.size() == no );
-    ASSERT_COND( network1.output_num() == no );
-    ASSERT_COND( network2.output_num() == no );
-  }
+  int ni = network1.input_num();
+  ASSERT_COND( network2.input_num() == ni );
+  ASSERT_COND( input_pair_list.size() == ni );
+
+  int no = network1.output_num();
+  ASSERT_COND( network2.output_num() == no );
+  ASSERT_COND( output_pair_list.size() == no );
 
   // FraigMgr を初期化する．
   FraigMgr fraig_mgr(mSigSize, mSolverType);
@@ -126,20 +106,38 @@ EquivMgr::check(const BnNetwork& network1,
     input_handles[i] = fraig_mgr.make_input();
   }
 
-
   // network1 に対応する Fraig を作る．
-  Bn2FraigConv convert1(network1, fraig_mgr);
   vector<FraigHandle> output_handles1(no);
-  convert1(input1_list, output1_list, input_handles, output_handles1);
+  {
+    vector<int> input_list(ni);
+    for ( int i: Range(ni) ) {
+      input_list[i] = input_pair_list[i].first;
+    }
+    vector<int> output_list(no);
+    for ( int i: Range(no) ) {
+      output_list[i] = output_pair_list[i].first;
+    }
+    Bn2FraigConv convert1(network1, fraig_mgr);
+    convert1(input_list, output_list, input_handles, output_handles1);
+  }
 
   // network2 に対応する Fraig を作る．
-  Bn2FraigConv convert2(network2, fraig_mgr);
   vector<FraigHandle> output_handles2(no);
-  convert2(input2_list, output2_list, input_handles, output_handles2);
+  {
+    vector<int> input_list(ni);
+    for ( int i: Range(ni) ) {
+      input_list[i] = input_pair_list[i].second;
+    }
+    vector<int> output_list(no);
+    for ( int i: Range(no) ) {
+      output_list[i] = output_pair_list[i].second;
+    }
+    Bn2FraigConv convert2(network2, fraig_mgr);
+    convert2(input_list, output_list, input_handles, output_handles2);
+  }
 
   // 各出力の等価検証を行う．
-  eq_stats.clear();
-  eq_stats.resize(no);
+  vector<SatBool3> eq_stats(no);
   SatBool3 stat = SatBool3::True;
   for ( auto i: Range(no) ) {
     if ( log_level() > 2 ) {
@@ -179,45 +177,7 @@ EquivMgr::check(const BnNetwork& network1,
     fraig_mgr.dump_stats(log_out());
   }
 
-  return stat;
-}
-
-// @brief ログレベルを設定する．
-// @param[in] level 設定するログレベル
-void
-EquivMgr::set_loglevel(int level)
-{
-  mLogLevel = level;
-}
-
-// @brief ログ出力用ストリームを設定する．
-// @param[in] out ストリームのポインタ
-void
-EquivMgr::set_logstream(ostream* out)
-{
-  mLogOutP = out;
-}
-
-// @brief ランダムシミュレーション制御用のパラメータを設定する．
-// @param[in] loop_limit 変化のない状態がこの回数連続したら止める．
-void
-EquivMgr::set_loop_limit(int loop_limit)
-{
-  mLoopLimit = loop_limit;
-}
-
-// @brief ログレベルを返す．
-int
-EquivMgr::log_level() const
-{
-  return mLogLevel;
-}
-
-// @brief ログの出力先を返す．
-ostream&
-EquivMgr::log_out() const
-{
-  return *mLogOutP;
+  return EquivResult(stat, eq_stats);
 }
 
 END_NAMESPACE_MAGUS

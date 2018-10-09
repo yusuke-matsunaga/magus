@@ -13,7 +13,7 @@
 BEGIN_NAMESPACE_EQUIV
 
 // 本当は 1 は素数ではないがここの目的としては可
-ymuint32 FraigNode::mPrimes[] = {
+ymuint64 FraigNode::mPrimes[] = {
     1,    2,    3,    5,    7,   11,   13,   17,   19,   23,
    29,   31,   37,   41,   43,   47,   53,   59,   61,   67,
    71,   73,   79,   83,   89,   97,  101,  103,  107,  109,
@@ -168,7 +168,7 @@ FraigNode::set_fanin(FraigHandle handle1,
 void
 FraigNode::set_pat(int start,
 		   int end,
-		   const vector<ymuint32>& pat)
+		   const vector<ymuint64>& pat)
 {
   int n = end - start;
   for ( int i = 0; i < n; ++ i ) {
@@ -191,13 +191,13 @@ FraigNode::calc_hash(int start,
     }
   }
 
-  ymuint32* src = mPat + start;
-  ymuint32* src_end = mPat + end;
-  ymuint32* prime = mPrimes + start;
-  ymuint32* prime_end = mPrimes + 1023;
+  ymuint64* src = mPat + start;
+  ymuint64* src_end = mPat + end;
+  ymuint64* prime = mPrimes + start;
+  ymuint64* prime_end = mPrimes + 1023;
   if ( pat_hash_inv() ) {
     for ( ; src != src_end; ++ src) {
-      ymuint32 pat = *src;
+      ymuint64 pat = *src;
       mHash ^= (pat * *prime);
       if ( pat != 0U ) {
 	set_1mark();
@@ -212,7 +212,7 @@ FraigNode::calc_hash(int start,
   }
   else {
     for ( ; src != src_end; ++ src) {
-      ymuint32 pat = *src;
+      ymuint64 pat = *src;
       mHash ^= (~pat * *prime);
       if ( pat != 0U ) {
 	set_1mark();

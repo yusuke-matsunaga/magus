@@ -288,29 +288,23 @@ EquivCmdBase::assoc_by_order()
   // まずは外部入力ノードの対応関係を取る．
   int ni = mNetwork1.input_num();
   ASSERT_COND( mNetwork2.input_num() == ni );
-  mInput1List.clear();
-  mInput1List.resize(ni);
-  mInput2List.clear();
-  mInput2List.resize(ni);
+  mInputPairList.clear();
+  mInputPairList.resize(ni);
   for ( int i = 0; i < ni; ++ i ) {
     int id1 = mNetwork1.input_id(i);
-    mInput1List[i] = id1;
     int id2 = mNetwork2.input_id(i);
-    mInput2List[i] = id2;
+    mInputPairList[i] = make_pair(id1, id2);
   }
 
   // 次は外部出力ノードの対応関係を取る．
   int no = mNetwork1.output_num();
   ASSERT_COND( mNetwork2.output_num() == no );
-  mOutput1List.clear();
-  mOutput1List.resize(no);
-  mOutput2List.clear();
-  mOutput2List.resize(no);
+  mOutputPairList.clear();
+  mOutputPairList.resize(no);
   for ( int i = 0; i < no; ++ i ) {
     int id1 = mNetwork1.output_id(i);
-    mOutput1List[i] = id1;
     int id2 = mNetwork2.output_id(i);
-    mOutput2List[i] = id2;
+    mOutputPairList[i] = make_pair(id1, id2);
   }
 }
 
@@ -329,17 +323,13 @@ EquivCmdBase::assoc_by_name()
 
   int ni = mNetwork1.input_num();
   ASSERT_COND( mNetwork2.input_num() == ni );
-  mInput1List.clear();
-  mInput1List.reserve(ni);
-  mInput2List.clear();
-  mInput2List.reserve(ni);
+  mInputPairList.clear();
+  mInputPairList.reserve(ni);
 
   int no = mNetwork1.output_num();
   ASSERT_COND( mNetwork2.output_num() == no );
-  mOutput1List.clear();
-  mOutput1List.reserve(no);
-  mOutput2List.clear();
-  mOutput2List.reserve(no);
+  mOutputPairList.clear();
+  mOutputPairList.reserve(no);
 
   for ( int i = 0; i < np1; ++ i ) {
     const BnPort* port1 = mNetwork1.port(i);
@@ -373,12 +363,10 @@ EquivCmdBase::assoc_by_name()
 	    return false;
 	  }
 	  if ( node1->is_input() ) {
-	    mInput1List.push_back(node1->id());
-	    mInput2List.push_back(node2->id());
+	    mInputPairList.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	  if ( node1->is_output() ) {
-	    mOutput1List.push_back(node1->id());
-	    mOutput2List.push_back(node2->id());
+	    mOutputPairList.push_back(make_pair(node1->id(), node2->id()));
 	  }
 	}
 	break;
@@ -466,14 +454,10 @@ EquivCmd::cmd_proc(TclObjVector& objv)
 
     MAGUS_NAMESPACE::EquivMgr equiv_mgr(sigsize, sat_type());
 
-    vector<SatBool3> comp_stats;
-    equiv_mgr.check(network1(),
-		    input1_list(),
-		    output1_list(),
-		    network2(),
-		    input2_list(),
-		    output2_list(),
-		    comp_stats);
+    EquivResult result = equiv_mgr.check(network1(),
+					 network2(),
+					 input_pair_list(),
+					 output_pair_list());
 
     bool has_neq = false;
     bool has_abt = false;
@@ -482,7 +466,7 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     int no = network1().output_num();
     for ( int i = 0; i < no; ++ i ) {
       string str;
-      switch ( comp_stats[i] ) {
+      switch ( result.output_results()[i] ) {
       case SatBool3::True:  str = "Equivalent"; break;
       case SatBool3::False: str = "Not Equivalent"; has_neq = true; break;
       case SatBool3::X:     str = "Aborted"; has_abt = true; break;
@@ -496,15 +480,15 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     {
       int no = network1().output_num();
       for ( int i = 0; i < no; ++ i ) {
-	auto oid1 = output1_list()[i];
-	auto oid2 = output2_list()[i];
+	auto oid1 = output_pair_list()[i].first;
+	auto oid2 = output_pair_list()[i].second;
 	const BnNode* node1 = network1().node(oid1);
 	const BnNode* node2 = network2().node(oid2);
-	if ( comp_stats[i] == SatBool3::False ) {
+	if ( result.output_results()[i] == SatBool3::False ) {
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
 	}
-	else if ( comp_stats[i] == SatBool3::X ) {
+	else if ( result.output_results()[i] == SatBool3::X ) {
 	  cout << "Node#" << node1->fanin() << "@network1 and "
 	       << "Node#" << node2->fanin() << "@network2 are unknown" << endl;
 	}

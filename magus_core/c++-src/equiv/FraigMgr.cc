@@ -72,7 +72,7 @@ FraigMgr::make_input()
   int iid = mInputNodes.size();
   node->set_input(iid);
   mInputNodes.push_back(node);
-  vector<ymuint32> tmp(mPatUsed);
+  vector<ymuint64> tmp(mPatUsed);
   for ( int i = 0; i < mPatUsed; ++ i ) {
     tmp[i] = mRandGen.int32();
   }
@@ -405,12 +405,12 @@ FraigMgr::add_pat(FraigNode* node)
   mHashTable2.clear();
 
   // 反例をパタンに加える．
-  vector<ymuint32> tmp(1);
+  vector<ymuint64> tmp(1);
   int nn = node_num();
   for ( int i = 0; i < nn; ++ i ) {
     FraigNode* node1 = mAllNodes[i];
     if ( node1->is_input() ) {
-      ymuint32 pat = 0U;
+      ymuint64 pat = 0U;
       if ( mModel[node1->varid().val()] == SatBool3::True ) {
 	pat = ~0U;
       }
@@ -515,7 +515,7 @@ void
 FraigMgr::init_pat(FraigNode* node)
 {
   ASSERT_COND(node->mPat == nullptr );
-  node->mPat = new ymuint32[mPatSize];
+  node->mPat = new ymuint64[mPatSize];
 }
 
 // @brief 全ノードのシミュレーションパタン用配列を拡大する．
@@ -525,8 +525,8 @@ FraigMgr::resize_pat(int size)
   int n = mAllNodes.size();
   for ( int i = 0; i < n; ++ i ) {
     FraigNode* node = mAllNodes[i];
-    ymuint32* old_array = node->mPat;
-    node->mPat = new ymuint32[size];
+    ymuint64* old_array = node->mPat;
+    node->mPat = new ymuint64[size];
     for ( int j = 0; j < mPatUsed; ++ j ) {
       node->mPat[j] = old_array[j];
     }
@@ -541,9 +541,9 @@ FraigMgr::compare_pat(FraigNode* node1,
 		      FraigNode* node2,
 		      bool inv)
 {
-  ymuint32* src1 = node1->mPat;
-  ymuint32* src2 = node2->mPat;
-  ymuint32* end = src1 + mPatUsed;
+  ymuint64* src1 = node1->mPat;
+  ymuint64* src2 = node2->mPat;
+  ymuint64* end = src1 + mPatUsed;
   if ( inv ) {
     for ( ; src1 != end; ++ src1, ++ src2) {
       if ( *src1 != ~*src2 ) {

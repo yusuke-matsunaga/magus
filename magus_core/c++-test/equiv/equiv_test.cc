@@ -36,11 +36,10 @@ TEST(EquivTest, EquivTest1)
   ASSERT_TRUE( network2.output_num() == no );
 
   EquivMgr eqmgr(1000);
-  vector<SatBool3> eq_stats;
-  SatBool3 ans = eqmgr.check(network1, network2, eq_stats);
-  EXPECT_EQ( SatBool3::True, ans );
+  EquivResult ans = eqmgr.check(network1, network2);
+  EXPECT_EQ( SatBool3::True, ans.result() );
   for ( int i: Range(no) ) {
-    EXPECT_EQ( SatBool3::True, eq_stats[i] );
+    EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
   }
 }
 
@@ -64,27 +63,24 @@ TEST(EquivTest, EquivTest2)
   ASSERT_TRUE( network2.input_num() == ni );
   ASSERT_TRUE( network2.output_num() == no );
 
-  vector<int> input1_list(ni);
-  vector<int> input2_list(ni);
+  vector<pair<int, int>> input_pair_list(ni);
   for ( int i: Range(ni) ) {
-    input1_list[i] = network1.input_id(i);
-    input2_list[i] = network2.input_id(i);
+    int id1 = network1.input_id(i);
+    int id2 = network2.input_id(i);
+    input_pair_list[i] = make_pair(id1, id2);
   }
-  vector<int> output1_list(no);
-  vector<int> output2_list(no);
+  vector<pair<int, int>> output_pair_list(no);
   for ( int i: Range(no) ) {
-    output1_list[i] = network1.output_id(i);
-    output2_list[i] = network2.output_id(i);
+    int id1 = network1.output_id(i);
+    int id2 = network2.output_id(i);
+    output_pair_list[i] = make_pair(id1, id2);
   }
 
   EquivMgr eqmgr(1000);
-  vector<SatBool3> eq_stats;
-  SatBool3 ans = eqmgr.check(network1, input1_list, output1_list,
-			     network2, input2_list, output2_list,
-			     eq_stats);
-  EXPECT_EQ( SatBool3::True, ans );
+  EquivResult ans = eqmgr.check(network1, network2, input_pair_list, output_pair_list);
+  EXPECT_EQ( SatBool3::True, ans.result() );
   for ( int i: Range(no) ) {
-    EXPECT_EQ( SatBool3::True, eq_stats[i] );
+    EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
   }
 }
 
