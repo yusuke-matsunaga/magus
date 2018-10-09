@@ -1,38 +1,36 @@
-﻿#ifndef LUTMAP_H
-#define LUTMAP_H
+﻿#ifndef LUTMAPMGR_H
+#define LUTMAPMGR_H
 
-/// @file LutMap.h
-/// @brief LutMap のヘッダファイル
+/// @file LutmapMgr.h
+/// @brief LutmapMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
+#include "magus.h"
 #include "ym/bnet.h"
 
 
-BEGIN_NAMESPACE_LUTMAP
-
-class DagCover;
+BEGIN_NAMESPACE_MAGUS
 
 //////////////////////////////////////////////////////////////////////
-/// @class LutMap LutMap.h "LutMap.h"
+/// @class LutmapMgr LutmapMgr.h "LutmapMgr.h"
 /// @brief LUT用のテクノロジマッパー
 //////////////////////////////////////////////////////////////////////
-class LutMap
+class LutmapMgr
 {
 public:
 
   /// @brief コンストラクタ
   /// @param[in] lut_size LUTの入力数
   /// @param[in] algorithm アルゴリズムを表す文字列
-  LutMap(int lut_size = 5,
-	 const string& algorithm = string());
+  LutmapMgr(int lut_size = 5,
+	    const string& algorithm = string());
 
   /// @brief デストラクタ
-  ~LutMap();
+  ~LutmapMgr();
 
 
 public:
@@ -84,12 +82,6 @@ private:
   void
   parse_algorithm();
 
-  /// @brief マッピングを行う実際の関数
-  void
-  do_mapping(const BnNetwork& src_network,
-	     BnNetwork& map_network,
-	     DagCover& dag_cover);
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -99,14 +91,11 @@ private:
   // LUTの入力数
   int mLutSize;
 
-  // スラック
-  int mSlack;
-
   // アルゴリズム
   string mAlgorithm;
 
-  // フローモード
-  bool mFlowMode;
+  // ファンアウトモード
+  bool mFanoutMode;
 
   // cut_resubstitution を行う時に true にするフラグ
   bool mDoCutResub;
@@ -128,7 +117,7 @@ private:
 // @param[in] lut_size LUTの入力数
 inline
 void
-LutMap::set_lut_size(int lut_size)
+LutmapMgr::set_lut_size(int lut_size)
 {
   mLutSize = lut_size;
 }
@@ -137,7 +126,7 @@ LutMap::set_lut_size(int lut_size)
 // @param[in] algorithm アルゴリズムを表す文字列
 inline
 void
-LutMap::set_algorithm(const string& algorithm)
+LutmapMgr::set_algorithm(const string& algorithm)
 {
   mAlgorithm = algorithm;
 }
@@ -145,7 +134,7 @@ LutMap::set_algorithm(const string& algorithm)
 // @brief 直前のマッピング結果のLUT数を返す．
 inline
 int
-LutMap::lut_num()
+LutmapMgr::lut_num()
 {
   return mLutNum;
 }
@@ -153,11 +142,11 @@ LutMap::lut_num()
 // @brief 直前のマッピング結果の段数を返す．
 inline
 int
-LutMap::depth()
+LutmapMgr::depth()
 {
   return mDepth;
 }
 
-END_NAMESPACE_LUTMAP
+END_NAMESPACE_MAGUS
 
-#endif // LUTMAP_H
+#endif // LUTMAPMGR_H

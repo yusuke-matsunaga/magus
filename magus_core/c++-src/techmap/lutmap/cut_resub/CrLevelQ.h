@@ -8,7 +8,7 @@
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "lutmap_nsdef.h"
+#include "lutmap.h"
 
 
 BEGIN_NAMESPACE_LUTMAP

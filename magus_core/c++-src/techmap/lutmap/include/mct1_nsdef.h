@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
+#include "lutmap.h"
 
 
 /// @brief lutmap 用の名前空間の開始

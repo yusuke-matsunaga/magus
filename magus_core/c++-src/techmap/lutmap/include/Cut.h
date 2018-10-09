@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
+#include "lutmap.h"
 #include "SbjGraph.h"
 #include "ym/TvFunc.h"
 

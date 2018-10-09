@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
+#include "lutmap.h"
 
 
 BEGIN_NAMESPACE_LUTMAP

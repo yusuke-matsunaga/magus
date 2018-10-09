@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "lutmap_nsdef.h"
+#include "lutmap.h"
 #include "ym/SimpleAlloc.h"
 #include "CrHeap.h"
 #include "CrLevelQ.h"

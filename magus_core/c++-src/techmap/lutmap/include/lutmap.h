@@ -1,8 +1,8 @@
-﻿#ifndef LUTMAP_NSDEF_H
-#define LUTMAP_NSDEF_H
+﻿#ifndef LUTMAP_H
+#define LUTMAP_H
 
-/// @file lutmap_nsdef.h
-/// @brief lutmap パッケージに共通な定義ファイル
+/// @file lutmap.h
+/// @brief lutmap パッケージ用の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2005-2011, 2016 Yusuke Matsunaga
@@ -10,7 +10,6 @@
 
 
 #include "magus.h"
-#include "ym/bnet.h"
 
 
 /// @brief lutmap 用の名前空間の開始
@@ -23,17 +22,4 @@ BEGIN_NAMESPACE(nsLutmap)
 END_NAMESPACE(nsLutmap) \
 END_NAMESPACE_MAGUS
 
-
-BEGIN_NAMESPACE_LUTMAP
-
-class LutMap;
-
-END_NAMESPACE_LUTMAP
-
-BEGIN_NAMESPACE_MAGUS
-
-using nsLutmap::LutMap;
-
-END_NAMESPACE_MAGUS
-
-#endif // LUTMAP_NSDEF_H
+#endif // LUTMAP_H
