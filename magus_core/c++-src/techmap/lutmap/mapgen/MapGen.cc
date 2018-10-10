@@ -220,7 +220,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
     if ( node_info.inv_req() ) {
       // NOT ゲートを表す LUT を作る．
       TvFunc tv = TvFunc::nega_literal(1, VarId(0));
-      int inv_id = mapgraph.new_tv(string(), 1, tv);
+      int inv_id = mapgraph.new_logic(string(), tv);
       mapgraph.connect(node_id, inv_id, 0);
 
       ++ mLutNum;
@@ -253,7 +253,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       if ( inv ) {
 	if ( mConst1 == kBnNullId ) {
 	  TvFunc tv = TvFunc::one(0);
-	  mConst1 = mapgraph.new_tv(string(), 0, tv);
+	  mConst1 = mapgraph.new_logic(string(), tv);
 	  mConst1 = node_id;
 
 	  ++ mLutNum;
@@ -267,7 +267,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       else {
 	if ( mConst0 == kBnNullId ) {
 	  TvFunc tv = TvFunc::zero(0);
-	  mConst0 = mapgraph.new_tv(string(), 0, tv);
+	  mConst0 = mapgraph.new_logic(string(), tv);
 
 	  ++ mLutNum;
 
@@ -372,7 +372,7 @@ MapGen::gen_back_trace(const SbjNode* node,
   TvFunc tv = cut->make_tv(output_inv, input_inv);
 
   // 新しいノードを作る．
-  node_id = mapnetwork.new_tv(string(), ni, tv);
+  node_id = mapnetwork.new_logic(string(), tv);
 
   ++ mLutNum;
 

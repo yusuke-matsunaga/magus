@@ -99,13 +99,13 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	// 定数1ノードを作る．
 	const ClibCell* const1_cell = record.const1_cell();
 	ASSERT_COND( const1_cell != nullptr );
-	mapnode = mMapGraph->new_logic_cell(string(), const1_cell->name());
+	mapnode = mMapGraph->new_logic(string(), const1_cell->name());
       }
       else {
 	// 定数0ノードを作る．
 	const ClibCell* const0_cell = record.const0_cell();
 	ASSERT_COND( const0_cell != nullptr );
-	mapnode = mMapGraph->new_logic_cell(string(), const0_cell->name());
+	mapnode = mMapGraph->new_logic(string(), const0_cell->name());
       }
     }
     ymuint omapnode = node_info(onode, false).mMapNode;
@@ -165,7 +165,7 @@ MapGen::gen_dff(const SbjDff* sbj_dff,
     cell = dff_cell0;
   }
   ClibFFInfo ff_info = cell->ff_info();
-  int dff_id = mMapGraph->new_dff_cell(string(), cell->name());
+  int dff_id = mMapGraph->new_dff(string(), cell->name());
   const BnDff* dff = mMapGraph->dff(dff_id);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
@@ -245,7 +245,7 @@ MapGen::back_trace(const SbjNode* node,
   const ClibCell* cell = record.get_node_cell(node, inv);
 
   // 新しいノードを作り mNodeMap に登録する．
-  mapnode = mMapGraph->new_logic_cell(string(), cell->name());
+  mapnode = mMapGraph->new_logic(string(), cell->name());
   node_info.mMapNode = mapnode;
 
   ymuint ni = match.leaf_num();
