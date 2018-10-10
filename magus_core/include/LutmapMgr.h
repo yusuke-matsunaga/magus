@@ -25,9 +25,9 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] lut_size LUTの入力数
-  /// @param[in] algorithm アルゴリズムを表す文字列
+  /// @param[in] option オプション文字列
   LutmapMgr(int lut_size = 5,
-	    const string& algorithm = string());
+	    const string& option = string());
 
   /// @brief デストラクタ
   ~LutmapMgr();
@@ -43,10 +43,10 @@ public:
   void
   set_lut_size(int lut_size);
 
-  /// @brief アルゴリズムを設定する．
-  /// @param[in] algorithm アルゴリズムを表す文字列
+  /// @brief オプション文字列を設定する．
+  /// @param[in] option オプション文字列
   void
-  set_algorithm(const string& algorithm);
+  set_option(const string& option);
 
   /// @brief 面積最小化 DAG covering のヒューリスティック関数
   /// @param[in] src_network もとのネットワーク
@@ -78,10 +78,6 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief アルゴリズムの文字列をパースする．
-  void
-  parse_algorithm();
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -91,7 +87,10 @@ private:
   // LUTの入力数
   int mLutSize;
 
-  // アルゴリズム
+  // オプション文字列
+  string mOption;
+
+  // アルゴリズムを表す文字列
   string mAlgorithm;
 
   // ファンアウトモード
@@ -120,15 +119,6 @@ void
 LutmapMgr::set_lut_size(int lut_size)
 {
   mLutSize = lut_size;
-}
-
-// @brief アルゴリズムを設定する．
-// @param[in] algorithm アルゴリズムを表す文字列
-inline
-void
-LutmapMgr::set_algorithm(const string& algorithm)
-{
-  mAlgorithm = algorithm;
 }
 
 // @brief 直前のマッピング結果のLUT数を返す．

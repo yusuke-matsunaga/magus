@@ -16,49 +16,7 @@
 #include "CutResub.h"
 #include "MapGen.h"
 #include "MapRecord.h"
-
-
-BEGIN_NAMESPACE_LUTMAP
-
-BEGIN_NONAMESPACE
-
-// @brief マッピングを行う実際の関数
-void
-do_mapping(const BnNetwork& src_network,
-	   DagCover& dag_cover,
-	   int lut_size,
-	   int slack,
-	   bool do_cut_resub,
-	   BnNetwork& map_network,
-	   int& lut_num,
-	   int& depth)
-{
-  SbjGraph sbjgraph;
-  Bn2Sbj bn2sbj;
-  bn2sbj.convert(src_network, sbjgraph);
-
-  // カットを列挙する．
-  CutHolder cut_holder;
-  cut_holder.enum_cut(sbjgraph, lut_size);
-
-  // 最良カットを記録する．
-  MapRecord maprec;
-  dag_cover.record_cuts(sbjgraph, cut_holder, maprec);
-
-  if ( do_cut_resub ) {
-    // cut resubstituion
-    CutResub cut_resub;
-    cut_resub(sbjgraph, cut_holder, maprec, slack);
-  }
-
-  // 最終的なネットワークを生成する．
-  MapGen gen;
-  gen.generate(sbjgraph, maprec, map_network, lut_num, depth);
-}
-
-END_NONAMESPACE
-
-END_NAMESPACE_LUTMAP
+#include "ym/OptionParser.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -69,14 +27,14 @@ BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
 // @param[in] lut_size LUTの入力数
-// @param[in] algorithm アルゴリズムを表す文字列
+// @param[in] option オプション文字列
 LutmapMgr::LutmapMgr(int lut_size,
-		     const string& algorithm) :
+		     const string& option) :
   mLutSize(lut_size),
   mFanoutMode(false),
   mDoCutResub(false)
 {
-  set_algorithm(algorithm);
+  set_option(option);
 }
 
 // @brief デストラクタ
@@ -93,9 +51,32 @@ LutmapMgr::area_map(const BnNetwork& src_network,
 {
   using namespace nsLutmap;
 
+  SbjGraph sbjgraph;
+  Bn2Sbj bn2sbj;
+  bn2sbj.convert(src_network, sbjgraph);
+
+  // カットを列挙する．
+  CutHolder cut_holder;
+  cut_holder.enum_cut(sbjgraph, mLutSize);
+
+  int slack = -1;
+
+  // 最良カットを記録する．
+  MapRecord maprec;
+
+  // 本当は mAlgorithm に応じた処理を行う．
   AreaCover area_cover(mFanoutMode);
-  do_mapping(src_network, area_cover, mLutSize, -1, mDoCutResub,
-	     map_network, mLutNum, mDepth);
+  area_cover.record_cuts(sbjgraph, cut_holder, maprec);
+
+  if ( mDoCutResub ) {
+    // cut resubstituion
+    CutResub cut_resub;
+    cut_resub(sbjgraph, cut_holder, maprec, slack);
+  }
+
+  // 最終的なネットワークを生成する．
+  MapGen gen;
+  gen.generate(sbjgraph, maprec, map_network, mLutNum, mDepth);
 }
 
 // @brief 段数最小化 DAG covering のヒューリスティック関数
@@ -104,20 +85,66 @@ LutmapMgr::area_map(const BnNetwork& src_network,
 // @param[out] mapnetwork マッピング結果
 void
 LutmapMgr::delay_map(const BnNetwork& src_network,
-		  int slack,
-		  BnNetwork& map_network)
+		     int slack,
+		     BnNetwork& map_network)
 {
   using namespace nsLutmap;
 
+  SbjGraph sbjgraph;
+  Bn2Sbj bn2sbj;
+  bn2sbj.convert(src_network, sbjgraph);
+
+  // カットを列挙する．
+  CutHolder cut_holder;
+  cut_holder.enum_cut(sbjgraph, mLutSize);
+
+  // 最良カットを記録する．
+  MapRecord maprec;
+
+  // 本当は mAlgorithm に応じた処理を行う．
   DelayCover delay_cover(mFanoutMode, slack);
-  do_mapping(src_network, delay_cover, mLutSize, slack, mDoCutResub,
-	     map_network, mLutNum, mDepth);
+  delay_cover.record_cuts(sbjgraph, cut_holder, maprec);
+
+  if ( mDoCutResub ) {
+    // cut resubstituion
+    CutResub cut_resub;
+    cut_resub(sbjgraph, cut_holder, maprec, slack);
+  }
+
+  // 最終的なネットワークを生成する．
+  MapGen gen;
+  gen.generate(sbjgraph, maprec, map_network, mLutNum, mDepth);
 }
 
-// @brief アルゴリズムの文字列をパースする．
+// @brief オプション文字列を設定する．
+// @param[in] option オプション文字列
 void
-LutmapMgr::parse_algorithm()
+LutmapMgr::set_option(const string& option)
 {
+  mOption = option;
+  mFanoutMode = true;
+  mDoCutResub = true;
+  OptionParser parser;
+  auto opt_list = parser.parse(mOption);
+  for ( auto p: opt_list ) {
+    auto key = p.first;
+    auto val = p.second;
+    if ( key == string("algorithm") ) {
+      mAlgorithm = val;
+    }
+    else if ( key == string("fanout") ) {
+      mFanoutMode = true;
+    }
+    else if ( key == string("flow") ) {
+      mFanoutMode = false;
+    }
+    else if ( key == string("cut_resub") ) {
+      mDoCutResub = true;
+    }
+    else if ( key == string("no_cut_resub") ) {
+      mDoCutResub = false;
+    }
+  }
 }
 
 END_NAMESPACE_MAGUS
