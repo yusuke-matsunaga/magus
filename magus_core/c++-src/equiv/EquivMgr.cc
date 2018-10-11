@@ -8,8 +8,7 @@
 
 
 #include "EquivMgr.h"
-#include "FraigMgr.h"
-#include "Bn2FraigConv.h"
+#include "ym/FraigMgr.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnNode.h"
 #include "ym/Range.h"
@@ -86,8 +85,6 @@ EquivMgr::check(const BnNetwork& network1,
 		const vector<pair<int, int>>& input_pair_list,
 		const vector<pair<int, int>>& output_pair_list)
 {
-  using namespace nsEquiv;
-
   // 最初に入出力数が等しいか調べる．
   int ni = network1.input_num();
   ASSERT_COND( network2.input_num() == ni );
@@ -109,31 +106,23 @@ EquivMgr::check(const BnNetwork& network1,
   // network1 に対応する Fraig を作る．
   vector<FraigHandle> output_handles1(no);
   {
-    vector<int> input_list(ni);
+    vector<FraigHandle> input_list(ni);
     for ( int i: Range(ni) ) {
-      input_list[i] = input_pair_list[i].first;
+      auto node = network1.node(input_pair_list[i].first);
+      input_list[node->input_id()] = input_handles[i];
     }
-    vector<int> output_list(no);
-    for ( int i: Range(no) ) {
-      output_list[i] = output_pair_list[i].first;
-    }
-    Bn2FraigConv convert1(network1, fraig_mgr);
-    convert1(input_list, output_list, input_handles, output_handles1);
+    fraig_mgr.import_subnetwork(network1, input_list, output_handles1);
   }
 
   // network2 に対応する Fraig を作る．
   vector<FraigHandle> output_handles2(no);
   {
-    vector<int> input_list(ni);
+    vector<FraigHandle> input_list(ni);
     for ( int i: Range(ni) ) {
-      input_list[i] = input_pair_list[i].second;
+      auto node = network2.node(input_pair_list[i].second);
+      input_list[node->input_id()] = input_handles[i];
     }
-    vector<int> output_list(no);
-    for ( int i: Range(no) ) {
-      output_list[i] = output_pair_list[i].second;
-    }
-    Bn2FraigConv convert2(network2, fraig_mgr);
-    convert2(input_list, output_list, input_handles, output_handles2);
+    fraig_mgr.import_subnetwork(network2, input_list, output_handles2);
   }
 
   // 各出力の等価検証を行う．
@@ -144,8 +133,10 @@ EquivMgr::check(const BnNetwork& network1,
       log_out() << "Checking Output#" << (i + 1) << " / " << no << endl;
     }
 
-    auto h1 = output_handles1[i];
-    auto h2 = output_handles2[i];
+    auto node1 = network1.node(output_pair_list[i].first);
+    auto node2 = network2.node(output_pair_list[i].second);
+    auto h1 = output_handles1[node1->output_id()];
+    auto h2 = output_handles2[node2->output_id()];
 
     SatBool3 stat1;
     if ( h1 == h2 ) {

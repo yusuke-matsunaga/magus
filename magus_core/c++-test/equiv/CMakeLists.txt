@@ -30,6 +30,7 @@ add_executable ( equiv_test
   $<TARGET_OBJECTS:ym_sat_ad>
   $<TARGET_OBJECTS:ym_cell_ad>
   $<TARGET_OBJECTS:ym_bnet_ad>
+  $<TARGET_OBJECTS:ym_fraig_ad>
   )
 
 target_compile_options ( equiv_test

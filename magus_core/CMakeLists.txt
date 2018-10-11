@@ -9,6 +9,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/ym-sat/cython-src
   ${PROJECT_SOURCE_DIR}/ym-cell/cython-src
   ${PROJECT_SOURCE_DIR}/ym-bnet/cython-src
+#  ${PROJECT_SOURCE_DIR}/ym-fraig/cython-src
   ${PROJECT_SOURCE_DIR}/ym-combopt/cython-src
   )
 
@@ -66,6 +67,7 @@ cython_add_module ( magus_core
   $<TARGET_OBJECTS:ym_logic>
   $<TARGET_OBJECTS:ym_cell>
   $<TARGET_OBJECTS:ym_bnet>
+  $<TARGET_OBJECTS:ym_fraig>
   $<TARGET_OBJECTS:ym_combopt>
   $<TARGET_OBJECTS:ym_sat>
   )
@@ -93,6 +95,7 @@ cython_add_module ( magus_core_d
   $<TARGET_OBJECTS:ym_logic_d>
   $<TARGET_OBJECTS:ym_cell_d>
   $<TARGET_OBJECTS:ym_bnet_d>
+  $<TARGET_OBJECTS:ym_fraig_d>
   $<TARGET_OBJECTS:ym_combopt>
   $<TARGET_OBJECTS:ym_sat_d>
   )

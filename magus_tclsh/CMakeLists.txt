@@ -121,7 +121,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:ym_logic_a>
   $<TARGET_OBJECTS:ym_cell_a>
   $<TARGET_OBJECTS:ym_bnet_a>
-  $<TARGET_OBJECTS:ym_sat_a>
+  $<TARGET_OBJECTS:ym_fraig_a>
   $<TARGET_OBJECTS:ym_combopt_a>
   $<TARGET_OBJECTS:ym_mvn_a>
   $<TARGET_OBJECTS:ym_sat_a>
@@ -174,10 +174,10 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:ym_logic_p>
   $<TARGET_OBJECTS:ym_cell_p>
   $<TARGET_OBJECTS:ym_bnet_p>
+  $<TARGET_OBJECTS:ym_fraig_p>
   $<TARGET_OBJECTS:ym_sat_p>
   $<TARGET_OBJECTS:ym_combopt_p>
   $<TARGET_OBJECTS:ym_mvn_p>
-  $<TARGET_OBJECTS:ym_sat_p>
   $<TARGET_OBJECTS:ym_verilog_p>
   $<TARGET_OBJECTS:ym_tclpp_p>
   )
@@ -227,10 +227,10 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:ym_logic_ad>
   $<TARGET_OBJECTS:ym_cell_ad>
   $<TARGET_OBJECTS:ym_bnet_ad>
+  $<TARGET_OBJECTS:ym_fraig_ad>
   $<TARGET_OBJECTS:ym_sat_ad>
   $<TARGET_OBJECTS:ym_combopt_ad>
   $<TARGET_OBJECTS:ym_mvn_ad>
-  $<TARGET_OBJECTS:ym_sat_ad>
   $<TARGET_OBJECTS:ym_verilog_ad>
   $<TARGET_OBJECTS:ym_tclpp_ad>
   )

@@ -84,6 +84,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/ym-cell/include
   ${PROJECT_SOURCE_DIR}/ym-combopt/include
   ${PROJECT_SOURCE_DIR}/ym-common/include
+  ${PROJECT_SOURCE_DIR}/ym-fraig/include
   ${PROJECT_SOURCE_DIR}/ym-logic/include
   ${PROJECT_SOURCE_DIR}/ym-mvn/include
   ${PROJECT_SOURCE_DIR}/ym-sat/include
@@ -103,6 +104,7 @@ add_subdirectory ( ym-combopt )
 add_subdirectory ( ym-logic )
 add_subdirectory ( ym-cell )
 add_subdirectory ( ym-bnet )
+add_subdirectory ( ym-fraig )
 add_subdirectory ( ym-mvn )
 add_subdirectory ( ym-sat )
 add_subdirectory ( ym-tclpp )
