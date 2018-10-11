@@ -52,5 +52,5 @@ add_custom_command(
 # 生成物のインストールルール
 install (DIRECTORY
   "${CMAKE_CURRENT_BINARY_DIR}/docs"
-  DESTINATION "share/${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}"
+  DESTINATION "share/${YM_PROJECT_STRING}"
   )

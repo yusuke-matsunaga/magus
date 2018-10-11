@@ -11,10 +11,12 @@ set (CMAKE_CXX_STANDARD 14)
 # ===================================================================
 # プロジェクト名，バージョンの設定
 # ===================================================================
-set (VERSION_MAJOR 1)
-set (VERSION_MINOR 0)
-set (VERSION ${VERSION_MAJOR}.${VERSION_MINOR})
-project ( magus VERSION "${VERSION}")
+set ( YM_VERSION_MAJOR 1 )
+set ( YM_VERSION_MINOR 0 )
+set ( YM_VERSION ${YM_VERSION_MAJOR}.${YM_VERSION_MINOR})
+project ( magus VERSION "${YM_VERSION}")
+
+set ( YM_PROJECT_STRING "${PROJECT_NAME}-${PROJECT_VERSION}" )
 
 # 名前空間
 set (MAGUS_NSNAME "nsMagus")
@@ -43,7 +45,7 @@ include( FindPythonInterp )
 include( FindPythonLibs )
 
 set( YM_PYTHON_STRING "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}" )
-set( YM_PYTHON_LIBDIR "lib/${YM_PYTHON_STRING}/site-packages/${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}" )
+set( YM_PYTHON_LIBDIR "lib/${YM_PYTHON_STRING}/site-packages/${YM_PROJECT_STRING}" )
 
 include( UseCython )
 
