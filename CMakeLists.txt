@@ -1,7 +1,7 @@
 # ===================================================================
 # CMAKE のおまじない
 # ===================================================================
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.2)
 
 
 # C++14 の指定
@@ -11,16 +11,16 @@ set (CMAKE_CXX_STANDARD 14)
 # ===================================================================
 # プロジェクト名，バージョンの設定
 # ===================================================================
-project (ym-magus)
 set (VERSION_MAJOR 1)
 set (VERSION_MINOR 0)
 set (VERSION ${VERSION_MAJOR}.${VERSION_MINOR})
+project ( magus VERSION "${VERSION}")
 
 # 名前空間
 set (MAGUS_NSNAME "nsMagus")
 
-# ライブラリのインストールディレクトリ
-set ( YM_INSTALL_LIBDIR "lib/magus" )
+# インストールディレクトリ
+set ( CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/stage" )
 
 
 # ===================================================================
@@ -41,6 +41,9 @@ include (FindDoxygen)
 set( Python_ADDITIONAL_VERSIONS 3.7 3.6 3.5 3.4 3.3 3.2 3.1 )
 include( FindPythonInterp )
 include( FindPythonLibs )
+
+set( YM_PYTHON_STRING "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}" )
+set( YM_PYTHON_LIBDIR "lib/${YM_PYTHON_STRING}/site-packages/${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}" )
 
 include( UseCython )
 
@@ -73,6 +76,19 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/etc/version_config.h.in"
   "${PROJECT_BINARY_DIR}/version_config.h"
   )
+
+
+# ===================================================================
+# スクリプトファイルの生成
+# ===================================================================
+
+if ( PYTHONINTERP_FOUND )
+  configure_file(
+    "${PROJECT_SOURCE_DIR}/etc/ym_python.in"
+    "${PROJECT_BINARY_DIR}/ym_python"
+    @ONLY
+    )
+endif ()
 
 
 # ===================================================================
@@ -116,3 +132,12 @@ add_subdirectory (magus_tclsh)
 if (DOXYGEN_FOUND)
   add_subdirectory( doxygen-src )
 endif (DOXYGEN_FOUND)
+
+
+# ===================================================================
+#  インストールターゲットの設定
+# ===================================================================
+
+install ( PROGRAMS ${PROJECT_BINARY_DIR}/ym_python
+  DESTINATION bin
+  )

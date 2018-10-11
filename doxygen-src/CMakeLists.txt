@@ -11,12 +11,13 @@ foreach ( dir
   list ( APPEND YM_DOXY_SRCS ${dir} )
 endforeach ()
 list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_core/include" )
-list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_tclsh/include" )
+#list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_tclsh/include" )
 foreach ( dir
     "ym-bnet"
     "ym-cell"
     "ym-combopt"
     "ym-common"
+    "ym-fraig"
     "ym-logic"
     "ym-mvn"
     "ym-sat"
@@ -51,5 +52,5 @@ add_custom_command(
 # 生成物のインストールルール
 install (DIRECTORY
   "${CMAKE_CURRENT_BINARY_DIR}/docs"
-  DESTINATION share/magus-${MAGUS_VERSION}/
+  DESTINATION "share/${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}"
   )
