@@ -3,7 +3,6 @@
 # ===================================================================
 cmake_minimum_required (VERSION 3.2)
 
-
 # C++14 の指定
 set (CMAKE_CXX_STANDARD 14)
 
@@ -38,23 +37,14 @@ list ( APPEND CMAKE_MODULE_PATH
   )
 
 include (FindDoxygen)
-
-# Python のバージョン指定
-set( Python_ADDITIONAL_VERSIONS 3.7 3.6 3.5 3.4 3.3 3.2 3.1 )
-include( FindPythonInterp )
-include( FindPythonLibs )
-
-set( YM_PYTHON_STRING "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}" )
-set( YM_PYTHON_LIBDIR "lib/${YM_PYTHON_STRING}/site-packages/${YM_PROJECT_STRING}" )
-
 include( UseCython )
-
 find_package(Gperftools)
 
 include (YmUtils)
 
 ym_init ("")
 
+ym_init_python ()
 
 # ===================================================================
 # google-test は内蔵のものを使う．
@@ -89,6 +79,10 @@ if ( PYTHONINTERP_FOUND )
     "${PROJECT_SOURCE_DIR}/etc/ym_python.in"
     "${PROJECT_BINARY_DIR}/ym_python"
     @ONLY
+    )
+
+  install ( PROGRAMS ${PROJECT_BINARY_DIR}/ym_python
+    DESTINATION bin
     )
 endif ()
 
@@ -129,9 +123,34 @@ add_subdirectory ( ym-tclpp )
 add_subdirectory ( ym-verilog )
 
 add_subdirectory ( magus_core )
-add_subdirectory (magus_tclsh)
+add_subdirectory ( magus_tclsh )
 
 if (DOXYGEN_FOUND)
+
+  # doxygen の対象となるヘッダファイル(のパタン)を YM_DOXY_SRCS に入れる．
+  set ( YM_DOXY_SRCS )
+  foreach ( dir
+      "${PROJECT_SOURCE_DIR}/doxygen-src"
+      "${PROJECT_BINARY_DIR}"
+      )
+    list ( APPEND YM_DOXY_SRCS ${dir} )
+  endforeach ()
+  foreach ( dir
+      "magus_core"
+      #"magus_tclsh"
+      "ym-bnet"
+      "ym-cell"
+      "ym-combopt"
+      "ym-common"
+      "ym-fraig"
+      "ym-logic"
+      "ym-mvn"
+      "ym-sat"
+      "ym-tclpp"
+      "ym-verilog"
+      )
+    list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/${dir}/include" )
+  endforeach ()
   add_subdirectory( doxygen-src )
 endif (DOXYGEN_FOUND)
 
@@ -139,7 +158,3 @@ endif (DOXYGEN_FOUND)
 # ===================================================================
 #  インストールターゲットの設定
 # ===================================================================
-
-install ( PROGRAMS ${PROJECT_BINARY_DIR}/ym_python
-  DESTINATION bin
-  )
