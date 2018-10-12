@@ -36,15 +36,15 @@ list ( APPEND CMAKE_MODULE_PATH
   "${PROJECT_SOURCE_DIR}/ym-common/cmake"
   )
 
-include (FindDoxygen)
-include( UseCython )
-find_package(Gperftools)
-
 include (YmUtils)
 
 ym_init ("")
 
 ym_init_python ()
+
+include (FindDoxygen)
+include( UseCython )
+find_package(Gperftools)
 
 # ===================================================================
 # google-test は内蔵のものを使う．
