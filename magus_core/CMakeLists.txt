@@ -2,15 +2,10 @@
 # ===================================================================
 # インクルードパスの設定
 # ===================================================================
+
 include_directories (
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/ym-base/cython-src
-  ${PROJECT_SOURCE_DIR}/ym-logic/cython-src
-  ${PROJECT_SOURCE_DIR}/ym-sat/cython-src
-  ${PROJECT_SOURCE_DIR}/ym-cell/cython-src
-  ${PROJECT_SOURCE_DIR}/ym-bnet/cython-src
-#  ${PROJECT_SOURCE_DIR}/ym-fraig/cython-src
-  ${PROJECT_SOURCE_DIR}/ym-combopt/cython-src
+  include
+  ${YM_SUBMODULE_CYTHON_LIST}
   )
 
 
@@ -57,19 +52,14 @@ set_source_files_properties (
 #  module ターゲットの設定
 # ===================================================================
 
+list ( REMOVE_ITEM YM_SUBMODULE_OBJ_LIST "$<TARGET_OBJECTS:ym_tclpp>" )
 cython_add_module ( magus_core
   ${CYTHON_SOURCES}
   $<TARGET_OBJECTS:magus_equiv>
   $<TARGET_OBJECTS:magus_cellmap>
   $<TARGET_OBJECTS:magus_lutmap>
   $<TARGET_OBJECTS:magus_sbjgraph>
-  $<TARGET_OBJECTS:ym_base>
-  $<TARGET_OBJECTS:ym_logic>
-  $<TARGET_OBJECTS:ym_cell>
-  $<TARGET_OBJECTS:ym_bnet>
-  $<TARGET_OBJECTS:ym_fraig>
-  $<TARGET_OBJECTS:ym_combopt>
-  $<TARGET_OBJECTS:ym_sat>
+  ${YM_SUBMODULE_OBJ_LIST}
   )
 
 target_compile_options ( magus_core
@@ -85,19 +75,14 @@ target_link_libraries ( magus_core
   )
 
 
+list ( REMOVE_ITEM YM_SUBMODULE_OBJ_D_LIST "$<TARGET_OBJECTS:ym_tclpp_d>" )
 cython_add_module ( magus_core_d
   ${CYTHON_SOURCES}
   $<TARGET_OBJECTS:magus_equiv_d>
   $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:magus_lutmap_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
-  $<TARGET_OBJECTS:ym_base_d>
-  $<TARGET_OBJECTS:ym_logic_d>
-  $<TARGET_OBJECTS:ym_cell_d>
-  $<TARGET_OBJECTS:ym_bnet_d>
-  $<TARGET_OBJECTS:ym_fraig_d>
-  $<TARGET_OBJECTS:ym_combopt>
-  $<TARGET_OBJECTS:ym_sat_d>
+  ${YM_SUBMODULE_OBJ_D_LIST}
   )
 
 target_compile_options ( magus_core_d

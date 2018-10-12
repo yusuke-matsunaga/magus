@@ -117,16 +117,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:magus_lutmap_a>
   $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
-  $<TARGET_OBJECTS:ym_base_a>
-  $<TARGET_OBJECTS:ym_logic_a>
-  $<TARGET_OBJECTS:ym_cell_a>
-  $<TARGET_OBJECTS:ym_bnet_a>
-  $<TARGET_OBJECTS:ym_fraig_a>
-  $<TARGET_OBJECTS:ym_combopt_a>
-  $<TARGET_OBJECTS:ym_mvn_a>
-  $<TARGET_OBJECTS:ym_sat_a>
-  $<TARGET_OBJECTS:ym_verilog_a>
-  $<TARGET_OBJECTS:ym_tclpp_a>
+  ${YM_SUBMODULE_OBJ_A_LIST}
   )
 
 target_compile_options (magus_tclsh
@@ -170,16 +161,7 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:magus_lutmap_p>
   $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
-  $<TARGET_OBJECTS:ym_base_p>
-  $<TARGET_OBJECTS:ym_logic_p>
-  $<TARGET_OBJECTS:ym_cell_p>
-  $<TARGET_OBJECTS:ym_bnet_p>
-  $<TARGET_OBJECTS:ym_fraig_p>
-  $<TARGET_OBJECTS:ym_sat_p>
-  $<TARGET_OBJECTS:ym_combopt_p>
-  $<TARGET_OBJECTS:ym_mvn_p>
-  $<TARGET_OBJECTS:ym_verilog_p>
-  $<TARGET_OBJECTS:ym_tclpp_p>
+  ${YM_SUBMODULE_OBJ_P_LIST}
   )
 
 target_compile_options (magus_tclsh_p
@@ -223,16 +205,7 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:magus_lutmap_d>
   $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
-  $<TARGET_OBJECTS:ym_base_ad>
-  $<TARGET_OBJECTS:ym_logic_ad>
-  $<TARGET_OBJECTS:ym_cell_ad>
-  $<TARGET_OBJECTS:ym_bnet_ad>
-  $<TARGET_OBJECTS:ym_fraig_ad>
-  $<TARGET_OBJECTS:ym_sat_ad>
-  $<TARGET_OBJECTS:ym_combopt_ad>
-  $<TARGET_OBJECTS:ym_mvn_ad>
-  $<TARGET_OBJECTS:ym_verilog_ad>
-  $<TARGET_OBJECTS:ym_tclpp_ad>
+  ${YM_SUBMODULE_OBJ_AD_LIST}
   )
 
 target_compile_options (magus_tclsh_d

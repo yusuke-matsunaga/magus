@@ -79,42 +79,47 @@ endif ()
 
 
 # ===================================================================
+# サブモジュールのリスト
+# ===================================================================
+
+ym_init_submodules (
+  ym-base
+  #  "ym-bfo
+  ym-bnet
+  ym-cell
+  ym-combopt
+  ym-common
+  ym-fraig
+  ym-logic
+  ym-mvn
+  ym-sat
+  ym-tclpp
+  ym-verilog
+  )
+
+
+# ===================================================================
 # インクルードパスの設定
 # ===================================================================
-include_directories (
-  ${PROJECT_SOURCE_DIR}/ym-base/include
-  ${PROJECT_SOURCE_DIR}/ym-bnet/include
-  ${PROJECT_SOURCE_DIR}/ym-cell/include
-  ${PROJECT_SOURCE_DIR}/ym-combopt/include
-  ${PROJECT_SOURCE_DIR}/ym-common/include
-  ${PROJECT_SOURCE_DIR}/ym-fraig/include
-  ${PROJECT_SOURCE_DIR}/ym-logic/include
-  ${PROJECT_SOURCE_DIR}/ym-mvn/include
-  ${PROJECT_SOURCE_DIR}/ym-sat/include
-  ${PROJECT_SOURCE_DIR}/ym-tclpp/include
-  ${PROJECT_SOURCE_DIR}/ym-verilog/include
-  ${PROJECT_BINARY_DIR}
-  )
+
+include_directories( "${PROJECT_BINARY_DIR}" ${YM_SUBMODULE_INCLUDE_LIST} )
 
 
 # ===================================================================
 # サブディレクトリの設定
 # ===================================================================
 
-add_subdirectory ( ym-common )
-add_subdirectory ( ym-base )
-add_subdirectory ( ym-combopt )
-add_subdirectory ( ym-logic )
-add_subdirectory ( ym-cell )
-add_subdirectory ( ym-bnet )
-add_subdirectory ( ym-fraig )
-add_subdirectory ( ym-mvn )
-add_subdirectory ( ym-sat )
-add_subdirectory ( ym-tclpp )
-add_subdirectory ( ym-verilog )
+foreach ( dir ${YM_SUBMODULE_LIST} )
+  add_subdirectory ( ${dir} )
+endforeach ()
 
 add_subdirectory ( magus_core )
 add_subdirectory ( magus_tclsh )
+
+
+# ===================================================================
+# Doxygen の設定
+# ===================================================================
 
 if (DOXYGEN_FOUND)
 
@@ -126,22 +131,11 @@ if (DOXYGEN_FOUND)
       )
     list ( APPEND YM_DOXY_SRCS ${dir} )
   endforeach ()
-  foreach ( dir
-      "magus_core"
-      #"magus_tclsh"
-      "ym-bnet"
-      "ym-cell"
-      "ym-combopt"
-      "ym-common"
-      "ym-fraig"
-      "ym-logic"
-      "ym-mvn"
-      "ym-sat"
-      "ym-tclpp"
-      "ym-verilog"
-      )
+  foreach ( dir ${YM_SUBMODULE_LIST} )
     list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/${dir}/include" )
   endforeach ()
+  list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_core/include" )
+  #list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_tclsh/include" )
 
   ym_add_doxygen ()
 
