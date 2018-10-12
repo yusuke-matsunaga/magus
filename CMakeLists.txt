@@ -39,25 +39,16 @@ list ( APPEND CMAKE_MODULE_PATH
 include (YmUtils)
 
 ym_init ("")
-
 ym_init_python ()
-
-include (FindDoxygen)
-include( UseCython )
-find_package(Gperftools)
+ym_init_cython ()
+ym_init_doxygen ()
+ym_init_gperftools ()
+ym_init_ctest ()
 
 # ===================================================================
 # google-test は内蔵のものを使う．
 # ===================================================================
 ym_use_gtest ()
-
-
-# ===================================================================
-# CTest モジュールの読み込み
-# ===================================================================
-include (CTest)
-
-enable_testing()
 
 
 # ===================================================================
