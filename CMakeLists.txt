@@ -151,7 +151,9 @@ if (DOXYGEN_FOUND)
       )
     list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/${dir}/include" )
   endforeach ()
-  add_subdirectory( doxygen-src )
+
+  ym_add_doxygen ()
+
 endif (DOXYGEN_FOUND)
 
 
