@@ -21,7 +21,7 @@
 #include "ym/BnNode.h"
 #include "ym/BnDff.h"
 #include "ym/BnLatch.h"
-
+#include "ym/Range.h"
 #include "ym/Expr.h"
 
 
@@ -67,8 +67,8 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     auto bn_node = src_network.node(id);
     int ni = bn_node->fanin_num();
     vector<SbjHandle> ihandle_list(ni);
-    for ( int j = 0; j < ni; ++ j ) {
-      int iid = bn_node->fanin(j);
+    for ( int j: Range(ni) ) {
+      int iid = bn_node->fanin_id(j);
       bool stat = node_map.find(iid, ihandle_list[j]);
       ASSERT_COND( stat );
     }
@@ -116,7 +116,10 @@ Bn2Sbj::convert(const BnNetwork& src_network,
       break;
 
     case BnNodeType::Expr:
-      sbj_handle = dst_network.new_expr(bn_node->expr(), ihandle_list);
+      {
+	const Expr& expr = src_network.expr(bn_node->expr_id());
+	sbj_handle = dst_network.new_expr(expr, ihandle_list);
+      }
       break;
 
     case BnNodeType::TvFunc:
@@ -132,11 +135,9 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   }
 
   // 外部出力ノードの生成
-  for ( auto id: src_network.output_id_list() ) {
-    auto bn_node = src_network.node(id);
-    int iid = bn_node->fanin();
+  for ( auto id: src_network.output_src_id_list() ) {
     SbjHandle ihandle;
-    bool stat = node_map.find(iid, ihandle);
+    bool stat = node_map.find(id, ihandle);
     ASSERT_COND( stat );
     SbjNode* sbj_node = dst_network.new_output(ihandle);
     node_map.add(id, SbjHandle(sbj_node));
@@ -240,7 +241,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   for ( auto bn_port: src_network.port_list() ) {
     int bw = bn_port->bit_width();
     vector<SbjNode*> sbj_bits(bw);
-    for ( int j = 0; j < bw; ++ j ) {
+    for ( int j: Range(bw) ) {
       int id = bn_port->bit(j);
       SbjHandle handle;
       bool stat = node_map.find(id, handle);

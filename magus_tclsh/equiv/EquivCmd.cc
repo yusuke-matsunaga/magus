@@ -485,12 +485,12 @@ EquivCmd::cmd_proc(TclObjVector& objv)
 	const BnNode* node1 = network1().node(oid1);
 	const BnNode* node2 = network2().node(oid2);
 	if ( result.output_results()[i] == SatBool3::False ) {
-	  cout << "Node#" << node1->fanin() << "@network1 and "
-	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
+	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
+	       << "Node#" << node2->fanin_id(0) << "@network2 are not equivalent" << endl;
 	}
 	else if ( result.output_results()[i] == SatBool3::X ) {
-	  cout << "Node#" << node1->fanin() << "@network1 and "
-	       << "Node#" << node2->fanin() << "@network2 are unknown" << endl;
+	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
+	       << "Node#" << node2->fanin_id(0) << "@network2 are unknown" << endl;
 	}
       }
     }
@@ -593,12 +593,12 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
 	int id2 = network2().output_id(i);
 	const BnNode* node2 = network2().node(id2);
 	if ( comp_stats[i] == SatBool3::False ) {
-	  cout << "Node#" << node1->fanin() << "@network1 and "
-	       << "Node#" << node2->fanin() << "@network2 are not equivalent" << endl;
+	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
+	       << "Node#" << node2->fanin_id(0) << "@network2 are not equivalent" << endl;
 	}
 	else if ( comp_stats[i] == SatBool3::X ) {
-	  cout << "Node#" << node1->fanin() << "@network1 and "
-	       << "Node#" << node2->fanin() << "@network2 are unknown" << endl;
+	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
+	       << "Node#" << node2->fanin_id(0) << "@network2 are unknown" << endl;
 	}
       }
     }

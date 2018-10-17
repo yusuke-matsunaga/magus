@@ -49,10 +49,9 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
     fout << comma << " pi_" << id;
     comma = ", ";
   }
-  for ( auto id: mapgraph.output_id_list() ) {
+  for ( auto id: mapgraph.output_src_id_list() ) {
     fout << " ," << endl;
-    auto po = mapgraph.node(id);
-    fout << " po_" << po->fanin();
+    fout << " po_" << id;
   }
   fout << endl
        << ");" << endl;
@@ -61,9 +60,8 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
   for ( auto id: mapgraph.input_id_list() ) {
     fout << " input pi_" << id << " ;" << endl;
   }
-  for ( auto id: mapgraph.output_id_list() ) {
-    auto po = mapgraph.node(id);
-    fout << " output po_" << po->fanin() << " ;" << endl;
+  for ( auto id: mapgraph.output_src_id_list() ) {
+    fout << " output po_" << id << " ;" << endl;
   }
   for ( auto id: mapgraph.input_id_list() ) {
     fout << " wire w_" << id << " ;" << endl;
@@ -129,7 +127,7 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
       for ( ymuint j = 0; j < 4; ++ j ){
 	fout << " ." << lut_in[j] << "(w_";
 	if ( j < ni ) {
-	  fout << lut->fanin(j) << ")," << endl;
+	  fout << lut->fanin_id(j) << ")," << endl;
 	}
 	else {
 	  fout << "gnd )," << endl;

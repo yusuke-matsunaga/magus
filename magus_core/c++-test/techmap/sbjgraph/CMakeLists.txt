@@ -28,6 +28,7 @@ add_executable( read_blif
   $<TARGET_OBJECTS:magus_sbjgraph_ad>
   $<TARGET_OBJECTS:ym_bnet_ad>
   $<TARGET_OBJECTS:ym_cell_ad>
+  $<TARGET_OBJECTS:ym_sat_ad>
   $<TARGET_OBJECTS:ym_logic_ad>
   $<TARGET_OBJECTS:ym_base_ad>
   )
@@ -50,6 +51,7 @@ ym_add_gtest( SbjNodeTest
   $<TARGET_OBJECTS:magus_sbjgraph_ad>
   $<TARGET_OBJECTS:ym_bnet_ad>
   $<TARGET_OBJECTS:ym_cell_ad>
+  $<TARGET_OBJECTS:ym_sat_ad>
   $<TARGET_OBJECTS:ym_logic_ad>
   $<TARGET_OBJECTS:ym_base_ad>
   )
@@ -59,6 +61,7 @@ ym_add_gtest( SbjHandleTest
   $<TARGET_OBJECTS:magus_sbjgraph_ad>
   $<TARGET_OBJECTS:ym_bnet_ad>
   $<TARGET_OBJECTS:ym_cell_ad>
+  $<TARGET_OBJECTS:ym_sat_ad>
   $<TARGET_OBJECTS:ym_logic_ad>
   $<TARGET_OBJECTS:ym_base_ad>
   )
