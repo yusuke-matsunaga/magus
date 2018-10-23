@@ -9,6 +9,7 @@
 
 #include "MapGen.h"
 #include "MapRecord.h"
+#include "SbjPort.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnPort.h"
 #include "ym/BnDff.h"
@@ -16,7 +17,7 @@
 #include "ym/ClibCell.h"
 #include "ym/ClibCellPin.h"
 #include "ym/Expr.h"
-#include "SbjPort.h"
+#include "ym/Range.h"
 
 
 BEGIN_NAMESPACE_CELLMAP
@@ -129,17 +130,17 @@ MapGen::gen_port(const SbjPort* sbj_port)
     }
   }
   int port_id = mMapGraph->new_port(sbj_port->name(), iovect);
-  const BnPort* dst_port = mMapGraph->port(port_id);
-  for (ymuint j = 0; j < nb; ++ j) {
+  auto& dst_port = mMapGraph->port(port_id);
+  for ( int j = 0; j < nb; ++ j ) {
     const SbjNode* sbj_node = sbj_port->bit(j);
-    const BnNode* node = mMapGraph->node(dst_port->bit(j));
+    auto& node = mMapGraph->node(dst_port.bit(j));
     if ( sbj_node->is_input() ) {
-      ASSERT_COND( node->is_input() );
-      node_info(sbj_node, false).mMapNode = node->id();
+      ASSERT_COND( node.is_input() );
+      node_info(sbj_node, false).mMapNode = node.id();
     }
     else if ( sbj_node->is_output() ) {
-      ASSERT_COND( node->is_output() );
-      node_info(sbj_node, false).mMapNode = node->id();
+      ASSERT_COND( node.is_output() );
+      node_info(sbj_node, false).mMapNode = node.id();
       add_mapreq(sbj_node, false);
     }
   }
@@ -166,32 +167,32 @@ MapGen::gen_dff(const SbjDff* sbj_dff,
   }
   ClibFFInfo ff_info = cell->ff_info();
   int dff_id = mMapGraph->new_dff(string(), cell->name());
-  const BnDff* dff = mMapGraph->dff(dff_id);
+  auto& dff = mMapGraph->dff(dff_id);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
-  ymuint output1 = dff->output();
+  int output1 = dff.output();
   ASSERT_COND( output1 != kBnNullId );
   node_info(sbj_output, inv).mMapNode = output1;
-  ymuint output2 = dff->xoutput();
+  int output2 = dff.xoutput();
   if ( output2 != kBnNullId ) {
     node_info(sbj_output, !inv).mMapNode = output2;
   }
 
   const SbjNode* sbj_input = sbj_dff->data_input();
-  ymuint input = dff->input();
+  int input = dff.input();
   node_info(sbj_input, false).mMapNode = input;
   add_mapreq(sbj_input, inv);
 
   const SbjNode* sbj_clock = sbj_dff->clock();
-  ymuint clock = dff->clock();
+  int clock = dff.clock();
   node_info(sbj_clock, false).mMapNode = clock;
   bool clock_inv = (ff_info.clock_sense() == 2);
   add_mapreq(sbj_clock, clock_inv);
 
-  ymuint clear_sense = ff_info.clear_sense();
+  int clear_sense = ff_info.clear_sense();
   if ( clear_sense != 0 ) {
     const SbjNode* sbj_clear = inv ? sbj_dff->preset() : sbj_dff->clear();
-    ymuint clear = dff->clear();
+    int clear = dff.clear();
     ASSERT_COND( clear != kBnNullId );
     node_info(sbj_clear, false).mMapNode = clear;
     bool clear_inv = (clear_sense == 2);
@@ -199,10 +200,10 @@ MapGen::gen_dff(const SbjDff* sbj_dff,
     add_mapreq(sbj_clear, clear_inv);
   }
 
-  ymuint preset_sense = ff_info.preset_sense();
+  int preset_sense = ff_info.preset_sense();
   if ( preset_sense != 0 ) {
     const SbjNode* sbj_preset = inv ? sbj_dff->clear() : sbj_dff->preset();
-    ymuint preset = dff->preset();
+    int preset = dff.preset();
     ASSERT_COND( preset != kBnNullId );
     node_info(sbj_preset, false).mMapNode = preset;
     bool preset_inv = (preset_sense == 2);
@@ -228,13 +229,13 @@ MapGen::add_mapreq(const SbjNode* sbj_node,
 
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
-ymuint
+int
 MapGen::back_trace(const SbjNode* node,
 		   bool inv,
 		   const MapRecord& record)
 {
   NodeInfo& node_info = this->node_info(node, inv);
-  ymuint mapnode = node_info.mMapNode;
+  int mapnode = node_info.mMapNode;
   if ( mapnode != kBnNullId ) {
     // すでに生成済みならそのノードを返す．
     return mapnode;
@@ -248,11 +249,11 @@ MapGen::back_trace(const SbjNode* node,
   mapnode = mMapGraph->new_logic(string(), cell->name());
   node_info.mMapNode = mapnode;
 
-  ymuint ni = match.leaf_num();
-  for (ymuint i = 0; i < ni; ++ i) {
+  int ni = match.leaf_num();
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);
-    ymuint iid = back_trace(inode, iinv, record);
+    int iid = back_trace(inode, iinv, record);
     mMapGraph->connect(iid, mapnode, i);
   }
 

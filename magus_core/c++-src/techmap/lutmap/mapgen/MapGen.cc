@@ -11,16 +11,17 @@
 #include "MapRecord.h"
 #include "Cut.h"
 
+#include "SbjNode.h"
+#include "SbjDff.h"
+#include "SbjLatch.h"
+#include "SbjPort.h"
+
 #include "ym/BnNetwork.h"
 #include "ym/BnPort.h"
 #include "ym/BnDff.h"
 #include "ym/BnLatch.h"
 #include "ym/TvFunc.h"
-
-#include "SbjNode.h"
-#include "SbjDff.h"
-#include "SbjLatch.h"
-#include "SbjPort.h"
+#include "ym/Range.h"
 
 #define LUTMAP_DEBUG_MAPGEN 0
 
@@ -151,10 +152,10 @@ MapGen::generate(const SbjGraph& sbjgraph,
       dir_vect[j] = sbjnode->is_input() ? 0 : 1;
     }
     int port_id = mapgraph.new_port(sbjport->name(), dir_vect);
-    const BnPort* bn_port = mapgraph.port(port_id);
+    auto& bn_port = mapgraph.port(port_id);
     for ( int j = 0; j < nb; ++ j ) {
       const SbjNode* sbjnode = sbjport->bit(j);
-      mNodeInfo[sbjnode->id()].set_map(bn_port->bit(j), 0);
+      mNodeInfo[sbjnode->id()].set_map(bn_port.bit(j), 0);
     }
   }
 
@@ -172,16 +173,16 @@ MapGen::generate(const SbjGraph& sbjgraph,
     bool has_preset = (preset != nullptr);
 
     int dff_id = mapgraph.new_dff(string(), has_clear, has_preset);
-    const BnDff* bn_dff = mapgraph.dff(dff_id);
+    auto& bn_dff = mapgraph.dff(dff_id);
 
-    mNodeInfo[input->id()].set_map(bn_dff->input(), 0);
-    mNodeInfo[output->id()].set_map(bn_dff->output(), 0);
-    mNodeInfo[clock->id()].set_map(bn_dff->clock(), 0);
+    mNodeInfo[input->id()].set_map(bn_dff.input(), 0);
+    mNodeInfo[output->id()].set_map(bn_dff.output(), 0);
+    mNodeInfo[clock->id()].set_map(bn_dff.clock(), 0);
     if ( has_clear ) {
-      mNodeInfo[clear->id()].set_map(bn_dff->clear(), 0);
+      mNodeInfo[clear->id()].set_map(bn_dff.clear(), 0);
     }
     if ( has_preset ) {
-      mNodeInfo[preset->id()].set_map(bn_dff->preset(), 0);
+      mNodeInfo[preset->id()].set_map(bn_dff.preset(), 0);
     }
   }
 
@@ -199,16 +200,16 @@ MapGen::generate(const SbjGraph& sbjgraph,
     bool has_preset = (preset != nullptr);
 
     int latch_id = mapgraph.new_latch(string(), has_clear, has_preset);
-    const BnLatch* bn_latch = mapgraph.latch(latch_id);
+    auto& bn_latch = mapgraph.latch(latch_id);
 
-    mNodeInfo[input->id()].set_map(bn_latch->input(), 0);
-    mNodeInfo[output->id()].set_map(bn_latch->output(), 0);
-    mNodeInfo[enable->id()].set_map(bn_latch->enable(), 0);
+    mNodeInfo[input->id()].set_map(bn_latch.input(), 0);
+    mNodeInfo[output->id()].set_map(bn_latch.output(), 0);
+    mNodeInfo[enable->id()].set_map(bn_latch.enable(), 0);
     if ( has_clear ) {
-      mNodeInfo[clear->id()].set_map(bn_latch->clear(), 0);
+      mNodeInfo[clear->id()].set_map(bn_latch.clear(), 0);
     }
     if ( has_preset ) {
-      mNodeInfo[preset->id()].set_map(bn_latch->preset(), 0);
+      mNodeInfo[preset->id()].set_map(bn_latch.preset(), 0);
     }
   }
 

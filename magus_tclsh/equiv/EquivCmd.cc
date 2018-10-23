@@ -332,41 +332,41 @@ EquivCmdBase::assoc_by_name()
   mOutputPairList.reserve(no);
 
   for ( int i = 0; i < np1; ++ i ) {
-    const BnPort* port1 = mNetwork1.port(i);
-    int bw1 = port1->bit_width();
+    auto& port1 = mNetwork1.port(i);
+    int bw1 = port1.bit_width();
 
     // とりあえず単純な線形探索
     bool found = false;
     for ( int j = 0; j < np2; ++ j ) {
-      const BnPort* port2 = mNetwork2.port(j);
-      if ( port1->name() == port2->name() ) {
+      auto& port2 = mNetwork2.port(j);
+      if ( port1.name() == port2.name() ) {
 	found = true;
-	int bw2 = port2->bit_width();
+	int bw2 = port2.bit_width();
 	if ( bw1 != bw2 ) {
 	  TclObj emsg;
-	  emsg << "bitwidth of port '" << port1->name()
+	  emsg << "bitwidth of port '" << port1.name()
 	       << "' is different";
 	  set_result(emsg);
 	  return false;
 	}
 
 	for ( int k = 0; k < bw1; ++ k ) {
-	  const BnNode* node1 = mNetwork1.node(port1->bit(k));
-	  const BnNode* node2 = mNetwork2.node(port2->bit(k));
-	  if ( node1->type() != node2->type() ) {
+	  auto& node1 = mNetwork1.node(port1.bit(k));
+	  auto& node2 = mNetwork2.node(port2.bit(k));
+	  if ( node1.type() != node2.type() ) {
 	    TclObj emsg;
 	    emsg
 	      << "direction of port '"
-	      << port1->name()
+	      << port1.name()
 	      << "] is different";
 	    set_result(emsg);
 	    return false;
 	  }
-	  if ( node1->is_input() ) {
-	    mInputPairList.push_back(make_pair(node1->id(), node2->id()));
+	  if ( node1.is_input() ) {
+	    mInputPairList.push_back(make_pair(node1.id(), node2.id()));
 	  }
-	  if ( node1->is_output() ) {
-	    mOutputPairList.push_back(make_pair(node1->id(), node2->id()));
+	  if ( node1.is_output() ) {
+	    mOutputPairList.push_back(make_pair(node1.id(), node2.id()));
 	  }
 	}
 	break;
@@ -374,7 +374,7 @@ EquivCmdBase::assoc_by_name()
     }
     if ( found == false ) {
       TclObj emsg;
-      emsg << "port '" << port1->name() << "' does not found"
+      emsg << "port '" << port1.name() << "' does not found"
 	   << " in network2";
       set_result(emsg);
       return false;
@@ -482,15 +482,15 @@ EquivCmd::cmd_proc(TclObjVector& objv)
       for ( int i = 0; i < no; ++ i ) {
 	auto oid1 = output_pair_list()[i].first;
 	auto oid2 = output_pair_list()[i].second;
-	const BnNode* node1 = network1().node(oid1);
-	const BnNode* node2 = network2().node(oid2);
+	auto& node1 = network1().node(oid1);
+	auto& node2 = network2().node(oid2);
 	if ( result.output_results()[i] == SatBool3::False ) {
-	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
-	       << "Node#" << node2->fanin_id(0) << "@network2 are not equivalent" << endl;
+	  cout << "Node#" << node1.fanin_id(0) << "@network1 and "
+	       << "Node#" << node2.fanin_id(0) << "@network2 are not equivalent" << endl;
 	}
 	else if ( result.output_results()[i] == SatBool3::X ) {
-	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
-	       << "Node#" << node2->fanin_id(0) << "@network2 are unknown" << endl;
+	  cout << "Node#" << node1.fanin_id(0) << "@network1 and "
+	       << "Node#" << node2.fanin_id(0) << "@network2 are unknown" << endl;
 	}
       }
     }
@@ -589,16 +589,16 @@ EquivCmd2::cmd_proc(TclObjVector& objv)
       int no = network1().output_num();
       for ( int i = 0; i < no; ++ i ) {
 	int id1 = network1().output_id(i);
-	const BnNode* node1 = network1().node(id1);
+	auto& node1 = network1().node(id1);
 	int id2 = network2().output_id(i);
-	const BnNode* node2 = network2().node(id2);
+	auto& node2 = network2().node(id2);
 	if ( comp_stats[i] == SatBool3::False ) {
-	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
-	       << "Node#" << node2->fanin_id(0) << "@network2 are not equivalent" << endl;
+	  cout << "Node#" << node1.fanin_id(0) << "@network1 and "
+	       << "Node#" << node2.fanin_id(0) << "@network2 are not equivalent" << endl;
 	}
 	else if ( comp_stats[i] == SatBool3::X ) {
-	  cout << "Node#" << node1->fanin_id(0) << "@network1 and "
-	       << "Node#" << node2->fanin_id(0) << "@network2 are unknown" << endl;
+	  cout << "Node#" << node1.fanin_id(0) << "@network1 and "
+	       << "Node#" << node2.fanin_id(0) << "@network2 are unknown" << endl;
 	}
       }
     }

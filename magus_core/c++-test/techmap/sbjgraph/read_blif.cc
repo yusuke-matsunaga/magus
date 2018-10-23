@@ -74,9 +74,9 @@ main(int argc,
     StreamMsgHandler msg_handler(&cerr);
     MsgMgr::attach_handler(&msg_handler);
 
-    BnNetwork network;
+    BnNetwork network = BnNetwork::read_blif(filename);
 
-    if ( !read_blif(network, filename) ) {
+    if ( network.node_num() == 0 ) {
       cerr << "Error in reading " << filename << endl;
       return 4;
     }

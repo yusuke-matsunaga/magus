@@ -64,10 +64,10 @@ ReadIscas89::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      bool result = read_iscas89(*neth->_bnetwork(), ex_file_name);
+      *neth->_bnetwork() = BnNetwork::read_iscas89(ex_file_name);
 
       // エラーが起きていないか調べる．
-      if ( !result ) {
+      if ( neth->_bnetwork()->node_num() == 0 ) {
 	TclObj emsg = mh.msg_obj();
 	emsg << "Error occurred in reading " << objv[1];
 	set_result(emsg);

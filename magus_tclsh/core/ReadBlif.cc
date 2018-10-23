@@ -62,10 +62,10 @@ ReadBlif::cmd_proc(TclObjVector& objv)
   switch ( neth->type() ) {
   case NetHandle::kMagBn:
     {
-      bool result = read_blif(*neth->_bnetwork(), ex_file_name, cur_cell_library());
+      *neth->_bnetwork() = BnNetwork::read_blif(ex_file_name, cur_cell_library());
 
       // エラーが起きていないか調べる．
-      if ( !result ) {
+      if ( neth->_bnetwork()->node_num() == 0 ) {
 	TclObj emsg = mh.msg_obj();
 	emsg << "Error occurred in reading " << objv[1];
 	set_result(emsg);

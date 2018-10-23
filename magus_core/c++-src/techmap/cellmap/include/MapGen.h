@@ -73,7 +73,7 @@ private:
     const ClibCell* mCell;
 
     // マップ結果
-    ymuint mMapNode;
+    int mMapNode;
 
   };
 
@@ -124,7 +124,7 @@ private:
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
   /// @param[in] record セルの割当結果
-  ymuint
+  int
   back_trace(const SbjNode* node,
 	     bool inv,
 	     const MapRecord& record);

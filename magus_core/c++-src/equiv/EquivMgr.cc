@@ -108,8 +108,8 @@ EquivMgr::check(const BnNetwork& network1,
   {
     vector<FraigHandle> input_list(ni);
     for ( int i: Range(ni) ) {
-      auto node = network1.node(input_pair_list[i].first);
-      input_list[node->input_id()] = input_handles[i];
+      auto& node = network1.node(input_pair_list[i].first);
+      input_list[node.input_id()] = input_handles[i];
     }
     fraig_mgr.import_subnetwork(network1, input_list, output_handles1);
   }
@@ -119,8 +119,8 @@ EquivMgr::check(const BnNetwork& network1,
   {
     vector<FraigHandle> input_list(ni);
     for ( int i: Range(ni) ) {
-      auto node = network2.node(input_pair_list[i].second);
-      input_list[node->input_id()] = input_handles[i];
+      auto& node = network2.node(input_pair_list[i].second);
+      input_list[node.input_id()] = input_handles[i];
     }
     fraig_mgr.import_subnetwork(network2, input_list, output_handles2);
   }
@@ -133,10 +133,10 @@ EquivMgr::check(const BnNetwork& network1,
       log_out() << "Checking Output#" << (i + 1) << " / " << no << endl;
     }
 
-    auto node1 = network1.node(output_pair_list[i].first);
-    auto node2 = network2.node(output_pair_list[i].second);
-    auto h1 = output_handles1[node1->output_id()];
-    auto h2 = output_handles2[node2->output_id()];
+    auto& node1 = network1.node(output_pair_list[i].first);
+    auto& node2 = network2.node(output_pair_list[i].second);
+    auto h1 = output_handles1[node1.output_id()];
+    auto h2 = output_handles2[node2.output_id()];
 
     SatBool3 stat1;
     if ( h1 == h2 ) {

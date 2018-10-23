@@ -110,10 +110,10 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
   lut_in[3] = "datad";
 
   for ( auto id: mapgraph.logic_id_list() ) {
-    auto lut = mapgraph.node(id);
-    ASSERT_COND( lut->type() == BnNodeType::TvFunc );
-    const TvFunc& tv = mapgraph.func(lut->func_id());
-    int ni = lut->fanin_num();
+    auto& lut = mapgraph.node(id);
+    ASSERT_COND( lut.type() == BnNodeType::TvFunc );
+    const TvFunc& tv = mapgraph.func(lut.func_id());
+    int ni = lut.fanin_num();
     int table_size = 1U << ni;
 
     fout << endl;
@@ -123,20 +123,20 @@ write_vqm_cycloneiii(const BnNetwork& mapgraph,
 	   << tv.value(0) << endl << endl;
     }
     else {
-      fout << " cycloneiii_lcell_comb lut_" << lut->id() << " (" << endl;
-      for ( ymuint j = 0; j < 4; ++ j ){
+      fout << " cycloneiii_lcell_comb lut_" << lut.id() << " (" << endl;
+      for ( int j = 0; j < 4; ++ j ){
 	fout << " ." << lut_in[j] << "(w_";
 	if ( j < ni ) {
-	  fout << lut->fanin_id(j) << ")," << endl;
+	  fout << lut.fanin_id(j) << ")," << endl;
 	}
 	else {
 	  fout << "gnd )," << endl;
 	}
       }
-      fout << " .combout(w_" << lut->id() << ") );" << endl;
-      fout << " defparam lut_" << lut->id()
+      fout << " .combout(w_" << lut.id() << ") );" << endl;
+      fout << " defparam lut_" << lut.id()
 	   << " .sum_lutc_input =\"datac\";" << endl;
-      fout << " defparam lut_" << lut->id()
+      fout << " defparam lut_" << lut.id()
 	   << " .lut_mask = 16'b";
       for ( ymuint j = 16; j != 0; --j ){
 	if ( j > table_size ){
