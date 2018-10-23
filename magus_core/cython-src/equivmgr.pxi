@@ -29,30 +29,26 @@ cdef class EquivMgr :
     def check(self,
               BnNetwork network1,
               BnNetwork network2,
-              input_pair_list, output_pair_list) :
-        cdef vector[pair[int, int]] c_input_pair_list
-        cdef vector[pair[int, int]] c_output_pair_list
+              input2_list, output2_list) :
+        cdef vector[int] c_input2_list
+        cdef vector[int] c_output2_list
         cdef int ni = network1.input_num
         cdef int no = network1.output_num
         cdef CXX_EquivResult c_result
 
-        assert len(input_pair_list) == ni
-        assert len(output_pair_list) == no
+        assert len(input2_list) == ni
+        assert len(output2_list) == no
 
-        c_input_pair_list.resize(ni)
+        c_input2_list.resize(ni)
         for i in range(ni) :
-            id1, id2 = input_pair_list[i];
-            c_input_pair_list[i].first = id1
-            c_input_pair_list[i].second = id2
+            c_input2_list[i] = input2_list[i]
 
-        c_output_pair_list.resize(no)
+        c_output2_list.resize(no)
         for i in range(no) :
-            id1, id2 = output_pair_list[i]
-            c_output_pair_list[i].first = id1
-            c_output_pair_list[i].second = id2
+            c_output2_list[i] = output2_list[i]
 
         c_result = self._this.check(network1._this, network2._this,
-                                    c_input_pair_list, c_output_pair_list)
+                                    c_input2_list, c_output2_list)
 
         eq_stats = [ to_SatBool3(c_result.output_results()[i]) for i in range(no) ]
         return to_SatBool3(c_result.result()), eq_stats

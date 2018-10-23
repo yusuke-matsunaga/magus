@@ -64,12 +64,12 @@ protected:
   network2() const;
 
   /// @brief 入力のノード番号のペアのリストを返す．
-  const vector<pair<int, int>>&
-  input_pair_list() const;
+  const vector<int>&
+  input2_list() const;
 
   /// @brief 出力のノード番号のペアのリストを返す．
-  const vector<pair<int, int>>&
-  output_pair_list() const;
+  const vector<int>&
+  output2_list() const;
 
 
 private:
@@ -144,11 +144,11 @@ private:
   // 検証対象のネットワーク2
   BnNetwork mNetwork2;
 
-  // 入力のノード番号の対のリスト
-  vector<pair<int, int>> mInputPairList;
+  // 入力のノード番号のリスト
+  vector<int> mInput2List;
 
-  // 出力のノード番号の対のリスト
-  vector<pair<int, int>> mOutputPairList;
+  // 出力のノード番号のリスト
+  vector<int> mOutput2List;
 
 };
 
@@ -275,20 +275,20 @@ EquivCmdBase::network2() const
   return mNetwork2;
 }
 
-// @brief 入力のノード番号の対のリストを返す．
+// @brief 入力のノード番号のリストを返す．
 inline
-const vector<pair<int, int>>&
-EquivCmdBase::input_pair_list() const
+const vector<int>&
+EquivCmdBase::input2_list() const
 {
-  return mInputPairList;
+  return mInput2List;
 }
 
-// @brief 出力のノード番号の対のリストを返す．
+// @brief 出力のノード番号のリストを返す．
 inline
-const vector<pair<int, int>>&
-EquivCmdBase::output_pair_list() const
+const vector<int>&
+EquivCmdBase::output2_list() const
 {
-  return mOutputPairList;
+  return mOutput2List;
 }
 
 END_NAMESPACE_MAGUS

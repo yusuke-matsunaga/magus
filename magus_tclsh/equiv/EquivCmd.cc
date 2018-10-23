@@ -13,6 +13,7 @@
 #include "ym/BnPort.h"
 #include "ym/TclPopt.h"
 #include "ym/MvnMgr.h"
+#include "ym/Range.h"
 
 
 #define DEBUG_OUTPUTS 1
@@ -288,23 +289,19 @@ EquivCmdBase::assoc_by_order()
   // まずは外部入力ノードの対応関係を取る．
   int ni = mNetwork1.input_num();
   ASSERT_COND( mNetwork2.input_num() == ni );
-  mInputPairList.clear();
-  mInputPairList.resize(ni);
-  for ( int i = 0; i < ni; ++ i ) {
-    int id1 = mNetwork1.input_id(i);
-    int id2 = mNetwork2.input_id(i);
-    mInputPairList[i] = make_pair(id1, id2);
+  mInput2List.clear();
+  mInput2List.resize(ni);
+  for ( int i: Range(ni) ) {
+    mInput2List[i] = i;
   }
 
   // 次は外部出力ノードの対応関係を取る．
   int no = mNetwork1.output_num();
   ASSERT_COND( mNetwork2.output_num() == no );
-  mOutputPairList.clear();
-  mOutputPairList.resize(no);
-  for ( int i = 0; i < no; ++ i ) {
-    int id1 = mNetwork1.output_id(i);
-    int id2 = mNetwork2.output_id(i);
-    mOutputPairList[i] = make_pair(id1, id2);
+  mOutput2List.clear();
+  mOutput2List.resize(no);
+  for ( int i: Range(no) ) {
+    mOutput2List[i] = i;
   }
 }
 
@@ -323,21 +320,21 @@ EquivCmdBase::assoc_by_name()
 
   int ni = mNetwork1.input_num();
   ASSERT_COND( mNetwork2.input_num() == ni );
-  mInputPairList.clear();
-  mInputPairList.reserve(ni);
+  mInput2List.clear();
+  mInput2List.reserve(ni);
 
   int no = mNetwork1.output_num();
   ASSERT_COND( mNetwork2.output_num() == no );
-  mOutputPairList.clear();
-  mOutputPairList.reserve(no);
+  mOutput2List.clear();
+  mOutput2List.reserve(no);
 
-  for ( int i = 0; i < np1; ++ i ) {
+  for ( int i: Range(np1) ) {
     auto& port1 = mNetwork1.port(i);
     int bw1 = port1.bit_width();
 
     // とりあえず単純な線形探索
     bool found = false;
-    for ( int j = 0; j < np2; ++ j ) {
+    for ( int j: Range(np2) ) {
       auto& port2 = mNetwork2.port(j);
       if ( port1.name() == port2.name() ) {
 	found = true;
@@ -350,7 +347,7 @@ EquivCmdBase::assoc_by_name()
 	  return false;
 	}
 
-	for ( int k = 0; k < bw1; ++ k ) {
+	for ( int k: Range(bw1) ) {
 	  auto& node1 = mNetwork1.node(port1.bit(k));
 	  auto& node2 = mNetwork2.node(port2.bit(k));
 	  if ( node1.type() != node2.type() ) {
@@ -363,10 +360,10 @@ EquivCmdBase::assoc_by_name()
 	    return false;
 	  }
 	  if ( node1.is_input() ) {
-	    mInputPairList.push_back(make_pair(node1.id(), node2.id()));
+	    mInput2List[node2.input_pos()] = node1.input_pos();
 	  }
 	  if ( node1.is_output() ) {
-	    mOutputPairList.push_back(make_pair(node1.id(), node2.id()));
+	    mOutput2List[node2.output_pos()] = node1.output_pos();
 	  }
 	}
 	break;
@@ -456,8 +453,8 @@ EquivCmd::cmd_proc(TclObjVector& objv)
 
     EquivResult result = equiv_mgr.check(network1(),
 					 network2(),
-					 input_pair_list(),
-					 output_pair_list());
+					 input2_list(),
+					 output2_list());
 
     bool has_neq = false;
     bool has_abt = false;
@@ -480,8 +477,8 @@ EquivCmd::cmd_proc(TclObjVector& objv)
     {
       int no = network1().output_num();
       for ( int i = 0; i < no; ++ i ) {
-	auto oid1 = output_pair_list()[i].first;
-	auto oid2 = output_pair_list()[i].second;
+	auto oid1 = network1().output_id(i);
+	auto oid2 = output2_list()[i];
 	auto& node1 = network1().node(oid1);
 	auto& node2 = network2().node(oid2);
 	if ( result.output_results()[i] == SatBool3::False ) {

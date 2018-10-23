@@ -60,21 +60,17 @@ TEST(EquivTest, EquivTest2)
   ASSERT_TRUE( network2.input_num() == ni );
   ASSERT_TRUE( network2.output_num() == no );
 
-  vector<pair<int, int>> input_pair_list(ni);
+  vector<int> input2_list(ni);
   for ( int i: Range(ni) ) {
-    int id1 = network1.input_id(i);
-    int id2 = network2.input_id(i);
-    input_pair_list[i] = make_pair(id1, id2);
+    input2_list[i] = i;
   }
-  vector<pair<int, int>> output_pair_list(no);
+  vector<int> output2_list(no);
   for ( int i: Range(no) ) {
-    int id1 = network1.output_id(i);
-    int id2 = network2.output_id(i);
-    output_pair_list[i] = make_pair(id1, id2);
+    output2_list[i] = i;
   }
 
   EquivMgr eqmgr;
-  EquivResult ans = eqmgr.check(network1, network2, input_pair_list, output_pair_list);
+  EquivResult ans = eqmgr.check(network1, network2, input2_list, output2_list);
   EXPECT_EQ( SatBool3::True, ans.result() );
   for ( int i: Range(no) ) {
     EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
@@ -99,40 +95,44 @@ TEST(EquivTest, EquivTest3)
   ASSERT_TRUE( network2.input_num() == ni );
   ASSERT_TRUE( network2.output_num() == no );
 
-  HashMap<string, int> input_map1;
-  for ( int id1: network1.input_id_list() ) {
+  // network1 の入力ノードの名前のハッシュ表を作る．
+  HashMap<string, int> input_map;
+  for ( int pos: Range(ni) ) {
+    int id1 = network1.input_id(pos);
     auto& node = network1.node(id1);
-    input_map1.add(node.name(), id1);
+    input_map.add(node.name(), pos);
   }
-  HashMap<string, int> output_map1;
-  for ( int id1: network1.output_id_list() ) {
+
+  // network1 の出力ノードの名前のハッシュ表を作る．
+  HashMap<string, int> output_map;
+  for ( int pos: Range(no) ) {
+    int id1 = network1.output_id(pos);
     auto& node = network1.node(id1);
-    output_map1.add(node.name(), id1);
+    output_map.add(node.name(), pos);
   }
 
-  vector<pair<int, int>> input_pair_list;
-  input_pair_list.reserve(ni);
-  for ( int id2: network2.input_id_list() ) {
-    auto& node = network2.node(id2);
-    int id1;
-    bool stat = input_map1.find(node.name(), id1);
+  vector<int> input2_list(ni);
+  for ( int pos2: Range(ni) ) {
+    int id2 = network2.input_id(pos2);
+    auto& node2 = network2.node(id2);
+    int pos1;
+    bool stat = input_map.find(node2.name(), pos1);
     ASSERT_TRUE( stat );
-
-    input_pair_list.push_back(make_pair(id1, id2));
+    input2_list[pos2] = pos1;
   }
-  vector<pair<int, int>> output_pair_list;
-  output_pair_list.reserve(no);
-  for ( int id2: network2.output_id_list() ) {
-    auto& node = network2.node(id2);
-    int id1;
-    bool stat = output_map1.find(node.name(), id1);
-    ASSERT_TRUE( stat );
 
-    output_pair_list.push_back(make_pair(id1, id2));
+  vector<int> output2_list(no);
+  for ( int pos2: Range(no) ) {
+    int id2 = network2.output_id(pos2);
+    auto& node2 = network2.node(id2);
+    int pos1;
+    bool stat = output_map.find(node2.name(), pos1);
+    ASSERT_TRUE( stat );
+    output2_list[pos2] = pos1;
   }
 
   EquivMgr eqmgr;
-  EquivResult ans = eqmgr.check(network1, network2, input_pair_list, output_pair_list);
+  EquivResult ans = eqmgr.check(network1, network2, input2_list, output2_list);
   EXPECT_EQ( SatBool3::True, ans.result() );
   for ( int i: Range(no) ) {
     EXPECT_EQ( SatBool3::True, ans.output_results()[i] );

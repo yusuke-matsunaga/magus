@@ -109,13 +109,17 @@ public:
   /// @brief 2つの回路が等価かどうか調べる．
   /// @param[in] network1 対象の回路1
   /// @param[in] network2 対象の回路2
-  /// @param[in] input_pair_list 入力ノード番号の対のリスト
-  /// @param[in] output_pair_list 出力ノード番号の対のリスト
+  /// @param[in] input2_list network2の入力順序を表すリスト
+  /// @param[in] output2_list network2の出力順序を表すリスト
+  ///
+  /// input2_list, output2_list ともに，network2 の i 番目の
+  /// 入力(出力)が network1 の何番目の入力(出力)に対応しているか
+  /// を示す．
   EquivResult
   check(const BnNetwork& network1,
 	const BnNetwork& network2,
-	const vector<pair<int, int>>& input_pair_list,
-	const vector<pair<int, int>>& output_pair_list);
+	const vector<int>& input2_list,
+	const vector<int>& output2r_list);
 
 
 public:

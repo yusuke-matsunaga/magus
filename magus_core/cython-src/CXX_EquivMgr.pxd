@@ -27,8 +27,8 @@ cdef extern from "EquivMgr.h" namespace "nsYm::nsMagus" :
                           const BnNetwork&)
         EquivResult check(const BnNetwork&,
                           const BnNetwork&,
-                          const vector[pair[int, int]]&,
-                          const vector[pair[int, int]]&)
+                          const vector[int]&,
+                          const vector[int]&)
         void set_signature_size(int sig_size)
         void set_sat_solver_type(const SatSolverType& solver_type)
         void set_loglevel(int level)
