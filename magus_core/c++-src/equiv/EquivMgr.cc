@@ -103,12 +103,19 @@ EquivMgr::check(const BnNetwork& network1,
     input_handles[i] = fraig_mgr.make_input();
   }
 
+  cout << "make_input end" << endl;
+
   // network1 に対応する Fraig を作る．
   vector<FraigHandle> output_handles1(no);
   {
     vector<FraigHandle> input_list(ni);
     for ( int i: Range(ni) ) {
       auto& node = network1.node(input_pair_list[i].first);
+      cout << "[1]input#" << i << ": " << node.name() << endl;
+      if ( !node.is_input() ) {
+	cout << " is not an input" << endl;
+      }
+      cout << " input_id = " << node.input_id() << endl;
       input_list[node.input_id()] = input_handles[i];
     }
     fraig_mgr.import_subnetwork(network1, input_list, output_handles1);
@@ -120,10 +127,14 @@ EquivMgr::check(const BnNetwork& network1,
     vector<FraigHandle> input_list(ni);
     for ( int i: Range(ni) ) {
       auto& node = network2.node(input_pair_list[i].second);
+      cout << "[2]input#" << i << ": " << node.name() << endl;
+      cout << " input_id = " << node.input_id() << endl;
       input_list[node.input_id()] = input_handles[i];
     }
     fraig_mgr.import_subnetwork(network2, input_list, output_handles2);
   }
+
+  cout << "import_subnetwork end" << endl;
 
   // 各出力の等価検証を行う．
   vector<SatBool3> eq_stats(no);
