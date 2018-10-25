@@ -56,8 +56,8 @@ ym_use_gtest ()
 # ===================================================================
 
 configure_file(
-  "${PROJECT_SOURCE_DIR}/etc/version_config.h.in"
-  "${PROJECT_BINARY_DIR}/version_config.h"
+  "${PROJECT_SOURCE_DIR}/etc/magus.h.in"
+  "${PROJECT_BINARY_DIR}/magus.h"
   )
 
 
@@ -126,8 +126,9 @@ if (DOXYGEN_FOUND)
   # doxygen の対象となるヘッダファイル(のパタン)を YM_DOXY_SRCS に入れる．
   set ( YM_DOXY_SRCS )
   foreach ( dir
-      "${PROJECT_SOURCE_DIR}/doxygen-src"
-      "${PROJECT_BINARY_DIR}"
+      "${PROJECT_BINARY_DIR}/ym_config.h"
+      "${PROJECT_BINARY_DIR}/magus.h"
+      "${PROJECT_SOURCE_DIR}/etc/mainpage.h"
       )
     list ( APPEND YM_DOXY_SRCS ${dir} )
   endforeach ()

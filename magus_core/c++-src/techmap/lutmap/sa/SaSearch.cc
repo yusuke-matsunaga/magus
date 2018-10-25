@@ -84,7 +84,7 @@ SaSearch::search(ymuint search_limit,
 	     << " @ " << T << " (" << n_acc << " / " << mNumAll << ")" << endl;
       }
       if ( prev_val < val ) {
-	ymint dint = prev_val - val;
+	int dint = prev_val - val;
 	double d = static_cast<double>(dint);
 	double t = exp(d / T);
 	double r = mRandGen.real1();
