@@ -4,7 +4,6 @@
 # ===================================================================
 
 include_directories (
-  include
   ${YM_SUBMODULE_CYTHON_LIST}
   )
 

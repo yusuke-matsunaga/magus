@@ -3,7 +3,6 @@
 # インクルードパスの設定
 # ===================================================================
 include_directories (
-  ${PROJECT_SOURCE_DIR}/magus_core/include
   include
   ${TCL_INCLUDE_PATH}
   )

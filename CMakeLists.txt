@@ -12,8 +12,8 @@ set (CMAKE_CXX_STANDARD 14)
 # ===================================================================
 set ( YM_VERSION_MAJOR 1 )
 set ( YM_VERSION_MINOR 0 )
-set ( YM_VERSION ${YM_VERSION_MAJOR}.${YM_VERSION_MINOR})
-project ( magus VERSION "${YM_VERSION}")
+set ( YM_VERSION ${YM_VERSION_MAJOR}.${YM_VERSION_MINOR} )
+project ( magus VERSION "${YM_VERSION}" )
 
 set ( YM_PROJECT_STRING "${PROJECT_NAME}-${PROJECT_VERSION}" )
 
@@ -102,7 +102,11 @@ ym_init_submodules (
 # インクルードパスの設定
 # ===================================================================
 
-include_directories( "${PROJECT_BINARY_DIR}" ${YM_SUBMODULE_INCLUDE_LIST} )
+include_directories(
+  include
+  ${PROJECT_BINARY_DIR}
+  ${YM_SUBMODULE_INCLUDE_LIST}
+  )
 
 
 # ===================================================================
@@ -124,18 +128,13 @@ add_subdirectory ( magus_tclsh )
 if (DOXYGEN_FOUND)
 
   # doxygen の対象となるヘッダファイル(のパタン)を YM_DOXY_SRCS に入れる．
-  set ( YM_DOXY_SRCS )
-  foreach ( dir
-      "${PROJECT_BINARY_DIR}/ym_config.h"
-      "${PROJECT_BINARY_DIR}/magus.h"
-      "${PROJECT_SOURCE_DIR}/etc/mainpage.h"
-      )
-    list ( APPEND YM_DOXY_SRCS ${dir} )
-  endforeach ()
-  foreach ( dir ${YM_SUBMODULE_LIST} )
-    list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/${dir}/include" )
-  endforeach ()
-  list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_core/include" )
+  set ( YM_DOXY_SRCS
+    ${PROJECT_BINARY_DIR}/ym_config.h
+    ${PROJECT_BINARY_DIR}/magus.h
+    ${PROJECT_SOURCE_DIR}/etc/mainpage.h
+    ${PROJECT_SOURCE_DIR}/include
+    ${YM_SUBMODULE_INCLUDE_LIST}
+    )
   #list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_tclsh/include" )
 
   ym_add_doxygen ()

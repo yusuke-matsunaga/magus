@@ -21,16 +21,19 @@
 //////////////////////////////////////////////////////////////////////
 
 /// @brief プロジェクトの major バージョン
-#define MAGUS_VERSION_MAJIR @VERSION_MAJOR@
+#define MAGUS_VERSION_MAJIR @PROJECT_VERSION_MAJOR@
 
 /// @brief プロジェクトの minor バージョン
-#define MAGUS_VERSION_MINOR @VERSION_MINOR@
+#define MAGUS_VERSION_MINOR @PROJECT_VERSION_MINOR@
 
 /// @brief プロジェクトのバージョン
-#define MAGUS_VERSION @VERSION@
+#define MAGUS_VERSION @PROJECT_VERSION@
 
 /// @brief プロジェクトのバージョンの文字列
-#define MAGUS_VERSION_STR "@VERSION@"
+#define MAGUS_VERSION_STR "@PROJECT_VERSION@"
+
+/// @brief バージョン付きのプロジェクト名の文字列
+#define MAGUS_PROJECT_STR "@YM_PROJECT_STRING@"
 
 
 //////////////////////////////////////////////////////////////////////
