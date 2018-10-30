@@ -93,7 +93,6 @@ ym_init_submodules (
   ym-logic
   ym-mvn
   ym-sat
-  ym-tclpp
   ym-verilog
   )
 
@@ -103,9 +102,8 @@ ym_init_submodules (
 # ===================================================================
 
 include_directories(
-  include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}
-  ${YM_SUBMODULE_INCLUDE_LIST}
   )
 
 
@@ -116,6 +114,8 @@ include_directories(
 foreach ( dir ${YM_SUBMODULE_LIST} )
   add_subdirectory ( ${dir} )
 endforeach ()
+
+add_subdirectory ( ym-tclpp )
 
 add_subdirectory ( magus_core )
 add_subdirectory ( magus_tclsh )

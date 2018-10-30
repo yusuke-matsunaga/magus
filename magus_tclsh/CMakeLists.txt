@@ -3,7 +3,9 @@
 # インクルードパスの設定
 # ===================================================================
 include_directories (
-  include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${YM_SUBMODULE_INCLUDE_LIST}
+  ${PROJECT_SOURCE_DIR}/ym-tclpp/include
   ${TCL_INCLUDE_PATH}
   )
 
@@ -116,6 +118,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:magus_lutmap_a>
   $<TARGET_OBJECTS:magus_cellmap_a>
   $<TARGET_OBJECTS:magus_sbjgraph_a>
+  $<TARGET_OBJECTS:ym_tclpp_a>
   ${YM_SUBMODULE_OBJ_A_LIST}
   )
 
@@ -160,6 +163,7 @@ add_executable (magus_tclsh_p
   $<TARGET_OBJECTS:magus_lutmap_p>
   $<TARGET_OBJECTS:magus_cellmap_p>
   $<TARGET_OBJECTS:magus_sbjgraph_p>
+  $<TARGET_OBJECTS:ym_tclpp_p>
   ${YM_SUBMODULE_OBJ_P_LIST}
   )
 
@@ -204,6 +208,7 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:magus_lutmap_d>
   $<TARGET_OBJECTS:magus_cellmap_d>
   $<TARGET_OBJECTS:magus_sbjgraph_d>
+  $<TARGET_OBJECTS:ym_tclpp_d>
   ${YM_SUBMODULE_OBJ_AD_LIST}
   )
 
