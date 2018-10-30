@@ -3,6 +3,7 @@
 # インクルードパスの設定
 # ===================================================================
 include_directories (
+  ${PROJECT_BINARY_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${YM_SUBMODULE_INCLUDE_LIST}
   ${PROJECT_SOURCE_DIR}/ym-tclpp/include

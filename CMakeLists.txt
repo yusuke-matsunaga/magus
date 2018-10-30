@@ -57,7 +57,7 @@ ym_use_gtest ()
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/etc/magus.h.in"
-  "${PROJECT_BINARY_DIR}/magus.h"
+  "${PROJECT_BINARY_DIR}/include/magus.h"
   )
 
 
@@ -102,8 +102,8 @@ ym_init_submodules (
 # ===================================================================
 
 include_directories(
+  ${PROJECT_BINARY_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${PROJECT_BINARY_DIR}
   )
 
 
@@ -129,9 +129,8 @@ if (DOXYGEN_FOUND)
 
   # doxygen の対象となるヘッダファイル(のパタン)を YM_DOXY_SRCS に入れる．
   set ( YM_DOXY_SRCS
-    ${PROJECT_BINARY_DIR}/ym_config.h
-    ${PROJECT_BINARY_DIR}/magus.h
     ${PROJECT_SOURCE_DIR}/etc/mainpage.h
+    ${PROJECT_BINARY_DIR}/include
     ${PROJECT_SOURCE_DIR}/include
     ${YM_SUBMODULE_INCLUDE_LIST}
     )
