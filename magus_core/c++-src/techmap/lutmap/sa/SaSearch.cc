@@ -71,12 +71,14 @@ SaSearch::search(ymuint search_limit,
 {
   mVerbose = verbose;
   ymuint nf = mFanoutPointList.size();
+  std::uniform_int_distribution<int> rd(0, nf - 1);
+  std::uniform_real_distribution<double> rd_real1(0, 1.0);
   vector<bool> state(nf, false);
   ymuint prev_val = evaluate(state);
   for (double T = mInitTemp; T > mEndTemp; T = T * mDecrement) {
     ymuint n_acc = 0;
     for (mNumAll = 1; mNumAll <= search_limit; ++ mNumAll) {
-      ymuint pos = mRandGen.int32() % nf;
+      int pos = rd(mRandGen);
       state[pos] = !state[pos];
       ymuint val = evaluate(state);
       if ( mVerbose ) {
@@ -87,7 +89,7 @@ SaSearch::search(ymuint search_limit,
 	int dint = prev_val - val;
 	double d = static_cast<double>(dint);
 	double t = exp(d / T);
-	double r = mRandGen.real1();
+	double r = rd_real1(mRandGen);
 	if ( r > t ) {
 	  state[pos] = !state[pos];
 	}

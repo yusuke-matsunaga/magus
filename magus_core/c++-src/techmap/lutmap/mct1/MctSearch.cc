@@ -108,8 +108,9 @@ MctSearch::default_policy(MctNode* node)
     }
 
 #if UNIFORM_SAMPLING
-    ymuint n = cut_list.size();
-    ymuint r = rg.int32() % n;
+    int n = cut_list.size();
+    std::uniform_int_distribution<int> rd(0, n - 1);
+    int r = rd(mRandGen);
     const SbjNode* root = cut_list[r];
     move(root);
 #else
@@ -123,8 +124,9 @@ MctSearch::default_policy(MctNode* node)
       sum += w;
       acc_w[i] = sum;
     }
-    ymuint r = mRandGen.int32() % sum;
-    ymuint pos = 0;
+    std::uniform_int_distribution<int> rd(0, sum - 1);
+    int r = rd(mRandGen);
+    int pos = 0;
     for ( ; pos < n; ++ pos) {
       if ( r < acc_w[pos] ) {
 	break;

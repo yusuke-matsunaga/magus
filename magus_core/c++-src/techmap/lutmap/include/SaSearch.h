@@ -12,7 +12,7 @@
 #include "lutmap.h"
 #include "AreaCover.h"
 #include "MapRecord.h"
-#include "ym/RandGen.h"
+#include <random>
 
 
 BEGIN_NAMESPACE_LUTMAP
@@ -118,7 +118,7 @@ private:
   MapRecord mBestRecord;
 
   // 乱数発生器
-  RandGen mRandGen;
+  std::mt19937 mRandGen;
 
   // verbose フラグ
   bool mVerbose;

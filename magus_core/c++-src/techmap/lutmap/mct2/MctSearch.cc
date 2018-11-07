@@ -209,7 +209,8 @@ MctSearch::default_policy(MctNode* node)
       else {
 	int delta = lut_num - lut_num1;
 	double t = exp(delta);
-	double r = mRandGen.real1();
+	std::uniform_real_distribution<double> rd(0, 1.0);
+	double r = rd(mRandGen);
 	if ( r < t ) {
 	  // 受け入れる．
 	  lut_num = lut_num1;
@@ -219,7 +220,8 @@ MctSearch::default_policy(MctNode* node)
 	}
       }
       old_state = state;
-      ymuint pos = mRandGen.int32() % (nf - mState.index());
+      std::uniform_int_distribution rd(0, nf - mState.index() - 1);
+      int pos = rd(mRandGen);
       state[pos] = !state[pos + mState.index()];
     }
   }
@@ -252,7 +254,8 @@ MctSearch::default_policy(MctNode* node)
     double ratio = 1.0 / (1U << (ni - 1));
 #endif
 #endif
-    double r = mRandGen.real1();
+    std::uniform_real_distribution<double> rd(0, 1.0);
+    double r = rd(mRandGen);
     const SbjNode* fanout_node = mFanoutPointList[index];
     if ( r > ratio ) {
       mState.add_boundary(fanout_node);
@@ -272,7 +275,8 @@ MctSearch::default_policy(MctNode* node)
   MapRecord record;
   if ( idx < nf ) {
     vector<const SbjNode*> boundary_list = mState.boundary_list();
-    ymuint pos = mRandGen.int32() % nf;
+    std::uniform_int_distribution<int> rd(0, nf - 1);
+    int pos = rd(mRandGen);
     if ( pos > idx ) {
       const SbjNode* node = mFanoutPointList[pos];
       boundary_list.push_back(node);
