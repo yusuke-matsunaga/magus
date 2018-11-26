@@ -63,53 +63,52 @@ MapGen::generate(const SbjGraph& sbjgraph,
   mMapReqList.reserve(sbjgraph.output_num());
 
   // ポートの生成
-  ymuint np = sbjgraph.port_num();
-  for (ymuint i = 0; i < np; ++ i) {
+  int np = sbjgraph.port_num();
+  for ( int i = 0; i < np; ++ i ) {
     const SbjPort* sbjport = sbjgraph.port(i);
     gen_port(sbjport);
   }
 
   // D-FF の生成
-  ymuint n_dff = sbjgraph.dff_num();
-  for (ymuint i = 0; i < n_dff; ++ i) {
+  int n_dff = sbjgraph.dff_num();
+  for ( int i = 0; i < n_dff; ++ i ) {
     const SbjDff* sbj_dff = sbjgraph.dff(i);
     gen_dff(sbj_dff, record);
   }
 
   // ラッチの生成
-  ymuint n_latch = sbjgraph.latch_num();
-  for (ymuint i = 0; i < n_latch; ++ i) {
+  int n_latch = sbjgraph.latch_num();
+  for ( int i = 0; i < n_latch; ++ i ) {
     const SbjLatch* sbj_latch = sbjgraph.latch(i);
     gen_latch(sbj_latch);
   }
 
   // 組み合わせ回路の出力からバックトレースを行い全ノードの生成を行う．
-  for (vector<MapReq>::iterator p = mMapReqList.begin();
-       p != mMapReqList.end(); ++ p) {
-    const SbjNode* onode = p->mNode;
-    bool ext_inv = p->mInv;
+  for ( const auto& rec: mMapReqList ) {
+    const SbjNode* onode = rec.mNode;
+    bool ext_inv = rec.mInv;
     const SbjNode* node = onode->fanin(0);
     bool inv = onode->output_fanin_inv() ^ ext_inv;
-    ymuint mapnode = 0;
+    int mapnode = 0;
     if ( node ) {
       mapnode = back_trace(node, inv, record);
     }
     else {
-      ymuint node_id = 0;
+      int node_id = 0;
       if ( inv ) {
 	// 定数1ノードを作る．
-	const ClibCell* const1_cell = record.const1_cell();
-	ASSERT_COND( const1_cell != nullptr );
-	mapnode = mMapGraph->new_logic(string(), const1_cell->name());
+	int const1_cell = record.const1_cell();
+	ASSERT_COND( const1_cell != -1 );
+	mapnode = mMapGraph->new_logic(string(), const1_cell);
       }
       else {
 	// 定数0ノードを作る．
-	const ClibCell* const0_cell = record.const0_cell();
-	ASSERT_COND( const0_cell != nullptr );
-	mapnode = mMapGraph->new_logic(string(), const0_cell->name());
+	int const0_cell = record.const0_cell();
+	ASSERT_COND( const0_cell != -1 );
+	mapnode = mMapGraph->new_logic(string(), const0_cell);
       }
     }
-    ymuint omapnode = node_info(onode, false).mMapNode;
+    int omapnode = node_info(onode, false).mMapNode;
     mMapGraph->connect(mapnode, omapnode, 0);
   }
 }
@@ -118,9 +117,9 @@ MapGen::generate(const SbjGraph& sbjgraph,
 void
 MapGen::gen_port(const SbjPort* sbj_port)
 {
-  ymuint nb = sbj_port->bit_width();
+  int nb = sbj_port->bit_width();
   vector<int> iovect(nb);
-  for (ymuint i = 0; i < nb; ++ i) {
+  for ( int i = 0; i < nb; ++ i ) {
     const SbjNode* sbj_node = sbj_port->bit(i);
     if ( sbj_node->is_input() ) {
       iovect[i] = 0;
@@ -151,22 +150,23 @@ void
 MapGen::gen_dff(const SbjDff* sbj_dff,
 		const MapRecord& record)
 {
-  const ClibCell* dff_cell0 = record.get_dff_cell(sbj_dff, false);
-  const ClibCell* dff_cell1 = record.get_dff_cell(sbj_dff, true);
-  const ClibCell* cell = nullptr;
+  int dff_cell0_id = record.get_dff_cell(sbj_dff, false);
+  int dff_cell1_id = record.get_dff_cell(sbj_dff, true);
+  int cell_id = -1;
   bool inv = false;
-  if ( dff_cell0 == nullptr ) {
-    if ( dff_cell1 == nullptr ) {
+  if ( dff_cell0_id == -1 ) {
+    if ( dff_cell1_id == -1 ) {
       ASSERT_NOT_REACHED;
     }
-    cell = dff_cell1;
+    cell_id = dff_cell1_id;
     inv = true;
   }
   else {
-    cell = dff_cell0;
+    cell_id = dff_cell0_id;
   }
-  ClibFFInfo ff_info = cell->ff_info();
-  int dff_id = mMapGraph->new_dff(string(), cell->name());
+  const ClibCell& cell = record.cell_library().cell(cell_id);
+  ClibFFInfo ff_info = cell.ff_info();
+  int dff_id = mMapGraph->new_dff(string(), cell_id);
   auto& dff = mMapGraph->dff(dff_id);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
@@ -243,10 +243,10 @@ MapGen::back_trace(const SbjNode* node,
 
   // node を根とするマッチを取り出す．
   const Cut& match = record.get_node_match(node, inv);
-  const ClibCell* cell = record.get_node_cell(node, inv);
+  int cell_id = record.get_node_cell(node, inv);
 
   // 新しいノードを作り mNodeMap に登録する．
-  mapnode = mMapGraph->new_logic(string(), cell->name());
+  mapnode = mMapGraph->new_logic(string(), cell_id);
   node_info.mMapNode = mapnode;
 
   int ni = match.leaf_num();

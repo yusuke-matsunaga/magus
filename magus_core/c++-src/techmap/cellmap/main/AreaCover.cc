@@ -12,10 +12,8 @@
 #include "ym/ClibCellLibrary.h"
 #include "ym/ClibPatGraph.h"
 #include "ym/ClibCellClass.h"
-#include "ym/ClibCellClassList.h"
 #include "ym/ClibCellGroup.h"
-#include "ym/ClibCellGroupList.h"
-#include "ym/ClibCellList.h"
+#include "ym/ClibObjList.h"
 #include "SbjGraph.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
@@ -59,7 +57,7 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
     SbjDumper::dump(cout, sbjgraph);
   }
 
-  MapRecord maprec;
+  MapRecord maprec(cell_library);
 
   maprec.init(sbjgraph);
 
@@ -70,17 +68,15 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
   record_cuts(sbjgraph, cell_library, maprec);
 
   // 定数０のセルを登録する．
-  const ClibCell* c0_cell = nullptr;
-  if ( cell_library.const0_func()->cell_list().num() > 0 ) {
-    c0_cell = cell_library.const0_func()->cell_list()[0];
-    maprec.set_const0(c0_cell);
+  if ( cell_library.const0_func().cell_list().num() > 0 ) {
+    const ClibCell& c0_cell = cell_library.const0_func().cell_list()[0];
+    maprec.set_const0(c0_cell.id());
   }
 
   // 定数１のセルを登録する．
-  const ClibCell* c1_cell = nullptr;
-  if ( cell_library.const1_func()->cell_list().num() > 0 ) {
-    c1_cell = cell_library.const1_func()->cell_list()[0];
-    maprec.set_const1(c1_cell);
+  if ( cell_library.const1_func().cell_list().num() > 0 ) {
+    const ClibCell& c1_cell = cell_library.const1_func().cell_list()[0];
+    maprec.set_const1(c1_cell.id());
   }
 
   // 最終的なネットワークを生成する．
@@ -110,33 +106,33 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
       has_preset = true;
     }
 
-    const ClibCell* min_cell = nullptr;
+    int min_cell_id = -1;
     ClibFFInfo min_pin_info;
     ClibArea min_area = ClibArea::infty();
-    const ClibCellClass* ff_class = cell_library.simple_ff_class(has_clear, has_preset);
-    if ( ff_class ) {
-      for ( auto ff_group: ff_class->group_list() ) {
-	for ( auto cell: ff_group->cell_list() ) {
-	  ClibArea area = cell->area();
+    const ClibCellClass& ff_class = cell_library.simple_ff_class(has_clear, has_preset);
+    if ( ff_class.group_list().num() > 0 ) {
+      for ( auto& ff_group: ff_class.group_list() ) {
+	for ( auto& cell: ff_group.cell_list() ) {
+	  ClibArea area = cell.area();
 	  if ( min_area > area ) {
 	    min_area = area;
-	    min_cell = cell;
-	    min_pin_info = ff_group->ff_info();
+	    min_cell_id = cell.id();
+	    min_pin_info = ff_group.ff_info();
 	  }
 	}
       }
     }
-    if ( min_cell != nullptr ) {
-      ff_info.mCell = min_cell;
+    if ( min_cell_id != -1 ) {
+      ff_info.mCellId = min_cell_id;
       ff_info.mPinInfo = min_pin_info;
     }
     else {
-      ff_info.mCell = nullptr;
+      ff_info.mCellId = -1;
     }
   }
 
-  ymuint ndff = sbjgraph.dff_num();
-  for (ymuint i = 0; i < ndff; ++ i) {
+  int ndff = sbjgraph.dff_num();
+  for ( int i = 0; i < ndff; ++ i ) {
     const SbjDff* dff = sbjgraph.dff(i);
     const SbjNode* clear = dff->clear();
     const SbjNode* preset = dff->preset();
@@ -155,12 +151,12 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
       xsig |= 1U;
     }
     FFInfo& ff_info1 = mFFInfo[sig];
-    if ( ff_info1.mCell != nullptr ) {
-      maprec.set_dff_match(dff, false, ff_info1.mCell);
+    if ( ff_info1.mCellId != -1 ) {
+      maprec.set_dff_match(dff, false, ff_info1.mCellId);
     }
     FFInfo& ff_info2 = mFFInfo[xsig];
-    if ( ff_info2.mCell != nullptr ) {
-      maprec.set_dff_match(dff, true, ff_info2.mCell);
+    if ( ff_info2.mCellId != -1 ) {
+      maprec.set_dff_match(dff, true, ff_info2.mCellId);
     }
   }
 }
@@ -174,18 +170,18 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 		       const ClibCellLibrary& cell_library,
 		       MapRecord& maprec)
 {
-  ymuint n = sbjgraph.node_num();
+  int n = sbjgraph.node_num();
   mCostArray.resize(n * 2);
-  ymuint max_input = cell_library.pg_max_input();
+  int max_input = cell_library.pg_max_input();
   mWeight.resize(max_input);
   mLeafNum.clear();
   mLeafNum.resize(n, -1);
 
-  const ClibCellGroup* inv_func = cell_library.inv_func();
+  const ClibCellGroup& inv_func = cell_library.inv_func();
 
   // 入力のコストを設定
-  ymuint ni = sbjgraph.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
+  int ni = sbjgraph.input_num();
+  for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* node = sbjgraph.input(i);
     ASSERT_COND( node->is_input() );
     double& p_cost = cost(node, false);
@@ -213,9 +209,9 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
   // 論理ノードのコストを入力側から計算
   PatMatcher pat_match(cell_library);
-  ymuint np = cell_library.pg_pat_num();
-  ymuint nl = sbjgraph.logic_num();
-  for (ymuint i = 0; i < nl; ++ i) {
+  int np = cell_library.pg_pat_num();
+  int nl = sbjgraph.logic_num();
+  for ( int i = 0; i < nl; ++ i ) {
     const SbjNode* node = sbjgraph.logic(i);
     if ( debug ) {
       cout << endl
@@ -225,24 +221,24 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
     double& n_cost = cost(node, true);
     p_cost = DBL_MAX;
     n_cost = DBL_MAX;
-    for (ymuint pat_id = 0; pat_id < np; ++ pat_id) {
+    for ( int pat_id = 0; pat_id < np; ++ pat_id ) {
       const ClibPatGraph& pat = cell_library.pg_pat(pat_id);
-      ymuint ni = pat.input_num();
+      int ni = pat.input_num();
       Cut cut(ni);
       if ( pat_match(node, pat, cut) ) {
-	ymuint rep_id = pat.rep_id();
+	int rep_id = pat.rep_id();
 	if ( debug ) {
 	  cout << "Match with Pat#" << pat_id
 	       << ", Rep#" << rep_id << endl;
 	}
-	const ClibCellClass* rep = cell_library.npn_class_list()[rep_id];
-	for ( auto group: rep->group_list() ) {
-	  const NpnMapM& npn_map = group->map();
+	const ClibCellClass& rep = cell_library.npn_class_list()[rep_id];
+	for ( auto& group: rep.group_list() ) {
+	  const NpnMapM& npn_map = group.map();
 	  Cut c_cut(ni);
-	  for (ymuint i = 0; i < ni; ++ i) {
+	  for ( int i = 0; i < ni; ++ i ) {
 	    NpnVmap imap = npn_map.imap(VarId(i));
 	    VarId dst_var = imap.var();
-	    ymuint pos = dst_var.val();
+	    int pos = dst_var.val();
 	    const SbjNode* inode = cut.leaf_node(pos);
 	    bool iinv = cut.leaf_inv(pos);
 	    if ( imap.inv() ) {
@@ -256,9 +252,9 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	    root_inv = !root_inv;
 	  }
 	  if ( debug ) {
-	    cout << "  Group#" << group->id() << endl
+	    cout << "  Group#" << group.id() << endl
 		 << "    Root_inv = " << root_inv << endl;
-	    for (ymuint i = 0; i < ni; ++ i) {
+	    for ( int i = 0; i < ni; ++ i ) {
 	      cout << "    Leaf#" << i << ": ";
 	      if ( c_cut.leaf_inv(i) ) {
 		cout << "~";
@@ -269,30 +265,30 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
 	  double& c_cost = root_inv ? n_cost : p_cost;
 
-	  for (ymuint i = 0; i < ni; ++ i) {
+	  for ( int i = 0; i < ni; ++ i ) {
 	    mWeight[i] = 0.0;
 	  }
 	  calc_weight(node, 1.0);
-	  for (ymuint i = 0; i < ni; ++ i) {
+	  for ( int i = 0; i < ni; ++ i ) {
 	    mLeafNum[c_cut.leaf_node(i)->id()] = -1;
 	  }
 
 	  double leaf_cost = 0.0;
-	  for (ymuint i = 0; i < ni; ++ i) {
+	  for ( int i = 0; i < ni; ++ i ) {
 	    const SbjNode* leaf_node = c_cut.leaf_node(i);
 	    bool leaf_inv = c_cut.leaf_inv(i);
 	    leaf_cost += cost(leaf_node, leaf_inv) * mWeight[i];
 	  }
 
-	  for ( auto cell: group->cell_list() ) {
-	    double cur_cost = cell->area().value() + leaf_cost;
+	  for ( auto& cell: group.cell_list() ) {
+	    double cur_cost = cell.area().value() + leaf_cost;
 	    if ( debug ) {
-	      cout << "      Cell = " << cell->name()
+	      cout << "      Cell = " << cell.name()
 		   << ", cost = " << cur_cost << endl;
 	    }
 	    if ( c_cost >= cur_cost ) {
 	      c_cost = cur_cost;
-	      maprec.set_logic_match(node, root_inv, c_cut, cell);
+	      maprec.set_logic_match(node, root_inv, c_cut, cell.id());
 	    }
 	  }
 	}
@@ -321,7 +317,7 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 void
 AreaCover::add_inv(const SbjNode* node,
 		   bool inv,
-		   const ClibCellGroup* inv_func,
+		   const ClibCellGroup& inv_func,
 		   MapRecord& maprec)
 {
   if ( maprec.get_node_match(node, !inv).leaf_num() == 1 ) {
@@ -331,20 +327,20 @@ AreaCover::add_inv(const SbjNode* node,
 
   double& cur_cost = cost(node, inv);
   double alt_cost = cost(node, !inv);
-  const ClibCell* inv_cell = nullptr;
+  int inv_cell_id = -1;
   double min_cost = DBL_MAX;
-  for ( auto cell: inv_func->cell_list() ) {
-    double cost = cell->area().value();
+  for ( auto& cell: inv_func.cell_list() ) {
+    double cost = cell.area().value();
     if ( min_cost > cost ) {
       min_cost = cost;
-      inv_cell = cell;
+      inv_cell_id = cell.id();
     }
   }
-  ASSERT_COND( inv_cell );
+  ASSERT_COND( inv_cell_id != -1 );
   min_cost += alt_cost;
   if ( cur_cost > min_cost ) {
     cur_cost = min_cost;
-    maprec.set_inv_match(node, inv, inv_cell);
+    maprec.set_inv_match(node, inv, inv_cell_id);
   }
 }
 

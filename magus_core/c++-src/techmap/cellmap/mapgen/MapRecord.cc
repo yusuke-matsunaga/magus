@@ -21,13 +21,17 @@
 BEGIN_NAMESPACE_CELLMAP
 
 // コンストラクタ
-MapRecord::MapRecord()
+// @param[in] library セルライブラリ
+MapRecord::MapRecord(const ClibCellLibrary& library) :
+  mCellLibrary(library)
 {
 }
 
 // @brief コピーコンストラクタ
 MapRecord::MapRecord(const MapRecord& src) :
-  mConst0(src.mConst0),
+  mCellLibrary(src.mCellLibrary),
+  mConst0Id(src.mConst0Id),
+  mConst1Id(src.mConst1Id),
   mDffInfo(src.mDffInfo),
   mLatchInfo(src.mLatchInfo),
   mNodeInfo(src.mNodeInfo)
@@ -54,16 +58,16 @@ MapRecord::init(const SbjGraph& sbjgraph)
 
 // @brief 定数０セルをセットする．
 void
-MapRecord::set_const0(const ClibCell* cell)
+MapRecord::set_const0(int cell_id)
 {
-  mConst0 = cell;
+  mConst0Id = cell_id;
 }
 
 // @brief 定数1セルをセットする．
 void
-MapRecord::set_const1(const ClibCell* cell)
+MapRecord::set_const1(int cell_id)
 {
-  mConst1 = cell;
+  mConst1Id = cell_id;
 }
 
 // @brief D-FF のマッチを記録する．
@@ -73,10 +77,10 @@ MapRecord::set_const1(const ClibCell* cell)
 void
 MapRecord::set_dff_match(const SbjDff* dff,
 			 bool inv,
-			 const ClibCell* cell)
+			 int cell_id)
 {
-  ymuint offset = inv ? 1 : 0;
-  mDffInfo[dff->id() * 2 + offset] = cell;
+  int offset = inv ? 1 : 0;
+  mDffInfo[dff->id() * 2 + offset] = cell_id;
 }
 
 // @brief ラッチのマッチを記録する．
@@ -86,10 +90,10 @@ MapRecord::set_dff_match(const SbjDff* dff,
 void
 MapRecord::set_latch_match(const SbjLatch* latch,
 			   bool inv,
-			   const ClibCell* cell)
+			   int cell_id)
 {
-  ymuint offset = inv ? 1 : 0;
-  mLatchInfo[latch->id() * 2 + offset] = cell;
+  int offset = inv ? 1 : 0;
+  mLatchInfo[latch->id() * 2 + offset] = cell_id;
 }
 
 // @brief 論理ゲートのマッチを記録する．
@@ -101,11 +105,11 @@ void
 MapRecord::set_logic_match(const SbjNode* node,
 			   bool inv,
 			   const Cut& match,
-			   const ClibCell* cell)
+			   int cell_id)
 {
   NodeInfo& node_info = _node_info(node, inv);
   node_info.mMatch = match;
-  node_info.mCell = cell;
+  node_info.mCellId = cell_id;
 }
 
 // @brief インバータのマッチを記録する．
@@ -115,12 +119,12 @@ MapRecord::set_logic_match(const SbjNode* node,
 void
 MapRecord::set_inv_match(const SbjNode* node,
 			 bool inv,
-			 const ClibCell* cell)
+			 int cell_id)
 {
   NodeInfo& node_info = _node_info(node, inv);
   node_info.mMatch.resize(1);
   node_info.mMatch.set_leaf(0, node, !inv);
-  node_info.mCell = cell;
+  node_info.mCellId = cell_id;
 }
 
 END_NAMESPACE_CELLMAP

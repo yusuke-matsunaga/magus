@@ -78,7 +78,7 @@ private:
   void
   add_inv(const SbjNode* node,
 	  bool inv,
-	  const ClibCellGroup* inv_func,
+	  const ClibCellGroup& inv_func,
 	  MapRecord& maprec);
 
   /// @brief node から各入力にいたる経路の重みを計算する．
@@ -101,12 +101,9 @@ private:
 
   struct FFInfo
   {
-    FFInfo() :
-      mCell(nullptr)
-    {
-    }
+    FFInfo() : mCellId{-1} { }
 
-    const ClibCell* mCell;
+    int mCellId;
     ClibFFInfo mPinInfo;
   };
 
