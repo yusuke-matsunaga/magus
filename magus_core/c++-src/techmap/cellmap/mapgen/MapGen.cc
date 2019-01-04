@@ -14,6 +14,7 @@
 #include "ym/BnPort.h"
 #include "ym/BnDff.h"
 #include "ym/BnNode.h"
+#include "ym/ClibCellLibrary.h"
 #include "ym/ClibCell.h"
 #include "ym/ClibCellPin.h"
 #include "ym/Expr.h"
