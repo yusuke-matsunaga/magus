@@ -360,31 +360,27 @@ MapGen::gen_back_trace(const SbjNode* node,
   }
   ++ depth;
 
-  // カットの実現している関数の真理値表を得る．
+  // ファンインの極性とファンインのノード番号のリストを作る．
   // 上のループで input_inv の設定を行うこともできるがそうすると
   // gen_back_trace() の再帰のたびにスタック上に input_inv が作られる
   // ことになるのであえてここで行う．
   vector<bool> input_inv(ni, false);
+  vector<int> fanin_id_list(ni);
   for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
     const NodeInfo& inode_info = mNodeInfo[inode->id()];
-    input_inv[i] = inode_info.inv_req();
+    bool iinv = inode_info.inv_req();
+    input_inv[i] = iinv;
+    fanin_id_list[i] = inode_info.map_node(iinv);
   }
+
+  // カットの実現している関数の真理値表を得る．
   TvFunc tv = cut->make_tv(output_inv, input_inv);
 
   // 新しいノードを作る．
-  node_id = mapnetwork.new_logic(string(), tv);
+  node_id = mapnetwork.new_logic(string(), tv, fanin_id_list);
 
   ++ mLutNum;
-
-  // 入力側のノードとの接続を行う．
-  for ( int i = 0; i < ni; ++ i ) {
-    const SbjNode* inode = cut->input(i);
-    const NodeInfo& inode_info = mNodeInfo[inode->id()];
-    int iinv = inode_info.inv_req();
-    int src_id = inode_info.map_node(iinv);
-    mapnetwork.connect(src_id, node_id, i);
-  }
 
   // マップ結果をセットする．
   node_info.set_map(node_id, depth, output_inv);
