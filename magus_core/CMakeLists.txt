@@ -111,5 +111,5 @@ add_custom_command (
 # ===================================================================
 
 install ( TARGETS magus_core
-  DESTINATION "${YM_PYTHON_LIBDIR}"
+  DESTINATION "${YM_MAGUS_PKGDIR}"
   )
