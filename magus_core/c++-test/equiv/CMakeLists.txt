@@ -24,13 +24,8 @@ include_directories(
 
 add_executable ( equiv_test
   equiv_test.cc
-  $<TARGET_OBJECTS:magus_equiv_ad>
-  $<TARGET_OBJECTS:ym_base_ad>
-  $<TARGET_OBJECTS:ym_logic_ad>
-  $<TARGET_OBJECTS:ym_sat_ad>
-  $<TARGET_OBJECTS:ym_cell_ad>
-  $<TARGET_OBJECTS:ym_bnet_ad>
-  $<TARGET_OBJECTS:ym_fraig_ad>
+  $<TARGET_OBJECTS:magus_equiv_obj_ad>
+  ${YM_SUBMODULE_OBJ_AD_LIST}
   )
 
 target_compile_options ( equiv_test

@@ -54,10 +54,10 @@ set_source_files_properties (
 list ( REMOVE_ITEM YM_SUBMODULE_OBJ_LIST "$<TARGET_OBJECTS:ym_tclpp>" )
 cython_add_module ( magus_core
   ${CYTHON_SOURCES}
-  $<TARGET_OBJECTS:magus_equiv>
-  $<TARGET_OBJECTS:magus_cellmap>
-  $<TARGET_OBJECTS:magus_lutmap>
-  $<TARGET_OBJECTS:magus_sbjgraph>
+  $<TARGET_OBJECTS:magus_equiv_obj>
+  $<TARGET_OBJECTS:magus_cellmap_obj>
+  $<TARGET_OBJECTS:magus_lutmap_obj>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj>
   ${YM_SUBMODULE_OBJ_LIST}
   )
 
@@ -77,10 +77,10 @@ target_link_libraries ( magus_core
 list ( REMOVE_ITEM YM_SUBMODULE_OBJ_D_LIST "$<TARGET_OBJECTS:ym_tclpp_d>" )
 cython_add_module ( magus_core_d
   ${CYTHON_SOURCES}
-  $<TARGET_OBJECTS:magus_equiv_d>
-  $<TARGET_OBJECTS:magus_cellmap_d>
-  $<TARGET_OBJECTS:magus_lutmap_d>
-  $<TARGET_OBJECTS:magus_sbjgraph_d>
+  $<TARGET_OBJECTS:magus_equiv_obj_d>
+  $<TARGET_OBJECTS:magus_cellmap_obj_d>
+  $<TARGET_OBJECTS:magus_lutmap_obj_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
   )
 

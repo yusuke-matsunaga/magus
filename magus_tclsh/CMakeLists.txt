@@ -113,13 +113,13 @@ add_executable (magus_tclsh
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
-  $<TARGET_OBJECTS:magus_equiv_a>
-  $<TARGET_OBJECTS:magus_sbjgraph_a>
+  $<TARGET_OBJECTS:magus_equiv_obj_a>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_a>
 #  $<TARGET_OBJECTS:magus_seal_a>
-  $<TARGET_OBJECTS:magus_lutmap_a>
-  $<TARGET_OBJECTS:magus_cellmap_a>
-  $<TARGET_OBJECTS:magus_sbjgraph_a>
-  $<TARGET_OBJECTS:ym_tclpp_a>
+  $<TARGET_OBJECTS:magus_lutmap_obj_a>
+  $<TARGET_OBJECTS:magus_cellmap_obj_a>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_a>
+  $<TARGET_OBJECTS:ym_tclpp_obj_a>
   ${YM_SUBMODULE_OBJ_A_LIST}
   )
 
@@ -158,13 +158,13 @@ add_executable (magus_tclsh_p
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
-  $<TARGET_OBJECTS:magus_equiv_p>
-  $<TARGET_OBJECTS:magus_sbjgraph_p>
-#  $<TARGET_OBJECTS:magus_seal_p>
-  $<TARGET_OBJECTS:magus_lutmap_p>
-  $<TARGET_OBJECTS:magus_cellmap_p>
-  $<TARGET_OBJECTS:magus_sbjgraph_p>
-  $<TARGET_OBJECTS:ym_tclpp_p>
+  $<TARGET_OBJECTS:magus_equiv_obj_p>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_p>
+#  $<TARGET_OBJECTS:magus_seal_obj_p>
+  $<TARGET_OBJECTS:magus_lutmap_obj_p>
+  $<TARGET_OBJECTS:magus_cellmap_obj_p>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_p>
+  $<TARGET_OBJECTS:ym_tclpp_obj_p>
   ${YM_SUBMODULE_OBJ_P_LIST}
   )
 
@@ -203,13 +203,13 @@ add_executable (magus_tclsh_d
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
-  $<TARGET_OBJECTS:magus_equiv_d>
-  $<TARGET_OBJECTS:magus_sbjgraph_d>
+  $<TARGET_OBJECTS:magus_equiv_obj_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
 #  $<TARGET_OBJECTS:magus_seal_d>
-  $<TARGET_OBJECTS:magus_lutmap_d>
-  $<TARGET_OBJECTS:magus_cellmap_d>
-  $<TARGET_OBJECTS:magus_sbjgraph_d>
-  $<TARGET_OBJECTS:ym_tclpp_d>
+  $<TARGET_OBJECTS:magus_lutmap_obj_d>
+  $<TARGET_OBJECTS:magus_cellmap_obj_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
+  $<TARGET_OBJECTS:ym_tclpp_obj_ad>
   ${YM_SUBMODULE_OBJ_AD_LIST}
   )
 

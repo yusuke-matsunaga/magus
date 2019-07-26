@@ -25,12 +25,8 @@ include_directories(
 
 add_executable( read_blif
   read_blif.cc
-  $<TARGET_OBJECTS:magus_sbjgraph_ad>
-  $<TARGET_OBJECTS:ym_bnet_ad>
-  $<TARGET_OBJECTS:ym_cell_ad>
-  $<TARGET_OBJECTS:ym_sat_ad>
-  $<TARGET_OBJECTS:ym_logic_ad>
-  $<TARGET_OBJECTS:ym_base_ad>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_ad>
+  ${YM_SUBMODULE_OBJ_AD_LIST}
   )
 
 target_compile_options( read_blif
@@ -48,20 +44,12 @@ target_link_libraries( read_blif
 
 ym_add_gtest( SbjNodeTest
   SbjNodeTest.cc
-  $<TARGET_OBJECTS:magus_sbjgraph_ad>
-  $<TARGET_OBJECTS:ym_bnet_ad>
-  $<TARGET_OBJECTS:ym_cell_ad>
-  $<TARGET_OBJECTS:ym_sat_ad>
-  $<TARGET_OBJECTS:ym_logic_ad>
-  $<TARGET_OBJECTS:ym_base_ad>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_ad>
+  ${YM_SUBMODULE_OBJ_AD_LIST}
   )
 
 ym_add_gtest( SbjHandleTest
   SbjHandleTest.cc
-  $<TARGET_OBJECTS:magus_sbjgraph_ad>
-  $<TARGET_OBJECTS:ym_bnet_ad>
-  $<TARGET_OBJECTS:ym_cell_ad>
-  $<TARGET_OBJECTS:ym_sat_ad>
-  $<TARGET_OBJECTS:ym_logic_ad>
-  $<TARGET_OBJECTS:ym_base_ad>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_ad>
+  ${YM_SUBMODULE_OBJ_AD_LIST}
   )

@@ -39,7 +39,7 @@ list ( APPEND CMAKE_MODULE_PATH
 include (YmUtils)
 
 ym_init ("")
-ym_init_python ()
+ym_init_python ( REQUIRED )
 ym_init_cython ()
 ym_init_doxygen ()
 ym_init_gperftools ()
@@ -68,17 +68,15 @@ configure_file(
 # スクリプトファイルの生成
 # ===================================================================
 
-if ( PYTHONINTERP_FOUND )
-  configure_file(
-    "${PROJECT_SOURCE_DIR}/etc/ym_python.in"
-    "${PROJECT_BINARY_DIR}/ym_python"
-    @ONLY
-    )
+configure_file(
+  "${PROJECT_SOURCE_DIR}/etc/ym_python.in"
+  "${PROJECT_BINARY_DIR}/ym_python"
+  @ONLY
+  )
 
-  install ( PROGRAMS ${PROJECT_BINARY_DIR}/ym_python
-    DESTINATION bin
-    )
-endif ()
+install ( PROGRAMS ${PROJECT_BINARY_DIR}/ym_python
+  DESTINATION bin
+  )
 
 
 # ===================================================================
@@ -87,7 +85,7 @@ endif ()
 
 ym_init_submodules (
   ym-base
-  #  "ym-bfo
+  #  ym-bfo
   ym-bnet
   ym-cell
   ym-combopt
