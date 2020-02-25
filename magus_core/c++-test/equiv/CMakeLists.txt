@@ -24,8 +24,8 @@ include_directories(
 
 add_executable ( equiv_test
   equiv_test.cc
-  $<TARGET_OBJECTS:magus_equiv_obj_ad>
-  ${YM_SUBMODULE_OBJ_AD_LIST}
+  $<TARGET_OBJECTS:magus_equiv_obj_d>
+  ${YM_SUBMODULE_OBJ_D_LIST}
   )
 
 target_compile_options ( equiv_test

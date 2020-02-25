@@ -113,13 +113,13 @@ add_executable (magus_tclsh
 #  ${seal_SOURCES}
   ${simplify_SOURCES}
   ${techmap_SOURCES}
-  $<TARGET_OBJECTS:magus_equiv_obj_a>
-  $<TARGET_OBJECTS:magus_sbjgraph_obj_a>
-#  $<TARGET_OBJECTS:magus_seal_a>
-  $<TARGET_OBJECTS:magus_lutmap_obj_a>
-  $<TARGET_OBJECTS:magus_cellmap_obj_a>
-  $<TARGET_OBJECTS:magus_sbjgraph_obj_a>
-  $<TARGET_OBJECTS:ym_tclpp_obj_a>
+  $<TARGET_OBJECTS:magus_equiv_obj>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj>
+#  $<TARGET_OBJECTS:magus_seal>
+  $<TARGET_OBJECTS:magus_lutmap_obj>
+  $<TARGET_OBJECTS:magus_cellmap_obj>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj>
+  $<TARGET_OBJECTS:ym_tclpp_obj>
   ${YM_SUBMODULE_OBJ_A_LIST}
   )
 
@@ -209,8 +209,8 @@ add_executable (magus_tclsh_d
   $<TARGET_OBJECTS:magus_lutmap_obj_d>
   $<TARGET_OBJECTS:magus_cellmap_obj_d>
   $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
-  $<TARGET_OBJECTS:ym_tclpp_obj_ad>
-  ${YM_SUBMODULE_OBJ_AD_LIST}
+  $<TARGET_OBJECTS:ym_tclpp_obj_d>
+  ${YM_SUBMODULE_OBJ_D_LIST}
   )
 
 target_compile_options (magus_tclsh_d
