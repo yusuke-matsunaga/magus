@@ -9,7 +9,6 @@
 
 #include "DumpLibrary.h"
 #include "ym/ClibCellLibrary.h"
-#include "ym/FileODO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -30,7 +29,7 @@ DumpLibrary::~DumpLibrary()
 int
 DumpLibrary::cmd_proc(TclObjVector& objv)
 {
-  ymuint objc = objv.size();
+  int objc = objv.size();
   if ( objc != 2 ) {
     print_usage();
     return TCL_ERROR;
@@ -44,8 +43,8 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     // ファイル名文字列の中に誤り
     return TCL_ERROR;
   }
-  FileODO bo;
-  if ( !bo.open(ex_name) ) {
+  ofstream fo(ex_name);
+  if ( !fo ) {
     // 開けなかった．
     TclObj errmsg;
     errmsg << ex_name << ": " << posix_error();
@@ -53,7 +52,7 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  cur_cell_library().dump(bo);
+  cur_cell_library().dump(fo);
 
   return TCL_OK;
 }

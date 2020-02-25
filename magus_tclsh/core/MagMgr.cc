@@ -21,14 +21,8 @@ string MagMgr::kCurNetwork("_network");
 
 
 // コンストラクタ
-MagMgr::MagMgr() :
-  mAlloc(sizeof(Cell), 1024),
-  mNetHandleHashSize(0),
-  mNetHandleHash(nullptr),
-  mNetHandleHashNum(0)
+MagMgr::MagMgr()
 {
-  alloc_table(16);
-
   // カレントネットワークは nullptr
   mCurNet = nullptr;
 }
@@ -40,14 +34,11 @@ MagMgr::~MagMgr()
   // このオブジェクトの管理しているネットワークを全て破棄する．
   // といってもこのループでは name_list にネットワーク名を入れている
   // だけ．
-  vector<string> name_list;
-  get_network_names(name_list);
+  auto name_list = get_network_names();
 
   // delete_net() 中で mNetHash を変更するので上のループ内
   // では削除できない．
-  for (vector<string>::iterator p = name_list.begin();
-       p != name_list.end(); ++ p) {
-    string name = *p;
+  for ( auto name: name_list ) {
     bool stat = delete_nethandle(name);
     ASSERT_COND(stat );
   }
@@ -281,17 +272,17 @@ MagMgr::cur_nethandle() const
 }
 
 // @brief ネットワーク名のリストの作成
-// @param[out] name_list 作成されたネットワーク名を収めるリスト
-void
-MagMgr::get_network_names(vector<string>& name_list) const
+// @return 作成されたネットワーク名を収めるリストを返す．
+vector<string>
+MagMgr::get_network_names() const
 {
-  name_list.clear();
-  name_list.reserve(mNetHandleHashNum);
-  for (ymuint i = 0; i < mNetHandleHashSize; ++ i) {
-    for (Cell* cell = mNetHandleHash[i]; cell; cell = cell->mLink) {
-      name_list.push_back(cell->mHandle->name());
-    }
+  vector<string> name_list;
+  name_list.reserve(mNetHandleMap.size());
+  for ( auto p: mNetHandleMap ) {
+    auto name = p.first;
+    name_list.push_back(name);
   }
+  return name_list;
 }
 
 // @brief テンポラリ名の生成
@@ -341,17 +332,7 @@ MagMgr::reg_nethandle(NetHandle* handle,
   }
 
   // 存在していないので登録する．
-  void* p = mAlloc.get_memory(sizeof(Cell));
-  Cell* cell = new (p) Cell;
-  cell->mHandle = handle;
-
-  if ( mNetHandleHashNum >= mNetHandleHashNextLimit ) {
-    alloc_table(mNetHandleHashSize * 2);
-  }
-  ymuint pos = hash_func(handle->name()) % mNetHandleHashSize;
-  cell->mLink = mNetHandleHash[pos];
-  mNetHandleHash[pos] = cell;
-  ++ mNetHandleHashNum;
+  mNetHandleMap.emplace(handle->name(), handle);
 
   return true;
 }
@@ -360,11 +341,8 @@ MagMgr::reg_nethandle(NetHandle* handle,
 NetHandle*
 MagMgr::_find_nethandle(const string& name)
 {
-  ymuint pos = hash_func(name) % mNetHandleHashSize;
-  for (Cell* cell = mNetHandleHash[pos]; cell; cell = cell->mLink) {
-    if ( cell->mHandle->name() == name ) {
-      return cell->mHandle;
-    }
+  if ( mNetHandleMap.count(name) > 0 ) {
+    return mNetHandleMap.at(name);
   }
   return nullptr;
 }
@@ -373,67 +351,7 @@ MagMgr::_find_nethandle(const string& name)
 void
 MagMgr::_delete_nethandle(NetHandle* net_handle)
 {
-  ymuint pos = hash_func(net_handle->name()) % mNetHandleHashSize;
-  Cell* cell;
-  for (Cell** prev = &mNetHandleHash[pos]; (cell = *prev);
-       prev = &cell->mLink) {
-    if ( cell->mHandle == net_handle ) {
-      *prev = cell->mLink;
-      delete cell->mHandle;
-      void* p = reinterpret_cast<void*>(cell);
-      mAlloc.put_memory(sizeof(Cell), p);
-      -- mNetHandleHashNum;
-      return;
-    }
-  }
-  ASSERT_NOT_REACHED;
-}
-
-// @brief ハッシュ表を拡大する．
-void
-MagMgr::alloc_table(ymuint req_size)
-{
-  ymuint old_size = mNetHandleHashSize;
-  Cell** old_table = mNetHandleHash;
-  while ( mNetHandleHashSize < req_size ) {
-    if ( mNetHandleHashSize == 0 ) {
-      mNetHandleHashSize = 1;
-    }
-    else {
-      mNetHandleHashSize <<= 1;
-    }
-  }
-
-  if ( old_size < mNetHandleHashSize ) {
-    mNetHandleHash = new Cell*[mNetHandleHashSize];
-    for (ymuint i = 0; i < mNetHandleHashSize; ++ i) {
-      mNetHandleHash[i] = nullptr;
-    }
-    mNetHandleHashNextLimit = static_cast<ymuint>(mNetHandleHashSize * 1.8);
-
-    // 再ハッシュを行う．
-    for (ymuint i = 0; i < old_size; ++ i) {
-      for (Cell* cell = old_table[i]; cell; ) {
-	Cell* tmp = cell;
-	cell = tmp->mLink;
-	ymuint pos = hash_func(tmp->mHandle->name()) % mNetHandleHashSize;
-	tmp->mLink = mNetHandleHash[pos];
-	mNetHandleHash[pos] = tmp;
-      }
-    }
-  }
-}
-
-// @brief string のハッシュ関数
-ymuint
-MagMgr::hash_func(const string& name)
-{
-  ymuint v = 0;
-  ymuint l = name.size();
-  for (ymuint i = 0; i < l; ++ i) {
-    v += v * 33 + name[i];
-  }
-  return v;
+  mNetHandleMap.erase(net_handle->name());
 }
 
 END_NAMESPACE_MAGUS

@@ -7,11 +7,11 @@
 ### All rights reserved.
 
 include "varid.pxi"
+include "bool3.pxi"
 include "literal.pxi"
 include "expr.pxi"
 include "tvfunc.pxi"
-include "satbool3.pxi"
-include "satsolvertype.pxi"
+include "solvertype.pxi"
 include "bnet.pxi"
 include "celllibrary.pxi"
 include "equivmgr.pxi"

@@ -22,8 +22,8 @@ cdef class EquivMgr :
         cdef int no = network1.output_num
         cdef CXX_EquivResult c_result
         c_result = self._this.check(network1._this, network2._this)
-        eq_stats = [ to_SatBool3(c_result.output_results()[i]) for i in range(no) ]
-        return to_SatBool3(c_result.result()), eq_stats
+        eq_stats = [ to_Bool3(c_result.output_results()[i]) for i in range(no) ]
+        return to_Bool3(c_result.result()), eq_stats
 
     ### @brief 等価検証を行う．
     def check(self,
@@ -50,15 +50,15 @@ cdef class EquivMgr :
         c_result = self._this.check(network1._this, network2._this,
                                     c_input2_list, c_output2_list)
 
-        eq_stats = [ to_SatBool3(c_result.output_results()[i]) for i in range(no) ]
-        return to_SatBool3(c_result.result()), eq_stats
+        eq_stats = [ to_Bool3(c_result.output_results()[i]) for i in range(no) ]
+        return to_Bool3(c_result.result()), eq_stats
 
     ### @brief シグネチャサイズをセットする．
     def set_signature_size(self, int size) :
         self._this.set_signature_size(size)
 
     ### @brief SATソルバの種類をセットする．
-    def set_sat_solver_type(self, SatSolverType solver_type) :
+    def set_sat_solver_type(self, SolverType solver_type) :
         self._this.set_sat_solver_type(solver_type._this)
 
     ### @brief ログレベルをセットする．

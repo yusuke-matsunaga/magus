@@ -45,7 +45,7 @@ target_link_libraries( read_blif
 ym_add_gtest( SbjNodeTest
   SbjNodeTest.cc
   $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
-  ${YM_SUBMODULE_OBJ_AD_LIST}
+  ${YM_SUBMODULE_OBJ_D_LIST}
   )
 
 ym_add_gtest( SbjHandleTest

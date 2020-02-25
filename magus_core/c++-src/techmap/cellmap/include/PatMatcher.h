@@ -12,7 +12,6 @@
 #include "cellmap_nsdef.h"
 #include "Cut.h"
 #include "ym/clib.h"
-#include "ym/HashMap.h"
 
 
 BEGIN_NAMESPACE_CELLMAP
@@ -90,7 +89,7 @@ private:
 
   // サブジェクトノードの ID をキーとしてパタンノードの ID を
   // 入れる配列
-  HashMap<ymuint, ymuint> mPatMap;
+  unordered_map<ymuint, ymuint> mPatMap;
 
   // パタンノードの ID をキーとして極性を入れる配列
   vector<bool> mInvMap;

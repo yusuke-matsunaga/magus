@@ -176,14 +176,15 @@ PatMatcher::bind(const SbjNode* sbj_node,
   }
 
   ymuint pat_id1;
-  if ( mPatMap.find(sbj_node->id(), pat_id1) ) {
+  if ( mPatMap.count(sbj_node->id()) > 0 ) {
+    pat_id1 = mPatMap.at(sbj_node->id());
     if ( pat_id1 != pat_id ) {
       // SbjNode が既に他のノードにバインドしていた．
       return false;
     }
   }
   else {
-    mPatMap.add(sbj_node->id(), pat_id);
+    mPatMap.emplace(sbj_node->id(), pat_id);
   }
   return true;
 }

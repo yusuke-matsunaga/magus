@@ -11,7 +11,6 @@
 
 #include "sbj_nsdef.h"
 #include "SbjGraph.h"
-#include "ym/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_SBJ
@@ -78,9 +77,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // メモリ確保用のオブジェクト
-  SimpleAlloc mAlloc;
 
   // 対象のサブジェクトグラフ
   const SbjGraph& mSbjGraph;

@@ -9,7 +9,6 @@
 
 #include "Cut.h"
 #include "SbjNode.h"
-#include "ym/HashMap.h"
 
 
 BEGIN_NAMESPACE_LUTMAP
@@ -20,7 +19,7 @@ BEGIN_NONAMESPACE
 // その時の node の値を計算する．
 ymuint64
 eval_node(const SbjNode* node,
-	  HashMap<int, ymuint64>& valmap)
+	  unordered_map<int, ymuint64>& valmap)
 {
   if ( node == nullptr ) {
     return 0ULL;
@@ -29,7 +28,7 @@ eval_node(const SbjNode* node,
   // まずすでに評価済みかどうか調べる．
   // 葉のノードの場合もここに登録されている．
   ymuint64 ans;
-  if ( !valmap.find(node->id(), ans) ) {
+  if ( valmap.count(node->id()) == 0 ) {
     // 未登録の場合は必ず論理ノード
     ASSERT_COND( node->is_logic() );
 
@@ -53,7 +52,10 @@ eval_node(const SbjNode* node,
     }
 
     // 登録しておく．
-    valmap.add(node->id(), ans);
+    valmap.emplace(node->id(), ans);
+  }
+  else {
+    ans = valmap.at(node->id());
   }
 
   return ans;
@@ -67,10 +69,10 @@ eval_cut(const Cut* cut,
   int ni = cut->input_num();
   ASSERT_COND( ni == vals.size() );
 
-  HashMap<int, ymuint64> valmap;
+  unordered_map<int, ymuint64> valmap;
   for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
-    valmap.add(inode->id(), vals[i]);
+    valmap.emplace(inode->id(), vals[i]);
   }
   return eval_node(cut->root(), valmap);
 }
@@ -90,10 +92,10 @@ Cut::eval(const vector<ymuint64>& vals) const
   ASSERT_COND( ni == vals.size() );
 
   // ノードの ID 番号をキーにして値を保持するハッシュ表
-  HashMap<int, ymuint64> valmap;
+  unordered_map<int, ymuint64> valmap;
   // 葉のノードの値を登録する．
   for ( int i = 0; i < ni; ++ i ) {
-    valmap.add(input(i)->id(), vals[i]);
+    valmap.emplace(input(i)->id(), vals[i]);
   }
 
   // 評価を行う．

@@ -51,12 +51,8 @@ ForNetwork::cmd_proc(TclObjVector& objv)
 
   // ネットワーク名を一つずつ取り出して処理する．
   int result = TCL_OK;
-  vector<string> name_list;
-  mgr()->get_network_names(name_list);
-  for (vector<string>::iterator p = name_list.begin();
-       p != name_list.end(); ++ p) {
-    string name = *p;
-
+  auto name_list = mgr()->get_network_names();
+  for ( auto name: name_list ) {
     // 実行結果をクリアしておく．
     reset_result();
 

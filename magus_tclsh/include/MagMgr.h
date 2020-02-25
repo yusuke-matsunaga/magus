@@ -12,7 +12,6 @@
 #include "magus.h"
 #include "ym/clib.h"
 #include "ym/ClibCellLibrary.h"
-#include "ym/UnitAlloc.h"
 #include "ym/ItvlMgr.h"
 
 
@@ -117,9 +116,9 @@ public:
   cur_nethandle() const;
 
   /// @brief ネットワーク名のリストの作成
-  /// @param[out] name_list 作成されたネットワーク名を収めるリスト
-  void
-  get_network_names(vector<string>& name_list) const;
+  /// @return 作成されたネットワーク名を収めるリストを返す．
+  vector<string>
+  get_network_names() const;
 
   /// @brief テンポラリ名の生成
   /// @note temporary name は '@' + 数字
@@ -151,16 +150,6 @@ private:
   /// @param[in] net_handle 削除するネットワークハンドル
   void
   _delete_nethandle(NetHandle* net_handle);
-
-  /// @brief ハッシュ表を拡大する．
-  /// @param[in] req_size 拡大するサイズ
-  void
-  alloc_table(ymuint req_size);
-
-  /// @brief string のハッシュ関数
-  static
-  ymuint
-  hash_func(const string& name);
 
   /// @brief 名前が適切かどうか調べる関数
   /// @param[in] name 調べる名前
@@ -196,26 +185,14 @@ private:
   // セルライブラリ
   ClibCellLibrary mCellLibrary;
 
-  // NetHandle 用のアロケータ
-  UnitAlloc mAlloc;
-
-  // ハッシュ表の大きさ
-  ymuint32 mNetHandleHashSize;
-
-  // NetHandle のハッシュ表
-  Cell** mNetHandleHash;
-
-  // ハッシュ表に登録されている要素数
-  ymuint32 mNetHandleHashNum;
-
-  // ハッシュ表を拡大する目安．
-  ymuint32 mNetHandleHashNextLimit;
+  // 名前をキーにして NetHandle を格納するハッシュ表
+  unordered_map<string, NetHandle*> mNetHandleMap;
 
   // 操作対象のネットワーク構造体(カレントネットワーク)
   NetHandle* mCurNet;
 
   // 古い操作対象のネットワーク構造体を入れておくスタック
-  list<NetHandle*> mNetStack;
+  vector<NetHandle*> mNetStack;
 
   // 使用中の temporary name を管理するためのネットワーク
   ItvlMgr mTempNameSet;

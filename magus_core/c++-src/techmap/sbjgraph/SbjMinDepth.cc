@@ -29,6 +29,7 @@ SmdNode::SmdNode() :
 // @brief デストラクタ
 SmdNode::~SmdNode()
 {
+  delete [] mFanoutArray;
 }
 
 // @brief ID番号を設定する．
@@ -61,11 +62,10 @@ SmdNode::set_fanin1(SmdNode* from)
 
 // @brief ファンアウト配列を設定する．
 void
-SmdNode::set_fanout_array(const vector<SmdEdge*>& foedge_list,
-			  Alloc& alloc)
+SmdNode::set_fanout_array(const vector<SmdEdge*>& foedge_list)
 {
   mFanoutNum = foedge_list.size();
-  mFanoutArray = alloc.get_array<SmdEdge*>(mFanoutNum);
+  mFanoutArray = new SmdEdge*[mFanoutNum];
   for ( int i = 0; i < mFanoutNum; ++ i ) {
     mFanoutArray[i] = foedge_list[i];
   }
@@ -79,7 +79,6 @@ SmdNode::set_fanout_array(const vector<SmdEdge*>& foedge_list,
 // @brief コンストラクタ
 // @param[in] sbjgraph 対象のサブジェクトグラフ
 SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
-  mAlloc(4096),
   mSbjGraph(sbjgraph)
 {
   int n = sbjgraph.node_num();
@@ -87,7 +86,7 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
   mTfiNodeList.reserve(n);
 
   mNodeNum = n;
-  mNodeArray = mAlloc.get_array<SmdNode>(n);
+  mNodeArray = new SmdNode[n];
 
   vector<vector<SmdEdge*> > foedge_list_array(n);
 
@@ -122,13 +121,14 @@ SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
 
   for ( int i = 0; i < n; ++ i ) {
     SmdNode* node = &mNodeArray[i];
-    node->set_fanout_array(foedge_list_array[node->id()], mAlloc);
+    node->set_fanout_array(foedge_list_array[node->id()]);
   }
 }
 
 // @brief デストラクタ
 SbjMinDepth::~SbjMinDepth()
 {
+  delete [] mNodeArray;
 }
 
 // @brief 各ノードの minimum depth を求める．

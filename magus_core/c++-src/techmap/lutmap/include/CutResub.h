@@ -58,7 +58,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際に処理を行うクラス
-  CutResubImpl* mImpl;
+  unique_ptr<CutResubImpl> mImpl;
 
 };
 

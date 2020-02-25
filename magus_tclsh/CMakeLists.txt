@@ -120,7 +120,7 @@ add_executable (magus_tclsh
   $<TARGET_OBJECTS:magus_cellmap_obj>
   $<TARGET_OBJECTS:magus_sbjgraph_obj>
   $<TARGET_OBJECTS:ym_tclpp_obj>
-  ${YM_SUBMODULE_OBJ_A_LIST}
+  ${YM_SUBMODULE_OBJ_LIST}
   )
 
 target_compile_options (magus_tclsh

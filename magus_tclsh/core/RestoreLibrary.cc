@@ -9,7 +9,6 @@
 
 #include "RestoreLibrary.h"
 #include "ym/ClibCellLibrary.h"
-#include "ym/FileIDO.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -38,15 +37,15 @@ bool
 RestoreLibrary::read_library(const string& filename,
 			     ClibCellLibrary& library)
 {
-  FileIDO bi;
-  if ( !bi.open(filename) ) {
+  ifstream fi(filename);
+  if ( !fi ) {
     TclObj emsg;
     emsg << "Could not open " << filename;
     set_result(emsg);
     return false;
   }
 
-  library.restore(bi);
+  library.restore(fi);
 
   return true;
 }

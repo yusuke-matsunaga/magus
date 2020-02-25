@@ -38,9 +38,10 @@ list ( APPEND CMAKE_MODULE_PATH
 
 include (YmUtils)
 
-ym_init ("")
+ym_init ("USE_POPT")
 ym_init_python ( REQUIRED )
 ym_init_cython ()
+ym_init_lua ()
 ym_init_doxygen ()
 ym_init_gperftools ()
 ym_init_ctest ()

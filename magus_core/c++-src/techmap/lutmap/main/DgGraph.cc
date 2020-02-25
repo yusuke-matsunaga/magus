@@ -69,7 +69,7 @@ DgGraph::connect(int id1,
   int index = id1 * mNodeNum + id2;
   int pos = 0;
   bool exists = false;
-  if ( mEdgeHash.find(index, pos) ) {
+  if ( mEdgeHash.count(index) == 0 ) {
     // 本当に重複しているか調べる．
     vector<DgNode*>& adj_link = node1->mAdjLink;
     if ( node1->mAdjLink[pos] == node2 ) {
@@ -77,11 +77,14 @@ DgGraph::connect(int id1,
       exists = true;
     }
   }
+  else {
+    pos = mEdgeHash.at(index);
+  }
   if ( !exists ) {
     pos = node1->mAdjLink.size();
     node1->mAdjLink.push_back(node2);
     node2->mAdjLink.push_back(node1);
-    mEdgeHash.add(index, pos);
+    mEdgeHash.emplace(index, pos);
   }
 }
 

@@ -96,28 +96,26 @@ TEST(EquivTest, EquivTest3)
   ASSERT_TRUE( network2.output_num() == no );
 
   // network1 の入力ノードの名前のハッシュ表を作る．
-  HashMap<string, int> input_map;
+  unordered_map<string, int> input_map;
   for ( int pos: Range(ni) ) {
     int id1 = network1.input_id(pos);
     auto& node = network1.node(id1);
-    input_map.add(node.name(), pos);
+    input_map.emplace(node.name(), pos);
   }
 
   // network1 の出力ノードの名前のハッシュ表を作る．
-  HashMap<string, int> output_map;
+  unordered_map<string, int> output_map;
   for ( int pos: Range(no) ) {
     int id1 = network1.output_id(pos);
     auto& node = network1.node(id1);
-    output_map.add(node.name(), pos);
+    output_map.emplace(node.name(), pos);
   }
 
   vector<int> input2_list(ni);
   for ( int pos2: Range(ni) ) {
     int id2 = network2.input_id(pos2);
     auto& node2 = network2.node(id2);
-    int pos1;
-    bool stat = input_map.find(node2.name(), pos1);
-    ASSERT_TRUE( stat );
+    int pos1 = input_map.at(node2.name());
     input2_list[pos2] = pos1;
   }
 
@@ -125,9 +123,7 @@ TEST(EquivTest, EquivTest3)
   for ( int pos2: Range(no) ) {
     int id2 = network2.output_id(pos2);
     auto& node2 = network2.node(id2);
-    int pos1;
-    bool stat = output_map.find(node2.name(), pos1);
-    ASSERT_TRUE( stat );
+    int pos1 = output_map.at(node2.name());
     output2_list[pos2] = pos1;
   }
 

@@ -48,11 +48,8 @@ ListNetwork::cmd_proc(TclObjVector& objv)
 
   TclObj result;
   result.clear();
-  vector<string> name_list;
-  mgr()->get_network_names(name_list);
-  for (vector<string>::iterator p = name_list.begin();
-       p != name_list.end(); ++ p) {
-    string name = *p;
+  auto name_list = mgr()->get_network_names();
+  for ( auto name: name_list ) {
     if ( all || name[0] != '@' ) {
       result.append_element(name, interp());
     }

@@ -158,8 +158,7 @@ public:
 
   /// @brief ファンアウト配列を設定する．
   void
-  set_fanout_array(const vector<SmdEdge*>& foedge_list,
-		   Alloc& alloc);
+  set_fanout_array(const vector<SmdEdge*>& foedge_list);
 
 
 public:

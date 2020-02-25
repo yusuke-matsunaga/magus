@@ -10,7 +10,6 @@
 
 
 #include "lutmap.h"
-#include "ym/SimpleAlloc.h"
 
 
 BEGIN_NAMESPACE_LUTMAP
@@ -24,7 +23,7 @@ class CutMgr
 public:
 
   /// @brief コンストラクタ
-  CutMgr();
+  CutMgr() = default;
 
   /// @brief デストラクタ
   ~CutMgr();
@@ -60,8 +59,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // アロケータ
-  SimpleAlloc mAlloc;
+  // ここで確保したメモリチャンクのリスト
+  vector<char*> mMemList;
 
 };
 
@@ -70,17 +69,11 @@ private:
 // インライン関数の定義
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-inline
-CutMgr::CutMgr() :
-  mAlloc(4096)
-{
-}
-
 // @brief デストラクタ
 inline
 CutMgr::~CutMgr()
 {
+  clear();
 }
 
 // @brief カットを生成する．
@@ -94,7 +87,8 @@ CutMgr::new_cut(const SbjNode* root,
 		const SbjNode* inputs[])
 {
   SizeType size = sizeof(Cut) + (ni - 1) * sizeof(const SbjNode*);
-  void* p = mAlloc.get_memory(size);
+  char* p = new char[size];
+  mMemList.push_back(p);
   return new (p) Cut(root, ni, inputs);
 }
 
@@ -103,7 +97,10 @@ inline
 void
 CutMgr::clear()
 {
-  mAlloc.destroy();
+  for ( auto p: mMemList ) {
+    delete [] p;
+  }
+  mMemList.clear();
 }
 
 END_NAMESPACE_LUTMAP

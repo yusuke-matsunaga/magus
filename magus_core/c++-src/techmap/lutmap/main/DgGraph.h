@@ -10,7 +10,7 @@
 
 
 #include "lutmap.h"
-#include "ym/HashMap.h"
+
 
 BEGIN_NAMESPACE_LUTMAP
 
@@ -74,7 +74,7 @@ private:
   // ノードの(実体の)配列
   DgNode* mNodeArray;
 
-  HashMap<int, int> mEdgeHash;
+  unordered_map<int, int> mEdgeHash;
 
 };
 

@@ -10,7 +10,6 @@
 
 
 #include "lutmap.h"
-#include "ym/SimpleAlloc.h"
 #include "CrHeap.h"
 #include "CrLevelQ.h"
 
@@ -142,9 +141,6 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // CrNode の領域確保用のオブジェクト
-  SimpleAlloc mAlloc;
 
   // 各ノードごとの情報を納める配列
   vector<CrNode*> mNodeArray;

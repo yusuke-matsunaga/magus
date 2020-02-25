@@ -25,15 +25,14 @@ BEGIN_NAMESPACE_LUTMAP
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-CutResub::CutResub()
+CutResub::CutResub() :
+  mImpl{new CutResubImpl}
 {
-  mImpl = new CutResubImpl;
 }
 
 // @brief デストラクタ
 CutResub::~CutResub()
 {
-  delete mImpl;
 }
 
 // @brief カットの置き換えを行って LUT 数の削減を行う．
@@ -56,14 +55,16 @@ CutResub::operator()(const SbjGraph& sbjgraph,
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-CutResubImpl::CutResubImpl() :
-  mAlloc(4096)
+CutResubImpl::CutResubImpl()
 {
 }
 
 // デストラクタ
 CutResubImpl::~CutResubImpl()
 {
+  for ( auto node: mGarbageList ) {
+    delete node;
+  }
 }
 
 // @brief カットの置き換えを行って LUT 数の削減を行う．
@@ -770,11 +771,10 @@ CrNode*
 CutResubImpl::alloc_node()
 {
   if ( mGarbageList.empty() ) {
-    void* p =  mAlloc.get_memory(sizeof(CrNode));
-    return new (p) CrNode;
+    return new CrNode;
   }
   else {
-    CrNode* node = mGarbageList.back();
+    auto node = mGarbageList.back();
     mGarbageList.pop_back();
     return node;
   }
