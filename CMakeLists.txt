@@ -129,16 +129,16 @@ add_subdirectory ( magus_tclsh )
 
 if (DOXYGEN_FOUND)
 
-  # doxygen の対象となるヘッダファイル(のパタン)を YM_DOXY_SRCS に入れる．
-  set ( YM_DOXY_SRCS
+  # doxygen の対象となるヘッダファイル(のパタン)
+  set ( DOXY_SRCS
     ${PROJECT_SOURCE_DIR}/etc/mainpage.h
     ${PROJECT_BINARY_DIR}/include
     ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/magus_tclsh/include
     ${YM_SUBMODULE_INCLUDE_LIST}
     )
-  #list ( APPEND YM_DOXY_SRCS "${PROJECT_SOURCE_DIR}/magus_tclsh/include" )
 
-  ym_add_doxygen ()
+  ym_add_doxygen ( ${DOXY_SRCS} )
 
 endif (DOXYGEN_FOUND)
 
