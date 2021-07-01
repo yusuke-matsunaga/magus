@@ -40,7 +40,7 @@ MvnReadVerilog::~MvnReadVerilog()
 int
 MvnReadVerilog::cmd_proc(TclObjVector& objv)
 {
-  StreamMsgHandler mh(&cerr);
+  StreamMsgHandler mh(cerr);
   mh.set_mask(kMsgMaskAll);
   mh.delete_mask(MsgType::Info);
   mh.delete_mask(MsgType::Debug);

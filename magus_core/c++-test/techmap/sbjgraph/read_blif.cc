@@ -71,7 +71,7 @@ main(int argc,
   string filename = argv[fpos];
 
   try {
-    StreamMsgHandler msg_handler(&cerr);
+    StreamMsgHandler msg_handler(cerr);
     MsgMgr::attach_handler(&msg_handler);
 
     BnNetwork network = BnNetwork::read_blif(filename);
