@@ -5,9 +5,8 @@
 /// @brief MapGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "sbj_nsdef.h"
@@ -27,10 +26,10 @@ class MapGen
 public:
 
   /// @brief コンストラクタ
-  MapGen();
+  MapGen() = default;
 
   /// @brief デストラクタ
-  ~MapGen();
+  ~MapGen() = default;
 
 
 public:
@@ -39,32 +38,30 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief マッピング結果を BnNetwork にセットする．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] record マッピング結果
-  /// @param[out] mapgraph マッピング結果を格納するネットワーク
-  /// @param[out] lut_num LUT数
-  /// @param[out] depth 最大段数
-  void
-  generate(const SbjGraph& sbjgraph,
-	   const MapRecord& record,
-	   BnNetwork& mapgraph,
-	   int& lut_num,
-	   int& depth);
+  /// @param[in] sbjgraph
+  /// @param[in] record
+  /// @return BnNetwork, LUT数，最大段数のタプルを返す．
+  tuple<SizeType, SizeType>
+  generate(
+    const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
+    const MapRecord& record,  ///< [in] マッピング結果
+    BnNetwork& mapnetwork     ///< [out] マッピング結果のネットワーク
+  );
 
   /// @brief マッピング結果から見積もりを行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] record マッピング結果
-  /// @param[out] lut_num LUT数
-  /// @param[out] depth 最大段数
-  void
-  estimate(const SbjGraph& sbjgraph,
-	   const MapRecord& record,
-	   int& lut_num,
-	   int& depth);
+  /// @return LUT数，最大段数のタプルを返す．
+  tuple<SizeType, SizeType>
+  estimate(
+    const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
+    const MapRecord& record   ///< [in] マッピング結果
+  );
 
   /// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
   const vector<const SbjNode*>&
-  fanoutpoint_list() const;
+  fanoutpoint_list() const
+  {
+    return mFanoutPointList;
+  }
 
 
 private:
@@ -77,43 +74,65 @@ private:
   {
   public:
 
-    /// @brief コンストラクタ
-    ///
-    /// 無難な初期化を行う．
-    NodeInfo();
-
     /// @brief 参照回数を増やす．
-    /// @param[in] inv 反転フラグ
     void
-    inc_ref(bool inv = false);
+    inc_ref(
+      bool inv = false ///< [in] 反転フラグ
+    )
+    {
+      int idx = inv ? 1 : 0;
+      ++ mRefCount[idx];
+    }
 
     /// @brief マップ結果を設定する．
-    /// @param[in] node_id ノード番号
-    /// @param[in] depth 段数
-    /// @param[in] inv 反転フラグ
     void
-    set_map(int node_id,
-	    int depth,
-	    bool inv = false);
+    set_map(
+      SizeType node_id, ///< [in] ノード番号
+      SizeType depth,   ///< [in] 段数
+      bool inv = false  ///< [in] 反転フラグ
+    )
+    {
+      int idx = inv ? 1 : 0;
+      mMapNode[idx] = node_id;
+      mDepth[idx] = depth;
+    }
 
     /// @brief 参照回数を返す．
-    /// @param[in] inv 反転フラグ
-    int
-    ref_count(bool inv = false) const;
+    SizeType
+    ref_count(
+      bool inv = false ///< [in] 反転フラグ
+    ) const
+    {
+      int idx = inv ? 1 : 0;
+      return mRefCount[idx];
+    }
 
     /// @brief 負極性しか作らないときに true を返す．
     bool
-    inv_req() const;
+    inv_req() const
+    {
+      return (mRefCount[1] > 0) && (mRefCount[0] == 0);
+    }
 
-    /// @brief マップ結果を返す．
-    /// @param[in] inv 反転フラグ
-    int
-    map_node(bool inv = false) const;
+    /// @brief マップ結果のノード番号を返す．
+    SizeType
+    map_node(
+      bool inv = false ///< [in] 反転フラグ
+    ) const
+    {
+      int idx = inv ? 1 : 0;
+      return mMapNode[idx];
+    }
 
     /// @brief 段数を返す．
-    /// @param[in] inv 反転フラグ
-    int
-    depth(bool inv = false) const;
+    SizeType
+    depth(
+      bool inv = false ///< [in] 反転フラグ
+    ) const
+    {
+      int idx = inv ? 1 : 0;
+      return mDepth[idx];
+    }
 
 
   private:
@@ -123,15 +142,15 @@ private:
 
     // 使われている回数
     // 正極性と負極性の2通りを保持する．
-    int mRefCount[2];
+    SizeType mRefCount[2]{0, 0};
 
     // マップ結果
     // 正極性と負極性の2通りを保持する．
-    int mMapNode[2];
+    SizeType mMapNode[2]{BNET_NULLID, BNET_NULLID};
 
     // 段数
     // 正極性と負極性の2通りを保持する．
-    int mDepth[2];
+    SizeType mDepth[2]{0, 0};
 
   };
 
@@ -142,30 +161,28 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 作業領域の初期化を行う．
-  /// @param[in] node_num ノード数
   void
-  init(int node_num);
+  init(
+    SizeType node_num ///< [in] ノード数
+  );
 
   /// @brief generate 用のバックトレースを行う．
-  /// @param[in] node 対象のノード
-  /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
-  /// @param[in] record マッピング結果
-  /// @param[out] mapnetwork マッピング結果のネットワーク
   /// @return (node, inv) を実現するノード番号を返す．
-  int
-  gen_back_trace(const SbjNode* node,
-		 bool inv,
-		 const MapRecord& record,
-		 BnNetwork& mapnetwork);
+  SizeType
+  gen_back_trace(
+    const SbjNode* node,     ///< [in] 対象のノード
+    bool inv,                ///< [in] 極性を表すフラグ．inv = true の時，反転を表す．
+    const MapRecord& record, ///< [in] マッピング結果
+    BnNetwork& mapnetwork    ///< [out] マッピング結果を格納するネットワーク
+  );
 
   /// @brief estimate 用のバックトレースを行う．
-  /// @param[in] node 対象のノード
-  /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
-  /// @param[in] record マッピング結果
   void
-  est_back_trace(const SbjNode* node,
-		 bool inv,
-		 const MapRecord& record);
+  est_back_trace(
+    const SbjNode* node,    ///< [in] 対象のノード
+    bool inv,               ///< [in] 極性を表すフラグ．inv = true の時，反転を表す．
+    const MapRecord& record ///< [in] マッピング結果
+  );
 
 
 private:
@@ -177,108 +194,18 @@ private:
   vector<NodeInfo> mNodeInfo;
 
   // 定数0のノード番号
-  int mConst0;
+  SizeType mConst0;
 
   // 定数1のノード番号
-  int mConst1;
+  SizeType mConst1;
 
   // LUT数の見積もりに使う作業領域
-  int mLutNum;
+  SizeType mLutNum;
 
   // ファンアウトポイントのリスト
   vector<const SbjNode*> mFanoutPointList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
-inline
-const vector<const SbjNode*>&
-MapGen::fanoutpoint_list() const
-{
-  return mFanoutPointList;
-}
-
-// @brief コンストラクタ
-//
-// 無難な初期化を行う．
-inline
-MapGen::NodeInfo::NodeInfo()
-{
-  mRefCount[0] = 0;
-  mRefCount[1] = 0;
-  mMapNode[0] = kBnNullId;
-  mMapNode[1] = kBnNullId;
-  mDepth[0] = 0;
-  mDepth[1] = 0;
-}
-
-// @brief 参照回数を増やす．
-// @param[in] inv 反転フラグ
-inline
-void
-MapGen::NodeInfo::inc_ref(bool inv)
-{
-  int idx = inv ? 1 : 0;
-  ++ mRefCount[idx];
-}
-
-// @brief マップ結果を設定する．
-// @param[in] node_id ノード番号
-// @param[in] depth 段数
-// @param[in] inv 反転フラグ
-inline
-void
-MapGen::NodeInfo::set_map(int node_id,
-			  int depth,
-			  bool inv)
-{
-  int idx = inv ? 1 : 0;
-  mMapNode[idx] = node_id;
-  mDepth[idx] = depth;
-}
-
-// @brief 参照回数を返す．
-// @param[in] inv 反転フラグ
-inline
-int
-MapGen::NodeInfo::ref_count(bool inv) const
-{
-  int idx = inv ? 1 : 0;
-  return mRefCount[idx];
-}
-
-// @brief 負極性しか作らないときに true を返す．
-inline
-bool
-MapGen::NodeInfo::inv_req() const
-{
-  return (mRefCount[1] > 0) && (mRefCount[0] == 0);
-}
-
-// @brief マップ結果を返す．
-// @param[in] inv 反転フラグ
-inline
-int
-MapGen::NodeInfo::map_node(bool inv) const
-{
-  int idx = inv ? 1 : 0;
-  return mMapNode[idx];
-}
-
-// @brief 段数を返す．
-// @param[in] inv 反転フラグ
-inline
-int
-MapGen::NodeInfo::depth(bool inv) const
-{
-  int idx = inv ? 1 : 0;
-  return mDepth[idx];
-}
 
 END_NAMESPACE_LUTMAP
 

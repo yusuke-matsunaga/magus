@@ -5,9 +5,8 @@
 /// @brief LutmapMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "magus.h"
 #include "ym/bnet.h"
@@ -24,10 +23,10 @@ class LutmapMgr
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] lut_size LUTの入力数
-  /// @param[in] option オプション文字列
-  LutmapMgr(int lut_size = 5,
-	    const string& option = string());
+  LutmapMgr(
+    SizeType lut_size = 5,          ///< [in] LUTの入力数
+    const string& option = string() ///< [in] オプション文字列
+  );
 
   /// @brief デストラクタ
   ~LutmapMgr();
@@ -39,44 +38,48 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief LUTの入力数を設定する
-  /// @param[in] lut_size LUTの入力数
   void
-  set_lut_size(int lut_size);
+  set_lut_size(
+    SizeType lut_size ///< [in] LUTの入力数
+  )
+  {
+    mLutSize = lut_size;
+  }
 
   /// @brief オプション文字列を設定する．
-  /// @param[in] option オプション文字列
   void
-  set_option(const string& option);
+  set_option(
+    const string& option ///< [in] オプション文字列
+  );
 
   /// @brief 面積最小化 DAG covering のヒューリスティック関数
-  /// @param[in] src_network もとのネットワーク
-  /// @param[out] dat_network マッピング結果
   void
-  area_map(const BnNetwork& src_network,
-	   BnNetwork& dst_network);
+  area_map(
+    const BnNetwork& src_network, ///< [in] もとのネットワーク
+    BnNetwork& dst_network        ///< [out] マッピング結果
+  );
 
   /// @brief 段数最小化 DAG covering のヒューリスティック関数
-  /// @param[in] src_network もとのネットワーク
-  /// @param[in] slack 最小段数に対するスラック
-  /// @param[out] dat_network マッピング結果
   void
-  delay_map(const BnNetwork& src_network,
-	    int slack,
-	    BnNetwork& dst_network);
+  delay_map(
+    const BnNetwork& src_network, ///< [in] もとのネットワーク
+    int slack,                    ///< [in] 最小段数に対するスラック
+    BnNetwork& dst_network        ///< [out] マッピング結果
+  );
 
   /// @brief 直前のマッピング結果のLUT数を返す．
-  int
-  lut_num();
+  SizeType
+  lut_num()
+  {
+    return mLutNum;
+  }
 
   /// @brief 直前のマッピング結果の段数を返す．
-  int
-  depth();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  SizeType
+  depth()
+  {
+    return mDepth;
+  }
 
 
 private:
@@ -85,7 +88,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // LUTの入力数
-  int mLutSize;
+  SizeType mLutSize;
 
   // オプション文字列
   string mOption;
@@ -100,42 +103,12 @@ private:
   bool mDoCutResub;
 
   // 直前のマッピング結果のLUT数
-  int mLutNum;
+  SizeType mLutNum;
 
   // 直前のマッピング結果の段数
-  int mDepth;
+  SizeType mDepth;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief LUTの入力数を設定する
-// @param[in] lut_size LUTの入力数
-inline
-void
-LutmapMgr::set_lut_size(int lut_size)
-{
-  mLutSize = lut_size;
-}
-
-// @brief 直前のマッピング結果のLUT数を返す．
-inline
-int
-LutmapMgr::lut_num()
-{
-  return mLutNum;
-}
-
-// @brief 直前のマッピング結果の段数を返す．
-inline
-int
-LutmapMgr::depth()
-{
-  return mDepth;
-}
 
 END_NAMESPACE_MAGUS
 

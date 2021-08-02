@@ -3,9 +3,8 @@
 /// @brief MctSearch の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "mct2/MctSearch.h"
 #include "mct2/MctState.h"
@@ -26,8 +25,10 @@ BEGIN_NAMESPACE_LUTMAP_MCT2
 BEGIN_NONAMESPACE
 
 ymuint
-dfs(const SbjNode* node,
-    vector<bool>& mark)
+dfs(
+  const SbjNode* node,
+  vector<bool>& mark
+)
 {
   if ( mark[node->id()] ) {
     return 0;
@@ -289,9 +290,9 @@ MctSearch::default_policy(MctNode* node)
 #endif
 
   MapGen gen;
-  int lut_num;
-  int depth;
-  gen.estimate(mSbjGraph, record, lut_num, depth);
+  SizeType lut_num;
+  SizeType depth;
+  tie(lut_num, depth) = gen.estimate(mSbjGraph, record);
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;
     mBestRecord = record;
@@ -307,8 +308,10 @@ MctSearch::default_policy(MctNode* node)
 
 // @brief 評価値の更新を行う．
 void
-MctSearch::back_up(MctNode* node,
-		   double val)
+MctSearch::back_up(
+  MctNode* node,
+  double val
+)
 {
   double num_all_ln = log(mNumAll);
   for ( ; ; ) {

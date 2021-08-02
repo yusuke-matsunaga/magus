@@ -5,9 +5,8 @@
 /// @brief MapGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "cellmap_nsdef.h"
 #include "SbjGraph.h"
@@ -31,10 +30,10 @@ class MapGen
 public:
 
   /// @brief コンストラクタ
-  MapGen();
+  MapGen() = default;
 
   /// @brief デストラクタ
-  ~MapGen();
+  ~MapGen() = default;
 
 
 public:
@@ -43,13 +42,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief マッピング結果を BnNetwork にセットする．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] record マッピング結果
-  /// @param[out] mapgraph マッピング結果を格納するネットワーク
   void
-  generate(const SbjGraph& sbjgraph,
-	   const MapRecord& record,
-	   BnNetwork& mapgraph);
+  generate(
+    const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
+    const MapRecord& record,  ///< [in] マッピング結果
+    BnNetwork& mapgraph       ///< [out] マッピング結果を格納するネットワーク
+  );
 
 
 private:
@@ -60,21 +58,14 @@ private:
   // ノードの割り当て情報
   struct NodeInfo
   {
-    NodeInfo()
-    {
-      mCell = nullptr;
-      mMapNode = kBnNullId;
-    }
-
     // マッチ
     Cut mMatch;
 
     // セル
-    const ClibCell* mCell;
+    const ClibCell* mCell{nullptr};
 
     // マップ結果
-    int mMapNode;
-
+    SizeType mMapNode{BNET_NULLID};
   };
 
   // マッピング要求情報
@@ -89,11 +80,10 @@ private:
     }
 
     // ノード
-    const SbjNode* mNode;
+    const SbjNode* mNode{nullptr};
 
     // 極性
-    bool mInv;
-
+    bool mInv{false};
   };
 
 
@@ -104,35 +94,47 @@ private:
 
   /// @brief ポートの生成を行う．
   void
-  gen_port(const SbjPort* sbj_port);
+  gen_port(
+    const SbjPort* sbj_port
+  );
 
   /// @brief D-FF の生成を行う．
   void
-  gen_dff(const SbjDff* sbj_dff,
-	  const MapRecord& record);
+  gen_dff(
+    const SbjDff* sbj_dff,
+    const MapRecord& record
+  );
 
   /// @brief ラッチの生成を行う．
   void
-  gen_latch(const SbjLatch* sbj_latch);
+  gen_latch(
+    const SbjLatch* sbj_latch
+  );
 
   /// @brief マッピング要求を追加する．
   void
-  add_mapreq(const SbjNode* node,
-	     bool inv);
+  add_mapreq(
+    const SbjNode* node,
+    bool inv
+  );
 
   /// @brief 最終結果を作るためのバックトレースを行う．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
   /// @param[in] record セルの割当結果
-  int
-  back_trace(const SbjNode* node,
-	     bool inv,
-	     const MapRecord& record);
+  SizeType
+  back_trace(
+    const SbjNode* node,
+    bool inv,
+    const MapRecord& record
+  );
 
   /// @brief node に関係する情報を得る．
   NodeInfo&
-  node_info(const SbjNode* node,
-	    bool inv);
+  node_info(
+    const SbjNode* node,
+    bool inv
+  );
 
 
 private:

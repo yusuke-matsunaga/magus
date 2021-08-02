@@ -3,9 +3,8 @@
 /// @brief LutmapMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "LutmapMgr.h"
 #include "Bn2Sbj.h"
@@ -26,13 +25,12 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] lut_size LUTの入力数
-// @param[in] option オプション文字列
-LutmapMgr::LutmapMgr(int lut_size,
-		     const string& option) :
-  mLutSize(lut_size),
-  mFanoutMode(false),
-  mDoCutResub(false)
+LutmapMgr::LutmapMgr(
+  SizeType lut_size,
+  const string& option
+) : mLutSize{lut_size},
+    mFanoutMode{false},
+    mDoCutResub{false}
 {
   set_option(option);
 }
@@ -43,11 +41,11 @@ LutmapMgr::~LutmapMgr()
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数
-// @param[in] src_network もとのネットワーク
-// @param[out] map_network マッピング結果
 void
-LutmapMgr::area_map(const BnNetwork& src_network,
-		    BnNetwork& map_network)
+LutmapMgr::area_map(
+  const BnNetwork& src_network,
+  BnNetwork& map_network
+)
 {
   using namespace nsLutmap;
 
@@ -76,7 +74,7 @@ LutmapMgr::area_map(const BnNetwork& src_network,
 
   // 最終的なネットワークを生成する．
   MapGen gen;
-  gen.generate(sbjgraph, maprec, map_network, mLutNum, mDepth);
+  tie(mLutNum, mDepth) = gen.generate(sbjgraph, maprec, map_network);
 }
 
 // @brief 段数最小化 DAG covering のヒューリスティック関数
@@ -84,9 +82,11 @@ LutmapMgr::area_map(const BnNetwork& src_network,
 // @param[in] slack 最小段数に対するスラック
 // @param[out] mapnetwork マッピング結果
 void
-LutmapMgr::delay_map(const BnNetwork& src_network,
-		     int slack,
-		     BnNetwork& map_network)
+LutmapMgr::delay_map(
+  const BnNetwork& src_network,
+  int slack,
+  BnNetwork& map_network
+)
 {
   using namespace nsLutmap;
 
@@ -113,13 +113,15 @@ LutmapMgr::delay_map(const BnNetwork& src_network,
 
   // 最終的なネットワークを生成する．
   MapGen gen;
-  gen.generate(sbjgraph, maprec, map_network, mLutNum, mDepth);
+  tie(mLutNum, mDepth) = gen.generate(sbjgraph, maprec, map_network);
 }
 
 // @brief オプション文字列を設定する．
 // @param[in] option オプション文字列
 void
-LutmapMgr::set_option(const string& option)
+LutmapMgr::set_option(
+  const string& option
+)
 {
   mOption = option;
   mFanoutMode = true;

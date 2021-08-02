@@ -26,15 +26,16 @@ BEGIN_NAMESPACE_LUTMAP
 // @param[in] cut_holder カットフォルダー
 // @param[in] cut_size カットサイズ
 // @param[in] flow_mode area_cover のモード
-SaSearch::SaSearch(const SbjGraph& sbjgraph,
-		   const CutHolder& cut_holder,
-		   ymuint cut_size,
-		   bool flow_mode) :
-  mSbjGraph(sbjgraph),
-  mCutHolder(cut_holder),
-  mCutSize(cut_size),
-  mAreaCover(flow_mode),
-  mVerbose(false)
+SaSearch::SaSearch(
+  const SbjGraph& sbjgraph,
+  const CutHolder& cut_holder,
+  ymuint cut_size,
+  bool flow_mode
+) : mSbjGraph(sbjgraph),
+    mCutHolder(cut_holder),
+    mCutSize(cut_size),
+    mAreaCover(flow_mode),
+    mVerbose(false)
 {
   mInitTemp  = 5.0;
   mEndTemp   = 0.001;
@@ -164,9 +165,9 @@ SaSearch::evaluate(const vector<bool>& state)
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
 
   MapGen gen;
-  int lut_num;
-  int depth;
-  gen.estimate(mSbjGraph, record, lut_num, depth);
+  SizeType lut_num;
+  SizeType depth;
+  tie(lut_num, depth) = gen.estimate(mSbjGraph, record);
 
   if ( mMinimumLutNum > lut_num ) {
     mMinimumLutNum = lut_num;
