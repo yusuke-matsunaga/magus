@@ -23,7 +23,7 @@ include_directories (
 
 set ( RUN_PYM_BNET
   env PYTHONPATH=${PROJECT_BINARY_DIR}/magus_core/debug
-  ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/magus_core_test.py)
+  ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/magus_core_test.py)
 
 add_test ( PyReadBlifTest
   ${RUN_PYM_BNET} ReadBlifTest

@@ -20,7 +20,7 @@ add_subdirectory ( debug )
 
 add_subdirectory ( c++-test/equiv )
 add_subdirectory ( c++-test/techmap/sbjgraph )
-add_subdirectory ( py-test )
+#add_subdirectory ( py-test )
 
 
 # ===================================================================
