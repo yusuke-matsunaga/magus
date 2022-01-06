@@ -3,9 +3,8 @@
 /// @brief EquivMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "EquivMgr.h"
 #include "ym/FraigMgr.h"
@@ -23,30 +22,20 @@ BEGIN_NAMESPACE_MAGUS
 // @brief コンストラクタ
 // @param[in] sig_size シグネチャのサイズ
 // @param[in] solver_type SAT-solver の種類を表すオブジェクト
-EquivMgr::EquivMgr(int sig_size,
-		   const SatSolverType& solver_type) :
-  mSigSize(sig_size),
-  mSolverType(solver_type),
-  mLogLevel(0),
-  mLogOutP(nullptr),
-  mLoopLimit(10)
-{
-}
-
-// @brief デストラクタ
-EquivMgr::~EquivMgr()
+EquivMgr::EquivMgr(
+  SizeType sig_size,
+  const SatSolverType& solver_type
+) : mSigSize{sig_size},
+    mSolverType{solver_type}
 {
 }
 
 // @brief 2つの回路が等価かどうか調べる．
-// @param[in] network1 対象の回路1
-// @param[in] network2 対象の回路2
-// @param[out] eq_stats 各出力ごとの等価検証の結果
-//
-// 入力と出力の対応関係は順序で対応させる．
 EquivResult
-EquivMgr::check(const BnNetwork& network1,
-		const BnNetwork& network2)
+EquivMgr::check(
+  const BnNetwork& network1,
+  const BnNetwork& network2
+)
 {
   int ni = network1.input_num();
   if ( network2.input_num() != ni ) {
@@ -71,19 +60,13 @@ EquivMgr::check(const BnNetwork& network1,
 }
 
 // @brief 2つの回路が等価かどうか調べる．
-// @param[in] network1 対象の回路1
-// @param[in] network2 対象の回路2
-// @param[in] input2_list network2の入力順序を表すリスト
-// @param[in] output2_list network2の出力順序を表すリスト
-//
-// input2_list, output2_list ともに，network2 の i 番目の
-// 入力(出力)が network1 の何番目の入力(出力)に対応しているか
-// を示す．
 EquivResult
-EquivMgr::check(const BnNetwork& network1,
-		const BnNetwork& network2,
-		const vector<int>& input2_list,
-		const vector<int>& output2_list)
+EquivMgr::check(
+  const BnNetwork& network1,
+  const BnNetwork& network2,
+  const vector<int>& input2_list,
+  const vector<int>& output2_list
+)
 {
   // 最初に入出力数が等しいか調べる．
   int ni = network1.input_num();
