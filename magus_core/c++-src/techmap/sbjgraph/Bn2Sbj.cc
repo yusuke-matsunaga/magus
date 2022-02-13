@@ -160,7 +160,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
 
     int rid = bn_dff.clear();
     SbjNode* sbj_clear = nullptr;
-    if ( rid != kBnNullId ) {
+    if ( rid != BNET_NULLID ) {
       SbjHandle handle1 = node_map[rid];
       ASSERT_COND( !handle1.inv() );
       sbj_clear = handle1.node();
@@ -168,7 +168,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
 
     int pid = bn_dff.preset();
     SbjNode* sbj_preset = nullptr;
-    if ( pid != kBnNullId ) {
+    if ( pid != BNET_NULLID ) {
       SbjHandle handle1 = node_map[pid];
       ASSERT_COND( !handle1.inv() );
       sbj_preset = handle1.node();
@@ -198,7 +198,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
 
     int rid = bn_latch.clear();
     SbjNode* sbj_clear = nullptr;
-    if ( rid != kBnNullId ) {
+    if ( rid != BNET_NULLID ) {
       SbjHandle handle1 = node_map[rid];
       ASSERT_COND( !handle1.inv() );
       sbj_clear = handle1.node();
@@ -206,7 +206,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
 
     int pid = bn_latch.preset();
     SbjNode* sbj_preset = nullptr;
-    if ( pid != kBnNullId ) {
+    if ( pid != BNET_NULLID ) {
       SbjHandle handle1 = node_map[pid];
       ASSERT_COND( !handle1.inv() );
       sbj_preset = handle1.node();

@@ -37,7 +37,8 @@ bool
 ReadLiberty::read_library(const string& filename,
 			  ClibCellLibrary& library)
 {
-  return library.read_liberty(filename);
+  library = ClibCellLibrary::read_liberty(filename);
+  return library.cell_num() > 0;
 }
 
 END_NAMESPACE_MAGUS

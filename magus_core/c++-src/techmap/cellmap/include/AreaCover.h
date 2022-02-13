@@ -101,10 +101,8 @@ private:
 
   struct FFInfo
   {
-    FFInfo() : mCellId{-1} { }
-
-    int mCellId;
-    ClibFFInfo mPinInfo;
+    int mCellId{-1};
+    //ClibFFInfo mPinInfo;
   };
 
 

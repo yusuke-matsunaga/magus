@@ -38,7 +38,7 @@ list ( APPEND CMAKE_MODULE_PATH
 
 include (YmUtils)
 
-ym_init ("USE_POPT")
+ym_init ("USE_POPT" "USE_LZMA" "USE_ZLIB" "USE_BZIP2")
 ym_init_python ( REQUIRED )
 ym_init_cython ()
 ym_init_lua ()
@@ -89,6 +89,7 @@ ym_init_submodules (
   #  ym-bfo
   ym-bnet
   ym-cell
+  ym-codec
   ym-combopt
   ym-common
   ym-fraig

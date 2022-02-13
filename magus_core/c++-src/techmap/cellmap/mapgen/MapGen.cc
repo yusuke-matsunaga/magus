@@ -16,7 +16,7 @@
 #include "ym/BnNode.h"
 #include "ym/ClibCellLibrary.h"
 #include "ym/ClibCell.h"
-#include "ym/ClibCellPin.h"
+#include "ym/ClibPin.h"
 #include "ym/Expr.h"
 #include "ym/Range.h"
 
@@ -64,22 +64,22 @@ MapGen::generate(const SbjGraph& sbjgraph,
   mMapReqList.reserve(sbjgraph.output_num());
 
   // ポートの生成
-  int np = sbjgraph.port_num();
-  for ( int i = 0; i < np; ++ i ) {
+  SizeType np = sbjgraph.port_num();
+  for ( SizeType i = 0; i < np; ++ i ) {
     const SbjPort* sbjport = sbjgraph.port(i);
     gen_port(sbjport);
   }
 
   // D-FF の生成
-  int n_dff = sbjgraph.dff_num();
-  for ( int i = 0; i < n_dff; ++ i ) {
+  SizeType n_dff = sbjgraph.dff_num();
+  for ( SizeType i = 0; i < n_dff; ++ i ) {
     const SbjDff* sbj_dff = sbjgraph.dff(i);
     gen_dff(sbj_dff, record);
   }
 
   // ラッチの生成
-  int n_latch = sbjgraph.latch_num();
-  for ( int i = 0; i < n_latch; ++ i ) {
+  SizeType n_latch = sbjgraph.latch_num();
+  for ( SizeType i = 0; i < n_latch; ++ i ) {
     const SbjLatch* sbj_latch = sbjgraph.latch(i);
     gen_latch(sbj_latch);
   }
@@ -90,12 +90,12 @@ MapGen::generate(const SbjGraph& sbjgraph,
     bool ext_inv = rec.mInv;
     const SbjNode* node = onode->fanin(0);
     bool inv = onode->output_fanin_inv() ^ ext_inv;
-    int mapnode = 0;
+    SizeType mapnode = 0;
     if ( node ) {
       mapnode = back_trace(node, inv, record);
     }
     else {
-      int node_id = 0;
+      SizeType node_id = 0;
       if ( inv ) {
 	// 定数1ノードを作る．
 	int const1_cell = record.const1_cell();
@@ -109,29 +109,31 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	mapnode = mMapGraph->new_logic(string(), const0_cell);
       }
     }
-    int omapnode = node_info(onode, false).mMapNode;
+    SizeType omapnode = node_info(onode, false).mMapNode;
     mMapGraph->connect(mapnode, omapnode, 0);
   }
 }
 
 // @brief ポートの生成を行う．
 void
-MapGen::gen_port(const SbjPort* sbj_port)
+MapGen::gen_port(
+  const SbjPort* sbj_port
+)
 {
-  int nb = sbj_port->bit_width();
-  vector<int> iovect(nb);
-  for ( int i = 0; i < nb; ++ i ) {
+  SizeType nb = sbj_port->bit_width();
+  vector<BnDir> iovect(nb);
+  for ( SizeType i = 0; i < nb; ++ i ) {
     const SbjNode* sbj_node = sbj_port->bit(i);
     if ( sbj_node->is_input() ) {
-      iovect[i] = 0;
+      iovect[i] = BnDir::INPUT;
     }
     else {
-      iovect[i] = 1;
+      iovect[i] = BnDir::OUTPUT;
     }
   }
-  int port_id = mMapGraph->new_port(sbj_port->name(), iovect);
+  SizeType port_id = mMapGraph->new_port(sbj_port->name(), iovect);
   auto& dst_port = mMapGraph->port(port_id);
-  for ( int j = 0; j < nb; ++ j ) {
+  for ( SizeType j = 0; j < nb; ++ j ) {
     const SbjNode* sbj_node = sbj_port->bit(j);
     auto& node = mMapGraph->node(dst_port.bit(j));
     if ( sbj_node->is_input() ) {
@@ -148,8 +150,10 @@ MapGen::gen_port(const SbjPort* sbj_port)
 
 // @brief D-FF の生成を行う．
 void
-MapGen::gen_dff(const SbjDff* sbj_dff,
-		const MapRecord& record)
+MapGen::gen_dff(
+  const SbjDff* sbj_dff,
+  const MapRecord& record
+)
 {
   int dff_cell0_id = record.get_dff_cell(sbj_dff, false);
   int dff_cell1_id = record.get_dff_cell(sbj_dff, true);
@@ -166,18 +170,20 @@ MapGen::gen_dff(const SbjDff* sbj_dff,
     cell_id = dff_cell0_id;
   }
   const ClibCell& cell = record.cell_library().cell(cell_id);
-  ClibFFInfo ff_info = cell.ff_info();
+  //ClibFFInfo ff_info = cell.ff_info();
   int dff_id = mMapGraph->new_dff(string(), cell_id);
   auto& dff = mMapGraph->dff(dff_id);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
-  int output1 = dff.output();
-  ASSERT_COND( output1 != kBnNullId );
+  SizeType output1 = dff.output();
+  ASSERT_COND( output1 != BNET_NULLID );
   node_info(sbj_output, inv).mMapNode = output1;
+#if 0
   int output2 = dff.xoutput();
-  if ( output2 != kBnNullId ) {
+  if ( output2 != BNET_NULLID ) {
     node_info(sbj_output, !inv).mMapNode = output2;
   }
+#endif
 
   const SbjNode* sbj_input = sbj_dff->data_input();
   int input = dff.input();
@@ -187,14 +193,15 @@ MapGen::gen_dff(const SbjDff* sbj_dff,
   const SbjNode* sbj_clock = sbj_dff->clock();
   int clock = dff.clock();
   node_info(sbj_clock, false).mMapNode = clock;
-  bool clock_inv = (ff_info.clock_sense() == 2);
+  bool clock_inv = false; /*(ff_info.clock_sense() == 2);*/
   add_mapreq(sbj_clock, clock_inv);
 
+#if 0
   int clear_sense = ff_info.clear_sense();
   if ( clear_sense != 0 ) {
     const SbjNode* sbj_clear = inv ? sbj_dff->preset() : sbj_dff->clear();
     int clear = dff.clear();
-    ASSERT_COND( clear != kBnNullId );
+    ASSERT_COND( clear != BNET_NULLID );
     node_info(sbj_clear, false).mMapNode = clear;
     bool clear_inv = (clear_sense == 2);
     // sbj_clear->output_fanin() == nullptr の時もうまくいく．
@@ -205,12 +212,13 @@ MapGen::gen_dff(const SbjDff* sbj_dff,
   if ( preset_sense != 0 ) {
     const SbjNode* sbj_preset = inv ? sbj_dff->clear() : sbj_dff->preset();
     int preset = dff.preset();
-    ASSERT_COND( preset != kBnNullId );
+    ASSERT_COND( preset != BNET_NULLID );
     node_info(sbj_preset, false).mMapNode = preset;
     bool preset_inv = (preset_sense == 2);
     // sbj_preset->output_fanin() == nullptr の時もうまくいく．
     add_mapreq(sbj_preset, preset_inv);
   }
+#endif
 }
 
 // @brief ラッチの生成を行う．
@@ -237,7 +245,7 @@ MapGen::back_trace(const SbjNode* node,
 {
   NodeInfo& node_info = this->node_info(node, inv);
   int mapnode = node_info.mMapNode;
-  if ( mapnode != kBnNullId ) {
+  if ( mapnode != BNET_NULLID ) {
     // すでに生成済みならそのノードを返す．
     return mapnode;
   }

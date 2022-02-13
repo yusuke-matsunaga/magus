@@ -37,7 +37,8 @@ bool
 ReadMislib::read_library(const string& filename,
 			 ClibCellLibrary& library)
 {
-  return library.read_mislib(filename);
+  library = ClibCellLibrary::read_mislib(filename);
+  return library.cell_num() > 0;
 }
 
 END_NAMESPACE_MAGUS

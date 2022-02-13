@@ -64,7 +64,10 @@ public:
 
   /// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
   const vector<const SbjNode*>&
-  fanoutpoint_list() const;
+  fanoutpoint_list() const
+  {
+    return mFanoutPointList;
+  }
 
 
 private:
@@ -77,43 +80,65 @@ private:
   {
   public:
 
-    /// @brief コンストラクタ
-    ///
-    /// 無難な初期化を行う．
-    NodeInfo();
-
     /// @brief 参照回数を増やす．
-    /// @param[in] inv 反転フラグ
     void
-    inc_ref(bool inv = false);
+    inc_ref(
+      bool inv = false ///< [in] 反転フラグ
+    )
+    {
+      int idx = inv ? 1 : 0;
+      ++ mRefCount[idx];
+    }
 
     /// @brief マップ結果を設定する．
-    /// @param[in] node_id ノード番号
-    /// @param[in] depth 段数
-    /// @param[in] inv 反転フラグ
     void
-    set_map(int node_id,
-	    int depth,
-	    bool inv = false);
+    set_map(
+      int node_id,     ///< [in] ノード番号
+      int depth,       ///< [in] 段数
+      bool inv = false ///< [in] 反転フラグ
+    )
+    {
+      int idx = inv ? 1 : 0;
+      mMapNode[idx] = node_id;
+      mDepth[idx] = depth;
+    }
 
     /// @brief 参照回数を返す．
-    /// @param[in] inv 反転フラグ
     int
-    ref_count(bool inv = false) const;
+    ref_count(
+      bool inv = false ///< [in] 反転フラグ
+    ) const
+    {
+      int idx = inv ? 1 : 0;
+      return mRefCount[idx];
+    }
 
     /// @brief 負極性しか作らないときに true を返す．
     bool
-    inv_req() const;
+    inv_req() const
+    {
+      return (mRefCount[1] > 0) && (mRefCount[0] == 0);
+    }
 
     /// @brief マップ結果を返す．
-    /// @param[in] inv 反転フラグ
     int
-    map_node(bool inv = false) const;
+    map_node(
+      bool inv = false ///< [in] 反転フラグ
+    ) const
+    {
+      int idx = inv ? 1 : 0;
+      return mMapNode[idx];
+    }
 
     /// @brief 段数を返す．
-    /// @param[in] inv 反転フラグ
     int
-    depth(bool inv = false) const;
+    depth(
+      bool inv = false ///< [in] 反転フラグ
+    ) const
+    {
+      int idx = inv ? 1 : 0;
+      return mDepth[idx];
+    }
 
 
   private:
@@ -123,15 +148,15 @@ private:
 
     // 使われている回数
     // 正極性と負極性の2通りを保持する．
-    int mRefCount[2];
+    int mRefCount[2]{0, 0};
 
-    // マップ結果
+    // マップ結果のノード番号
     // 正極性と負極性の2通りを保持する．
-    int mMapNode[2];
+    SizeType mMapNode[2]{BNET_NULLID, BNET_NULLID};
 
     // 段数
     // 正極性と負極性の2通りを保持する．
-    int mDepth[2];
+    int mDepth[2]{0, 0};
 
   };
 
@@ -177,10 +202,10 @@ private:
   vector<NodeInfo> mNodeInfo;
 
   // 定数0のノード番号
-  int mConst0;
+  SizeType mConst0;
 
   // 定数1のノード番号
-  int mConst1;
+  SizeType mConst1;
 
   // LUT数の見積もりに使う作業領域
   int mLutNum;
@@ -189,96 +214,6 @@ private:
   vector<const SbjNode*> mFanoutPointList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
-inline
-const vector<const SbjNode*>&
-MapGen::fanoutpoint_list() const
-{
-  return mFanoutPointList;
-}
-
-// @brief コンストラクタ
-//
-// 無難な初期化を行う．
-inline
-MapGen::NodeInfo::NodeInfo()
-{
-  mRefCount[0] = 0;
-  mRefCount[1] = 0;
-  mMapNode[0] = kBnNullId;
-  mMapNode[1] = kBnNullId;
-  mDepth[0] = 0;
-  mDepth[1] = 0;
-}
-
-// @brief 参照回数を増やす．
-// @param[in] inv 反転フラグ
-inline
-void
-MapGen::NodeInfo::inc_ref(bool inv)
-{
-  int idx = inv ? 1 : 0;
-  ++ mRefCount[idx];
-}
-
-// @brief マップ結果を設定する．
-// @param[in] node_id ノード番号
-// @param[in] depth 段数
-// @param[in] inv 反転フラグ
-inline
-void
-MapGen::NodeInfo::set_map(int node_id,
-			  int depth,
-			  bool inv)
-{
-  int idx = inv ? 1 : 0;
-  mMapNode[idx] = node_id;
-  mDepth[idx] = depth;
-}
-
-// @brief 参照回数を返す．
-// @param[in] inv 反転フラグ
-inline
-int
-MapGen::NodeInfo::ref_count(bool inv) const
-{
-  int idx = inv ? 1 : 0;
-  return mRefCount[idx];
-}
-
-// @brief 負極性しか作らないときに true を返す．
-inline
-bool
-MapGen::NodeInfo::inv_req() const
-{
-  return (mRefCount[1] > 0) && (mRefCount[0] == 0);
-}
-
-// @brief マップ結果を返す．
-// @param[in] inv 反転フラグ
-inline
-int
-MapGen::NodeInfo::map_node(bool inv) const
-{
-  int idx = inv ? 1 : 0;
-  return mMapNode[idx];
-}
-
-// @brief 段数を返す．
-// @param[in] inv 反転フラグ
-inline
-int
-MapGen::NodeInfo::depth(bool inv) const
-{
-  int idx = inv ? 1 : 0;
-  return mDepth[idx];
-}
 
 END_NAMESPACE_LUTMAP
 

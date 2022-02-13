@@ -9,6 +9,7 @@
 
 #include "DumpLibrary.h"
 #include "ym/ClibCellLibrary.h"
+#include "ym/BinEnc.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -52,7 +53,8 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  cur_cell_library().dump(fo);
+  BinEnc benc{fo};
+  cur_cell_library().dump(benc);
 
   return TCL_OK;
 }

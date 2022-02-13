@@ -3,9 +3,8 @@
 /// @brief MapGen の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "MapGen.h"
 #include "MapRecord.h"
@@ -100,8 +99,8 @@ MapGen::init(int node_num)
   // 具体的な初期化は NodeInfo のコンストラクタが行っている．
   mNodeInfo.clear();
   mNodeInfo.resize(node_num);
-  mConst0 = kBnNullId;
-  mConst1 = kBnNullId;
+  mConst0 = BNET_NULLID;
+  mConst1 = BNET_NULLID;
   mLutNum = 0;
 
   mFanoutPointList.clear();
@@ -146,10 +145,10 @@ MapGen::generate(const SbjGraph& sbjgraph,
   for ( int i = 0; i < np; ++ i ) {
     const SbjPort* sbjport = sbjgraph.port(i);
     int nb = sbjport->bit_width();
-    vector<int> dir_vect(nb);
+    vector<BnDir> dir_vect(nb);
     for ( int j = 0; j < nb; ++ j ) {
       const SbjNode* sbjnode = sbjport->bit(j);
-      dir_vect[j] = sbjnode->is_input() ? 0 : 1;
+      dir_vect[j] = sbjnode->is_input() ? BnDir::INPUT : BnDir::OUTPUT;
     }
     int port_id = mapgraph.new_port(sbjport->name(), dir_vect);
     auto& bn_port = mapgraph.port(port_id);
@@ -252,7 +251,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
     else {
       // 定数の場合
       if ( inv ) {
-	if ( mConst1 == kBnNullId ) {
+	if ( mConst1 == BNET_NULLID ) {
 	  TvFunc tv = TvFunc::make_one(0);
 	  mConst1 = mapgraph.new_logic(string(), tv);
 	  mConst1 = node_id;
@@ -266,7 +265,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	node_id = mConst1;
       }
       else {
-	if ( mConst0 == kBnNullId ) {
+	if ( mConst0 == BNET_NULLID ) {
 	  TvFunc tv = TvFunc::make_zero(0);
 	  mConst0 = mapgraph.new_logic(string(), tv);
 
@@ -325,7 +324,7 @@ MapGen::gen_back_trace(const SbjNode* node,
   NodeInfo& node_info = mNodeInfo[node->id()];
 
   int node_id = node_info.map_node(output_inv);
-  if ( node_id != kBnNullId ) {
+  if ( node_id != BNET_NULLID ) {
     // すでに生成済みならそのノードを返す．
     return node_id;
   }
@@ -365,7 +364,7 @@ MapGen::gen_back_trace(const SbjNode* node,
   // gen_back_trace() の再帰のたびにスタック上に input_inv が作られる
   // ことになるのであえてここで行う．
   vector<bool> input_inv(ni, false);
-  vector<int> fanin_id_list(ni);
+  vector<SizeType> fanin_id_list(ni);
   for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = cut->input(i);
     const NodeInfo& inode_info = mNodeInfo[inode->id()];
@@ -409,11 +408,11 @@ MapGen::estimate(const SbjGraph& sbjgraph,
 
   init(sbjgraph.node_num());
 
-  int ni = sbjgraph.input_num();
-  int no = sbjgraph.output_num();
+  SizeType ni = sbjgraph.input_num();
+  SizeType no = sbjgraph.output_num();
 
   // 外部出力から要求されている極性を記録する．
-  for ( int i = 0; i < no; ++ i ) {
+  for ( SizeType i = 0; i < no; ++ i ) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
     if ( node ) {
@@ -422,7 +421,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
   }
 
   // 外部入力の生成
-  for ( int i = 0; i < ni; ++ i ) {
+  for ( SizeType i = 0; i < ni; ++ i ) {
     const SbjNode* node = sbjgraph.input(i);
     NodeInfo& node_info = mNodeInfo[node->id()];
     node_info.set_map(1, 0);
@@ -452,7 +451,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
     }
     else {
       if ( inv ) {
-	if ( mConst1 == kBnNullId ) {
+	if ( mConst1 == BNET_NULLID ) {
 	  mConst1 = 1;
 
 	  ++ mLutNum;
@@ -463,7 +462,7 @@ MapGen::estimate(const SbjGraph& sbjgraph,
 	}
       }
       else {
-	if ( mConst0 == kBnNullId ) {
+	if ( mConst0 == BNET_NULLID ) {
 	  mConst0 = 1;
 
 	  ++ mLutNum;
@@ -480,8 +479,8 @@ MapGen::estimate(const SbjGraph& sbjgraph,
   depth = max_depth;
 
   // ファンアウトポイントを記録する．
-  int nl = sbjgraph.logic_num();
-  for ( int i = 0; i < nl; ++ i ) {
+  SizeType nl = sbjgraph.logic_num();
+  for ( SizeType i = 0; i < nl; ++ i ) {
     const SbjNode* node = sbjgraph.logic(i);
     const NodeInfo& node_info = mNodeInfo[node->id()];
     if ( node_info.ref_count(false) > 1 || node_info.ref_count(true) > 1 ) {

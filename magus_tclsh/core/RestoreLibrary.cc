@@ -9,6 +9,7 @@
 
 #include "RestoreLibrary.h"
 #include "ym/ClibCellLibrary.h"
+#include "ym/BinDec.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -45,7 +46,8 @@ RestoreLibrary::read_library(const string& filename,
     return false;
   }
 
-  library.restore(fi);
+  BinDec bdec{fi};
+  library.restore(bdec);
 
   return true;
 }

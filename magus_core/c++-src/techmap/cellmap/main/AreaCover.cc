@@ -9,11 +9,12 @@
 
 #include "AreaCover.h"
 #include "ym/ClibCell.h"
+#include "ym/ClibCellList.h"
 #include "ym/ClibCellLibrary.h"
+#include "ym/ClibIOMap.h"
 #include "ym/ClibPatGraph.h"
 #include "ym/ClibCellClass.h"
 #include "ym/ClibCellGroup.h"
-#include "ym/ClibObjList.h"
 #include "SbjGraph.h"
 #include "PatMatcher.h"
 #include "MapRecord.h"
@@ -68,14 +69,14 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
   record_cuts(sbjgraph, cell_library, maprec);
 
   // 定数０のセルを登録する．
-  if ( cell_library.const0_func().cell_list().num() > 0 ) {
-    const ClibCell& c0_cell = cell_library.const0_func().cell_list()[0];
+  if ( cell_library.const0_func().cell_num() > 0 ) {
+    const ClibCell& c0_cell = cell_library.const0_func().cell(0);
     maprec.set_const0(c0_cell.id());
   }
 
   // 定数１のセルを登録する．
-  if ( cell_library.const1_func().cell_list().num() > 0 ) {
-    const ClibCell& c1_cell = cell_library.const1_func().cell_list()[0];
+  if ( cell_library.const1_func().cell_num() > 0 ) {
+    const ClibCell& c1_cell = cell_library.const1_func().cell(0);
     maprec.set_const1(c1_cell.id());
   }
 
@@ -107,32 +108,30 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
     }
 
     int min_cell_id = -1;
-    ClibFFInfo min_pin_info;
+    //ClibFFInfo min_pin_info;
     ClibArea min_area = ClibArea::infty();
     const ClibCellClass& ff_class = cell_library.simple_ff_class(has_clear, has_preset);
-    if ( ff_class.group_list().num() > 0 ) {
-      for ( auto& ff_group: ff_class.group_list() ) {
-	for ( auto& cell: ff_group.cell_list() ) {
-	  ClibArea area = cell.area();
-	  if ( min_area > area ) {
-	    min_area = area;
-	    min_cell_id = cell.id();
-	    min_pin_info = ff_group.ff_info();
-	  }
+    for ( auto& ff_group: ff_class.cell_group_list() ) {
+      for ( auto& cell: ff_group.cell_list() ) {
+	ClibArea area = cell.area();
+	if ( min_area > area ) {
+	  min_area = area;
+	  min_cell_id = cell.id();
+	  //min_pin_info = ff_group.ff_info();
 	}
       }
     }
     if ( min_cell_id != -1 ) {
       ff_info.mCellId = min_cell_id;
-      ff_info.mPinInfo = min_pin_info;
+      //ff_info.mPinInfo = min_pin_info;
     }
     else {
       ff_info.mCellId = -1;
     }
   }
 
-  int ndff = sbjgraph.dff_num();
-  for ( int i = 0; i < ndff; ++ i ) {
+  SizeType ndff = sbjgraph.dff_num();
+  for ( SizeType i = 0; i < ndff; ++ i ) {
     const SbjDff* dff = sbjgraph.dff(i);
     const SbjNode* clear = dff->clear();
     const SbjNode* preset = dff->preset();
@@ -231,24 +230,23 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 	  cout << "Match with Pat#" << pat_id
 	       << ", Rep#" << rep_id << endl;
 	}
-	const ClibCellClass& rep = cell_library.npn_class_list()[rep_id];
-	for ( auto& group: rep.group_list() ) {
-	  const NpnMapM& npn_map = group.map();
+	const ClibCellClass& rep = cell_library.npn_class(rep_id);
+	for ( auto& group: rep.cell_group_list() ) {
+	  const ClibIOMap& iomap = group.iomap();
 	  Cut c_cut(ni);
 	  for ( int i = 0; i < ni; ++ i ) {
-	    NpnVmap imap = npn_map.imap(VarId(i));
-	    VarId dst_var = imap.var();
-	    int pos = dst_var.val();
+	    auto pinmap = iomap.input_map(i);
+	    int pos = pinmap.id();
 	    const SbjNode* inode = cut.leaf_node(pos);
 	    bool iinv = cut.leaf_inv(pos);
-	    if ( imap.inv() ) {
+	    if ( pinmap.inv() ) {
 	      iinv = !iinv;
 	    }
 	    c_cut.set_leaf(i, inode, iinv);
 	    mLeafNum[inode->id()] = i;
 	  }
 	  bool root_inv = pat.root_inv();
-	  if ( npn_map.omap(VarId(0)).inv() ) {
+	  if ( iomap.output_map(0).inv() ) {
 	    root_inv = !root_inv;
 	  }
 	  if ( debug ) {

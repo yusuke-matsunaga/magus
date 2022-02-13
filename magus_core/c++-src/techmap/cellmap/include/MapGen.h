@@ -60,20 +60,14 @@ private:
   // ノードの割り当て情報
   struct NodeInfo
   {
-    NodeInfo()
-    {
-      mCell = nullptr;
-      mMapNode = kBnNullId;
-    }
-
     // マッチ
     Cut mMatch;
 
     // セル
-    const ClibCell* mCell;
+    const ClibCell* mCell{nullptr};
 
     // マップ結果
-    int mMapNode;
+    SizeType mMapNode{BNET_NULLID};
 
   };
 
@@ -81,10 +75,11 @@ private:
   struct MapReq
   {
     // コンストラクタ
-    MapReq(const SbjNode* node = nullptr,
-	   bool inv = false) :
-      mNode(node),
-      mInv(inv)
+    MapReq(
+      const SbjNode* node = nullptr,
+      bool inv = false
+    ) : mNode(node),
+	mInv(inv)
     {
     }
 
