@@ -31,3 +31,6 @@
 [submodule "ym-fraig"]
 	path = ym-fraig
 	url = git@github.com:yusuke-matsunaga/ym-fraig.git
+[submodule "ym-codec"]
+	path = ym-codec
+	url = git@github.com:yusuke-matsunaga/ym-codec.git
