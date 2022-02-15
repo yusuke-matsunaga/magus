@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // コンストラクタ
-StpwatchObj::StpwatchObj()
+TimerObj::TimerObj()
 {
   const char* usage =
     " CMD\n"
@@ -37,13 +37,13 @@ StpwatchObj::StpwatchObj()
 }
 
 // デストラクタ
-StpwatchObj::~StpwatchObj()
+TimerObj::~TimerObj()
 {
 }
 
 // ストップウォッチを操作するコマンド
 int
-StpwatchObj::cmd_proc(TclObjVector& objv)
+TimerObj::cmd_proc(TclObjVector& objv)
 {
   if ( objv.size() != 2 ) {
     print_usage();
@@ -52,34 +52,18 @@ StpwatchObj::cmd_proc(TclObjVector& objv)
 
   string cmd = objv[1];
   if ( cmd == "reset" ) {
-    mStopWatch.reset();
+    mTimer.reset();
   }
   else if ( cmd == "start" ) {
-    mStopWatch.start();
+    mTimer.start();
   }
   else if ( cmd == "stop" ) {
-    mStopWatch.stop();
+    mTimer.stop();
   }
   else if ( cmd == "get" ) {
-    USTime time = mStopWatch.time();
-    TclObj tmp[3];
-    tmp[0] = time.real_time();
-    tmp[1] = time.usr_time();
-    tmp[2] = time.sys_time();
-    TclObj result(3, tmp);
+    auto time = mTimer.get_time();
+    TclObj result(time);
     set_result(result);
-  }
-  else if ( cmd == "get_rtime" ) {
-    USTime time = mStopWatch.time();
-    set_result(time.real_time());
-  }
-  else if ( cmd == "get_utime" ) {
-    USTime time = mStopWatch.time();
-    set_result(time.usr_time());
-  }
-  else if ( cmd == "get_stime" ) {
-    USTime time = mStopWatch.time();
-    set_result(time.sys_time());
   }
   else {
     TclObj emsg;
@@ -95,11 +79,11 @@ StpwatchObj::cmd_proc(TclObjVector& objv)
 // タイマーオブジェクトを生成するコマンドクラス
 //////////////////////////////////////////////////////////////////////
 
-// StpwatchObjのオブジェクトを生成する仮想関数
+// TimerObjのオブジェクトを生成する仮想関数
 TclCmd*
 StpwatchCls::create_obj() const
 {
-  return new StpwatchObj();
+  return new TimerObj();
 }
 
 
@@ -110,9 +94,9 @@ StpwatchCls::create_obj() const
 // コンストラクタ
 TimeCmd::TimeCmd()
 {
-  mStopWatch.reset();
-  mStopWatch.start();
-  mTotalTime.set(0.0, 0.0, 0.0);
+  mTimer.reset();
+  mTimer.start();
+  mTotalTime = 0.0;
 }
 
 // デストラクタ
@@ -126,15 +110,15 @@ TimeCmd::~TimeCmd()
 int
 TimeCmd::cmd_proc(TclObjVector& objv)
 {
-  mStopWatch.stop();
-  USTime time = mStopWatch.time();
+  mTimer.stop();
+  auto time = mTimer.get_time();
   mTotalTime += time;
 
   int code = TCL_OK;
   TclObj res;
   if ( objv.size() > 1 ) {
-    mStopWatch.reset();
-    mStopWatch.start();
+    mTimer.reset();
+    mTimer.start();
 
     // 残りの引数を評価する．
     TclObjVector::const_iterator p1 = objv.begin();
@@ -144,24 +128,20 @@ TimeCmd::cmd_proc(TclObjVector& objv)
     TclObj new_args(tmp_array);
     code = eval(new_args);
 
-    mStopWatch.stop();
-    time = mStopWatch.time();
+    mTimer.stop();
+    time = mTimer.get_time();
     mTotalTime += time;
     res = result();
     res << "\n";
   }
 
   char buff[128];
-  sprintf(buff, "Lap:%7.2fu%7.2fs%7.2fr, Total:%7.2fu%7.2fs%7.2fr",
-	  time.usr_time(),
-	  time.sys_time(),
-	  time.real_time(),
-	  mTotalTime.usr_time(),
-	  mTotalTime.sys_time(),
-	  mTotalTime.real_time());
+  sprintf(buff, "Lap:%7.2fms, Total:%7.2fms",
+	  time,
+	  mTotalTime);
 
-  mStopWatch.reset();
-  mStopWatch.start();
+  mTimer.reset();
+  mTimer.start();
 
   res << buff;
   set_result(res);

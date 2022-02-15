@@ -17,7 +17,7 @@
 #include "magus.h"
 
 #include "ym/TclCmd.h"
-#include "ym/StopWatch.h"
+#include "ym/Timer.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -25,17 +25,17 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 // ストップウォッチ操作を行うコマンド用のクラス
 //////////////////////////////////////////////////////////////////////
-class StpwatchObj :
+class TimerObj :
   public TclCmd
 {
 public:
 
   // コンストラクタ
-  StpwatchObj();
+  TimerObj();
 
   // デストラクタ
   virtual
-  ~StpwatchObj();
+  ~TimerObj();
 
 
 protected:
@@ -52,7 +52,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 本当のストップウォッチオブジェクト
-  StopWatch mStopWatch;
+  Timer mTimer;
 
 };
 
@@ -65,7 +65,7 @@ class StpwatchCls :
 {
 protected:
 
-  // StpwatchObjのオブジェクトを生成する仮想関数
+  // TimerObjのオブジェクトを生成する仮想関数
   virtual
   TclCmd*
   create_obj() const;
@@ -103,10 +103,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 時間計測を行うオブジェクト
-  StopWatch mStopWatch;
+  Timer mTimer;
 
   // 今までの経過時間
-  USTime mTotalTime;
+  double mTotalTime;
 };
 
 END_NAMESPACE_MAGUS
