@@ -47,6 +47,24 @@ bnet_new(
   return 1;
 }
 
+// BnNetwork 用のデストラクタ
+int
+bnet_gc(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  auto bnet = lua.to_bnet(1);
+  if ( bnet ) {
+    // デストラクタを明示的に起動する．
+    bnet->~BnNetwork();
+  }
+
+  // メモリは Lua が開放する．
+  return 0;
+}
+
 // blif ファイルを読み込む．
 int
 bnet_read_blif(
@@ -63,9 +81,7 @@ bnet_read_blif(
     auto filename = lua.to_string(2);
     auto src = BnNetwork::read_blif(filename);
     if ( src.node_num() == 0 ) {
-      lua.push_boolean(false);
-      lua.push_string("Error during BnNetwork::read_blif");
-      return 2;
+      return lua.error_end("Error during BnNetwork::read_blif");
     }
 
     // 今読み込んだネットワークの内容をムーブする．
@@ -77,9 +93,7 @@ bnet_read_blif(
     //bnet = BnNetwork::read_blif(filename, cell_library);
   }
   else {
-    lua.push_boolean(false);
-    lua.push_string("Error: BnNetwork:read_blif() expects one or two arguments.");
-    return 2;
+    return lua.error_end("Error: BnNetwork:read_blif() expects one or two arguments.");
   }
 
   lua.push_boolean(true);
@@ -102,27 +116,67 @@ bnet_read_iscas89(
     auto filename = lua.to_string(2);
     auto src = BnNetwork::read_iscas89(filename);
     if ( src.node_num() == 0 ) {
-      lua.push_boolean(false);
-      lua.push_string("Error during BnNetwork::read_iscas89");
-      return 2;
+      return lua.error_end("Error during BnNetwork::read_iscas89");
     }
 
     // 今読み込んだネットワークの内容をムーブする．
     bnet->move(std::move(src));
   }
   else {
-    lua.push_boolean(false);
-    lua.push_string("Error: BnNetwork:read_iscas89() expects one argument.");
-    return 2;
+    return lua.error_end("Error: BnNetwork:read_iscas89() expects one argument.");
   }
 
   lua.push_boolean(true);
   return 1;
 }
 
-// 諸元を書き出す．
+// blif 形式でファイルに書き出す．
 int
-bnet_write_stats(
+bnet_write_blif(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  int n = lua.get_top();
+  if ( n != 2 ) {
+    return lua.error_end("Error: BnNetwork:write_blif() expects one argument.");
+  }
+
+  auto bnet = lua.to_bnet(1);
+  auto filename = lua.to_string(2);
+
+  bnet->write_blif(filename);
+
+  lua.push_boolean(true);
+  return 1;
+}
+
+// iscas89 形式でファイルに書き出す．
+int
+bnet_write_iscas89(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  int n = lua.get_top();
+  if ( n != 2 ) {
+    return lua.error_end("Error: BnNetwork:write_iscas89() expects one argument.");
+  }
+
+  auto bnet = lua.to_bnet(1);
+  auto filename = lua.to_string(2);
+
+  bnet->write_iscas89(filename);
+
+  lua.push_boolean(true);
+  return 1;
+}
+
+// 内容をクリアする．
+int
+bnet_clear(
   lua_State* L
 )
 {
@@ -130,34 +184,79 @@ bnet_write_stats(
 
   int n = lua.get_top();
   if ( n != 1 ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: BnNetwork::write_stats() expects no arguments.");
-    return 2;
+    return lua.error_end("Error: BnNetwork:clear() expects no arguments.");
   }
 
   auto bnet = lua.to_bnet(1);
 
-  auto name = bnet->name();
-  lua.push_string(name.c_str());
+  bnet->clear();
+
+  lua.push_boolean(true);
   return 1;
 }
 
-// BnNetwork 用のデストラクタ
+// 内容をコピーする．
 int
-bnet_gc(
+bnet_copy(
   lua_State* L
 )
 {
   LuaMagus lua{L};
 
-  auto bnet = lua.to_bnet(1);
-  if ( bnet ) {
-    // デストラクタを明示的に起動する．
-    bnet->~BnNetwork();
+  int n = lua.get_top();
+  if ( n != 2 ) {
+    return lua.error_end("Error: BnNetwork:copy() expects two arguments.");
   }
 
-  // メモリは Lua が開放する．
-  return 0;
+  auto bnet = lua.to_bnet(1);
+  auto src = lua.to_bnet(2);
+
+  bnet->copy(*src);
+
+  lua.push_boolean(true);
+  return 1;
+}
+
+// 名前をセットする．
+int
+bnet_set_name(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  int n = lua.get_top();
+  if ( n != 2 ) {
+    return lua.error_end("Error: BnNetwork:set_name() expects one argment.");
+  }
+
+  auto bnet = lua.to_bnet(1);
+  auto name = lua.to_string(2);
+
+  bnet->set_name(name);
+
+  lua.push_boolean(true);
+  return 1;
+}
+
+// 名前を得る．
+int
+bnet_name(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  int n = lua.get_top();
+  if ( n != 1 ) {
+    return lua.error_end("Error: BnNetwork:name() expects no arguments.");
+  }
+
+  auto bnet = lua.to_bnet(1);
+  auto name = bnet->name();
+
+  lua.push_string(name.c_str());
+  return 1;
 }
 
 END_NONAMESPACE
@@ -169,7 +268,12 @@ LuaMagus::init_Bnet()
   static const struct luaL_Reg mt[] = {
     {"read_blif", bnet_read_blif},
     {"read_iscas89", bnet_read_iscas89},
-    {"write_stats", bnet_write_stats},
+    {"write_blif", bnet_write_blif},
+    {"write_iscas89", bnet_write_iscas89},
+    {"clear", bnet_clear},
+    {"copy", bnet_copy},
+    {"set_name", bnet_set_name},
+    {"name", bnet_name},
     {nullptr, nullptr}
   };
 
