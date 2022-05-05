@@ -122,6 +122,7 @@ add_subdirectory ( ym-tclpp )
 
 add_subdirectory ( magus_core )
 add_subdirectory ( magus_tclsh )
+add_subdirectory ( magus_lua )
 
 
 # ===================================================================
