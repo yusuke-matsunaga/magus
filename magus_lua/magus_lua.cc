@@ -36,27 +36,43 @@ main(
   using namespace std;
   using namespace MAGUS_NAMESPACE;
 
-  if ( argc < 2 ) {
-    usage(argv);
-    return 1;
-  }
-
   LuaMagus lua;
 
   lua.L_openlibs();
   lua.open_Magus();
 
-  // 引数を lua のグローバル変数 "arg" にセットする．
-  lua.create_table(argc, 0);
-  for ( int i = 0; i < argc; ++ i ) {
-    lua.push_string(argv[i]);
-    lua.set_table(-2, i);
+  if ( argc == 1 ) {
+    for ( ; ; ) {
+      cerr << "% ";
+      cerr.flush();
+      string linebuf;
+      if ( !getline(cin, linebuf) ) {
+	break;
+      }
+      int err = lua.L_loadstring(linebuf.c_str()) || lua.pcall(0, 0, 0);
+      if ( err ) {
+	cerr << lua.to_string(-1) << endl;
+	lua.pop(1);
+      }
+    }
   }
-  lua.set_global("arg");
-
-  string init_file = argv[1];
-  if ( init_file != string{} && lua.L_dofile(init_file.c_str()) ) {
-    cerr << lua.to_string(-1) << endl;
+  else if ( argc >= 2 ) {
+    // 引数を lua のグローバル変数 "arg" にセットする．
+    lua.create_table(argc, 0);
+    for ( int i = 0; i < argc; ++ i ) {
+      lua.push_string(argv[i]);
+      lua.set_table(-2, i);
+    }
+    lua.set_global("arg");
+    // 先頭の引数をスクリプトファイルとみなして実行する．
+    string init_file = argv[1];
+    if ( init_file != string{} && lua.L_dofile(init_file.c_str()) ) {
+      cerr << lua.to_string(-1) << endl;
+      return 1;
+    }
+  }
+  else {
+    usage(argv);
     return 1;
   }
 
