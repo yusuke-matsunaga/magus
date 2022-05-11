@@ -18,6 +18,7 @@ void
 LuaMagus::open_Magus()
 {
   init_Bnet();
+  init_Clib();
 }
 
 END_NAMESPACE_MAGUS

@@ -17,6 +17,7 @@ set (magus_lua_SOURCES
   magus_lua.cc
   LuaMagus.cc
   LuaMagus_Bnet.cc
+  LuaMagus_Clib.cc
   )
 
 

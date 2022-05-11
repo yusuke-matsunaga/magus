@@ -96,21 +96,25 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
 		  MapRecord& maprec)
 {
   // FFの割り当て情報を作る．
-  for (ymuint i = 0; i < 4; ++ i) {
+  for (ymuint i = 0; i < 8; ++ i) {
     FFInfo& ff_info = mFFInfo[i];
+    bool master_slave = false;
     bool has_clear = false;
     bool has_preset = false;
-    if ( i & 1U ) {
-      has_clear = true;
+    if ( i & 1 ) {
+      master_slave = true;
     }
     if ( i & 2U ) {
+      has_clear = true;
+    }
+    if ( i & 4U ) {
       has_preset = true;
     }
 
     int min_cell_id = -1;
     //ClibFFInfo min_pin_info;
     ClibArea min_area = ClibArea::infty();
-    const ClibCellClass& ff_class = cell_library.simple_ff_class(has_clear, has_preset);
+    auto& ff_class = cell_library.simple_ff_class(master_slave, has_clear, has_preset);
     for ( auto& ff_group: ff_class.cell_group_list() ) {
       for ( auto& cell: ff_group.cell_list() ) {
 	ClibArea area = cell.area();

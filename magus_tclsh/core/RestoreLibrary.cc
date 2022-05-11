@@ -3,9 +3,8 @@
 /// @brief RestoreLibrary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "RestoreLibrary.h"
 #include "ym/ClibCellLibrary.h"
@@ -19,8 +18,9 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-RestoreLibrary::RestoreLibrary(MagMgr* mgr) :
-  ReadLibrary(mgr)
+RestoreLibrary::RestoreLibrary(
+  MagMgr* mgr
+) : ReadLibrary{mgr}
 {
   set_usage_string("<filename>");
 }
@@ -35,8 +35,10 @@ RestoreLibrary::~RestoreLibrary()
 // @param[in] library 設定対象のライブラリ
 // @return 読み込みが成功したら true を返す．
 bool
-RestoreLibrary::read_library(const string& filename,
-			     ClibCellLibrary& library)
+RestoreLibrary::read_library(
+  const string& filename,
+  ClibCellLibrary& library
+)
 {
   ifstream fi(filename);
   if ( !fi ) {
@@ -46,8 +48,7 @@ RestoreLibrary::read_library(const string& filename,
     return false;
   }
 
-  BinDec bdec{fi};
-  library.restore(bdec);
+  library.restore(fi);
 
   return true;
 }

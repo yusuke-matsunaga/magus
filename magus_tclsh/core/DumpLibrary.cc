@@ -3,9 +3,8 @@
 /// @brief DumpLibrary の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "DumpLibrary.h"
 #include "ym/ClibCellLibrary.h"
@@ -15,8 +14,9 @@
 BEGIN_NAMESPACE_MAGUS
 
 // @brief コンストラクタ
-DumpLibrary::DumpLibrary(MagMgr* mgr) :
-  MagCmd(mgr)
+DumpLibrary::DumpLibrary(
+  MagMgr* mgr
+) : MagCmd(mgr)
 {
   set_usage_string("output-filename");
 }
@@ -28,7 +28,9 @@ DumpLibrary::~DumpLibrary()
 
 // @brief コマンドを実行する仮想関数
 int
-DumpLibrary::cmd_proc(TclObjVector& objv)
+DumpLibrary::cmd_proc(
+  TclObjVector& objv
+)
 {
   int objc = objv.size();
   if ( objc != 2 ) {
@@ -53,8 +55,7 @@ DumpLibrary::cmd_proc(TclObjVector& objv)
     return TCL_ERROR;
   }
 
-  BinEnc benc{fo};
-  cur_cell_library().dump(benc);
+  cur_cell_library().dump(fo);
 
   return TCL_OK;
 }

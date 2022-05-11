@@ -10,6 +10,7 @@
 
 #include "Luapp.h"
 #include "ym/bnet.h"
+#include "ym/clib.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -70,6 +71,20 @@ public:
     int idx ///< [in] スタック上のインデックス
   );
 
+  /// @brief 対象が ClibCellLibrary の時 true を返す．
+  bool
+  is_clib(
+    int idx ///< [in] スタック上のインデックス
+  );
+
+  /// @brief 対象を ClibCellLibrary として取り出す．
+  ///
+  /// ClibCellLibrary でない時は nullptr を返す．
+  ClibCellLibrary*
+  to_clib(
+    int idx ///< [in] スタック上のインデックス
+  );
+
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -79,6 +94,10 @@ private:
   /// @brief BnNetwork 関係の初期化を行う．
   void
   init_Bnet();
+
+  /// @brief ClibCellLibrary 関係の初期化を行う．
+  void
+  init_Clib();
 
 
 private:

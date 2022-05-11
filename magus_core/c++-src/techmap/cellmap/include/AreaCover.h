@@ -121,7 +121,7 @@ private:
   vector<int> mLeafNum;
 
   // FFの割り当て情報
-  FFInfo mFFInfo[4];
+  FFInfo mFFInfo[8];
 
 };
 
@@ -133,8 +133,10 @@ private:
 // @brief (node, inv) に対応する NodeInfo を取り出す．
 inline
 double&
-AreaCover::cost(const SbjNode* node,
-		bool inv)
+AreaCover::cost(
+  const SbjNode* node,
+  bool inv
+)
 {
   return mCostArray[node->id() * 2 + static_cast<ymuint>(inv)];
 }
