@@ -2,9 +2,6 @@
 # ===================================================================
 # インクルードパスの設定
 # ===================================================================
-include_directories(
-  ${GTEST_INCLUDE_DIR}
-  )
 
 
 # ===================================================================
@@ -22,26 +19,10 @@ include_directories(
 #  テスト用のターゲットの設定
 # ===================================================================
 
-add_executable ( equiv_test
+ym_add_gtest ( magus_equiv_test
   equiv_test.cc
   $<TARGET_OBJECTS:magus_equiv_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
-  )
-
-target_compile_options ( equiv_test
-  PRIVATE "-g"
-  )
-
-target_compile_definitions ( equiv_test
-  PRIVATE "-DDATAPATH=\"${PROJECT_SOURCE_DIR}/magus_core/testdata/\""
-  )
-
-target_link_libraries ( equiv_test
-  ${YM_LIB_DEPENDS}
-  pthread
-  ${GTEST_BOTH_LIBRARIES}
-  )
-
-add_test ( equiv_test
-  equiv_test
+  DEFINITIONS
+  "-DDATAPATH=\"${PROJECT_SOURCE_DIR}/magus_core/testdata/\""
   )

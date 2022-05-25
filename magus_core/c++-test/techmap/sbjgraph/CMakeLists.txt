@@ -4,7 +4,6 @@
 # ===================================================================
 include_directories(
   ${PROJECT_SOURCE_DIR}/magus_core/c++-src/techmap/include
-  ${GTEST_INCLUDE_DIR}
   )
 
 
