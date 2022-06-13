@@ -25,18 +25,72 @@ clib_new(
 {
   LuaMagus lua{L};
 
-  // メモリ領域は Lua で確保する．
-  void* p = lua.new_userdata(sizeof(ClibCellLibrary));
-
   int n = lua.get_top();
+  if ( n != 1 && n != 2 ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: new_clib() expects one or two arguments.");
+    return 2;
+  }
+
+  // 最初の引数はファイル名とみなす．
+  if ( !lua.is_string(1) ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: new_clib(): Arg#1 should be a string.");
+    return 2;
+  }
+  string filename = lua.to_string(1);
+
+  // 2番目の引数がある場合にはファイルの形式を表す文字列とみなす．
+  // ない場合にはファイルの形式は拡張子から推測する．
+  bool mislib = false;
+  bool liberty = false;
   if ( n == 1 ) {
-    // 引数なしの場合
-    new (p) ClibCellLibrary{};
+    auto ext = filename.substr(filename.find_last_of('.') + 1);
+    mislib = ( ext == "genlib" );
+    liberty = ( ext == "lib" );
+    if ( !mislib && !liberty ) {
+      lua.push_boolean(false);
+      lua.push_string("Error: new_clib(): Arg#1's extension should be \".genlib\" or \".lib\".");
+      return 2;
+    }
   }
   else {
-    // 引数ありの場合
-    // ...
+    if ( !lua.is_string(2) ) {
+      lua.push_boolean(false);
+      lua.push_string("Error: new_clib(): Arg#2 should be a string.");
+      return 2;
+    }
+    string type = lua.to_string(2);
+    mislib = ( type == "mislib" );
+    liberty = ( type == "liberty" );
+    if ( !mislib && !liberty ) {
+      lua.push_boolean(false);
+      lua.push_string("Error: new_clib(): Arg#2 should be \"mislib\" or \"liberty\".");
+      return 2;
+    }
   }
+
+  ClibCellLibrary src;
+  try {
+    if ( mislib ) {
+      src = ClibCellLibrary::read_mislib(filename);
+    }
+    if ( liberty ) {
+      src = ClibCellLibrary::read_liberty(filename);
+    }
+  }
+  catch ( ClibError& error ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: new_clib(): read failed.");
+    return 2;
+  }
+
+  // メモリ領域は Lua で確保する．
+  void* p = lua.new_userdata(sizeof(ClibCellLibrary));
+  auto lib = new (p) ClibCellLibrary{};
+
+  // 読んだ内容をコピーする．
+  *lib = src;
 
   // ClibCellLibrary 用の metatable を取ってくる．
   luaL_getmetatable(L, CLIB_SIGNATURE);
@@ -65,9 +119,9 @@ clib_gc(
   return 0;
 }
 
-// mislib ファイルを読み込む．
+// ライブラリの内容を出力する．
 int
-clib_read_mislib(
+clib_display(
   lua_State* L
 )
 {
@@ -75,54 +129,9 @@ clib_read_mislib(
 
   auto clib = lua.to_clib(1);
 
-  int n = lua.get_top();
-  if ( n != 2 ) {
-    return lua.error_end("Error: ClibCellLibrary:read_mislib() expects one argument.");
-  }
+  display_library(cout, *clib);
 
-  // 引数はファイル名のみ
-  auto filename = lua.to_string(2);
-
-  auto src = ClibCellLibrary::read_mislib(filename);
-  if ( src.cell_num() == 0 ) {
-    return lua.error_end("Error: ClibCellLibrary:read_mislib() failed.");
-  }
-
-  // 今読み込んだセルライブラリをコピーする．
-  *clib = src;
-
-  lua.push_boolean(true);
-  return 1;
-}
-
-// liberty ファイルを読み込む．
-int
-clib_read_liberty(
-  lua_State* L
-)
-{
-  LuaMagus lua{L};
-
-  auto clib = lua.to_clib(1);
-
-  int n = lua.get_top();
-  if ( n != 2 ) {
-    return lua.error_end("Error: ClibCellLibrary:read_liberty() expects one argument.");
-  }
-
-  // 引数はファイル名のみ
-  auto filename = lua.to_string(2);
-
-  auto src = ClibCellLibrary::read_liberty(filename);
-  if ( src.cell_num() == 0 ) {
-    return lua.error_end("Error: ClibCellLibrary:read_liberty() failed.");
-  }
-
-  // 今読み込んだセルライブラリをコピーする．
-  *clib = src;
-
-  lua.push_boolean(true);
-  return 1;
+  return 0;
 }
 
 END_NONAMESPACE
@@ -132,8 +141,7 @@ void
 LuaMagus::init_Clib()
 {
   static const struct luaL_Reg mt[] = {
-    {"read_mislib", clib_read_mislib},
-    {"read_liberty", clib_read_liberty},
+    {"display", clib_display},
     {nullptr, nullptr}
   };
 
