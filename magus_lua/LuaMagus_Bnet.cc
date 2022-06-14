@@ -10,6 +10,9 @@
 #include "ym/BnNetwork.h"
 #include "ym/ClibCellLibrary.h"
 
+#include "ym/MsgMgr.h"
+#include "ym/StreamMsgHandler.h"
+
 
 BEGIN_NAMESPACE_MAGUS
 
@@ -96,10 +99,19 @@ bnet_read_blif(
     auto ret = lua.get_field(3, "cell_library");
     if ( ret == LUA_TNIL ) {
       // 存在しなかった．
+      // エラーではない．
       ;
     }
     else {
+      auto lib = lua.to_clib(-1);
+      if ( lib == nullptr ) {
+	return lua.error_end("Error in BnNetwork::read_blif(): ClibCellLibrary required for 'cell_library' field.");
+      }
+      library = *lib;
     }
+    // get_filed(3, "cell_library") で積まれた要素を棄てる．
+    lua.pop(1);
+
     if ( lua.get_string_field(3, "clock", clock_str) == Luapp::ERROR ) {
       return lua.error_end("Error in BnNetwork:read_blif(): Illegal value for 'clock' field in 2nd argument.");
     }
@@ -110,6 +122,9 @@ bnet_read_blif(
   else {
     return lua.error_end("Error: BnNetwork:read_blif() expects one or two arguments.");
   }
+
+  StreamMsgHandler mh{cout};
+  MsgMgr::attach_handler(&mh);
 
   auto src = BnNetwork::read_blif(filename, library, clock_str, reset_str);
   if ( src.node_num() == 0 ) {
