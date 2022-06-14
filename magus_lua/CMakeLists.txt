@@ -7,6 +7,7 @@ include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${YM_SUBMODULE_INCLUDE_LIST}
   ${LUA_INCLUDE_DIR}
+  ${Readline_INCLUDE_DIR}
   )
 
 
@@ -43,9 +44,16 @@ target_compile_definitions (magus_lua
   PRIVATE "-DNDEBUG"
   )
 
+if ( Readline_FOUND )
+  target_compile_definitions (magus_lua
+    PRIVATE "-DHAS_READLINE"
+    )
+endif ()
+
 target_link_libraries (magus_lua
   ${YM_LIB_DEPENDS}
   ${LUA_LIBRARIES}
+  ${Readline_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
@@ -77,9 +85,16 @@ target_compile_definitions (magus_lua_p
   PRIVATE "-DNDEBUG"
   )
 
+if ( Readline_FOUND )
+  target_compile_definitions (magus_lua_p
+    PRIVATE "-DHAS_READLINE"
+    )
+endif ()
+
 target_link_libraries (magus_lua_p
   ${YM_LIB_DEPENDS}
   ${LUA_LIBRARIES}
+  ${Readline_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
@@ -107,9 +122,16 @@ target_compile_options (magus_lua_d
   PRIVATE "-g"
   )
 
+if ( Readline_FOUND )
+  target_compile_definitions (magus_lua_d
+    PRIVATE "-DHAS_READLINE"
+    )
+endif ()
+
 target_link_libraries (magus_lua_d
   ${YM_LIB_DEPENDS}
   ${LUA_LIBRARIES}
+  ${Readline_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
