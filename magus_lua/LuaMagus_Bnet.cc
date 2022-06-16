@@ -8,6 +8,7 @@
 
 #include "LuaMagus.h"
 #include "ym/BnNetwork.h"
+#include "ym/BnNode.h"
 #include "ym/ClibCellLibrary.h"
 
 #include "ym/MsgMgr.h"
@@ -77,8 +78,6 @@ bnet_read_blif(
 {
   LuaMagus lua{L};
 
-  auto bnet = lua.to_bnet(1);
-
   string clock_str{};
   string reset_str{};
   ClibCellLibrary library{};
@@ -123,19 +122,19 @@ bnet_read_blif(
     return lua.error_end("Error: BnNetwork:read_blif() expects one or two arguments.");
   }
 
-  StreamMsgHandler mh{cout};
-  MsgMgr::attach_handler(&mh);
+  try {
+    auto src = BnNetwork::read_blif(filename, library, clock_str, reset_str);
 
-  auto src = BnNetwork::read_blif(filename, library, clock_str, reset_str);
-  if ( src.node_num() == 0 ) {
+    // 今読み込んだネットワークの内容をムーブする．
+    auto bnet = lua.to_bnet(1);
+    bnet->move(std::move(src));
+
+    lua.push_boolean(true);
+    return 1;
+  }
+  catch ( BnetError& error ) {
     return lua.error_end("Error: BnNetwork:read_blif() failed.");
   }
-
-  // 今読み込んだネットワークの内容をムーブする．
-  bnet->move(std::move(src));
-
-  lua.push_boolean(true);
-  return 1;
 }
 
 // iscas89 ファイルを読み込む．
@@ -146,10 +145,8 @@ bnet_read_iscas89(
 {
   LuaMagus lua{L};
 
-  string clock_str{};
   string filename{};
-
-  auto bnet = lua.to_bnet(1);
+  string clock_str{};
 
   int n = lua.get_top();
   if ( n == 2 ) {
@@ -157,22 +154,35 @@ bnet_read_iscas89(
     filename = lua.to_string(2);
   }
   else if ( n == 3 ) {
-    // ファイル名と
+    // ファイル名とパラメータのテーブル
+    filename = lua.to_string(2);
+
+    if ( !lua.is_table(3) ) {
+      return lua.error_end("Error in BnNetwork:read_iscas89(): 2nd argument should be a table.");
+    }
+
+    if ( lua.get_string_field(3, "clock", clock_str) == Luapp::ERROR ) {
+      return lua.error_end("Error in BnNetwork:read_iscas89(): Illegal value for 'clock' field in 2nd argument.");
+    }
+
   }
   else {
     return lua.error_end("Error: BnNetwork:read_iscas89() expects one or two arguments.");
   }
 
-  auto src = BnNetwork::read_iscas89(filename);
-  if ( src.node_num() == 0 ) {
+  try {
+    auto src = BnNetwork::read_iscas89(filename);
+
+    // 今読み込んだネットワークの内容をムーブする．
+    auto bnet = lua.to_bnet(1);
+    bnet->move(std::move(src));
+
+    lua.push_boolean(true);
+    return 1;
+  }
+  catch ( BnetError& error ) {
     return lua.error_end("Error: BnNetwork:read_iscas89() failed.");
   }
-
-  // 今読み込んだネットワークの内容をムーブする．
-  bnet->move(std::move(src));
-
-  lua.push_boolean(true);
-  return 1;
 }
 
 // blif 形式でファイルに書き出す．
@@ -304,6 +314,83 @@ bnet_name(
   return 1;
 }
 
+// 諸元を格納したターブルを作る．
+int
+bnet_stats(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  int n = lua.get_top();
+  if ( n != 1 ) {
+    return lua.error_end("Error: BnNetwork:stats() expects no arguments.");
+  }
+
+  // 対象のネットワーク
+  auto bnet = lua.to_bnet(1);
+
+  // 結果のテーブルを作る．
+  lua.create_table();
+  int tbl_idx = lua.absindex(-1);
+
+  { // cell_library
+    auto lib = bnet->library();
+    if ( lib.cell_num() > 0 ) {
+      ;
+    }
+  }
+
+  { // port_num
+    SizeType n = bnet->port_num();
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "port_num");
+  }
+  { // dff_num
+    SizeType n = bnet->dff_num();
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "dff_num");
+  }
+  { // dff_num
+    SizeType n = bnet->dff_num();
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "dff_num");
+  }
+  { // latch_num
+    SizeType n = bnet->latch_num();
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "latch_num");
+  }
+  { // input_num
+    SizeType n = bnet->input_num();
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "input_num");
+  }
+  { // output_num
+    SizeType n = bnet->output_num();
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "output_num");
+  }
+  { // logic_num
+    SizeType n = bnet->logic_num();
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "logic_num");
+  }
+  { // literal_sum
+    SizeType n = 0;
+    for ( SizeType id: bnet->logic_id_list() ) {
+      const auto& node = bnet->node(id);
+      SizeType expr_id = node.expr_id();
+      auto expr = bnet->expr(expr_id);
+      n += expr.literal_num();
+    }
+    lua.push_integer(n);
+    lua.set_field(tbl_idx, "literal_sum");
+  }
+
+  return 1;
+}
+
 END_NONAMESPACE
 
 
@@ -319,6 +406,7 @@ LuaMagus::init_Bnet()
     {"copy", bnet_copy},
     {"set_name", bnet_set_name},
     {"name", bnet_name},
+    {"stats", bnet_stats},
     {nullptr, nullptr}
   };
 
