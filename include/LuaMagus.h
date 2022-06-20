@@ -93,18 +93,15 @@ private:
 
   /// @brief BnNetwork 関係の初期化を行う．
   void
-  init_Bnet();
+  init_Bnet(
+    vector<struct luaL_Reg>& mylib ///< [out] モジュールに登録する関数のリスト
+  );
 
   /// @brief ClibCellLibrary 関係の初期化を行う．
   void
-  init_Clib();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  init_Clib(
+    vector<struct luaL_Reg>& mylib ///< [out] モジュールに登録する関数のリスト
+  );
 
 };
 

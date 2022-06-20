@@ -54,6 +54,23 @@ clib_gc(
   return 0;
 }
 
+// ライブラリの内容を出力する．
+int
+clib_display(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  auto clib = lua.to_clib(1);
+
+  display_library(cout, *clib);
+
+  return 0;
+}
+
+END_NONAMESPACE
+
 // mislib 形式のファイルを読んで ClibCellLibrary を作る．
 int
 clib_read_mislib(
@@ -126,26 +143,10 @@ clib_read_liberty(
   }
 }
 
-// ライブラリの内容を出力する．
-int
-clib_display(
-  lua_State* L
-)
-{
-  LuaMagus lua{L};
-
-  auto clib = lua.to_clib(1);
-
-  display_library(cout, *clib);
-
-  return 0;
-}
-
-END_NONAMESPACE
-
-
 void
-LuaMagus::init_Clib()
+LuaMagus::init_Clib(
+  vector<struct luaL_Reg>& mylib
+)
 {
   static const struct luaL_Reg mt[] = {
     {"display", clib_display},
@@ -167,10 +168,8 @@ LuaMagus::init_Clib()
   luaL_setfuncs(lua_state(), mt, 0);
 
   // 生成関数を登録する．
-  push_cfunction(clib_read_mislib);
-  set_global("read_mislib");
-  push_cfunction(clib_read_liberty);
-  set_global("read_liberty");
+  mylib.push_back({"read_mislib", clib_read_mislib});
+  mylib.push_back({"read_liberty", clib_read_liberty});
 }
 
 
