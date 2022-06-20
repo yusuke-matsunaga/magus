@@ -18,87 +18,22 @@ BEGIN_NONAMESPACE
 const char* CLIB_SIGNATURE{"Magus.Clib"};
 
 // ClibCellLibrary を作る．
-int
+ClibCellLibrary*
 clib_new(
-  lua_State* L
+  Luapp& lua
 )
 {
-  LuaMagus lua{L};
-
-  int n = lua.get_top();
-  if ( n != 1 && n != 2 ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: new_clib() expects one or two arguments.");
-    return 2;
-  }
-
-  // 最初の引数はファイル名とみなす．
-  if ( !lua.is_string(1) ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: new_clib(): Arg#1 should be a string.");
-    return 2;
-  }
-  string filename = lua.to_string(1);
-
-  // 2番目の引数がある場合にはファイルの形式を表す文字列とみなす．
-  // ない場合にはファイルの形式は拡張子から推測する．
-  bool mislib = false;
-  bool liberty = false;
-  if ( n == 1 ) {
-    auto ext = filename.substr(filename.find_last_of('.') + 1);
-    mislib = ( ext == "genlib" );
-    liberty = ( ext == "lib" );
-    if ( !mislib && !liberty ) {
-      lua.push_boolean(false);
-      lua.push_string("Error: new_clib(): Arg#1's extension should be \".genlib\" or \".lib\".");
-      return 2;
-    }
-  }
-  else {
-    if ( !lua.is_string(2) ) {
-      lua.push_boolean(false);
-      lua.push_string("Error: new_clib(): Arg#2 should be a string.");
-      return 2;
-    }
-    string type = lua.to_string(2);
-    mislib = ( type == "mislib" );
-    liberty = ( type == "liberty" );
-    if ( !mislib && !liberty ) {
-      lua.push_boolean(false);
-      lua.push_string("Error: new_clib(): Arg#2 should be \"mislib\" or \"liberty\".");
-      return 2;
-    }
-  }
-
-  ClibCellLibrary src;
-  try {
-    if ( mislib ) {
-      src = ClibCellLibrary::read_mislib(filename);
-    }
-    if ( liberty ) {
-      src = ClibCellLibrary::read_liberty(filename);
-    }
-  }
-  catch ( ClibError& error ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: new_clib(): read failed.");
-    return 2;
-  }
-
   // メモリ領域は Lua で確保する．
   void* p = lua.new_userdata(sizeof(ClibCellLibrary));
   auto lib = new (p) ClibCellLibrary{};
 
-  // 読んだ内容をコピーする．
-  *lib = src;
-
   // ClibCellLibrary 用の metatable を取ってくる．
-  luaL_getmetatable(L, CLIB_SIGNATURE);
+  luaL_getmetatable(lua.lua_state(), CLIB_SIGNATURE);
 
   // それを今作った userdata にセットする．
   lua.set_metatable(-2);
 
-  return 1;
+  return lib;
 }
 
 // ClibCellLibrary 用のデストラクタ
@@ -117,6 +52,90 @@ clib_gc(
 
   // メモリは Lua が開放する．
   return 0;
+}
+
+// mislib 形式のファイルを読んで ClibCellLibrary を作る．
+int
+clib_read_mislib(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  int n = lua.get_top();
+  if ( n != 1 ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: read_mislib() expects one argument.");
+    return 2;
+  }
+
+  // 最初の引数はファイル名とみなす．
+  if ( !lua.is_string(1) ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: read_mislib(): Arg#1 should be a string.");
+    return 2;
+  }
+  string filename = lua.to_string(1);
+
+  try {
+    // ファイルを読み込む．
+    auto src = ClibCellLibrary::read_mislib(filename);
+
+    // lua インタプリタの制御下にあるオブジェクトを作る．
+    auto lib = clib_new(lua);
+
+    // lib にコピーする．
+    *lib = src;
+
+    return 1;
+  }
+  catch ( ClibError& error ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: new_clib(): read failed.");
+    return 2;
+  }
+}
+
+// liberty 形式のファイルを読んで ClibCellLibrary を作る．
+int
+clib_read_liberty(
+  lua_State* L
+)
+{
+  LuaMagus lua{L};
+
+  int n = lua.get_top();
+  if ( n != 1 ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: read_mislib() expects one argument.");
+    return 2;
+  }
+
+  // 最初の引数はファイル名とみなす．
+  if ( !lua.is_string(1) ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: read_mislib(): Arg#1 should be a string.");
+    return 2;
+  }
+  string filename = lua.to_string(1);
+
+  try {
+    // ファイルを読み込む．
+    auto src = ClibCellLibrary::read_liberty(filename);
+
+    // lua インタプリタの制御下にあるオブジェクトを作る．
+    auto lib = clib_new(lua);
+
+    // lib にコピーする．
+    *lib = src;
+
+    return 1;
+  }
+  catch ( ClibError& error ) {
+    lua.push_boolean(false);
+    lua.push_string("Error: new_clib(): read failed.");
+    return 2;
+  }
 }
 
 // ライブラリの内容を出力する．
@@ -160,8 +179,10 @@ LuaMagus::init_Clib()
   luaL_setfuncs(lua_state(), mt, 0);
 
   // 生成関数を登録する．
-  push_cfunction(clib_new);
-  set_global("new_clib");
+  push_cfunction(clib_read_mislib);
+  set_global("read_mislib");
+  push_cfunction(clib_read_liberty);
+  set_global("read_liberty");
 }
 
 

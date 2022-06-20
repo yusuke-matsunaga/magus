@@ -22,34 +22,23 @@ BEGIN_NONAMESPACE
 // Bnet 用のシグネチャ
 const char* BNET_SIGNATURE{"Magus.Bnet"};
 
-// BnNetwork を作る．
-int
+// BnNetwork を生成する共通関数
+BnNetwork*
 bnet_new(
-  lua_State* L
+  Luapp& lua
 )
 {
-  LuaMagus lua{L};
-
   // メモリ領域は Lua で確保する．
   void* p = lua.new_userdata(sizeof(BnNetwork));
-
-  int n = lua.get_top();
-  if ( n == 1 ) {
-    // 引数なしの場合
-    new (p) BnNetwork{};
-  }
-  else {
-    // 引数ありの場合
-    // ...
-  }
+  auto bnet = new (p) BnNetwork{};
 
   // BnNetwork 用の metatable を取ってくる．
-  luaL_getmetatable(L, BNET_SIGNATURE);
+  luaL_getmetatable(lua.lua_state(), BNET_SIGNATURE);
 
   // それを今作った userdata にセットする．
   lua.set_metatable(-2);
 
-  return 1;
+  return bnet;
 }
 
 // BnNetwork 用のデストラクタ
@@ -84,18 +73,18 @@ bnet_read_blif(
   string filename{};
 
   int n = lua.get_top();
-  if ( n == 2 ) {
+  if ( n == 1 ) {
     // ファイル名のみ
-    filename = lua.to_string(2);
+    filename = lua.to_string(1);
   }
-  else if ( n == 3 ) {
+  else if ( n == 2 ) {
     // ファイル名とパラメータのテーブル
-    filename = lua.to_string(2);
+    filename = lua.to_string(1);
 
-    if ( !lua.is_table(3) ) {
+    if ( !lua.is_table(2) ) {
       return lua.error_end("Error in BnNetwork:read_blif(): 2nd argument should be a table.");
     }
-    auto ret = lua.get_field(3, "cell_library");
+    auto ret = lua.get_field(2, "cell_library");
     if ( ret == LUA_TNIL ) {
       // 存在しなかった．
       // エラーではない．
@@ -104,7 +93,7 @@ bnet_read_blif(
     else {
       auto lib = lua.to_clib(-1);
       if ( lib == nullptr ) {
-	return lua.error_end("Error in BnNetwork::read_blif(): ClibCellLibrary required for 'cell_library' field.");
+	return lua.error_end("Error in read_blif(): ClibCellLibrary required for 'cell_library' field.");
       }
       library = *lib;
     }
@@ -112,28 +101,28 @@ bnet_read_blif(
     lua.pop(1);
 
     if ( lua.get_string_field(3, "clock", clock_str) == Luapp::ERROR ) {
-      return lua.error_end("Error in BnNetwork:read_blif(): Illegal value for 'clock' field in 2nd argument.");
+      return lua.error_end("Error in read_blif(): Illegal value for 'clock' field in 2nd argument.");
     }
     if ( lua.get_string_field(3, "reset", reset_str) == Luapp::ERROR ) {
-      return lua.error_end("Error in BnNetwork:read_blif(): Illegal value for 'reset' field in 2nd argument.");
+      return lua.error_end("Error in read_blif(): Illegal value for 'reset' field in 2nd argument.");
     }
   }
   else {
-    return lua.error_end("Error: BnNetwork:read_blif() expects one or two arguments.");
+    return lua.error_end("Error: read_blif() expects one or two arguments.");
   }
 
   try {
     auto src = BnNetwork::read_blif(filename, library, clock_str, reset_str);
 
+    auto bnet = bnet_new(lua);
+
     // 今読み込んだネットワークの内容をムーブする．
-    auto bnet = lua.to_bnet(1);
     bnet->move(std::move(src));
 
-    lua.push_boolean(true);
     return 1;
   }
   catch ( BnetError& error ) {
-    return lua.error_end("Error: BnNetwork:read_blif() failed.");
+    return lua.error_end("Error: read_blif() failed.");
   }
 }
 
@@ -149,39 +138,39 @@ bnet_read_iscas89(
   string clock_str{};
 
   int n = lua.get_top();
-  if ( n == 2 ) {
+  if ( n == 1 ) {
     // ファイル名を引数にとる．
-    filename = lua.to_string(2);
+    filename = lua.to_string(1);
   }
-  else if ( n == 3 ) {
+  else if ( n == 2 ) {
     // ファイル名とパラメータのテーブル
-    filename = lua.to_string(2);
+    filename = lua.to_string(1);
 
-    if ( !lua.is_table(3) ) {
-      return lua.error_end("Error in BnNetwork:read_iscas89(): 2nd argument should be a table.");
+    if ( !lua.is_table(2) ) {
+      return lua.error_end("Error in read_iscas89(): 2nd argument should be a table.");
     }
 
-    if ( lua.get_string_field(3, "clock", clock_str) == Luapp::ERROR ) {
-      return lua.error_end("Error in BnNetwork:read_iscas89(): Illegal value for 'clock' field in 2nd argument.");
+    if ( lua.get_string_field(2, "clock", clock_str) == Luapp::ERROR ) {
+      return lua.error_end("Error in read_iscas89(): Illegal value for 'clock' field in 2nd argument.");
     }
 
   }
   else {
-    return lua.error_end("Error: BnNetwork:read_iscas89() expects one or two arguments.");
+    return lua.error_end("Error: read_iscas89() expects one or two arguments.");
   }
 
   try {
     auto src = BnNetwork::read_iscas89(filename);
 
+    auto bnet = bnet_new(lua);
+
     // 今読み込んだネットワークの内容をムーブする．
-    auto bnet = lua.to_bnet(1);
     bnet->move(std::move(src));
 
-    lua.push_boolean(true);
     return 1;
   }
   catch ( BnetError& error ) {
-    return lua.error_end("Error: BnNetwork:read_iscas89() failed.");
+    return lua.error_end("Error: read_iscas89() failed.");
   }
 }
 
@@ -194,14 +183,20 @@ bnet_write_blif(
   LuaMagus lua{L};
 
   int n = lua.get_top();
-  if ( n != 2 ) {
-    return lua.error_end("Error: BnNetwork:write_blif() expects one argument.");
+  if ( n != 1 && n != 2 ) {
+    return lua.error_end("Error: BnNetwork:write_blif() expects at most one argument.");
   }
 
   auto bnet = lua.to_bnet(1);
-  auto filename = lua.to_string(2);
 
-  bnet->write_blif(filename);
+  if ( n == 1 ) {
+    bnet->write_blif(cout);
+  }
+  else {
+    auto filename = lua.to_string(2);
+
+    bnet->write_blif(filename);
+  }
 
   lua.push_boolean(true);
   return 1;
@@ -216,14 +211,20 @@ bnet_write_iscas89(
   LuaMagus lua{L};
 
   int n = lua.get_top();
-  if ( n != 2 ) {
-    return lua.error_end("Error: BnNetwork:write_iscas89() expects one argument.");
+  if ( n != 1 && n != 2 ) {
+    return lua.error_end("Error: BnNetwork:write_iscas89() expects at most one argument.");
   }
 
   auto bnet = lua.to_bnet(1);
-  auto filename = lua.to_string(2);
 
-  bnet->write_iscas89(filename);
+  if ( n == 1 ) {
+    bnet->write_iscas89(cout);
+  }
+  else {
+    auto filename = lua.to_string(2);
+
+    bnet->write_iscas89(filename);
+  }
 
   lua.push_boolean(true);
   return 1;
@@ -259,16 +260,16 @@ bnet_copy(
   LuaMagus lua{L};
 
   int n = lua.get_top();
-  if ( n != 2 ) {
-    return lua.error_end("Error: BnNetwork:copy() expects two arguments.");
+  if ( n != 1 ) {
+    return lua.error_end("Error: BnNetwork:copy() expects one argument.");
   }
 
-  auto bnet = lua.to_bnet(1);
-  auto src = lua.to_bnet(2);
+  auto src = lua.to_bnet(1);
+
+  auto bnet = bnet_new(lua);
 
   bnet->copy(*src);
 
-  lua.push_boolean(true);
   return 1;
 }
 
@@ -376,7 +377,7 @@ bnet_stats(
     lua.push_integer(n);
     lua.set_field(tbl_idx, "logic_num");
   }
-  { // literal_sum
+  if ( 0 ) { // literal_sum
     SizeType n = 0;
     for ( SizeType id: bnet->logic_id_list() ) {
       const auto& node = bnet->node(id);
@@ -397,9 +398,8 @@ END_NONAMESPACE
 void
 LuaMagus::init_Bnet()
 {
+  // メンバ関数(メソッド)テーブル
   static const struct luaL_Reg mt[] = {
-    {"read_blif", bnet_read_blif},
-    {"read_iscas89", bnet_read_iscas89},
     {"write_blif", bnet_write_blif},
     {"write_iscas89", bnet_write_iscas89},
     {"clear", bnet_clear},
@@ -425,8 +425,11 @@ LuaMagus::init_Bnet()
   luaL_setfuncs(lua_state(), mt, 0);
 
   // 生成関数を登録する．
-  push_cfunction(bnet_new);
-  set_global("new_bnet");
+  push_cfunction(bnet_read_blif);
+  set_global("read_blif");
+
+  push_cfunction(bnet_read_iscas89);
+  set_global("read_iscas89");
 }
 
 
