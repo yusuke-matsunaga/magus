@@ -40,7 +40,6 @@ include (YmUtils)
 
 ym_init ("USE_POPT" "USE_LZMA" "USE_ZLIB" "USE_BZIP2")
 ym_init_python ( REQUIRED )
-#ym_init_cython ()
 ym_init_lua ()
 ym_init_readline ()
 ym_init_doxygen ()
@@ -70,16 +69,6 @@ configure_file(
 # スクリプトファイルの生成
 # ===================================================================
 
-configure_file(
-  "${PROJECT_SOURCE_DIR}/etc/ym_python.in"
-  "${PROJECT_BINARY_DIR}/ym_python"
-  @ONLY
-  )
-
-install ( PROGRAMS ${PROJECT_BINARY_DIR}/ym_python
-  DESTINATION bin
-  )
-
 
 # ===================================================================
 # サブモジュールのリスト
@@ -106,8 +95,9 @@ ym_init_submodules (
 # ===================================================================
 
 include_directories(
+  ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${YM_SUBMODULE_INCLUDE_LIST}
   )
 
 
@@ -119,11 +109,8 @@ foreach ( dir ${YM_SUBMODULE_LIST} )
   add_subdirectory ( ${dir} )
 endforeach ()
 
-add_subdirectory ( ym-tclpp )
-
-add_subdirectory ( magus_core )
-add_subdirectory ( magus_tclsh )
-add_subdirectory ( magus_lua )
+add_subdirectory ( c++-srcs )
+add_subdirectory ( tests )
 
 
 # ===================================================================
@@ -137,7 +124,6 @@ if (DOXYGEN_FOUND)
     ${PROJECT_SOURCE_DIR}/etc/mainpage.h
     ${PROJECT_BINARY_DIR}/include
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/magus_tclsh/include
     ${YM_SUBMODULE_INCLUDE_LIST}
     )
 
