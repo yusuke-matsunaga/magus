@@ -5,4 +5,7 @@ filename = datadir .. "/netblif/C432.netblif"
 print(filename)
 bnet = assert(read_blif(filename, {cell_library = lib}))
 
-bnet:write_blif()
+stats = bnet:stats()
+assert( stats["input_num"] == 36 )
+assert( stats["output_num"] == 7 )
+assert( stats["logic_num"] == 209 )

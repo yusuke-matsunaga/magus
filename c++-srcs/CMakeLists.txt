@@ -10,6 +10,7 @@
 
 add_subdirectory ( equiv )
 add_subdirectory ( techmap )
+add_subdirectory ( magus_lua )
 
 
 # ===================================================================

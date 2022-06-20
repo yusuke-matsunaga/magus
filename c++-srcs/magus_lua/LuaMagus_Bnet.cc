@@ -81,10 +81,11 @@ bnet_read_blif(
     // ファイル名とパラメータのテーブル
     filename = lua.to_string(1);
 
-    if ( !lua.is_table(2) ) {
+    const int TABLE_INDEX = 2;
+    if ( !lua.is_table(TABLE_INDEX) ) {
       return lua.error_end("Error in BnNetwork:read_blif(): 2nd argument should be a table.");
     }
-    auto ret = lua.get_field(2, "cell_library");
+    auto ret = lua.get_field(TABLE_INDEX, "cell_library");
     if ( ret == LUA_TNIL ) {
       // 存在しなかった．
       // エラーではない．
@@ -97,13 +98,13 @@ bnet_read_blif(
       }
       library = *lib;
     }
-    // get_filed(3, "cell_library") で積まれた要素を棄てる．
+    // get_filed(TABLE_INDEX, "cell_library") で積まれた要素を棄てる．
     lua.pop(1);
 
-    if ( lua.get_string_field(3, "clock", clock_str) == Luapp::ERROR ) {
+    if ( lua.get_string_field(TABLE_INDEX, "clock", clock_str) == Luapp::ERROR ) {
       return lua.error_end("Error in read_blif(): Illegal value for 'clock' field in 2nd argument.");
     }
-    if ( lua.get_string_field(3, "reset", reset_str) == Luapp::ERROR ) {
+    if ( lua.get_string_field(TABLE_INDEX, "reset", reset_str) == Luapp::ERROR ) {
       return lua.error_end("Error in read_blif(): Illegal value for 'reset' field in 2nd argument.");
     }
   }
@@ -146,11 +147,12 @@ bnet_read_iscas89(
     // ファイル名とパラメータのテーブル
     filename = lua.to_string(1);
 
-    if ( !lua.is_table(2) ) {
+    const int TABLE_INDEX = 2;
+    if ( !lua.is_table(TABLE_INDEX) ) {
       return lua.error_end("Error in read_iscas89(): 2nd argument should be a table.");
     }
 
-    if ( lua.get_string_field(2, "clock", clock_str) == Luapp::ERROR ) {
+    if ( lua.get_string_field(TABLE_INDEX, "clock", clock_str) == Luapp::ERROR ) {
       return lua.error_end("Error in read_iscas89(): Illegal value for 'clock' field in 2nd argument.");
     }
 

@@ -64,16 +64,12 @@ clib_read_mislib(
 
   int n = lua.get_top();
   if ( n != 1 ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: read_mislib() expects one argument.");
-    return 2;
+    return lua.error_end("Error: read_mislib() expects one argument.");
   }
 
   // 最初の引数はファイル名とみなす．
   if ( !lua.is_string(1) ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: read_mislib(): Arg#1 should be a string.");
-    return 2;
+    return lua.error_end("Error: read_mislib(): Arg#1 should be a string.");
   }
   string filename = lua.to_string(1);
 
@@ -90,9 +86,7 @@ clib_read_mislib(
     return 1;
   }
   catch ( ClibError& error ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: new_clib(): read failed.");
-    return 2;
+    return lua.error_end("Error: new_clib(): read failed.");
   }
 }
 
@@ -106,16 +100,12 @@ clib_read_liberty(
 
   int n = lua.get_top();
   if ( n != 1 ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: read_mislib() expects one argument.");
-    return 2;
+    return lua.error_end("Error: read_mislib() expects one argument.");
   }
 
   // 最初の引数はファイル名とみなす．
   if ( !lua.is_string(1) ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: read_mislib(): Arg#1 should be a string.");
-    return 2;
+    return lua.error_end("Error: read_mislib(): Arg#1 should be a string.");
   }
   string filename = lua.to_string(1);
 
@@ -132,9 +122,7 @@ clib_read_liberty(
     return 1;
   }
   catch ( ClibError& error ) {
-    lua.push_boolean(false);
-    lua.push_string("Error: new_clib(): read failed.");
-    return 2;
+    return lua.error_end("Error: new_clib(): read failed.");
   }
 }
 
