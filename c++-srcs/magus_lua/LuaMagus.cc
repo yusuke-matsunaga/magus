@@ -17,7 +17,7 @@ struct luaL_Reg* magus_table = nullptr;
 SizeType table_size = 0;
 
 int
-open_magus(
+luaopen_magus(
   lua_State* L
 )
 {
@@ -40,10 +40,6 @@ LuaMagus::open_Magus()
   init_Bnet(mylib);
   init_Clib(mylib);
 
-  L_requiref("_G", luaopen_base, 1);
-  L_requiref("package", luaopen_package, 1);
-  pop(2);
-
   // C API には struct luaL_reg の配列が必要
   table_size = mylib.size();
   magus_table = new luaL_Reg[table_size + 1];
@@ -52,8 +48,9 @@ LuaMagus::open_Magus()
   }
   magus_table[table_size] = {NULL, NULL};
 
-  reg_module("magus", open_magus);
-
+  reg_module("magus", luaopen_magus);
+  L_requiref("magus", luaopen_magus, 1);
+  pop(1);
 }
 
 END_NAMESPACE_MAGUS
