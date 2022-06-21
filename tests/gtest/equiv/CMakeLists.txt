@@ -22,7 +22,7 @@
 ym_add_gtest ( magus_equiv_test
   equiv_test.cc
   $<TARGET_OBJECTS:magus_equiv_obj_d>
-  ${YM_SUBMODULE_OBJ_D_LIST}
+  ${YM_SUBMODULE_OBJ_LIST}
   DEFINITIONS
   "-DDATAPATH=\"${PROJECT_SOURCE_DIR}/tests/data/blif/\""
   )

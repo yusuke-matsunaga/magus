@@ -23,6 +23,6 @@
 #  テスト用のターゲットの設定
 # ===================================================================
 
-add_test ( NAME magus_bnet_test
+add_test ( NAME magus_lua_bnet_test
   COMMAND magus_lua ${CMAKE_CURRENT_SOURCE_DIR}/bnet-test.lua
   )

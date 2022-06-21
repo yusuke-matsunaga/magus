@@ -8,7 +8,8 @@
 /// Copyright (C) 2022 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "Luapp.h"
+#include "magus.h"
+#include "ym/Luapp.h"
 #include "ym/bnet.h"
 #include "ym/clib.h"
 
@@ -55,7 +56,13 @@ public:
   ///
   /// この関数を呼ばないと Luapp と同等になる．
   void
-  open_Magus();
+  open_Magus()
+  {
+    vector<struct luaL_Reg> mylib;
+    init_Bnet(mylib);
+    init_Clib(mylib);
+    reg_module("magus", mylib);
+  }
 
   /// @brief 対象が BnNetwork の時 true を返す．
   bool

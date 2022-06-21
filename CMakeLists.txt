@@ -87,6 +87,7 @@ ym_init_submodules (
   ym-mvn
   ym-sat
   ym-verilog
+  ym-luapp
   )
 
 

@@ -50,5 +50,6 @@ ym_add_gtest( SbjNodeTest
 ym_add_gtest( SbjHandleTest
   SbjHandleTest.cc
   $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
   )
