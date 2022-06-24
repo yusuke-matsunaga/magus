@@ -47,6 +47,7 @@ main(
   lua.open_Magus();
 
   if ( argc == 1 ) {
+    // インタラクティブモード
     const char* prompt{"% "};
     for ( ; ; ) {
 #ifdef HAS_READLINE
