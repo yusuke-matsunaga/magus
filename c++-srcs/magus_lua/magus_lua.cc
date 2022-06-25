@@ -85,8 +85,13 @@ main(
     }
     lua.set_global("arg");
     // 先頭の引数をスクリプトファイルとみなして実行する．
-    string init_file = argv[1];
-    if ( init_file != string{} && lua.L_dofile(init_file.c_str()) ) {
+    char* init_file = argv[1];
+    string script{argv[1]};
+    // スクリプトファイルの場所を変数 "script_dir" にセットする．
+    char* dir_name = dirname(init_file);
+    lua.push_string(dir_name);
+    lua.set_global("script_dir");
+    if ( script != string{} && lua.L_dofile(script.c_str()) ) {
       cerr << lua.to_string(-1) << endl;
       return 1;
     }
