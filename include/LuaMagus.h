@@ -9,9 +9,8 @@
 /// All rights reserved.
 
 #include "magus.h"
-#include "ym/Luapp.h"
+#include "ym/LuaClib.h"
 #include "ym/bnet.h"
-#include "ym/clib.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -21,7 +20,7 @@ BEGIN_NAMESPACE_MAGUS
 /// @brief Magus 用の Luapp 拡張
 //////////////////////////////////////////////////////////////////////
 class LuaMagus :
-  public Luapp
+  public LuaClib
 {
 public:
 
@@ -31,15 +30,15 @@ public:
   /// @brief 通常のコンストラクタ
   LuaMagus(
     lua_Alloc f, ///< [in] アロケーター
-    void* ud      ///< [in] ユーザーデータ
-  ) : Luapp{f, ud}
+    void* ud     ///< [in] ユーザーデータ
+  ) : LuaClib{f, ud}
   {
   }
 
   /// @brief すでに生成済みのインタプリタを用いるコンストラクタ
   LuaMagus(
     lua_State* L ///< [in] lua インタープリタ
-  ) : Luapp{L}
+  ) : LuaClib{L}
   {
   }
 
@@ -78,20 +77,6 @@ public:
     int idx ///< [in] スタック上のインデックス
   );
 
-  /// @brief 対象が ClibCellLibrary の時 true を返す．
-  bool
-  is_clib(
-    int idx ///< [in] スタック上のインデックス
-  );
-
-  /// @brief 対象を ClibCellLibrary として取り出す．
-  ///
-  /// ClibCellLibrary でない時は nullptr を返す．
-  ClibCellLibrary*
-  to_clib(
-    int idx ///< [in] スタック上のインデックス
-  );
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -101,12 +86,6 @@ private:
   /// @brief BnNetwork 関係の初期化を行う．
   void
   init_Bnet(
-    vector<struct luaL_Reg>& mylib ///< [out] モジュールに登録する関数のリスト
-  );
-
-  /// @brief ClibCellLibrary 関係の初期化を行う．
-  void
-  init_Clib(
     vector<struct luaL_Reg>& mylib ///< [out] モジュールに登録する関数のリスト
   );
 
