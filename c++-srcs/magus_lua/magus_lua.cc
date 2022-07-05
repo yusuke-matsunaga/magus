@@ -9,10 +9,7 @@
 #include <unistd.h> // for getopt()
 #include <libgen.h> // for basename()
 #include <stdio.h>
-#ifdef HAS_READLINE
-#include <readline/readline.h>
-#include <readline/history.h>
-#endif
+#include <ym/ReadLine.h>
 #include "LuaMagus.h"
 
 
@@ -39,7 +36,8 @@ main(
 )
 {
   using namespace std;
-  using namespace MAGUS_NAMESPACE;
+  using YM_NAMESPACE::ReadLine;
+  using MAGUS_NAMESPACE::LuaMagus;
 
   LuaMagus lua;
 
@@ -50,25 +48,10 @@ main(
     // インタラクティブモード
     const char* prompt{"% "};
     for ( ; ; ) {
-#ifdef HAS_READLINE
-      auto line_read = readline(prompt);
-      if ( line_read == nullptr ) {
-	// EOF
-	break;
-      }
-      if ( line_read[0] ) {
-	add_history(line_read);
-      }
-      string linebuf{line_read};
-      free(line_read);
-#else
-      cerr << prompt;
-      cerr.flush();
       string linebuf;
-      if ( !getline(cin, linebuf) ) {
+      if ( !ReadLine::get_line(prompt, linebuf) ) {
 	break;
       }
-#endif
       int err = lua.L_loadstring(linebuf.c_str()) || lua.pcall(0, 0, 0);
       if ( err ) {
 	cerr << lua.to_string(-1) << endl;
