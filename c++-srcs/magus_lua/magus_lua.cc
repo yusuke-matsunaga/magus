@@ -44,6 +44,7 @@ main(
   lua.L_openlibs();
   lua.open_Magus();
 
+#if 0
   if ( argc == 1 ) {
     // インタラクティブモード
     const char* prompt{"% "};
@@ -85,4 +86,7 @@ main(
   }
 
   return 0;
+#else
+  return lua.main_loop(argc, argv);
+#endif
 }

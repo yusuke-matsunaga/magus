@@ -33,7 +33,7 @@ bnet_new(
   auto bnet = new (p) BnNetwork{};
 
   // BnNetwork 用の metatable を取ってくる．
-  luaL_getmetatable(lua.lua_state(), BNET_SIGNATURE);
+  lua.L_getmetatable(BNET_SIGNATURE);
 
   // それを今作った userdata にセットする．
   lua.set_metatable(-2);
@@ -438,7 +438,7 @@ LuaMagus::init_Bnet(
   set_field(-2, "__gc");
 
   // メソッドテーブルを登録する．
-  luaL_setfuncs(lua_state(), mt, 0);
+  L_setfuncs(mt, 0);
 
   // 生成関数を登録する．
   mylib.push_back({"read_blif", bnet_read_blif});
@@ -462,7 +462,7 @@ LuaMagus::to_bnet(
   int idx
 )
 {
-  return reinterpret_cast<BnNetwork*>(luaL_checkudata(lua_state(), idx, BNET_SIGNATURE));
+  return reinterpret_cast<BnNetwork*>(L_checkudata(idx, BNET_SIGNATURE));
 }
 
 END_NAMESPACE_MAGUS
