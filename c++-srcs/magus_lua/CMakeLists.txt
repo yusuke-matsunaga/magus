@@ -50,8 +50,6 @@ endif ()
 
 target_link_libraries ( magus_lua
   ${YM_LIB_DEPENDS}
-  ${LUA_LIBRARIES}
-  ${Readline_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
@@ -91,8 +89,6 @@ endif ()
 
 target_link_libraries ( magus_lua_p
   ${YM_LIB_DEPENDS}
-  ${LUA_LIBRARIES}
-  ${Readline_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
@@ -128,8 +124,6 @@ endif ()
 
 target_link_libraries ( magus_lua_d
   ${YM_LIB_DEPENDS}
-  ${LUA_LIBRARIES}
-  ${Readline_LIBRARY}
   )
 
 if ( GPERFTOOLS_FOUND )
