@@ -73,6 +73,7 @@ configure_file(
 # ===================================================================
 
 ym_init_submodules (
+  ym-aig
   ym-base
   #  ym-bfo
   ym-bnet
