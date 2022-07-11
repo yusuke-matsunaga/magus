@@ -37,3 +37,6 @@
 [submodule "ym-luapp"]
 	path = ym-luapp
 	url = git@github.com:yusuke-matsunaga/ym-luapp.git
+[submodule "ym-aig"]
+	path = ym-aig
+	url = git@github.com:yusuke-matsunaga/ym-aig.git
