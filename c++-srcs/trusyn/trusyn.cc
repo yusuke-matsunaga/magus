@@ -23,7 +23,7 @@ trusyn(
   for ( SizeType i = 1; i < O; ++ i ) {
     ASSERT_COND( f_vect[i].input_num() == I );
   }
-  
+
 }
 
 END_NAMESPACE_TRUSYN
