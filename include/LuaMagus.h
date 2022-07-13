@@ -60,6 +60,7 @@ public:
     vector<struct luaL_Reg> mylib;
     init_Bnet(mylib);
     init_Clib(mylib);
+    init_equiv(mylib);
     reg_module("magus", mylib);
   }
 
@@ -86,6 +87,12 @@ private:
   /// @brief BnNetwork 関係の初期化を行う．
   void
   init_Bnet(
+    vector<struct luaL_Reg>& mylib ///< [out] モジュールに登録する関数のリスト
+  );
+
+  /// @brief equiv 関係の初期化を行う．
+  void
+  init_equiv(
     vector<struct luaL_Reg>& mylib ///< [out] モジュールに登録する関数のリスト
   );
 

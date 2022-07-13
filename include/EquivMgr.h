@@ -86,10 +86,10 @@ public:
 
   /// @brief コンストラクタ
   EquivMgr(
-    SizeType sig_size = 1,                             ///< [in] シグネチャのサイズ
-    const SatSolverType& solver_type = SatSolverType{} ///< [in] SAT-solver の種類を表すオブジェクト
+    SizeType sig_size = 1,           ///< [in] シグネチャのサイズ
+    const SatSolverType& solver_type ///< [in] SAT-solver の種類を表すオブジェクト
+    = SatSolverType{}
   );
-
 
   /// @brief デストラクタ
   ~EquivMgr() = default;
