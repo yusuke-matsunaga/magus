@@ -10,7 +10,7 @@
 
 add_subdirectory ( gtest/equiv )
 add_subdirectory ( gtest/techmap/sbjgraph )
-add_subdirectory ( magus_lua )
+add_subdirectory ( lua_magus )
 
 
 # ===================================================================
