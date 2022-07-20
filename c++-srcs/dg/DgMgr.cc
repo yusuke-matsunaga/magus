@@ -199,7 +199,7 @@ DgMgr::merge(
   // ここまで来ると CPLX タイプなのでグローバル関数が必要になる．
   auto f0 = r0.global_func();
   auto f1 = r1.global_func();
-  auto var = mBddMgr.make_posi_literal(VarId{top});
+  auto var = mBddMgr.posi_literal(VarId{top});
   auto f = ite(var, f1, f0);
   if ( node0->is_cplx() && node1->is_cplx() ) {
     if ( rest0_list.size() == 1 && rest1_list.size() == 1 ) {
@@ -632,7 +632,7 @@ DgMgr::make_lit(
   SizeType index
 )
 {
-  auto f = mBddMgr.make_posi_literal(VarId{index});
+  auto f = mBddMgr.posi_literal(VarId{index});
   auto node = new DgLitNode{f, index};
   return DgEdge{node};
 }
