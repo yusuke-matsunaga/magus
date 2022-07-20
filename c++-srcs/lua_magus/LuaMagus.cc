@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 #include "LuaMagus.h"
-//#include "ym/LuaBdd.h"
+#include "ym/LuaBdd.h"
 #include "ym/LuaBnet.h"
 #include "ym/LuaClib.h"
 
@@ -19,7 +19,7 @@ void
 LuaMagus::open_Magus()
 {
   vector<struct luaL_Reg> mylib;
-  //LuaBdd::init(lua_state(), mylib);
+  LuaBdd::init(lua_state(), mylib);
   LuaBnet::init(lua_state(), mylib);
   LuaClib::init(lua_state(), mylib);
   init_equiv(mylib);

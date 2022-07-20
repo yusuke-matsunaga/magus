@@ -32,6 +32,7 @@ add_executable ( lua_magus
   $<TARGET_OBJECTS:magus_cellmap_obj>
   $<TARGET_OBJECTS:magus_sbjgraph_obj>
   $<TARGET_OBJECTS:ym_luaclib_obj>
+  $<TARGET_OBJECTS:ym_luabdd_obj>
   $<TARGET_OBJECTS:ym_luabnet_obj>
   ${YM_SUBMODULE_OBJ_LIST}
   )
@@ -72,6 +73,7 @@ add_executable ( lua_magus_p
   $<TARGET_OBJECTS:magus_cellmap_obj_p>
   $<TARGET_OBJECTS:magus_sbjgraph_obj_p>
   $<TARGET_OBJECTS:ym_luaclib_obj_p>
+  $<TARGET_OBJECTS:ym_luabdd_obj_p>
   $<TARGET_OBJECTS:ym_luabnet_obj_p>
   ${YM_SUBMODULE_OBJ_P_LIST}
   )
@@ -112,6 +114,7 @@ add_executable (lua_magus_d
   $<TARGET_OBJECTS:magus_cellmap_obj_d>
   $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
   $<TARGET_OBJECTS:ym_luaclib_obj_d>
+  $<TARGET_OBJECTS:ym_luabdd_obj_d>
   $<TARGET_OBJECTS:ym_luabnet_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
   )
