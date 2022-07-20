@@ -8,6 +8,7 @@
 
 #include "LuaMagus.h"
 #include "EquivMgr.h"
+#include "ym/LuaBnet.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -43,15 +44,15 @@ equiv_cmd(
   int n = lua.get_top();
   if ( n == 2 || n == 3 ) {
     // 2つの BnNetwork とオプションテーブルを引数に取る．
-    if ( !lua.is_bnet(1) ) {
+    if ( !LuaBnet::is_bnet(L, 1) ) {
       return lua.error_end("Error in equiv(): 1st argument should be a BnNetwork.");
     }
-    auto net1 = lua.to_bnet(1);
+    auto net1 = LuaBnet::to_bnet(L, 1);
 
-    if ( !lua.is_bnet(2) ) {
+    if ( !LuaBnet::is_bnet(L, 2) ) {
       return lua.error_end("Error in equiv(): 2nd argument should be a BnNetwork.");
     }
-    auto net2 = lua.to_bnet(2);
+    auto net2 = LuaBnet::to_bnet(L, 2);
 
     if ( n == 3 ) {
       if ( !lua.is_table(3) ) {
