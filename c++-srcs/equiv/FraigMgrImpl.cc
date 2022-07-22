@@ -3,9 +3,8 @@
 /// @brief FraigMgrImpl の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2018 Yusuke Matsunaga
+/// Copyright (C) 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
@@ -36,19 +35,18 @@ END_NONAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @brief sig_size シグネチャのサイズ
-// @param[in] solver_type SAT-solver の種類を表すオブジェクト
-FraigMgrImpl::FraigMgrImpl(int sig_size,
-			   const SatSolverType& solver_type) :
-  mPatSize(sig_size * 2),
-  mPatInit(sig_size),
-  mPatUsed(sig_size),
-  mSolver(solver_type),
-  mSimCount(0),
-  mSimTime(0.0),
-  mLogLevel(0),
-  mLogStream(new ofstream("/dev/null")),
-  mLoopLimit(1000)
+FraigMgrImpl::FraigMgrImpl(
+  SizeType sig_size,
+  const SatSolverType& solver_type
+) : mPatSize(sig_size * 2),
+    mPatInit(sig_size),
+    mPatUsed(sig_size),
+    mSolver(solver_type),
+    mSimCount(0),
+    mSimTime(0.0),
+    mLogLevel(0),
+    mLogStream(new ofstream("/dev/null")),
+    mLoopLimit(1000)
 {
 }
 
@@ -91,10 +89,11 @@ FraigMgrImpl::make_input()
 }
 
 // @brief 2つのノードの AND を取る．
-// @param[in] handle1, handle2 入力の AIG ハンドル
 FraigHandle
-FraigMgrImpl::make_and(FraigHandle handle1,
-		       FraigHandle handle2)
+FraigMgrImpl::make_and(
+  FraigHandle handle1,
+  FraigHandle handle2
+)
 {
   if ( debug ) {
     cout << "make_and(" << handle1 << ", " << handle2 << ") ..." << endl;
@@ -168,7 +167,9 @@ FraigMgrImpl::make_and(FraigHandle handle1,
 
 // @brief ノードの入出力の関係を表す CNF 式を作る．
 void
-FraigMgrImpl::make_cnf(FraigNode* node)
+FraigMgrImpl::make_cnf(
+  FraigNode* node
+)
 {
   FraigHandle handle1 = node->fanin0_handle();
   FraigHandle handle2 = node->fanin1_handle();
@@ -181,14 +182,11 @@ FraigMgrImpl::make_cnf(FraigNode* node)
 }
 
 // @brief 0縮退検査を行う．
-// @param[in] node 対象のノード
-// @param[out] ans 答
-// @retval SatBool3::True 定数に縮退していた．
-// @retval SatBool3::False 定数ではなかった．
-// @retval SatBool3::X 不明(アボート)
 SatBool3
-FraigMgrImpl::verify_const(FraigNode* node,
-			   FraigHandle& ans)
+FraigMgrImpl::verify_const(
+  FraigNode* node,
+  FraigHandle& ans
+)
 {
   SatBool3 stat = SatBool3::False;
   if ( !node->check_1mark() ) {
@@ -227,10 +225,12 @@ FraigMgrImpl::verify_const(FraigNode* node,
 
 // @brief パタンハッシュで同値と判定されたノードを比較する．
 bool
-FraigMgrImpl::compare_node(FraigNode* node1,
-			   FraigNode* node2,
-			   bool inv,
-			   bool& retry)
+FraigMgrImpl::compare_node(
+  FraigNode* node1,
+  FraigNode* node2,
+  bool inv,
+  bool& retry
+)
 {
   retry = false;
   if ( compare_pat(node1, node2, inv) ) {
@@ -255,7 +255,9 @@ FraigMgrImpl::compare_node(FraigNode* node1,
 
 // @breif 直前の SAT の反例を加えて再ハッシュする．
 void
-FraigMgrImpl::add_pat(FraigNode* node)
+FraigMgrImpl::add_pat(
+  FraigNode* node
+)
 {
   if ( mPatSize <= mPatUsed ) {
     resize_pat(mPatSize * 2);
@@ -298,8 +300,10 @@ FraigMgrImpl::add_pat(FraigNode* node)
 
 // @brief 2つのハンドルが等価かどうか調べる．
 SatBool3
-FraigMgrImpl::check_equiv(FraigHandle aig1,
-			  FraigHandle aig2)
+FraigMgrImpl::check_equiv(
+  FraigHandle aig1,
+  FraigHandle aig2
+)
 {
   if ( aig1 == aig2 ) {
     // もっとも簡単なパタン
@@ -348,14 +352,18 @@ FraigMgrImpl::check_equiv(FraigHandle aig1,
 
 // @brief ログレベルを設定する．
 void
-FraigMgrImpl::set_loglevel(int level)
+FraigMgrImpl::set_loglevel(
+  SizeType level
+)
 {
   mLogLevel = level;
 }
 
 // @brief ログ出力用ストリームを設定する．
 void
-FraigMgrImpl::set_logstream(ostream* out)
+FraigMgrImpl::set_logstream(
+  ostream* out
+)
 {
   if ( mLogStream != &cout ) {
     delete mLogStream;
@@ -365,14 +373,18 @@ FraigMgrImpl::set_logstream(ostream* out)
 
 // @brief ランダムシミュレーション制御用のパラメータを設定する．
 void
-FraigMgrImpl::set_loop_limit(int val)
+FraigMgrImpl::set_loop_limit(
+  SizeType val
+)
 {
   mLoopLimit = val;
 }
 
 // @brief ノードのシミュレーションパタン用配列を確保する．
 void
-FraigMgrImpl::init_pat(FraigNode* node)
+FraigMgrImpl::init_pat(
+  FraigNode* node
+)
 {
   ASSERT_COND(node->mPat == nullptr );
   node->mPat = new ymuint64[mPatSize];
@@ -380,9 +392,11 @@ FraigMgrImpl::init_pat(FraigNode* node)
 
 // @brief 全ノードのシミュレーションパタン用配列を拡大する．
 void
-FraigMgrImpl::resize_pat(int size)
+FraigMgrImpl::resize_pat(
+  SizeType size
+)
 {
-  int n = mAllNodes.size();
+  SizeType n = mAllNodes.size();
   for ( int i = 0; i < n; ++ i ) {
     FraigNode* node = mAllNodes[i];
     ymuint64* old_array = node->mPat;
@@ -397,9 +411,11 @@ FraigMgrImpl::resize_pat(int size)
 
 // @brief シミュレーションパタンが等しいか調べる．
 bool
-FraigMgrImpl::compare_pat(FraigNode* node1,
-			  FraigNode* node2,
-			  bool inv)
+FraigMgrImpl::compare_pat(
+  FraigNode* node1,
+  FraigNode* node2,
+  bool inv
+)
 {
   ymuint64* src1 = node1->mPat;
   ymuint64* src2 = node2->mPat;
@@ -436,8 +452,10 @@ FraigMgrImpl::new_node()
 
 // node が定数かどうか調べる．
 SatBool3
-FraigMgrImpl::check_const(FraigNode* node,
-			  bool inv)
+FraigMgrImpl::check_const(
+  FraigNode* node,
+  bool inv
+)
 {
   if ( debug ) {
     cout << "CHECK CONST";
@@ -489,9 +507,11 @@ FraigMgrImpl::check_const(FraigNode* node,
 
 // node1 と node2 機能的に等価かどうか調べる．
 SatBool3
-FraigMgrImpl::check_equiv(FraigNode* node1,
-			  FraigNode* node2,
-			  bool inv)
+FraigMgrImpl::check_equiv(
+  FraigNode* node1,
+  FraigNode* node2,
+  bool inv
+)
 {
   SatLiteral id1 = node1->varid();
   SatLiteral id2 = node2->varid();
@@ -552,7 +572,9 @@ FraigMgrImpl::check_equiv(FraigNode* node1,
 
 // lit1 が成り立つか調べる．
 SatBool3
-FraigMgrImpl::check_condition(SatLiteral lit1)
+FraigMgrImpl::check_condition(
+  SatLiteral lit1
+)
 {
   vector<SatLiteral> assumptions{lit1};
   SatBool3 ans1 = mSolver.solve(assumptions);
@@ -596,8 +618,10 @@ FraigMgrImpl::check_condition(SatLiteral lit1)
 
 // lit1 & lit2 が成り立つか調べる．
 SatBool3
-FraigMgrImpl::check_condition(SatLiteral lit1,
-			      SatLiteral lit2)
+FraigMgrImpl::check_condition(
+  SatLiteral lit1,
+  SatLiteral lit2
+)
 {
   vector<SatLiteral> assumptions{lit1, lit2};
   SatBool3 ans1 = mSolver.solve(assumptions);
@@ -692,7 +716,9 @@ FraigMgrImpl::dump_eqgroup(ostream& s) const
 
 // @brief 直前の sat_sweep に関する統計情報を出力する．
 void
-FraigMgrImpl::dump_stats(ostream& s)
+FraigMgrImpl::dump_stats(
+  ostream& s
+)
 {
   s << "=====<< AigMgr Statistics >> =====" << endl;
   s << "simulation:" << endl
@@ -728,8 +754,10 @@ FraigMgrImpl::SatStat::SatStat()
 }
 
 void
-FraigMgrImpl::SatStat::set_result(SatBool3 code,
-				  double t)
+FraigMgrImpl::SatStat::set_result(
+  SatBool3 code,
+  double t
+)
 {
   ++ mTotalCount;
 
@@ -749,7 +777,9 @@ FraigMgrImpl::SatStat::set_result(SatBool3 code,
 }
 
 void
-FraigMgrImpl::SatStat::dump(ostream& s) const
+FraigMgrImpl::SatStat::dump(
+  ostream& s
+) const
 {
   s << mTimeStat[1].mCount << " / " << mTotalCount << endl;
   if ( mTimeStat[1].mCount > 0 ) {

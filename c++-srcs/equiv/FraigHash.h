@@ -8,7 +8,7 @@
 /// Copyright (C) 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fraig.h"
+#include "fraig_nsdef.h"
 
 
 BEGIN_NAMESPACE_FRAIG
@@ -71,11 +71,6 @@ protected:
   FraigNode** mTable;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE_FRAIG
 

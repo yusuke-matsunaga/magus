@@ -1,7 +1,7 @@
-﻿#ifndef FRAIG_H
-#define FRAIG_H
+﻿#ifndef FRAIG_NSDEF_H
+#define FRAIG_NSDEF_H
 
-/// @file fraig.h
+/// @file fraig_nsdef.h
 /// @brief fraig の名前空間の定義ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
@@ -35,4 +35,4 @@ using nsFraig::FraigHandle;
 
 END_NAMESPACE_MAGUS
 
-#endif // FRAIG_H
+#endif // FRAIG_NSDEF_H

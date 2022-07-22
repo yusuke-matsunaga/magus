@@ -8,7 +8,7 @@
 /// Copyright (C) 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fraig.h"
+#include "fraig_nsdef.h"
 #include "ym/SatLiteral.h"
 
 
@@ -171,9 +171,9 @@ public:
 
   /// @brief ハッシュ値を返す．
   SizeType
-  hash_func() const
+  hash() const
   {
-    return static_cast<SizeType>(mPackedData);
+    return static_cast<SizeType>((mPackedData * mPackedData) >> 20);
   }
 
   /// @brief 等価比較関数
@@ -220,7 +220,7 @@ operator!=(
   FraigHandle src2  ///< [in] オペランド2
 )
 {
-  return !operator==(src1, src2);
+  return !src1.operator==(src2);
 }
 
 /// @relates FraigHandle
@@ -247,12 +247,12 @@ BEGIN_NAMESPACE_STD
 
 // FraigHandleをキーにしたハッシュ関数クラスの定義
 template <>
-struct hash<YM_NAMESPACE::nsFraig::FraigHandle>
+struct hash<MAGUS_NAMESPACE::nsFraig::FraigHandle>
 {
   SizeType
-  operator()(YM_NAMESPACE::nsFraig::FraigHandle handle) const
+  operator()(MAGUS_NAMESPACE::nsFraig::FraigHandle handle) const
   {
-    return handle.hash_func();
+    return handle.hash();
   }
 };
 

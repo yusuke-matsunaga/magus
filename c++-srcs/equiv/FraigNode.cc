@@ -3,9 +3,8 @@
 /// @brief FraigNode の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2018 Yusuke Matsunaga
+/// Copyright (C) 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "FraigNode.h"
 
@@ -121,14 +120,14 @@ ymuint64 FraigNode::mPrimes[] = {
 
 
 // @brief コンストラクタ
-FraigNode::FraigNode() :
-  mFlags(0),
-  mPat(nullptr),
-  mHash(0),
-  mRepNode(this),
-  mEqLink(nullptr),
-  mEqTail(nullptr),
-  mFanins{nullptr, nullptr}
+FraigNode::FraigNode(
+) : mFlags(0),
+    mPat(nullptr),
+    mHash(0),
+    mRepNode(this),
+    mEqLink(nullptr),
+    mEqTail(nullptr),
+    mFanins{nullptr, nullptr}
 {
 }
 
@@ -141,8 +140,10 @@ FraigNode::~FraigNode()
 
 // @brief ファンインをセットする．
 void
-FraigNode::set_fanin(FraigHandle handle1,
-		     FraigHandle handle2)
+FraigNode::set_fanin(
+  FraigHandle handle1,
+  FraigHandle handle2
+)
 {
   mFanins[0] = handle1.node();
   mFanins[1] = handle2.node();
@@ -161,13 +162,12 @@ FraigNode::set_fanin(FraigHandle handle1,
 }
 
 // @brief パタンをセットする．
-// @param[in] start 開始位置
-// @param[in] end 終了位置
-// @param[in] pat パタンのベクタ
 void
-FraigNode::set_pat(int start,
-		   int end,
-		   const vector<ymuint64>& pat)
+FraigNode::set_pat(
+  SizeType start,
+  SizeType end,
+  const vector<ymuint64>& pat
+)
 {
   int n = end - start;
   for ( int i = 0; i < n; ++ i ) {
@@ -177,11 +177,11 @@ FraigNode::set_pat(int start,
 }
 
 // @brief ハッシュ値を計算する．
-// @param[in] start 開始位置
-// @param[in] end 終了位置
 void
-FraigNode::calc_hash(int start,
-		     int end)
+FraigNode::calc_hash(
+  SizeType start,
+  SizeType end
+)
 {
   if ( start == 0 ) {
     // 極性を決める．

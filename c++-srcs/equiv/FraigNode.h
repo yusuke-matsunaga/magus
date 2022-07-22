@@ -8,7 +8,7 @@
 /// Copyright (C) 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fraig.h"
+#include "fraig_nsdef.h"
 #include "FraigHandle.h"
 
 
@@ -400,25 +400,25 @@ private:
   ymuint32 mFlags;
 
   // シミュレーションパタン
-  ymuint64* mPat;
+  ymuint64* mPat{nullptr};
 
   // mPat のハッシュ値
-  SizeType mHash;
+  SizeType mHash{0UL};
 
   // 構造ハッシュ用のリンクポインタ
-  FraigNode* mLink1;
+  FraigNode* mLink1{nullptr};
 
   // シグネチャハッシュ用のリンクポインタ
-  FraigNode* mLink2;
+  FraigNode* mLink2{nullptr};
 
   // 代表ノード情報
-  FraigNode* mRepNode;
+  FraigNode* mRepNode{nullptr};
 
   // 次の等価候補ノード
-  FraigNode* mEqLink;
+  FraigNode* mEqLink{nullptr};
 
   // 等価候補リストの末尾のノード
-  FraigNode* mEqTail;
+  FraigNode* mEqTail{nullptr};
 
 
 private:
@@ -469,309 +469,6 @@ private:
   const int kSftD  = 7;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief CNF 上の変数番号を返す．
-inline
-SatLiteral
-FraigNode::varid() const
-{
-  return mVarId;
-}
-
-// @brief 入力ノードの時に true を返す．
-inline
-bool
-FraigNode::is_input() const
-{
-  return static_cast<bool>((mFlags >> kSftI) & 1U);
-}
-
-// @brief 入力番号を返す．
-inline
-int
-FraigNode::input_id() const
-{
-  return reinterpret_cast<ympuint>(mFanins[0]);
-}
-
-// @brief 入力番号をセットする．
-inline
-void
-FraigNode::set_input(int id)
-{
-  mFlags |= (1U << kSftI);
-  mFanins[0] = reinterpret_cast<FraigNode*>(id);
-}
-
-// @brief AND の時に true を返す．
-inline
-bool
-FraigNode::is_and() const
-{
-  return !is_input();
-}
-
-// @brief ファンインを得る．
-inline
-FraigNode*
-FraigNode::fanin(int pos) const
-{
-  // 安全のため pos の値を補正しておく．
-  pos &= 1;
-  return mFanins[pos];
-}
-
-// @brief 最初のファンインを得る．
-inline
-FraigNode*
-FraigNode::fanin0() const
-{
-  return mFanins[0];
-}
-
-// @brief 2番めのファンインを得る．
-inline
-FraigNode*
-FraigNode::fanin1() const
-{
-  return mFanins[1];
-}
-
-// @brief ファンインの極性を得る．
-inline
-bool
-FraigNode::fanin_inv(int pos) const
-{
-  // 安全のため pos の値を補正しておく．
-  pos &= 1;
-  return static_cast<bool>((mFlags >> (kSftP0 + pos)) & 1U);
-}
-
-// @brief 最初のファンインの極性を得る．
-inline
-bool
-FraigNode::fanin0_inv() const
-{
-  return static_cast<bool>((mFlags >> kSftP0) & 1U);
-}
-
-// @brief 2番めのファンインの極性を得る．
-inline
-bool
-FraigNode::fanin1_inv() const
-{
-  return static_cast<bool>((mFlags >> kSftP1) & 1U);
-}
-
-// @brief ファンインのハンドルを得る．
-inline
-FraigHandle
-FraigNode::fanin_handle(int pos) const
-{
-  // 安全のため pos の値を補正しておく．
-  pos &= 1;
-  return FraigHandle(fanin(pos), fanin_inv(pos));
-}
-
-// @brief 最初のファンインのハンドルを得る．
-inline
-FraigHandle
-FraigNode::fanin0_handle() const
-{
-  return FraigHandle(fanin0(), fanin0_inv());
-}
-
-// @brief 2番めのファンインのハンドルを得る．
-inline
-FraigHandle
-FraigNode::fanin1_handle() const
-{
-  return FraigHandle(fanin1(), fanin1_inv());
-}
-
-// @brief 0 の値を取るとき true を返す．
-inline
-bool
-FraigNode::check_0mark() const
-{
-  return static_cast<bool>((mFlags >> kSft0) & 1U);
-}
-
-// @brief 1 の値を取るとき true を返す．
-inline
-bool
-FraigNode::check_1mark() const
-{
-  return static_cast<bool>((mFlags >> kSft1) & 1U);
-}
-
-// @brief パタンのハッシュ値を返す．
-inline
-SizeType
-FraigNode::pat_hash() const
-{
-  return mHash;
-}
-
-// @brief ハッシュ値の極性を返す．
-inline
-bool
-FraigNode::pat_hash_inv() const
-{
-  return static_cast<bool>((mFlags >> kSftH) & 1U);
-}
-
-// @brief 削除済みのとき true を返す．
-inline
-bool
-FraigNode::check_dmark() const
-{
-  return static_cast<bool>((mFlags >> kSftD) & 1U);
-}
-
-// @brief 要素数が2以上の等価候補グループの代表なら true を返す．
-inline
-bool
-FraigNode::check_rep() const
-{
-  return mRepNode == this && mEqLink != nullptr;
-}
-
-// @brief 代表ノードを返す．
-inline
-FraigNode*
-FraigNode::rep_node() const
-{
-  return mRepNode;
-}
-
-// @brief 代表ノードに対する極性を返す．
-inline
-bool
-FraigNode::rep_inv() const
-{
-  return static_cast<bool>((mFlags >> kSftP) & 1U);
-}
-
-// @brief 代表ノードを返す．
-inline
-FraigHandle
-FraigNode::rep_handle() const
-{
-  return FraigHandle(mRepNode, rep_inv());
-}
-
-// @brief 次の等価候補ノードを得る．
-inline
-FraigNode*
-FraigNode::next_eqnode()
-{
-  return mEqLink;
-}
-
-// @brief 代表ノードをセットする．
-inline
-void
-FraigNode::set_rep(FraigNode* rep_node,
-		   bool inv)
-{
-  mRepNode = rep_node;
-  if ( inv ) {
-    set_rep_inv();
-  }
-}
-
-// @brief 等価候補ノードを追加する．
-inline
-void
-FraigNode::add_eqnode(FraigNode* node)
-{
-  mEqTail->mEqLink = node;
-  mEqTail = node;
-  node->mRepNode = this;
-  node->mEqLink = nullptr;
-}
-
-// @brief 0 の値を取ったことを記録する．
-inline
-void
-FraigNode::set_0mark()
-{
-  mFlags |= (1U << kSft0);
-}
-
-// @brief 1 の値を取ったことを記録する．
-inline
-void
-FraigNode::set_1mark()
-{
-  mFlags |= (1U << kSft1);
-}
-
-// @brief 極性反転の印をつける．
-inline
-void
-FraigNode::set_rep_inv()
-{
-  mFlags |= (1U << kSftP);
-}
-
-// @brief 削除済みの印をつける．
-inline
-void
-FraigNode::set_dmark()
-{
-  mFlags |= (1U << kSftD);
-}
-
-// @brief パタンを計算する．
-inline
-void
-FraigNode::calc_pat(int start,
-		    int end)
-{
-  ymuint64* dst = mPat + start;
-  ymuint64* dst_end = mPat + end;
-  ymuint64* src1 = mFanins[0]->mPat + start;
-  ymuint64* src2 = mFanins[1]->mPat + start;
-  if ( fanin0_inv() ) {
-    if ( fanin1_inv() ) {
-      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
-	*dst = ~(*src1 | *src2);
-      }
-    }
-    else {
-      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
-	*dst = ~*src1 & *src2;
-      }
-    }
-  }
-  else {
-    if ( fanin1_inv() ) {
-      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
-	*dst = *src1 & ~*src2;
-      }
-    }
-    else {
-      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
-	*dst = *src1 & *src2;
-      }
-    }
-  }
-  calc_hash(start, end);
-}
-
-inline
-FraigNode*&
-FraigNode::link(int link_pos)
-{
-  return link_pos == 0 ? mLink1 : mLink2;
-}
 
 END_NAMESPACE_FRAIG
 

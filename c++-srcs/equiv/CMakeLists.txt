@@ -17,6 +17,13 @@ include_directories (
 
 set ( equiv_SOURCES
   EquivMgr.cc
+  FraigHandle.cc
+  FraigHash.cc
+  FraigMgr.cc
+  FraigMgrImpl.cc
+  FraigNode.cc
+  PatHash.cc
+  StructHash.cc
   )
 
 

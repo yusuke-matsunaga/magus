@@ -73,15 +73,12 @@ configure_file(
 # ===================================================================
 
 ym_init_submodules (
-  ym-aig
   ym-base
-  #  ym-bfo
   ym-bnet
   ym-cell
   ym-codec
   ym-combopt
   ym-common
-  ym-fraig
   ym-logic
   ym-mvn
   ym-sat

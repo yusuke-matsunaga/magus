@@ -8,7 +8,7 @@
 /// Copyright (C) 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fraig.h"
+#include "fraig_nsdef.h"
 #include "FraigHandle.h"
 #include "ym/bnet.h"
 #include "ym/Expr.h"
@@ -273,7 +273,7 @@ public:
   /// @brief ログレベルを設定する．
   void
   set_loglevel(
-    int level ///< [in] ログレベル
+    SizeType level ///< [in] ログレベル
   );
 
   /// @brief ログ出力用ストリームを設定する．
@@ -308,8 +308,8 @@ private:
   FraigHandle
   _make_and(
     const vector<FraigHandle>& edge_list, ///< [in] 入力のハンドルのリスト
-    int start_pos,                        ///< [in] 開始位置
-    int end_pos,                          ///< [in] 終了位置
+    SizeType start_pos,                   ///< [in] 開始位置
+    SizeType end_pos,                     ///< [in] 終了位置
     bool iinv                             ///< [in] 入力の反転フラグ
   );
 
@@ -321,8 +321,8 @@ private:
   FraigHandle
   _make_xor(
     const vector<FraigHandle>& edge_list, ///< [in] 入力のハンドルのリスト
-    int start_pos,			  ///< [in] 開始位置
-    int end_pos				  ///< [in] 終了位置
+    SizeType start_pos,			  ///< [in] 開始位置
+    SizeType end_pos			  ///< [in] 終了位置
   );
 
 

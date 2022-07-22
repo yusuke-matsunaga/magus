@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 #include "FraigHash.h"
-#include "ym/FraigHandle.h"
+#include "FraigHandle.h"
 
 
 BEGIN_NAMESPACE_FRAIG

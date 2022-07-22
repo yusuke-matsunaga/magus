@@ -65,7 +65,7 @@ FraigHandle::is_input() const
 // @brief 外部入力ノードへのハンドルのとき，入力番号を返す．
 //
 // is_input() の時のみ意味を持つ．
-int
+SizeType
 FraigHandle::input_id() const
 {
   FraigNode* n = node();

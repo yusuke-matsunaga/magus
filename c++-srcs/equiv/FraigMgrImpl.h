@@ -8,7 +8,7 @@
 /// Copyright (C) 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "fraig.h"
+#include "fraig_nsdef.h"
 #include "FraigHandle.h"
 #include "StructHash.h"
 #include "PatHash.h"
@@ -48,17 +48,28 @@ public:
 
   /// @brief 入力ノード数を得る．
   SizeType
-  input_num() const;
+  input_num() const
+  {
+    return mInputNodes.size();
+  }
 
   /// @brief 入力ノードを取り出す．
   FraigNode*
   input_node(
     SizeType pos ///< [in] 入力番号 ( 0 <= pos < input_num() )
-  ) const;
+  ) const
+  {
+    ASSERT_COND( pos >= 0 && pos < input_num() );
+
+    return mInputNodes[pos];
+  }
 
   /// @brief ノード数を得る．
   SizeType
-  node_num() const;
+  node_num() const
+  {
+    return mAllNodes.size();
+  }
 
   /// @brief ノードを取り出す．
   ///
@@ -66,7 +77,12 @@ public:
   FraigNode*
   node(
     SizeType pos ///< [in] ノード番号 ( 0 <= pos < node_num() )
-  ) const;
+  ) const
+  {
+    ASSERT_COND( pos >= 0 && pos < node_num() );
+
+    return mAllNodes[pos];
+  }
 
 
 public:
@@ -176,44 +192,56 @@ private:
 
   /// @brief 全ノードのシミュレーションパタン用配列を拡大する．
   void
-  resize_pat(int size);
+  resize_pat(
+    SizeType size ///< [in] サイズ
+  );
 
   /// @breif 直前の SAT の反例を加えて再ハッシュする．
   void
-  add_pat(FraigNode* node);
+  add_pat(
+    FraigNode* node ///< [in] 対象のノード
+  );
 
   /// @brief ノードが定数と等価かどうか調べる．
-  /// @param[in] node 対象のノード
-  /// @param[in] inv false で 0, true で 1 を表す．
   SatBool3
-  check_const(FraigNode* node,
-	      bool inv);
+  check_const(
+    FraigNode* node, ///< [in] 対象のノード
+    bool inv         ///< [in] false で 0, true で 1 を表す．
+  );
 
   /// @brief 2つのノードが等価かどうか調べる．
-  /// @param[in] node1, node2 対象のノード
-  /// @param[in] inv false で同相，true で逆相を表す．
   SatBool3
-  check_equiv(FraigNode* node1,
-	      FraigNode* node2,
-	      bool inv);
+  check_equiv(
+    FraigNode* node1, ///< [in] ノード1
+    FraigNode* node2, ///< [in] ノード2
+    bool inv          ///< [in] 極性の反転フラグ
+  );
 
   /// @brief lit1 が成り立つか調べる．
   SatBool3
-  check_condition(SatLiteral lit1);
+  check_condition(
+    SatLiteral lit1
+  );
 
   /// @brief lit1 & lit2 が成り立つか調べる．
   SatBool3
-  check_condition(SatLiteral lit1,
-		  SatLiteral lit2);
+  check_condition(
+    SatLiteral lit1,
+    SatLiteral lit2
+  );
 
   /// @brief FraigHandle に対応するリテラルを返す．
   /// @note 定数の場合の返り値は未定
   SatLiteral
-  fraig2literal(FraigHandle aig);
+  fraig2literal(
+    FraigHandle aig
+  );
 
   /// @brief 等価候補グループの情報を出力する．
   void
-  dump_eqgroup(ostream& s) const;
+  dump_eqgroup(
+    ostream& s ///< [in] 出力ストリーム
+  ) const;
 
   /// @brief 新しいノードを生成する．
   FraigNode*
@@ -221,9 +249,11 @@ private:
 
   /// @brief シミュレーションパタンが等しいか調べる．
   bool
-  compare_pat(FraigNode* node1,
-	      FraigNode* node2,
-	      bool inv);
+  compare_pat(
+    FraigNode* node1, ///< [in] ノード1
+    FraigNode* node2, ///< [in] ノード2
+    bool inv	      ///< [in] 極性の反転フラグ
+  );
 
 
 private:
@@ -270,16 +300,20 @@ private:
     SatStat();
 
     // 結果をセットする．
-    // code = kB3True 検証成功
-    //      = kB3False 検証失敗
-    //      = kB3X     アボート
+    // code = SatBool3::True 検証成功
+    //      = SatBool3::3False 検証失敗
+    //      = SatBool3::X     アボート
     void
-    set_result(SatBool3 code,
-	       double t);
+    set_result(
+      SatBool3 code,
+      double t
+    );
 
     // 内容をダンプする．
     void
-    dump(ostream& s) const;
+    dump(
+      ostream& s ///< [in] 出力ストリーム
+    ) const;
 
   };
 
@@ -299,13 +333,13 @@ private:
   StructHash mHashTable1;
 
   // 各ノードのシミュレーションパタンのサイズ
-  int mPatSize;
+  SizeType mPatSize;
 
   // 初期パタン数
-  int mPatInit;
+  SizeType mPatInit;
 
   // 使用しているパタン数
-  int mPatUsed;
+  SizeType mPatUsed;
 
   // パタンハッシュ
   PatHash mHashTable2;
@@ -320,7 +354,7 @@ private:
   SatModel mModel;
 
   // sat_sweep 中のシミュレーション回数
-  int mSimCount;
+  SizeType mSimCount;
 
   // シミュレーションに要した時間
   double mSimTime;
@@ -335,59 +369,15 @@ private:
   ostream* mOutP;
 
   // ログレベル
-  int mLogLevel;
+  SizeType mLogLevel;
 
   // ログ出力用のストリーム
   ostream* mLogStream;
 
   // シミュレーションのループ回数
-  int mLoopLimit;
+  SizeType mLoopLimit;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 入力ノード数を得る．
-inline
-int
-FraigMgrImpl::input_num() const
-{
-  return mInputNodes.size();
-}
-
-// @brief 入力ノードを取り出す．
-// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
-inline
-FraigNode*
-FraigMgrImpl::input_node(int pos) const
-{
-  ASSERT_COND( pos >= 0 && pos < input_num() );
-
-  return mInputNodes[pos];
-}
-
-// @brief ノード数を得る．
-inline
-int
-FraigMgrImpl::node_num() const
-{
-  return mAllNodes.size();
-}
-
-// @brief ノードを取り出す．
-// @param[in] pos ノード番号 ( 0 <= pos < node_num() )
-// @note ANDノードの他に入力ノードも含まれる．
-inline
-FraigNode*
-FraigMgrImpl::node(int pos) const
-{
-  ASSERT_COND( pos >= 0 && pos < node_num() );
-
-  return mAllNodes[pos];
-}
 
 END_NAMESPACE_FRAIG
 

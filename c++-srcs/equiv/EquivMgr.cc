@@ -7,7 +7,7 @@
 /// All rights reserved.
 
 #include "EquivMgr.h"
-#include "ym/FraigMgr.h"
+#include "FraigMgr.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnNode.h"
 #include "ym/Range.h"
