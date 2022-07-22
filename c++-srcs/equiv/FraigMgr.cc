@@ -49,6 +49,38 @@ FraigMgr::~FraigMgr()
 {
 }
 
+// @brief 入力ノード数を得る．
+SizeType
+FraigMgr::input_num() const
+{
+  return mRep->input_num();
+}
+
+// @brief 入力ノードを取り出す．
+FraigNode*
+FraigMgr::input_node(
+  SizeType pos
+) const
+{
+  return mRep->input_node(pos);
+}
+
+// @brief ノード数を得る．
+SizeType
+FraigMgr::node_num() const
+{
+  return mRep->node_num();
+}
+
+// @brief ノードを取り出す．
+FraigNode*
+FraigMgr::node(
+  SizeType pos
+) const
+{
+  return mRep->node(pos);
+}
+
 // @brief 外部入力を作る．
 FraigHandle
 FraigMgr::make_input()

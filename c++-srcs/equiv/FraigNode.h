@@ -44,7 +44,7 @@ public:
     SizeType id
   )
   {
-    mFlags |= (1U << kSftI);
+    mFlags[BIT_I] = true;
     mFanins[0] = reinterpret_cast<FraigNode*>(id);
   }
 
@@ -78,7 +78,7 @@ public:
   bool
   is_input() const
   {
-    return static_cast<bool>((mFlags >> kSftI) & 1U);
+    return mFlags[BIT_I];
   }
 
   /// @brief 入力番号を返す．
@@ -134,21 +134,21 @@ public:
   {
     // 安全のため pos の値を補正しておく．
     pos &= 1;
-    return static_cast<bool>((mFlags >> (kSftP0 + pos)) & 1U);
+    return mFlags[BIT_INV0 + pos];
   }
 
   /// @brief 1番めのファンインの極性を得る．
   bool
   fanin0_inv() const
   {
-    return static_cast<bool>((mFlags >> kSftP0) & 1U);
+    return mFlags[BIT_INV0];
   }
 
   /// @brief 2番めのファンインの極性を得る．
   bool
   fanin1_inv() const
   {
-    return static_cast<bool>((mFlags >> kSftP1) & 1U);
+    return mFlags[BIT_INV1];
   }
 
   /// @brief ファンインのハンドルを得る．
@@ -232,14 +232,14 @@ public:
   bool
   check_0mark() const
   {
-    return static_cast<bool>((mFlags >> kSft0) & 1U);
+    return mFlags[BIT_0];
   }
 
   /// @brief 1 の値を取るとき true を返す．
   bool
   check_1mark() const
   {
-    return static_cast<bool>((mFlags >> kSft1) & 1U);
+    return mFlags[BIT_1];
   }
 
   /// @brief パタンのハッシュ値を返す．
@@ -253,7 +253,7 @@ public:
   bool
   pat_hash_inv() const
   {
-    return static_cast<bool>((mFlags >> kSftH) & 1U);
+    return mFlags[BIT_H];
   }
 
 
@@ -266,7 +266,7 @@ public:
   bool
   check_dmark() const
   {
-    return static_cast<bool>((mFlags >> kSftD) & 1U);
+    return mFlags[BIT_D];
   }
 
   /// @brief 要素数が2以上の等価候補グループの代表なら true を返す．
@@ -287,7 +287,7 @@ public:
   bool
   rep_inv() const
   {
-    return static_cast<bool>((mFlags >> kSftP) & 1U);
+    return mFlags[BIT_R];
   }
 
   /// @brief 代表ハンドルを返す．
@@ -321,7 +321,7 @@ public:
   void
   set_rep_inv()
   {
-    mFlags |= (1U << kSftP);
+    mFlags[BIT_R] = true;
   }
 
   /// @brief 等価候補ノードを追加する．
@@ -340,7 +340,7 @@ public:
   void
   set_dmark()
   {
-    mFlags |= (1U << kSftD);
+    mFlags[BIT_D] = true;
   }
 
 
@@ -374,14 +374,14 @@ private:
   void
   set_0mark()
   {
-    mFlags |= (1U << kSft0);
+    mFlags[BIT_0] = true;
   }
 
   /// @brief 1 の値を取ったことを記録する．
   void
   set_1mark()
   {
-    mFlags |= (1U << kSft1);
+    mFlags[BIT_1] = true;
   }
 
 
@@ -397,7 +397,8 @@ private:
   FraigNode* mFanins[2];
 
   // 0/1マーク，極性などの情報をパックしたもの
-  ymuint32 mFlags;
+  //ymuint32 mFlags;
+  bitset<8> mFlags;
 
   // シミュレーションパタン
   ymuint64* mPat{nullptr};
@@ -438,35 +439,35 @@ private:
 
   // 入力フラグ
   static
-  const int kSftI  = 0;
+  const int BIT_I  = 0;
 
   // ファンイン0 の極性
   static
-  const int kSftP0 = 1;
+  const int BIT_INV0 = 1;
 
   // ファンイン1 の極性
   static
-  const int kSftP1 = 2;
+  const int BIT_INV1 = 2;
 
   // 0 になったことがあるかどうか
   static
-  const int kSft0  = 3;
+  const int BIT_0  = 3;
 
   // 1 になったことがあるかどうか
   static
-  const int kSft1  = 4;
+  const int BIT_1  = 4;
 
   // ハッシュパタンの極性
   static
-  const int kSftH  = 5;
+  const int BIT_H  = 5;
 
   // 等価グループ中の極性
   static
-  const int kSftP  = 6;
+  const int BIT_R  = 6;
 
   // 削除マーク
   static
-  const int kSftD  = 7;
+  const int BIT_D  = 7;
 
 };
 

@@ -45,26 +45,28 @@ public:
   // 情報を取得するメンバ関数
   //////////////////////////////////////////////////////////////////////
 
-#if 0
   /// @brief 入力ノード数を得る．
-  int
+  SizeType
   input_num() const;
 
   /// @brief 入力ノードを取り出す．
-  /// @param[in] pos 入力番号 ( 0 <= pos < input_num() )
   FraigNode*
-  input_node(int pos) const;
+  input_node(
+    SizeType pos ///< [in] 入力番号 ( 0 <= pos < input_num() )
+  ) const;
 
   /// @brief ノード数を得る．
-  int
+  SizeType
   node_num() const;
 
   /// @brief ノードを取り出す．
-  /// @param[in] pos ノード番号 ( 0 <= pos < input_num() )
-  /// @note ANDノードの他に入力ノードも含まれる．
+  ///
+  /// ANDノードの他に入力ノードも含まれる．
   FraigNode*
-  node(int pos) const;
-#endif
+  node(
+    SizeType pos ///< [in] ノード番号 ( 0 <= pos < node_num() )
+  ) const;
+
 
 public:
   //////////////////////////////////////////////////////////////////////

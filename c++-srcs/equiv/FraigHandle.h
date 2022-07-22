@@ -22,9 +22,6 @@ class FraigNode;
 //////////////////////////////////////////////////////////////////////
 class FraigHandle
 {
-  friend class FraigNode;
-  friend class StructHash;
-
 public:
   //////////////////////////////////////////////////////////////////////
   // コンストラクタ/デストラクタと生成/内容の設定
@@ -59,22 +56,6 @@ public:
 
   /// @brief デストラクタ
   ~FraigHandle() = default;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容を設定する．
-  void
-  set(
-    FraigNode* node, ///< [in] ノード
-    bool inv         ///< [in] 反転している時に true とするフラグ
-  )
-  {
-    mPackedData = reinterpret_cast<ympuint>(node) | inv;
-  }
 
 
 public:
@@ -198,7 +179,6 @@ private:
   ) : mPackedData{data}
   {
   }
-
 
 
 private:

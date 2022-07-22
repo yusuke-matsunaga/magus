@@ -147,18 +147,8 @@ FraigNode::set_fanin(
 {
   mFanins[0] = handle1.node();
   mFanins[1] = handle2.node();
-  if ( handle1.inv() ) {
-    mFlags |= (1U << kSftP0);
-  }
-  else {
-    mFlags &= ~(1U << kSftP0);
-  }
-  if ( handle2.inv() ) {
-    mFlags |= (1U << kSftP1);
-  }
-  else {
-    mFlags &= ~(1U << kSftP1);
-  }
+  mFlags[BIT_INV0] = handle1.inv();
+  mFlags[BIT_INV1] = handle2.inv();
 }
 
 // @brief パタンをセットする．
@@ -186,7 +176,7 @@ FraigNode::calc_hash(
   if ( start == 0 ) {
     // 極性を決める．
     if ( mPat[0] & 1U ) {
-      mFlags |= (1U << kSftH);
+      mFlags[BIT_H] = true;
     }
   }
 
