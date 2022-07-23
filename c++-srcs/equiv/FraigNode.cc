@@ -118,11 +118,15 @@ ymuint64 FraigNode::mPrimes[] = {
  8111, 8117, 8123, 8147
 };
 
+SizeType FraigNode::mPatSize = 0;
+SizeType FraigNode::mPatUsed = 0;
+
 
 // @brief コンストラクタ
 FraigNode::FraigNode(
 ) : mRepNode{this}
 {
+  resize_pat(mPatSize);
 }
 
 // @brief AND用のコンストラクタ
@@ -131,6 +135,7 @@ FraigNode::FraigNode(
   FraigHandle handle2
 ) : mRepNode{this}
 {
+  resize_pat(mPatSize);
   set_fanin(handle1, handle2);
 }
 
@@ -167,6 +172,22 @@ FraigNode::set_pat(
     mPat[start + i] = pat[i];
   }
   calc_hash(start, end);
+}
+
+// @brief パタンを初期化する．
+void
+FraigNode::resize_pat(
+  SizeType size
+)
+{
+  ymuint64* old_array = mPat;
+  mPat = new ymuint64[size];
+  if ( old_array != nullptr ) {
+    for ( SizeType i = 0; i < mPatUsed; ++ i ) {
+      mPat[i] = old_array[i];
+    }
+    delete [] old_array;
+  }
 }
 
 // @brief ハッシュ値を計算する．

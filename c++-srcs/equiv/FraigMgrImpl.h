@@ -184,12 +184,6 @@ private:
     FraigNode* node ///< [in] 対象のノード
   );
 
-  /// @brief ノードのシミュレーションパタン用配列を確保する．
-  void
-  init_pat(
-    FraigNode* node ///< [in] 対象のノード
-  );
-
   /// @brief 全ノードのシミュレーションパタン用配列を拡大する．
   void
   resize_pat(
@@ -332,15 +326,6 @@ private:
   // 構造ハッシュ
   StructTable mStructTable;
 
-  // 各ノードのシミュレーションパタンのサイズ
-  SizeType mPatSize;
-
-  // 初期パタン数
-  SizeType mPatInit;
-
-  // 使用しているパタン数
-  SizeType mPatUsed;
-
   // パタンハッシュ
   PatHash mHashTable2;
 
@@ -352,12 +337,6 @@ private:
 
   // SAT 用の割り当て格納配列
   SatModel mModel;
-
-  // sat_sweep 中のシミュレーション回数
-  SizeType mSimCount;
-
-  // シミュレーションに要した時間
-  double mSimTime;
 
   // check_const の統計情報
   SatStat mCheckConstInfo;

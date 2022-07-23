@@ -186,6 +186,12 @@ public:
   // シミュレーション・パタンに関するアクセス関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief パタンを初期化する．
+  void
+  resize_pat(
+    SizeType size ///< [in] サイズ
+  );
+
   /// @brief パタンをセットする．
   void
   set_pat(
@@ -372,6 +378,14 @@ private:
   // ハッシュ用の素数配列
   static
   ymuint64 mPrimes[];
+
+  // 実際のパタンサイズ
+  static
+  SizeType mPatSize;
+
+  // 使用中のパタンサイズ
+  static
+  SizeType mPatUsed;
 
 
 private:

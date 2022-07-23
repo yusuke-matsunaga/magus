@@ -38,16 +38,14 @@ END_NONAMESPACE
 FraigMgrImpl::FraigMgrImpl(
   SizeType sig_size,
   const SatSolverType& solver_type
-) : mPatSize(sig_size * 2),
-    mPatInit(sig_size),
-    mPatUsed(sig_size),
+) :
     mSolver(solver_type),
-    mSimCount(0),
-    mSimTime(0.0),
     mLogLevel(0),
     mLogStream(new ofstream("/dev/null")),
     mLoopLimit(1000)
 {
+  FraigNode::mPatSize = sig_size * 2;
+  FraigNode::mPatUsed = sig_size;
 }
 
 // @brief デストラクタ
@@ -73,12 +71,12 @@ FraigMgrImpl::make_input()
   int iid = mInputNodes.size();
   node->set_input(iid);
   mInputNodes.push_back(node);
-  vector<ymuint64> tmp(mPatUsed);
+  vector<ymuint64> tmp(FraigNode::mPatUsed);
   std::uniform_int_distribution<ymuint64> rd;
-  for ( int i: Range(mPatUsed) ) {
+  for ( int i: Range(FraigNode::mPatUsed) ) {
     tmp[i] = rd(mRandGen);
   }
-  node->set_pat(0, mPatUsed, tmp);
+  node->set_pat(0, FraigNode::mPatUsed, tmp);
   FraigHandle ans = FraigHandle(node, false);
 
   if ( debug ) {
@@ -137,7 +135,7 @@ FraigMgrImpl::make_and(
       // ノードを作る．
       auto node = new_node();
       node->set_fanin(handle1, handle2);
-      node->calc_pat(0, mPatUsed);
+      node->calc_pat(0, FraigNode::mPatUsed);
 
       // 構造ハッシュに追加する．
       mStructTable.insert(node);
@@ -265,8 +263,8 @@ FraigMgrImpl::add_pat(
   FraigNode* node
 )
 {
-  if ( mPatSize <= mPatUsed ) {
-    resize_pat(mPatSize * 2);
+  if ( FraigNode::mPatSize <= FraigNode::mPatUsed ) {
+    resize_pat(FraigNode::mPatSize * 2);
   }
   mHashTable2.clear();
 
@@ -291,17 +289,17 @@ FraigMgrImpl::add_pat(
 	}
       }
       tmp[0] = pat;
-      node1->set_pat(mPatUsed, mPatUsed + 1, tmp);
+      node1->set_pat(FraigNode::mPatUsed, FraigNode::mPatUsed + 1, tmp);
     }
     else {
-      node1->calc_pat(mPatUsed, mPatUsed + 1);
+      node1->calc_pat(FraigNode::mPatUsed, FraigNode::mPatUsed + 1);
     }
 
     if ( node1 != node ) {
       mHashTable2.add(node1);
     }
   }
-  ++ mPatUsed;
+  ++ FraigNode::mPatUsed;
 }
 
 // @brief 2つのハンドルが等価かどうか調べる．
@@ -386,6 +384,7 @@ FraigMgrImpl::set_loop_limit(
   mLoopLimit = val;
 }
 
+#if 0
 // @brief ノードのシミュレーションパタン用配列を確保する．
 void
 FraigMgrImpl::init_pat(
@@ -395,6 +394,7 @@ FraigMgrImpl::init_pat(
   ASSERT_COND(node->mPat == nullptr );
   node->mPat = new ymuint64[mPatSize];
 }
+#endif
 
 // @brief 全ノードのシミュレーションパタン用配列を拡大する．
 void
@@ -402,17 +402,10 @@ FraigMgrImpl::resize_pat(
   SizeType size
 )
 {
-  SizeType n = mAllNodes.size();
-  for ( int i = 0; i < n; ++ i ) {
-    FraigNode* node = mAllNodes[i];
-    ymuint64* old_array = node->mPat;
-    node->mPat = new ymuint64[size];
-    for ( int j = 0; j < mPatUsed; ++ j ) {
-      node->mPat[j] = old_array[j];
-    }
-    delete [] old_array;
+  for ( auto node: mAllNodes ) {
+    node->resize_pat(size);
   }
-  mPatSize = size;
+  FraigNode::mPatSize = size;
 }
 
 // @brief シミュレーションパタンが等しいか調べる．
@@ -425,7 +418,7 @@ FraigMgrImpl::compare_pat(
 {
   ymuint64* src1 = node1->mPat;
   ymuint64* src2 = node2->mPat;
-  ymuint64* end = src1 + mPatUsed;
+  ymuint64* end = src1 + FraigNode::mPatUsed;
   if ( inv ) {
     for ( ; src1 != end; ++ src1, ++ src2) {
       if ( *src1 != ~*src2 ) {
@@ -451,7 +444,6 @@ FraigMgrImpl::new_node()
   node->mVarId = mSolver.new_variable();
   ASSERT_COND(node->mVarId.varid() == mAllNodes.size() );
   mSolver.freeze_literal(SatLiteral(node->mVarId));
-  init_pat(node);
   mAllNodes.push_back(node);
   return node;
 }
@@ -727,10 +719,6 @@ FraigMgrImpl::dump_stats(
 )
 {
   s << "=====<< AigMgr Statistics >> =====" << endl;
-  s << "simulation:" << endl
-    << " total " << mSimCount << " loops" << endl
-    << " total " << mSimTime << " sec." << endl;
-  s << "----------------------------------" << endl;
   s << "check_const:" << endl;
   mCheckConstInfo.dump(s);
   s << "----------------------------------" << endl;
