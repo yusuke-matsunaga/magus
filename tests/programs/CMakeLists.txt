@@ -2,24 +2,34 @@
 # ===================================================================
 # インクルードパスの設定
 # ===================================================================
+include_directories(
+  )
+
 
 
 # ===================================================================
 # サブディレクトリの設定
 # ===================================================================
 
-add_subdirectory ( gtest/equiv )
-add_subdirectory ( gtest/techmap/sbjgraph )
-add_subdirectory ( lua_magus )
-add_subdirectory ( programs )
-
 
 # ===================================================================
-#  ソースファイルの設定
+# equiv_test
 # ===================================================================
 
+set ( equiv_test_SOURCES
+  equiv_test.cc
+  )
 
+add_executable ( equiv_test
+  ${equiv_test_SOURCES}
+  $<TARGET_OBJECTS:magus_equiv_obj_d>
+  ${YM_SUBMODULE_OBJ_D_LIST}
+  )
 
-# ===================================================================
-#  テスト用のターゲットの設定
-# ===================================================================
+target_compile_options ( equiv_test
+  PRIVATE "-g"
+  )
+
+target_link_libraries ( equiv_test
+  ${YM_LIB_DEPENDS}
+  )

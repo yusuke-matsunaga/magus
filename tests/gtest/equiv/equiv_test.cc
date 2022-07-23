@@ -6,7 +6,6 @@
 /// Copyright (C) 2018 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "gtest/gtest.h"
 #include "EquivMgr.h"
 #include "ym/BnNetwork.h"
