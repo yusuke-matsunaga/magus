@@ -8,7 +8,6 @@
 
 #include "FraigSat.h"
 #include "FraigNode.h"
-#include "ym/Range.h"
 #include "ym/Timer.h"
 #include "ym/SatStats.h"
 
@@ -68,7 +67,7 @@ FraigSat::make_cnf(
 {
   auto handle1 = node->fanin0_handle();
   auto handle2 = node->fanin1_handle();
-  auto lito = node->varid();
+  auto lito = node->literal();
   auto lit1 = handle1.literal();
   auto lit2 = handle2.literal();
   mSolver.add_clause(~lit1, ~lit2, lito);
@@ -112,7 +111,7 @@ FraigSat::check_const(
     else {
       cout << "0";
     }
-    cout << " " << setw(6) << node->varid()
+    cout << " " << setw(6) << node->literal()
 	 << "       ";
     cout.flush();
   }
@@ -120,7 +119,7 @@ FraigSat::check_const(
   Timer timer;
   timer.start();
 
-  SatLiteral lit{node->varid(), inv};
+  SatLiteral lit{node->literal(), inv};
 
   // この関数の戻り値
   SatBool3 code = SatBool3::X;
@@ -160,8 +159,8 @@ FraigSat::check_equiv(
   bool inv
 )
 {
-  SatLiteral id1 = node1->varid();
-  SatLiteral id2 = node2->varid();
+  SatLiteral id1 = node1->literal();
+  SatLiteral id2 = node2->literal();
 
   if ( debug ) {
     cout << "CHECK EQUIV  "
@@ -229,8 +228,8 @@ FraigSat::check_condition(
 #if defined(VERIFY_SATSOLVER)
   SatSolver solver(nullptr, "minisat");
   for ( auto node: mAllNodes ) {
-    SatVarId id = solver.new_variable();
-    ASSERT_COND(id == node->varid() );
+    auto lit = solver.new_variable();
+    ASSERT_COND( lit == node->literal() );
     if ( node->is_and() ) {
       SatLiteral lito(id, false);
       SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());

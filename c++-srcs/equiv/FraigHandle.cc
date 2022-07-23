@@ -23,7 +23,7 @@ FraigHandle::literal() const
 {
   FraigNode* n = node();
   if ( n ) {
-    return SatLiteral{n->varid(), inv()};
+    return SatLiteral{n->literal(), inv()};
   }
   else {
     return kSatLiteralX;

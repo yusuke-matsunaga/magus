@@ -306,13 +306,11 @@ FraigMgrImpl::add_pat(
   // 反例をパタンに加える．
   const SatModel& model = mSolver.model();
   vector<ymuint64> tmp(1);
-  int nn = node_num();
   std::uniform_int_distribution<int> rd100(0, 99);
-  for ( int i = 0; i < nn; ++ i ) {
-    FraigNode* node1 = mAllNodes[i];
+  for ( auto node1: mAllNodes ) {
     if ( node1->is_input() ) {
       ymuint64 pat = 0U;
-      if ( model[node1->varid()] == SatBool3::True ) {
+      if ( model[node1->literal()] == SatBool3::True ) {
 	pat = ~0U;
       }
       else {
@@ -377,8 +375,8 @@ FraigMgrImpl::reg_node(
   FraigNode* node
 )
 {
-  node->mVarId = mSolver.new_var();
-  ASSERT_COND(node->mVarId.varid() == mAllNodes.size() );
+  node->mLiteral = mSolver.new_var();
+  ASSERT_COND(node->literal().varid() == mAllNodes.size() );
   mAllNodes.push_back(node);
 }
 

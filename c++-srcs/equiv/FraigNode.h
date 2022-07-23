@@ -65,11 +65,11 @@ public:
   // 変数番号に関するアクセス関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief CNF 上の変数番号を返す．
+  /// @brief CNF 上のリテラルを返す．
   SatLiteral
-  varid() const
+  literal() const
   {
-    return mVarId;
+    return mLiteral;
   }
 
 
@@ -329,8 +329,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // CNF 上の変数番号
-  SatLiteral mVarId;
+  // CNF 上のリテラル
+  SatLiteral mLiteral;
 
   // ファンインのノード
   FraigNode* mFanins[2]{nullptr, nullptr};
