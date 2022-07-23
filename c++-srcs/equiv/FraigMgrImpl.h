@@ -224,29 +224,10 @@ private:
     SatLiteral lit2
   );
 
-  /// @brief FraigHandle に対応するリテラルを返す．
-  /// @note 定数の場合の返り値は未定
-  SatLiteral
-  fraig2literal(
-    FraigHandle aig
-  );
-
-  /// @brief 等価候補グループの情報を出力する．
+  /// @brief ノードを登録する．
   void
-  dump_eqgroup(
-    ostream& s ///< [in] 出力ストリーム
-  ) const;
-
-  /// @brief 新しいノードを生成する．
-  FraigNode*
-  new_node();
-
-  /// @brief シミュレーションパタンが等しいか調べる．
-  bool
-  compare_pat(
-    FraigNode* node1, ///< [in] ノード1
-    FraigNode* node2, ///< [in] ノード2
-    bool inv	      ///< [in] 極性の反転フラグ
+  reg_node(
+    FraigNode* node
   );
 
 

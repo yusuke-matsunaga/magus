@@ -174,6 +174,44 @@ FraigNode::set_pat(
   calc_hash(start, end);
 }
 
+// @brief パタンを計算する．
+void
+FraigNode::calc_pat(
+  SizeType start,
+  SizeType end
+)
+{
+  ymuint64* dst = mPat + start;
+  ymuint64* dst_end = mPat + end;
+  ymuint64* src1 = mFanins[0]->mPat + start;
+  ymuint64* src2 = mFanins[1]->mPat + start;
+  if ( fanin0_inv() ) {
+    if ( fanin1_inv() ) {
+      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
+	*dst = ~(*src1 | *src2);
+      }
+    }
+    else {
+      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
+	*dst = ~*src1 & *src2;
+      }
+    }
+  }
+  else {
+    if ( fanin1_inv() ) {
+      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
+	*dst = *src1 & ~*src2;
+      }
+    }
+    else {
+      for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
+	*dst = *src1 & *src2;
+      }
+    }
+  }
+  calc_hash(start, end);
+}
+
 // @brief パタンを初期化する．
 void
 FraigNode::resize_pat(

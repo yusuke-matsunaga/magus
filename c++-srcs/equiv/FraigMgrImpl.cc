@@ -8,6 +8,7 @@
 
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
+#include "PatTable.h"
 #include "ym/Range.h"
 #include "ym/Timer.h"
 #include "ym/SatStats.h"
@@ -38,8 +39,7 @@ END_NONAMESPACE
 FraigMgrImpl::FraigMgrImpl(
   SizeType sig_size,
   const SatSolverType& solver_type
-) :
-    mSolver(solver_type),
+) : mSolver(solver_type),
     mLogLevel(0),
     mLogStream(new ofstream("/dev/null")),
     mLoopLimit(1000)
@@ -67,7 +67,8 @@ FraigMgrImpl::make_input()
     cout << "make_input ...";
   }
 
-  FraigNode* node = new_node();
+  auto node = new FraigNode{};
+  reg_node(node);
   int iid = mInputNodes.size();
   node->set_input(iid);
   mInputNodes.push_back(node);
@@ -133,8 +134,8 @@ FraigMgrImpl::make_and(
     auto p = mStructTable.find(&key);
     if ( p == mStructTable.end() ) {
       // ノードを作る．
-      auto node = new_node();
-      node->set_fanin(handle1, handle2);
+      auto node = new FraigNode{handle1, handle2};
+      reg_node(node);
       node->calc_pat(0, FraigNode::mPatUsed);
 
       // 構造ハッシュに追加する．
@@ -205,7 +206,7 @@ FraigMgrImpl::verify_const(
       // 反例をパタンに加えておく．
       add_pat(node);
 
-      ASSERT_COND(node->check_1mark() );
+      ASSERT_COND( node->check_1mark() );
     }
   }
   if ( !node->check_0mark() ) {
@@ -220,7 +221,7 @@ FraigMgrImpl::verify_const(
       // 反例をパタンに加えておく．
       add_pat(node);
 
-      ASSERT_COND(node->check_0mark() );
+      ASSERT_COND( node->check_0mark() );
     }
   }
 
@@ -237,7 +238,8 @@ FraigMgrImpl::compare_node(
 )
 {
   retry = false;
-  if ( compare_pat(node1, node2, inv) ) {
+  PatEq eq;
+  if ( eq(node1, node2) ) {
     // node1 と node2 が等価かどうか調べる．
     SatBool3 stat = check_equiv(node1, node2, inv);
     if ( stat == SatBool3::True ) {
@@ -249,11 +251,12 @@ FraigMgrImpl::compare_node(
       // 反例をパタンに加えて再ハッシュする．
       add_pat(node2);
 
-      ASSERT_COND( !compare_pat(node1, node2, inv) );
+      ASSERT_COND( !eq(node1, node2) );
       retry = true;
       return false;
     }
   }
+
   return false;
 }
 
@@ -384,18 +387,6 @@ FraigMgrImpl::set_loop_limit(
   mLoopLimit = val;
 }
 
-#if 0
-// @brief ノードのシミュレーションパタン用配列を確保する．
-void
-FraigMgrImpl::init_pat(
-  FraigNode* node
-)
-{
-  ASSERT_COND(node->mPat == nullptr );
-  node->mPat = new ymuint64[mPatSize];
-}
-#endif
-
 // @brief 全ノードのシミュレーションパタン用配列を拡大する．
 void
 FraigMgrImpl::resize_pat(
@@ -408,44 +399,16 @@ FraigMgrImpl::resize_pat(
   FraigNode::mPatSize = size;
 }
 
-// @brief シミュレーションパタンが等しいか調べる．
-bool
-FraigMgrImpl::compare_pat(
-  FraigNode* node1,
-  FraigNode* node2,
-  bool inv
+// @brief ノードを登録する．
+void
+FraigMgrImpl::reg_node(
+  FraigNode* node
 )
 {
-  ymuint64* src1 = node1->mPat;
-  ymuint64* src2 = node2->mPat;
-  ymuint64* end = src1 + FraigNode::mPatUsed;
-  if ( inv ) {
-    for ( ; src1 != end; ++ src1, ++ src2) {
-      if ( *src1 != ~*src2 ) {
-	return false;
-      }
-    }
-  }
-  else {
-    for ( ; src1 != end; ++ src1, ++ src2) {
-      if ( *src1 != *src2 ) {
-	return false;
-      }
-    }
-  }
-  return true;
-}
-
-// @brief 新しいノードを生成する．
-FraigNode*
-FraigMgrImpl::new_node()
-{
-  FraigNode* node = new FraigNode();
   node->mVarId = mSolver.new_variable();
   ASSERT_COND(node->mVarId.varid() == mAllNodes.size() );
-  mSolver.freeze_literal(SatLiteral(node->mVarId));
+  mSolver.freeze_literal(SatLiteral{node->mVarId});
   mAllNodes.push_back(node);
-  return node;
 }
 
 // node が定数かどうか調べる．
@@ -661,56 +624,6 @@ FraigMgrImpl::check_condition(
 #endif
   return ans1;
 }
-
-#if 0
-// @brief FraigHandle に対応するリテラルを返す．
-// @note 定数の場合の返り値は未定
-SatLiteral
-FraigMgrImpl::fraig2literal(FraigHandle aig)
-{
-  if ( aig.is_const() ) {
-    return SatLiteral(SatVarId(0), false);
-  }
-  SatVarId id = aig.node()->varid();
-  bool inv = aig.inv();
-  return SatLiteral(id, inv);
-}
-#endif
-
-#if 0
-// @brief 等価候補グループの情報を出力する．
-void
-FraigMgrImpl::dump_eqgroup(ostream& s) const
-{
-  for ( int i = 0; i < mNodeNum; ++ i ) {
-    SweepNode* snode = &mNodeArray[i];
-    if ( snode->mAigNode == nullptr ) continue;
-    if ( snode->rep_node() != snode ) continue;
-    if ( snode->next_eqnode() == nullptr &&
-	 snode->check_1mark() &&
-	 snode->check_0mark() ) continue;
-    if ( !snode->check_1mark() ) {
-      cout << "C0?";
-    }
-    else if ( !snode->check_0mark() ) {
-      cout << "C1?";
-    }
-    else {
-      cout << "   ";
-    }
-    cout << " {";
-    for ( SweepNode* snode1 = snode; snode1; snode1 = snode1->next_eqnode() ) {
-      cout << " ";
-      if ( snode1->eq_inv() ) {
-	cout << "~";
-      }
-      cout << snode1->aignode()->node_id();
-    }
-    cout << "}";
-    cout << endl;
-  }
-}
-#endif
 
 // @brief 直前の sat_sweep に関する統計情報を出力する．
 void
