@@ -252,11 +252,11 @@ public:
   );
 
   /// @brief BnNetwork をインポートする．
-  void
+  /// @return 出力のハンドルのリストを返す．
+  vector<FraigHandle>
   import_subnetwork(
-    const BnNetwork& network,                 ///< [in] インポートするネットワーク
-    const vector<FraigHandle>& input_handles, ///< [in] 入力に接続するハンドルのリスト
-    vector<FraigHandle>& output_handles       ///< [out] 出力のハンドルのリスト
+    const BnNetwork& network,                ///< [in] インポートするネットワーク
+    const vector<FraigHandle>& input_handles ///< [in] 入力に接続するハンドルのリスト
   );
 
 

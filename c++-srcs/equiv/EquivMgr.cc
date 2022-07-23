@@ -81,25 +81,21 @@ EquivMgr::check(
   FraigMgr fraig_mgr(mSigSize, mSolverType);
 
   // 外部入力に対応する FraigHandle を作る．
-  vector<FraigHandle> input_handles(ni);
+  vector<FraigHandle> input1_handles(ni);
   for ( auto i: Range(ni) ) {
-    input_handles[i] = fraig_mgr.make_input();
+    input1_handles[i] = fraig_mgr.make_input();
   }
 
   // network1 に対応する Fraig を作る．
-  vector<FraigHandle> output_handles1(no);
-  fraig_mgr.import_subnetwork(network1, input_handles, output_handles1);
+  auto output1_handles = fraig_mgr.import_subnetwork(network1, input1_handles);
 
   // network2 に対応する Fraig を作る．
-  vector<FraigHandle> output_handles2(no);
-  {
-    vector<FraigHandle> input2_handles(ni);
-    for ( int i: Range(ni) ) {
-      int pos1 = input2_list[i];
-      input2_handles[i] = input_handles[pos1];
-    }
-    fraig_mgr.import_subnetwork(network2, input2_handles, output_handles2);
+  vector<FraigHandle> input2_handles(ni);
+  for ( int i: Range(ni) ) {
+    int pos1 = input2_list[i];
+    input2_handles[i] = input1_handles[pos1];
   }
+  auto output2_handles = fraig_mgr.import_subnetwork(network2, input2_handles);
 
   // 各出力の等価検証を行う．
   vector<SatBool3> eq_stats(no);
@@ -109,8 +105,8 @@ EquivMgr::check(
       log_out() << "Checking Output#" << (i + 1) << " / " << no << endl;
     }
 
-    auto h1 = output_handles1[output2_list[i]];
-    auto h2 = output_handles2[i];
+    auto h1 = output1_handles[output2_list[i]];
+    auto h2 = output2_handles[i];
 
     SatBool3 stat1;
     if ( h1 == h2 ) {

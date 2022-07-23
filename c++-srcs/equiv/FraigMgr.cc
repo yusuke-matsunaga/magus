@@ -186,11 +186,10 @@ FraigMgr::make_cofactor(
 }
 
 // @brief BnNetwork をインポートする．
-void
+vector<FraigHandle>
 FraigMgr::import_subnetwork(
   const BnNetwork& network,
-  const vector<FraigHandle>& input_handles,
-  vector<FraigHandle>& output_handles
+  const vector<FraigHandle>& input_handles
 )
 {
   // network のノードの番号をキーとして対応するハンドルを収める配列
@@ -290,12 +289,13 @@ FraigMgr::import_subnetwork(
   // 外部出力のマップを作成する．
   //////////////////////////////////////////////////////////////////////
   SizeType no = network.output_num();
-  output_handles.clear();
-  output_handles.resize(no);
+  vector<FraigHandle> output_handles(no);
   for ( auto i: Range(no) ) {
-    int iid = network.output_src_id(i);
+    SizeType iid = network.output_src_id(i);
     output_handles[i] = h_map[iid];
   }
+
+  return output_handles;
 }
 
 // @brief 複数のノードの AND を取る．
