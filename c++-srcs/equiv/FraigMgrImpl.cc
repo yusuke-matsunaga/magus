@@ -131,20 +131,22 @@ FraigMgrImpl::make_and(
     }
 
     // 同じ構造を持つノードが既にないか調べる．
-    if ( !mHashTable1.find(handle1, handle2, ans) ) {
+    FraigNode key{handle1, handle2};
+    auto p = mStructTable.find(&key);
+    if ( p == mStructTable.end() ) {
       // ノードを作る．
-      FraigNode* node = new_node();
+      auto node = new_node();
       node->set_fanin(handle1, handle2);
       node->calc_pat(0, mPatUsed);
 
       // 構造ハッシュに追加する．
-      mHashTable1.add(node);
+      mStructTable.insert(node);
 
       // 入出力の関係を表す CNF を作る．
       make_cnf(node);
 
       if ( debug ) {
-	cout << "  new node: " << FraigHandle(node, false) << endl;
+	cout << "  new node: " << FraigHandle{node, false} << endl;
       }
 
       // 縮退検査を行う．
@@ -152,9 +154,13 @@ FraigMgrImpl::make_and(
 	// パタンハッシュで等しいノードがないか調べる．
 	if ( !mHashTable2.find(node, *this, ans) ) {
 	  mHashTable2.add(node);
-	  ans = FraigHandle(node, false);
+	  ans = FraigHandle{node, false};
 	}
       }
+    }
+    else {
+      auto node = *p;
+      ans = FraigHandle{node, false};
     }
   }
 

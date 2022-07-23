@@ -23,7 +23,6 @@ set ( equiv_SOURCES
   FraigMgrImpl.cc
   FraigNode.cc
   PatHash.cc
-  StructHash.cc
   )
 
 

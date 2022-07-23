@@ -121,9 +121,17 @@ ymuint64 FraigNode::mPrimes[] = {
 
 // @brief コンストラクタ
 FraigNode::FraigNode(
-) : mPat(nullptr),
-    mRepNode(this)
+) : mRepNode{this}
 {
+}
+
+// @brief AND用のコンストラクタ
+FraigNode::FraigNode(
+  FraigHandle handle1,
+  FraigHandle handle2
+) : mRepNode{this}
+{
+  set_fanin(handle1, handle2);
 }
 
 // @brief デストラクタ

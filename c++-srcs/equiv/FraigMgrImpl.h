@@ -10,7 +10,7 @@
 
 #include "fraig_nsdef.h"
 #include "FraigHandle.h"
-#include "StructHash.h"
+#include "StructTable.h"
 #include "PatHash.h"
 #include "ym/Expr.h"
 #include "ym/SatBool3.h"
@@ -330,7 +330,7 @@ private:
   vector<FraigNode*> mInputNodes;
 
   // 構造ハッシュ
-  StructHash mHashTable1;
+  StructTable mStructTable;
 
   // 各ノードのシミュレーションパタンのサイズ
   SizeType mPatSize;

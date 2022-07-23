@@ -29,6 +29,12 @@ public:
   /// @brief コンストラクタ
   FraigNode();
 
+  /// @brief AND用のコンストラクタ
+  FraigNode(
+    FraigHandle handle1, ///< [in] 入力1のハンドル
+    FraigHandle handle2  ///< [in] 入力2のハンドル
+  );
+
   /// @brief デストラクタ
   ~FraigNode();
 
@@ -350,9 +356,6 @@ private:
 
   // mPat のハッシュ値
   SizeType mHash{0UL};
-
-  // 構造ハッシュ用のリンクポインタ
-  FraigNode* mLink1{nullptr};
 
   // シグネチャハッシュ用のリンクポインタ
   FraigNode* mLink2{nullptr};
