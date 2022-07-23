@@ -11,7 +11,7 @@
 #include "fraig_nsdef.h"
 #include "FraigHandle.h"
 #include "StructTable.h"
-#include "PatHash.h"
+#include "PatTable.h"
 #include "ym/Expr.h"
 #include "ym/SatBool3.h"
 #include "ym/SatSolverType.h"
@@ -308,7 +308,7 @@ private:
   StructTable mStructTable;
 
   // パタンハッシュ
-  PatHash mHashTable2;
+  PatTable mPatTable;
 
   // 乱数発生器
   std::mt19937 mRandGen;

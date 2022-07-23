@@ -132,7 +132,12 @@ FraigMgrImpl::make_and(
     // 同じ構造を持つノードが既にないか調べる．
     FraigNode key{handle1, handle2};
     auto p = mStructTable.find(&key);
-    if ( p == mStructTable.end() ) {
+    if ( p != mStructTable.end() ) {
+      // 等価なノードが存在した．
+      auto node = *p;
+      ans = FraigHandle{node, false};
+    }
+    else {
       // ノードを作る．
       auto node = new FraigNode{handle1, handle2};
       reg_node(node);
@@ -150,16 +155,29 @@ FraigMgrImpl::make_and(
 
       // 縮退検査を行う．
       if ( verify_const(node, ans) != SatBool3::True ) {
-	// パタンハッシュで等しいノードがないか調べる．
-	if ( !mHashTable2.find(node, *this, ans) ) {
-	  mHashTable2.add(node);
-	  ans = FraigHandle{node, false};
-	}
+	bool go_on;
+	do { // do-while() は今風の C++ のスコープに合っていない．
+	  go_on = false;
+	  auto range = mPatTable.equal_range(node);
+	  auto start = range.first;
+	  auto end = range.second;
+	  bool inv0 = node->pat_hash_inv();
+	  for ( auto p = start; p != end; ++ p ) {
+	    auto node1 = *p;
+	    bool inv = inv0 ^ node1->pat_hash_inv();
+	    bool retry = false;
+	    bool stat = compare_node(node1, node, inv, retry);
+	    if ( stat ) {
+	      ans = FraigHandle(node1, inv);
+	      break;
+	    }
+	    if ( retry ) {
+	      go_on = true;
+	      break;
+	    }
+	  }
+	} while ( go_on );
       }
-    }
-    else {
-      auto node = *p;
-      ans = FraigHandle{node, false};
     }
   }
 
@@ -269,7 +287,7 @@ FraigMgrImpl::add_pat(
   if ( FraigNode::mPatSize <= FraigNode::mPatUsed ) {
     resize_pat(FraigNode::mPatSize * 2);
   }
-  mHashTable2.clear();
+  mPatTable.clear();
 
   // 反例をパタンに加える．
   const SatModel& model = mSolver.model();
@@ -299,7 +317,7 @@ FraigMgrImpl::add_pat(
     }
 
     if ( node1 != node ) {
-      mHashTable2.add(node1);
+      mPatTable.insert(node1);
     }
   }
   ++ FraigNode::mPatUsed;

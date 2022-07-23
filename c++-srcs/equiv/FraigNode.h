@@ -21,7 +21,6 @@ BEGIN_NAMESPACE_FRAIG
 class FraigNode
 {
   friend class FraigMgrImpl;
-  friend class PatHash;
 
 public:
 
@@ -344,9 +343,6 @@ private:
 
   // mPat のハッシュ値
   SizeType mHash{0UL};
-
-  // シグネチャハッシュ用のリンクポインタ
-  FraigNode* mLink2{nullptr};
 
   // 代表ノード情報
   FraigNode* mRepNode{nullptr};

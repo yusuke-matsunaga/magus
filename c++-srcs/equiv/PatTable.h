@@ -12,7 +12,7 @@
 
 
 BEGIN_NAMESPACE_FRAIG
-#if 0
+
 //////////////////////////////////////////////////////////////////////
 /// @class PatHash PatTable.h "PatTable.h"
 /// @brief FraigNode のパタンハッシュ関数
@@ -33,7 +33,7 @@ public:
     return node->pat_hash();
   }
 };
-#endif
+
 
 //////////////////////////////////////////////////////////////////////
 /// @class PatEq PatTable.h "PatTable.h"
