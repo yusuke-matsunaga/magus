@@ -284,12 +284,6 @@ public:
     ostream* out ///< [in] ストリーム
   );
 
-  /// @brief ランダムシミュレーション制御用のパラメータを設定する．
-  void
-  set_loop_limit(
-    SizeType loop_limit ///< [in] 変化のない状態がこの回数連続したら止める．
-  );
-
   /// @brief 内部の統計情報を出力する．
   void
   dump_stats(

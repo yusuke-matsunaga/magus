@@ -373,15 +373,6 @@ FraigMgr::set_logstream(
   mRep->set_logstream(out);
 }
 
-// @brief ランダムシミュレーション制御用のパラメータを設定する．
-void
-FraigMgr::set_loop_limit(
-  SizeType val
-)
-{
-  mRep->set_loop_limit(val);
-}
-
 // @brief 内部の統計情報を出力する．
 void
 FraigMgr::dump_stats(
