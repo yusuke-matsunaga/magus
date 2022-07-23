@@ -8,7 +8,6 @@
 
 #include "FraigHandle.h"
 #include "FraigNode.h"
-#include "ym/SatLiteral.h"
 
 
 BEGIN_NAMESPACE_FRAIG
@@ -17,43 +16,11 @@ BEGIN_NAMESPACE_FRAIG
 // FraigHandle
 //////////////////////////////////////////////////////////////////////
 
-// @brief 対応するリテラルを得る．
-SatLiteral
-FraigHandle::literal() const
-{
-  FraigNode* n = node();
-  if ( n ) {
-    return SatLiteral{n->literal(), inv()};
-  }
-  else {
-    return kSatLiteralX;
-  }
-}
-
-// @brief 代表ハンドルを得る．
-FraigHandle
-FraigHandle::rep_handle() const
-{
-  FraigNode* n = node();
-  if ( n ) {
-    FraigHandle ans = n->rep_handle();
-    if ( inv() ) {
-      return ~ans;
-    }
-    else {
-      return ans;
-    }
-  }
-  else {
-    return *this;
-  }
-}
-
 // @brief 外部入力ノードへのハンドルのとき true を返す．
 bool
 FraigHandle::is_input() const
 {
-  FraigNode* n = node();
+  auto n = node();
   if ( n && n->is_input() ) {
     return true;
   }
@@ -68,7 +35,7 @@ FraigHandle::is_input() const
 SizeType
 FraigHandle::input_id() const
 {
-  FraigNode* n = node();
+  auto n = node();
   if ( n && n->is_input() ) {
     return n->input_id();
   }
@@ -97,7 +64,7 @@ operator<<(
       s << "I" << src.input_id();
     }
     else {
-      s << "A" << src.literal();
+      s << "A" << src.node()->id();
     }
   }
   return s;

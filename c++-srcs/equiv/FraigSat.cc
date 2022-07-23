@@ -51,12 +51,14 @@ FraigSat::~FraigSat()
 }
 
 // @brief ノードを登録する．
-SatLiteral
-FraigSat::new_var()
+void
+FraigSat::reg_node(
+  FraigNode* node
+)
 {
   auto var = mSolver.new_variable();
   mSolver.freeze_literal(var);
-  return var;
+  mLiteralDict.emplace(node->id(), var);
 }
 
 // @brief ノードの入出力の関係を表す CNF 式を作る．
@@ -67,9 +69,9 @@ FraigSat::make_cnf(
 {
   auto handle1 = node->fanin0_handle();
   auto handle2 = node->fanin1_handle();
-  auto lito = node->literal();
-  auto lit1 = handle1.literal();
-  auto lit2 = handle2.literal();
+  auto lito = node_lit(node);
+  auto lit1 = handle_lit(handle1);
+  auto lit2 = handle_lit(handle2);
   mSolver.add_clause(~lit1, ~lit2, lito);
   mSolver.add_clause( lit1, ~lito);
   mSolver.add_clause( lit2, ~lito);
@@ -111,7 +113,7 @@ FraigSat::check_const(
     else {
       cout << "0";
     }
-    cout << " " << setw(6) << node->literal()
+    cout << " " << setw(6) << node_lit(node)
 	 << "       ";
     cout.flush();
   }
@@ -119,7 +121,7 @@ FraigSat::check_const(
   Timer timer;
   timer.start();
 
-  SatLiteral lit{node->literal(), inv};
+  SatLiteral lit{node_lit(node), inv};
 
   // この関数の戻り値
   SatBool3 code = SatBool3::X;
@@ -159,8 +161,8 @@ FraigSat::check_equiv(
   bool inv
 )
 {
-  SatLiteral id1 = node1->literal();
-  SatLiteral id2 = node2->literal();
+  SatLiteral id1 = node_lit(node1);
+  SatLiteral id2 = node_lit(node2);
 
   if ( debug ) {
     cout << "CHECK EQUIV  "
@@ -216,6 +218,27 @@ FraigSat::check_equiv(
   return code;
 }
 
+// @brief ノードに対応するリテラルを得る．
+SatLiteral
+FraigSat::node_lit(
+  FraigNode* node
+)
+{
+  ASSERT_COND( mLiteralDict.count(node->id()) > 0 );
+  return mLiteralDict.at(node->id());
+}
+
+// @brief ハンドルに対応するリテラルを得る．
+SatLiteral
+FraigSat::handle_lit(
+  const FraigHandle& handle
+)
+{
+  auto node = handle.node();
+  auto lit = node_lit(node);
+  return SatLiteral{lit, handle.inv()};
+}
+
 // lit1 が成り立つか調べる．
 SatBool3
 FraigSat::check_condition(
@@ -229,7 +252,7 @@ FraigSat::check_condition(
   SatSolver solver(nullptr, "minisat");
   for ( auto node: mAllNodes ) {
     auto lit = solver.new_variable();
-    ASSERT_COND( lit == node->literal() );
+    ASSERT_COND( lit == node_lit(node) );
     if ( node->is_and() ) {
       SatLiteral lito(id, false);
       SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());

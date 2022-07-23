@@ -124,19 +124,37 @@ SizeType FraigNode::mPatUsed = 0;
 
 // @brief コンストラクタ
 FraigNode::FraigNode(
-) : mRepNode{this}
+  SizeType id,
+  SizeType input_id,
+  const vector<ymuint64>& init_pat
+) : mId{id}
 {
   resize_pat(mPatSize);
+
+  mFanins[0] = reinterpret_cast<FraigNode*>(input_id);
+  mFlags[BIT_I] = true;
+
+  SizeType n = init_pat.size();
+  for ( SizeType i = 0; i < n; ++ i ) {
+    mPat[i] = init_pat[i];
+  }
+  calc_hash(0, n);
 }
 
 // @brief AND用のコンストラクタ
 FraigNode::FraigNode(
+  SizeType id,
   FraigHandle handle1,
   FraigHandle handle2
-) : mRepNode{this}
+) : mId{id}
 {
   resize_pat(mPatSize);
-  set_fanin(handle1, handle2);
+
+  mFanins[0] = handle1.node();
+  mFanins[1] = handle2.node();
+  mFlags[BIT_INV0] = handle1.inv();
+  mFlags[BIT_INV1] = handle2.inv();
+  calc_pat(0, mPatUsed);
 }
 
 // @brief デストラクタ
@@ -145,33 +163,14 @@ FraigNode::~FraigNode()
   delete [] mPat;
 }
 
-
-// @brief ファンインをセットする．
+// @brief パタンを追加する．
 void
-FraigNode::set_fanin(
-  FraigHandle handle1,
-  FraigHandle handle2
+FraigNode::add_pat(
+  ymuint64 pat
 )
 {
-  mFanins[0] = handle1.node();
-  mFanins[1] = handle2.node();
-  mFlags[BIT_INV0] = handle1.inv();
-  mFlags[BIT_INV1] = handle2.inv();
-}
-
-// @brief パタンをセットする．
-void
-FraigNode::set_pat(
-  SizeType start,
-  SizeType end,
-  const vector<ymuint64>& pat
-)
-{
-  int n = end - start;
-  for ( int i = 0; i < n; ++ i ) {
-    mPat[start + i] = pat[i];
-  }
-  calc_hash(start, end);
+  mPat[mPatUsed] = pat;
+  calc_hash(mPatUsed, mPatUsed + 1);
 }
 
 // @brief パタンを計算する．

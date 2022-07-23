@@ -20,15 +20,18 @@ BEGIN_NAMESPACE_FRAIG
 //////////////////////////////////////////////////////////////////////
 class FraigNode
 {
-  friend class FraigMgrImpl;
-
 public:
 
-  /// @brief コンストラクタ
-  FraigNode();
+  /// @brief 入力用のコンストラクタ
+  FraigNode(
+    SizeType id,                     ///< [in] ノード番号
+    SizeType input_id,               ///< [in] 入力番号
+    const vector<ymuint64>& init_pat ///< [in] 初期パタン
+  );
 
   /// @brief AND用のコンストラクタ
   FraigNode(
+    SizeType id,         ///< [in] ノード番号
     FraigHandle handle1, ///< [in] 入力1のハンドル
     FraigHandle handle2  ///< [in] 入力2のハンドル
   );
@@ -39,37 +42,14 @@ public:
 
 public:
   //////////////////////////////////////////////////////////////////////
-  // 内容を設定する関数
+  // 基本情報
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 入力番号をセットする．
-  void
-  set_input(
-    SizeType id
-  )
+  /// @brief ID番号を返す．
+  SizeType
+  id() const
   {
-    mFlags[BIT_I] = true;
-    mFanins[0] = reinterpret_cast<FraigNode*>(id);
-  }
-
-  /// @brief ファンインをセットする．
-  void
-  set_fanin(
-    FraigHandle handle1, ///< [in] 入力1のハンドル
-    FraigHandle handle2  ///< [in] 入力2のハンドル
-  );
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 変数番号に関するアクセス関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief CNF 上のリテラルを返す．
-  SatLiteral
-  literal() const
-  {
-    return mLiteral;
+    return mId;
   }
 
 
@@ -190,12 +170,10 @@ public:
     SizeType size ///< [in] サイズ
   );
 
-  /// @brief パタンをセットする．
+  /// @brief パタンを追加する．
   void
-  set_pat(
-    SizeType start,             ///< [in] 開始位置
-    SizeType end,               ///< [in] 終了位置
-    const vector<ymuint64>& pat ///< [in] パタンのベクタ
+  add_pat(
+    ymuint64 pat ///< [in] 追加するパタン
   );
 
   /// @brief パタンを計算する．
@@ -250,53 +228,6 @@ public:
   }
 
 
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 等価グループに関するアクセス関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 代表ノードを返す．
-  FraigNode*
-  rep_node() const
-  {
-    return mRepNode;
-  }
-
-  /// @brief 代表ノードに対する極性を返す．
-  bool
-  rep_inv() const
-  {
-    return mFlags[BIT_R];
-  }
-
-  /// @brief 代表ハンドルを返す．
-  FraigHandle
-  rep_handle() const
-  {
-    return FraigHandle(mRepNode, rep_inv());
-  }
-
-  /// @brief 等価候補の代表をセットする．
-  void
-  set_rep(
-    FraigNode* rep_node, ///< [in] 代表ノード
-    bool inv             ///< [in] 反転フラグ
-  )
-  {
-    mRepNode = rep_node;
-    if ( inv ) {
-      set_rep_inv();
-    }
-  }
-
-  /// @brief 極性反転の印をつける．
-  void
-  set_rep_inv()
-  {
-    mFlags[BIT_R] = true;
-  }
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // 下請け関数
@@ -329,8 +260,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // CNF 上のリテラル
-  SatLiteral mLiteral;
+  // ID番号
+  SizeType mId;
 
   // ファンインのノード
   FraigNode* mFanins[2]{nullptr, nullptr};
@@ -344,9 +275,6 @@ private:
   // mPat のハッシュ値
   SizeType mHash{0UL};
 
-  // 代表ノード情報
-  FraigNode* mRepNode{nullptr};
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -356,6 +284,12 @@ private:
   // ハッシュ用の素数配列
   static
   ymuint64 mPrimes[];
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // クラスメンバ
+  //////////////////////////////////////////////////////////////////////
 
   // 実際のパタンサイズ
   static
@@ -394,10 +328,6 @@ private:
   // ハッシュパタンの極性
   static
   const int BIT_H  = 5;
-
-  // 等価グループ中の極性
-  static
-  const int BIT_R  = 6;
 
 };
 

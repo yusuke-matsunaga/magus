@@ -9,15 +9,11 @@
 /// All rights reserved.
 
 #include "fraig_nsdef.h"
-#include "FraigHandle.h"
-#include "StructTable.h"
-#include "PatTable.h"
-#include "ym/Expr.h"
+#include "FraigNode.h"
 #include "ym/SatBool3.h"
 #include "ym/SatSolverType.h"
 #include "ym/SatSolver.h"
 #include "ym/SatModel.h"
-#include <random>
 
 
 BEGIN_NAMESPACE_FRAIG
@@ -33,7 +29,7 @@ public:
   /// @brief コンストラクタ
   FraigSat(
     const SatSolverType& solver_type ///< [in] SAT-solver の種類を表すオブジェクト
-    = SatSolverType()
+    = SatSolverType{}
   );
 
   /// @brief デストラクタ
@@ -45,9 +41,11 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 新しい変数を作る．
-  SatLiteral
-  new_var();
+  /// @brief ノードを登録する．
+  void
+  reg_node(
+    FraigNode* node ///< [in] 対象のノード
+  );
 
   /// @brief ノードの入出力の関係を表す CNF 式を作る．
   void
@@ -70,20 +68,13 @@ public:
     bool inv         ///< [in] false で 0, true で 1 を表す．
   );
 
-#if 0
-  /// @brief 2つのハンドルが等価かどうか調べる．
-  SatBool3
-  check_equiv(
-    FraigHandle aig1, ///< [in] 入力1のハンドル
-    FraigHandle aig2  ///< [in] 入力2のハンドル
-  );
-#endif
-
   /// @brief 直前のSATの結果を得る．
-  const SatModel&
-  model()
+  SatBool3
+  model_val(
+    FraigNode* node ///< [in] 対象のノード
+  )
   {
-    return mSolver.model();
+    return mSolver.model()[node_lit(node)];
   }
 
   /// @brief ログレベルを設定する．
@@ -110,6 +101,18 @@ private:
   // 内部で用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief ノードに対応するリテラルを得る．
+  SatLiteral
+  node_lit(
+    FraigNode* node ///< [in] 対象のノード
+  );
+
+  /// @brief ハンドルに対応するリテラルを得る．
+  SatLiteral
+  handle_lit(
+    const FraigHandle& handle ///< [in] 対象のハンドル
+  );
+
   /// @brief lit1 が成り立つか調べる．
   SatBool3
   check_condition(
@@ -134,12 +137,12 @@ private:
   {
 
     // 試行回数
-    int mTotalCount;
+    SizeType mTotalCount;
 
     struct
     {
       // 回数
-      int mCount;
+      SizeType mCount;
 
       // 計算時間の総和
       double mTotalTime;
@@ -148,7 +151,7 @@ private:
       double mMaxTime;
 
       // restart 回数
-      int mRestart;
+      SizeType mRestart;
 
       // コンフリクト数
       ymuint64 mConflictNum;
@@ -193,6 +196,9 @@ private:
 
   // SATソルバ
   SatSolver mSolver;
+
+  // ノード番号をキーにしてリテラルを格納する辞書
+  unordered_map<SizeType, SatLiteral> mLiteralDict;
 
   // check_const の統計情報
   SatStat mCheckConstInfo;

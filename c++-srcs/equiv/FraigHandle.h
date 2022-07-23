@@ -9,7 +9,6 @@
 /// All rights reserved.
 
 #include "fraig_nsdef.h"
-#include "ym/SatLiteral.h"
 
 
 BEGIN_NAMESPACE_FRAIG
@@ -43,7 +42,7 @@ public:
   FraigHandle
   zero()
   {
-    return FraigHandle(nullptr, false);
+    return FraigHandle{nullptr, false};
   }
 
   /// @brief 定数1のハンドルを返す．
@@ -51,7 +50,7 @@ public:
   FraigHandle
   one()
   {
-    return FraigHandle(nullptr, true);
+    return FraigHandle{nullptr, true};
   }
 
   /// @brief デストラクタ
@@ -70,6 +69,15 @@ public:
     return FraigHandle{mPackedData ^ 1UL};
   }
 
+  /// @brief 極性をかけ合わせる．
+  FraigHandle
+  operator*(
+    bool inv ///< [in] 極性
+  ) const
+  {
+    return FraigHandle{mPackedData ^ static_cast<bool>(inv)};
+  }
+
   /// @brief ノードを得る．
   FraigNode*
   node() const
@@ -84,10 +92,6 @@ public:
   {
     return static_cast<bool>(mPackedData & 1UL);
   }
-
-  /// @brief 対応するリテラルを得る．
-  SatLiteral
-  literal() const;
 
   /// @brief 定数0を指しているとき true を返す．
   bool
@@ -146,10 +150,6 @@ public:
   FraigHandle
   fanin1_handle() const;
 
-  /// @brief 代表ハンドルを得る．
-  FraigHandle
-  rep_handle() const;
-
   /// @brief ハッシュ値を返す．
   SizeType
   hash() const
@@ -164,6 +164,15 @@ public:
   ) const
   {
     return mPackedData == src2.mPackedData;
+  }
+
+  /// @brief 非等価比較演算
+  bool
+  operator!=(
+    FraigHandle src2  ///< [in] オペランド2
+  )
+  {
+    return !operator==(src2);
   }
 
 
@@ -192,27 +201,6 @@ private:
 };
 
 /// @relates FraigHandle
-/// @brief 非等価比較演算
-inline
-bool
-operator!=(
-  FraigHandle src1, ///< [in] オペランド1
-  FraigHandle src2  ///< [in] オペランド2
-)
-{
-  return !src1.operator==(src2);
-}
-
-/// @relates FraigHandle
-/// @brief 内容をダンプする関数
-void
-dump_handle(
-  ostream& s,              ///< [in] 出力先のストリーム
-  FraigHandle src,         ///< [in] 根の枝
-  unordered_set<int>& mark ///< [in] すでに処理したノードの番号を保持するマーク
-);
-
-/// @relates FraigHandle
 /// @brief 内容を出力する関数
 ostream&
 operator<<(
@@ -221,21 +209,5 @@ operator<<(
 );
 
 END_NAMESPACE_FRAIG
-
-
-BEGIN_NAMESPACE_STD
-
-// FraigHandleをキーにしたハッシュ関数クラスの定義
-template <>
-struct hash<MAGUS_NAMESPACE::nsFraig::FraigHandle>
-{
-  SizeType
-  operator()(MAGUS_NAMESPACE::nsFraig::FraigHandle handle) const
-  {
-    return handle.hash();
-  }
-};
-
-END_NAMESPACE_YM
 
 #endif // FRAIGHANDLE_H

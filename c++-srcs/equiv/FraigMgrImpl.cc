@@ -64,17 +64,17 @@ FraigMgrImpl::make_input()
     cout << "make_input ...";
   }
 
-  auto node = new FraigNode{};
-  reg_node(node);
-  int iid = mInputNodes.size();
-  node->set_input(iid);
-  mInputNodes.push_back(node);
-  vector<ymuint64> tmp(FraigNode::mPatUsed);
+  SizeType id = mAllNodes.size();
+  SizeType iid = mInputNodes.size();
+  vector<ymuint64> init_pat(FraigNode::mPatUsed);
   std::uniform_int_distribution<ymuint64> rd;
   for ( int i: Range(FraigNode::mPatUsed) ) {
-    tmp[i] = rd(mRandGen);
+    init_pat[i] = rd(mRandGen);
   }
-  node->set_pat(0, FraigNode::mPatUsed, tmp);
+  auto node = new FraigNode{id, iid, init_pat};
+  reg_node(node);
+  mInputNodes.push_back(node);
+
   FraigHandle ans{node, false};
 
   if ( debug ) {
@@ -116,7 +116,7 @@ FraigMgrImpl::make_and(
   }
   else {
     // 順番の正規化
-    if ( handle1.literal().varid() < handle2.literal().varid() ) {
+    if ( handle1.node()->id() < handle2.node()->id() ) {
       std::swap(handle1, handle2);
     }
 
@@ -125,7 +125,7 @@ FraigMgrImpl::make_and(
     }
 
     // 同じ構造を持つノードが既にないか調べる．
-    FraigNode key{handle1, handle2};
+    FraigNode key{0, handle1, handle2};
     auto p = mStructTable.find(&key);
     if ( p != mStructTable.end() ) {
       // 等価なノードが存在した．
@@ -134,9 +134,9 @@ FraigMgrImpl::make_and(
     }
     else {
       // ノードを作る．
-      auto node = new FraigNode{handle1, handle2};
+      SizeType id = mAllNodes.size();
+      auto node = new FraigNode{id, handle1, handle2};
       reg_node(node);
-      node->calc_pat(0, FraigNode::mPatUsed);
 
       // 構造ハッシュに追加する．
       mStructTable.insert(node);
@@ -148,43 +148,43 @@ FraigMgrImpl::make_and(
 	cout << "  new node: " << FraigHandle{node, false} << endl;
       }
 
-      PatEq eq;
-
       // 縮退検査を行う．
-      if ( verify_const(node, ans) != SatBool3::True ) {
-	while ( true ) {
-	  auto range = mPatTable.equal_range(node);
-	  bool inv0 = node->pat_hash_inv();
-	  bool change{false};
-	  auto end = range.second;
-	  for ( auto p = range.first; p != end; ++ p ) {
-	    auto node1 = *p;
-	    bool inv = inv0 ^ node1->pat_hash_inv();
-	    bool retry = false;
-	    if ( eq(node, node1) ) {
-	      // node と node1 が等価かどうか調べる．
-	      auto stat = mSolver.check_equiv(node, node1, inv);
-	      if ( stat == SatBool3::True ) {
-		// 等価なノードが見つかった．
-		node->set_rep(node1, inv);
-		ans = FraigHandle{node1, inv};
-		goto exit;
-	      }
-	      else if ( stat == SatBool3::False ) {
-		// 反例をパタンに加えて再ハッシュする．
-		add_pat(node);
+      if ( verify_const(node, ans) == SatBool3::True ) {
+	// 縮退していた．
+	goto exit;
+      }
 
-		ASSERT_COND( !eq(node, node1) );
-		retry = true;
-		change = true;
-		break;
-	      }
+      // 等価なノードを探す．
+      PatEq eq;
+      while ( true ) {
+	auto range = mPatTable.equal_range(node);
+	bool inv0 = node->pat_hash_inv();
+	bool change{false};
+	auto end = range.second;
+	for ( auto p = range.first; p != end; ++ p ) {
+	  auto node1 = *p;
+	  bool inv = inv0 ^ node1->pat_hash_inv();
+	  if ( eq(node, node1) ) {
+	    // node と node1 が等価かどうか調べる．
+	    auto stat = mSolver.check_equiv(node, node1, inv);
+	    if ( stat == SatBool3::True ) {
+	      // 等価なノードが見つかった．
+	      ans = FraigHandle{node1, inv};
+	      goto exit;
+	    }
+	    else if ( stat == SatBool3::False ) {
+	      // 反例をパタンに加えて再ハッシュする．
+	      add_pat(node);
+
+	      ASSERT_COND( !eq(node, node1) );
+	      change = true;
+	      break;
 	    }
 	  }
-	  if ( !change ) {
-	    ans = FraigHandle{node, false};
-	    break;
-	  }
+	}
+	if ( !change ) {
+	  ans = FraigHandle{node, false};
+	  break;
 	}
       }
     }
@@ -263,7 +263,6 @@ FraigMgrImpl::verify_const(
     stat = mSolver.check_const(node, false);
     if ( stat == SatBool3::True ) {
       // 定数0と等価だった．
-      node->set_rep(nullptr, false);
       ans = FraigHandle::zero();
     }
     else if ( stat == SatBool3::False ) {
@@ -278,7 +277,6 @@ FraigMgrImpl::verify_const(
     stat = mSolver.check_const(node, true);
     if ( stat == SatBool3::True ) {
       // 定数1と等価だった．
-      node->set_rep(nullptr, true);
       ans = FraigHandle::one();
     }
     else if ( stat == SatBool3::False ) {
@@ -304,25 +302,24 @@ FraigMgrImpl::add_pat(
   mPatTable.clear();
 
   // 反例をパタンに加える．
-  const SatModel& model = mSolver.model();
-  vector<ymuint64> tmp(1);
   std::uniform_int_distribution<int> rd100(0, 99);
   for ( auto node1: mAllNodes ) {
     if ( node1->is_input() ) {
-      ymuint64 pat = 0U;
-      if ( model[node1->literal()] == SatBool3::True ) {
-	pat = ~0U;
+      ymuint64 pat = 0UL;
+      if ( mSolver.model_val(node1) == SatBool3::True ) {
+	pat = ~0UL;
       }
       else {
-	pat = 0U;
+	pat = 0UL;
       }
-      for ( int b = 1; b < 32; ++ b ) {
+      // ただし一度に64個のパタンを加えるので63個は
+      // 適当にばらつかせる．
+      for ( int b = 1; b < 64; ++ b ) {
 	if ( rd100(mRandGen) <= 3 ) {
-	  pat ^= (1U << b);
+	  pat ^= (1UL << b);
 	}
       }
-      tmp[0] = pat;
-      node1->set_pat(FraigNode::mPatUsed, FraigNode::mPatUsed + 1, tmp);
+      node1->add_pat(pat);
     }
     else {
       node1->calc_pat(FraigNode::mPatUsed, FraigNode::mPatUsed + 1);
@@ -335,6 +332,15 @@ FraigMgrImpl::add_pat(
   ++ FraigNode::mPatUsed;
 }
 
+// @brief ノードを登録する．
+void
+FraigMgrImpl::reg_node(
+  FraigNode* node
+)
+{
+  mSolver.reg_node(node);
+  mAllNodes.push_back(node);
+}
 
 // @brief ログレベルを設定する．
 void
@@ -367,17 +373,6 @@ FraigMgrImpl::resize_pat(
     node->resize_pat(size);
   }
   FraigNode::mPatSize = size;
-}
-
-// @brief ノードを登録する．
-void
-FraigMgrImpl::reg_node(
-  FraigNode* node
-)
-{
-  node->mLiteral = mSolver.new_var();
-  ASSERT_COND(node->literal().varid() == mAllNodes.size() );
-  mAllNodes.push_back(node);
 }
 
 // @brief 内部の統計情報を出力する．

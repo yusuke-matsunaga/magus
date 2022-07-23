@@ -13,11 +13,10 @@
 #include "StructTable.h"
 #include "PatTable.h"
 #include "FraigSat.h"
+#include <random>
 
 #include "ym/SatBool3.h"
 #include "ym/SatSolverType.h"
-#include "ym/SatSolver.h"
-#include "ym/SatModel.h"
 
 
 BEGIN_NAMESPACE_FRAIG
