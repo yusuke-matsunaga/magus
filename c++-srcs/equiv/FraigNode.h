@@ -262,20 +262,6 @@ public:
   // 等価グループに関するアクセス関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 削除済みのとき true を返す．
-  bool
-  check_dmark() const
-  {
-    return mFlags[BIT_D];
-  }
-
-  /// @brief 要素数が2以上の等価候補グループの代表なら true を返す．
-  bool
-  check_rep() const
-  {
-    return mRepNode == this && mEqLink != nullptr;
-  }
-
   /// @brief 代表ノードを返す．
   FraigNode*
   rep_node() const
@@ -297,13 +283,6 @@ public:
     return FraigHandle(mRepNode, rep_inv());
   }
 
-  /// @brief 次の等価候補ノードを得る．
-  FraigNode*
-  next_eqnode()
-  {
-    return mEqLink;
-  }
-
   /// @brief 等価候補の代表をセットする．
   void
   set_rep(
@@ -322,39 +301,6 @@ public:
   set_rep_inv()
   {
     mFlags[BIT_R] = true;
-  }
-
-  /// @brief 等価候補ノードを追加する．
-  void
-  add_eqnode(
-    FraigNode* node ///< [in] ノード
-  )
-  {
-    mEqTail->mEqLink = node;
-    mEqTail = node;
-    node->mRepNode = this;
-    node->mEqLink = nullptr;
-  }
-
-  /// @brief 削除済みの印をつける．
-  void
-  set_dmark()
-  {
-    mFlags[BIT_D] = true;
-  }
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // ハッシュ用のリンクアクセス関数
-  //////////////////////////////////////////////////////////////////////
-
-  FraigNode*&
-  link(
-    SizeType link_pos ///< [in] リンクの種類 ( 0 or 1 )
-  )
-  {
-    return link_pos == 0 ? mLink1 : mLink2;
   }
 
 
@@ -394,11 +340,10 @@ private:
   SatLiteral mVarId;
 
   // ファンインのノード
-  FraigNode* mFanins[2];
+  FraigNode* mFanins[2]{nullptr, nullptr};
 
   // 0/1マーク，極性などの情報をパックしたもの
-  //ymuint32 mFlags;
-  bitset<8> mFlags;
+  bitset<7> mFlags{0};
 
   // シミュレーションパタン
   ymuint64* mPat{nullptr};
@@ -414,12 +359,6 @@ private:
 
   // 代表ノード情報
   FraigNode* mRepNode{nullptr};
-
-  // 次の等価候補ノード
-  FraigNode* mEqLink{nullptr};
-
-  // 等価候補リストの末尾のノード
-  FraigNode* mEqTail{nullptr};
 
 
 private:
@@ -464,10 +403,6 @@ private:
   // 等価グループ中の極性
   static
   const int BIT_R  = 6;
-
-  // 削除マーク
-  static
-  const int BIT_D  = 7;
 
 };
 

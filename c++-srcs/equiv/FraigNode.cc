@@ -121,13 +121,8 @@ ymuint64 FraigNode::mPrimes[] = {
 
 // @brief コンストラクタ
 FraigNode::FraigNode(
-) : mFlags(0),
-    mPat(nullptr),
-    mHash(0),
-    mRepNode(this),
-    mEqLink(nullptr),
-    mEqTail(nullptr),
-    mFanins{nullptr, nullptr}
+) : mPat(nullptr),
+    mRepNode(this)
 {
 }
 
