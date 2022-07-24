@@ -134,4 +134,30 @@ TEST(EquivTest, EquivTest3)
   }
 }
 
+TEST(EquivTest, EquivTest4)
+{
+  string filename1 = "C499.blif";
+  string path1 = DATAPATH + filename1;
+  BnNetwork network1 = BnNetwork::read_blif(path1);
+  ASSERT_TRUE( network1.node_num() != 0 );
+
+  int ni = network1.input_num();
+  int no = network1.output_num();
+
+  string filename2 = "C499_reordered.blif";
+  string path2 = DATAPATH + filename2;
+  BnNetwork network2 = BnNetwork::read_blif(path2);
+  ASSERT_TRUE( network2.node_num() != 0 );
+
+  ASSERT_TRUE( network2.input_num() == ni );
+  ASSERT_TRUE( network2.output_num() == no );
+
+  EquivMgr eqmgr;
+  EquivResult ans = eqmgr.check(network1, network2, true);
+  EXPECT_EQ( SatBool3::True, ans.result() );
+  for ( int i: Range(no) ) {
+    EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
+  }
+}
+
 END_NAMESPACE_MAGUS

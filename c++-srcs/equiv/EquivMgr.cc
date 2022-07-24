@@ -34,26 +34,68 @@ EquivMgr::EquivMgr(
 EquivResult
 EquivMgr::check(
   const BnNetwork& network1,
-  const BnNetwork& network2
+  const BnNetwork& network2,
+  bool match_by_name
 )
 {
-  int ni = network1.input_num();
+  SizeType ni = network1.input_num();
   if ( network2.input_num() != ni ) {
     return SatBool3::False;
   }
-  int no = network1.output_num();
+  SizeType no = network1.output_num();
   if ( network2.output_num() != no ) {
     return SatBool3::False;
   }
 
   vector<int> input2_list(ni);
-  for ( int i: Range(ni) ) {
-    input2_list[i] = i;
-  }
-
   vector<int> output2_list(no);
-  for ( int i: Range(no) ) {
-    output2_list[i] = i;
+  if ( match_by_name ) {
+    // 名前による対応
+    // 入力名をキーにして network1 の入力位置を格納する辞書
+    unordered_map<string, SizeType> input_map;
+    for ( SizeType i = 0; i < ni; ++ i ) {
+      SizeType id = network1.input_id(i);
+      auto& node = network1.node(id);
+      input_map.emplace(node.name(), i);
+    }
+    // 入力の対応付を行う．
+    for ( SizeType i = 0; i < ni; ++ i ) {
+      SizeType id = network2.input_id(i);
+      auto& node = network2.node(id);
+      auto name = node.name();
+      if ( input_map.count(name) == 0 ) {
+	// 入力名が未対応
+	return EquivResult{SatBool3::False, vector<SatBool3>(no, SatBool3::False)};
+      }
+      input2_list[i] = input_map.at(name);
+    }
+    // 出力名をキーにして network1 の出力位置を格納する辞書
+    unordered_map<string, SizeType> output_map;
+    for ( SizeType i = 0; i < no; ++ i ) {
+      SizeType id = network1.output_id(i);
+      auto& node = network1.node(id);
+      output_map.emplace(node.name(), i);
+    }
+    // 出力の対応付を行う．
+    for ( SizeType i = 0; i < no; ++ i ) {
+      SizeType id = network2.output_id(i);
+      auto& node = network2.node(id);
+      auto name = node.name();
+      if ( output_map.count(name) == 0 ) {
+	// 出力名が未対応
+	return EquivResult{SatBool3::False, vector<SatBool3>(no, SatBool3::False)};
+      }
+      output2_list[i] = output_map.at(name);
+    }
+  }
+  else {
+    // 順序による対応
+    for ( int i: Range(ni) ) {
+      input2_list[i] = i;
+    }
+    for ( int i: Range(no) ) {
+      output2_list[i] = i;
+    }
   }
 
   return check(network1, network2, input2_list, output2_list);
@@ -69,11 +111,11 @@ EquivMgr::check(
 )
 {
   // 最初に入出力数が等しいか調べる．
-  int ni = network1.input_num();
+  SizeType ni = network1.input_num();
   ASSERT_COND( network2.input_num() == ni );
   ASSERT_COND( input2_list.size() == ni );
 
-  int no = network1.output_num();
+  SizeType no = network1.output_num();
   ASSERT_COND( network2.output_num() == no );
   ASSERT_COND( output2_list.size() == no );
 

@@ -25,8 +25,6 @@ class EquivResult
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] result
-  /// @param[in] output_results
   EquivResult(
     SatBool3 result = SatBool3::X,              ///< [in] 全体の結果
     const vector<SatBool3>& output_results = {} ///< [in] 各出力ごとの結果のリスト
@@ -102,11 +100,12 @@ public:
 
   /// @brief 2つの回路が等価かどうか調べる．
   ///
-  /// 入力と出力の対応関係は順序で対応させる．
+  /// デフォルトでは入力と出力の対応関係は順序で対応させる．
   EquivResult
   check(
     const BnNetwork& network1, ///< [in] 対象の回路1
-    const BnNetwork& network2  ///< [in] 対象の回路2
+    const BnNetwork& network2, ///< [in] 対象の回路2
+    bool match_by_name = false ///< [in] 対応関係を名前で取る．
   );
 
   /// @brief 2つの回路が等価かどうか調べる．
@@ -164,15 +163,6 @@ public:
     mLogOutP = out;
   }
 
-  /// @brief ランダムシミュレーション制御用のパラメータを設定する．
-  void
-  set_loop_limit(
-    int loop_limit ///< [in] 変化のない状態がこの回数連続したら止める．
-  )
-  {
-    mLoopLimit = loop_limit;
-  }
-
 
 private:
   //////////////////////////////////////////////////////////////////////
@@ -210,9 +200,6 @@ private:
 
   // ログの出力先
   ostream* mLogOutP{nullptr};
-
-  // ランダムシミュレーション制御用のパラメータ
-  int mLoopLimit{10};
 
 };
 
