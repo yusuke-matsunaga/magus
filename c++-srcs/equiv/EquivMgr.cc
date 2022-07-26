@@ -47,8 +47,8 @@ EquivMgr::check(
     return SatBool3::False;
   }
 
-  vector<int> input2_list(ni);
-  vector<int> output2_list(no);
+  vector<SizeType> input2_list(ni);
+  vector<SizeType> output2_list(no);
   if ( match_by_name ) {
     // 名前による対応
     // 入力名をキーにして network1 の入力位置を格納する辞書
@@ -90,10 +90,10 @@ EquivMgr::check(
   }
   else {
     // 順序による対応
-    for ( int i: Range(ni) ) {
+    for ( SizeType i: Range(ni) ) {
       input2_list[i] = i;
     }
-    for ( int i: Range(no) ) {
+    for ( SizeType i: Range(no) ) {
       output2_list[i] = i;
     }
   }
@@ -106,8 +106,8 @@ EquivResult
 EquivMgr::check(
   const BnNetwork& network1,
   const BnNetwork& network2,
-  const vector<int>& input2_list,
-  const vector<int>& output2_list
+  const vector<SizeType>& input2_list,
+  const vector<SizeType>& output2_list
 )
 {
   // 最初に入出力数が等しいか調べる．

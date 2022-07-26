@@ -22,8 +22,8 @@ TEST(EquivTest, EquivTest1)
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
 
-  int ni = network1.input_num();
-  int no = network1.output_num();
+  SizeType ni = network1.input_num();
+  SizeType no = network1.output_num();
 
   string filename2 = "C1355.blif";
   string path2 = DATAPATH + filename2;
@@ -36,7 +36,7 @@ TEST(EquivTest, EquivTest1)
   EquivMgr eqmgr;
   EquivResult ans = eqmgr.check(network1, network2);
   EXPECT_EQ( SatBool3::True, ans.result() );
-  for ( int i: Range(no) ) {
+  for ( SizeType i: Range(no) ) {
     EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
   }
 }
@@ -48,8 +48,8 @@ TEST(EquivTest, EquivTest2)
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
 
-  int ni = network1.input_num();
-  int no = network1.output_num();
+  SizeType ni = network1.input_num();
+  SizeType no = network1.output_num();
 
   string filename2 = "C1355.blif";
   string path2 = DATAPATH + filename2;
@@ -59,19 +59,19 @@ TEST(EquivTest, EquivTest2)
   ASSERT_TRUE( network2.input_num() == ni );
   ASSERT_TRUE( network2.output_num() == no );
 
-  vector<int> input2_list(ni);
-  for ( int i: Range(ni) ) {
+  vector<SizeType> input2_list(ni);
+  for ( SizeType i: Range(ni) ) {
     input2_list[i] = i;
   }
-  vector<int> output2_list(no);
-  for ( int i: Range(no) ) {
+  vector<SizeType> output2_list(no);
+  for ( SizeType i: Range(no) ) {
     output2_list[i] = i;
   }
 
   EquivMgr eqmgr;
   EquivResult ans = eqmgr.check(network1, network2, input2_list, output2_list);
   EXPECT_EQ( SatBool3::True, ans.result() );
-  for ( int i: Range(no) ) {
+  for ( SizeType i: Range(no) ) {
     EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
   }
 }
@@ -83,8 +83,8 @@ TEST(EquivTest, EquivTest3)
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
 
-  int ni = network1.input_num();
-  int no = network1.output_num();
+  SizeType ni = network1.input_num();
+  SizeType no = network1.output_num();
 
   string filename2 = "C499_reordered.blif";
   string path2 = DATAPATH + filename2;
@@ -95,41 +95,41 @@ TEST(EquivTest, EquivTest3)
   ASSERT_TRUE( network2.output_num() == no );
 
   // network1 の入力ノードの名前のハッシュ表を作る．
-  unordered_map<string, int> input_map;
-  for ( int pos: Range(ni) ) {
-    int id1 = network1.input_id(pos);
+  unordered_map<string, SizeType> input_map;
+  for ( SizeType pos: Range(ni) ) {
+    SizeType id1 = network1.input_id(pos);
     auto& node = network1.node(id1);
     input_map.emplace(node.name(), pos);
   }
 
   // network1 の出力ノードの名前のハッシュ表を作る．
-  unordered_map<string, int> output_map;
-  for ( int pos: Range(no) ) {
-    int id1 = network1.output_id(pos);
+  unordered_map<string, SizeType> output_map;
+  for ( SizeType pos: Range(no) ) {
+    SizeType id1 = network1.output_id(pos);
     auto& node = network1.node(id1);
     output_map.emplace(node.name(), pos);
   }
 
-  vector<int> input2_list(ni);
-  for ( int pos2: Range(ni) ) {
-    int id2 = network2.input_id(pos2);
+  vector<SizeType> input2_list(ni);
+  for ( SizeType pos2: Range(ni) ) {
+    SizeType id2 = network2.input_id(pos2);
     auto& node2 = network2.node(id2);
-    int pos1 = input_map.at(node2.name());
+    SizeType pos1 = input_map.at(node2.name());
     input2_list[pos2] = pos1;
   }
 
-  vector<int> output2_list(no);
-  for ( int pos2: Range(no) ) {
-    int id2 = network2.output_id(pos2);
+  vector<SizeType> output2_list(no);
+  for ( SizeType pos2: Range(no) ) {
+    SizeType id2 = network2.output_id(pos2);
     auto& node2 = network2.node(id2);
-    int pos1 = output_map.at(node2.name());
+    SizeType pos1 = output_map.at(node2.name());
     output2_list[pos2] = pos1;
   }
 
   EquivMgr eqmgr;
   EquivResult ans = eqmgr.check(network1, network2, input2_list, output2_list);
   EXPECT_EQ( SatBool3::True, ans.result() );
-  for ( int i: Range(no) ) {
+  for ( SizeType i: Range(no) ) {
     EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
   }
 }
@@ -141,8 +141,8 @@ TEST(EquivTest, EquivTest4)
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
 
-  int ni = network1.input_num();
-  int no = network1.output_num();
+  SizeType ni = network1.input_num();
+  SizeType no = network1.output_num();
 
   string filename2 = "C499_reordered.blif";
   string path2 = DATAPATH + filename2;
@@ -155,7 +155,7 @@ TEST(EquivTest, EquivTest4)
   EquivMgr eqmgr;
   EquivResult ans = eqmgr.check(network1, network2, true);
   EXPECT_EQ( SatBool3::True, ans.result() );
-  for ( int i: Range(no) ) {
+  for ( SizeType i: Range(no) ) {
     EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
   }
 }

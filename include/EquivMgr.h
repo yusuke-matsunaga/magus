@@ -115,10 +115,10 @@ public:
   /// を示す．
   EquivResult
   check(
-    const BnNetwork& network1,      ///< [in] 対象の回路1
-    const BnNetwork& network2,      ///< [in] 対象の回路2
-    const vector<int>& input2_list, ///< [in] network2の入力順序を表すリスト
-    const vector<int>& output2_list ///< [in] network2の出力順序を表すリスト
+    const BnNetwork& network1,           ///< [in] 対象の回路1
+    const BnNetwork& network2,           ///< [in] 対象の回路2
+    const vector<SizeType>& input2_list, ///< [in] network2の入力順序を表すリスト
+    const vector<SizeType>& output2_list ///< [in] network2の出力順序を表すリスト
   );
 
 
