@@ -12,10 +12,12 @@
 
 BEGIN_NAMESPACE_MAGUS
 
-//@ brief Magus 拡張に関する初期化を行う．
+// @brief Magus 拡張に関する初期化を行う．
 void
 LuaMagus::open_Magus()
 {
+  L_openlibs();
+
   vector<struct luaL_Reg> mylib;
   LuaBdd::init(lua_state(), mylib);
   LuaBnet::init(mylib);

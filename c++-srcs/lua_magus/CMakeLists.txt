@@ -17,7 +17,7 @@ include_directories (
 set ( lua_magus_SOURCES
   lua_magus.cc
   LuaMagus.cc
-  LuaMagus_equiv.cc
+  equiv_cmd.cc
   )
 
 

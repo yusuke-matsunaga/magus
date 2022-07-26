@@ -17,7 +17,6 @@ main(
 {
   MAGUS_NAMESPACE::LuaMagus lua;
 
-  lua.L_openlibs();
   lua.open_Magus();
 
   return lua.main_loop(argc, argv);
