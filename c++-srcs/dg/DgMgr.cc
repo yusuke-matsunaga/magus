@@ -9,6 +9,7 @@
 #include "DgMgr.h"
 #include "DgNode.h"
 #include "NodeMark.h"
+#include "ym/BddVarSet.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -251,25 +252,18 @@ DgMgr::merge(
 
   auto sup0 = node0->sup_list();
   auto sup1 = node1->sup_list();
-
   if ( !(sup0 && sup1) ) {
     // ITE(top, r1, r0) となる．
     vector<DgEdge> tmp_inputs(3);
     tmp_inputs[0] = make_lit(top);
-    if ( node0->top() < node1->top() ) {
-      tmp_inputs[1] = r0;
-      tmp_inputs[2] = r1;
-    }
-    else {
-      tmp_inputs[1] = r1;
-      tmp_inputs[2] = r0;
-    }
+    tmp_inputs[1] = r0;
+    tmp_inputs[2] = r1;
     return make_cplx(f, tmp_inputs);
   }
 
   auto sup0_diff = sup0 - sup1;
   auto sup1_diff = sup1 - sup0;
-  if ( node0->is_cplx() && !sup0_diff.empty() && sup1_diff.empty() ) {
+  if ( node0->is_cplx() && sup0_diff.size() > 0 && sup1_diff.size() == 0 ) {
     for ( SizeType i = 0; i < nc0; ++ i ) {
       auto cedge = node0->child(i);
       auto cnode = cedge.node();
@@ -288,7 +282,7 @@ DgMgr::merge(
       }
     }
   }
-  if ( node1->is_cplx() && !sup1_diff.empty() && sup0_diff.empty() ) {
+  if ( node1->is_cplx() && sup1_diff.size() > 0 && sup0_diff.size() == 0 ) {
     for ( SizeType i = 0; i < nc1; ++ i ) {
       auto cedge = node1->child(i);
       auto cnode = cedge.node();
@@ -800,7 +794,11 @@ DgMgr::make_cplx(
     for ( auto var: var_list ) {
       sup_list.push_back(var.val());
     }
-    auto node = new DgCplxNode{f_normal, sup_list, child_list};
+    vector<DgEdge> tmp_list{child_list};
+    sort(tmp_list.begin(), tmp_list.end(),
+	 [](DgEdge e1, DgEdge e2)
+	 { return e1.node()->top() < e2.node()->top(); });
+    auto node = new DgCplxNode{f_normal, sup_list, tmp_list};
     result = DgEdge{node, false};
     put_node(f_normal, result);
   }
