@@ -7,6 +7,7 @@
 /// All rights reserved.
 
 #include "DgNode.h"
+#include "DgEdge.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -57,7 +58,7 @@ DgNode::child(
 ) const
 {
   ASSERT_NOT_REACHED;
-  return DgEdge::make_zero();
+  return DgEdge::zero();
 }
 
 
@@ -70,6 +71,15 @@ bool
 DgLitNode::is_lit() const
 {
   return true;
+}
+
+// @brief 内容を出力する．
+void
+DgLitNode::print(
+  ostream& s
+) const
+{
+  s << "#" << id() << ": LIT(" << top() << ")" << endl;
 }
 
 
@@ -106,6 +116,23 @@ DgOrNode::is_or() const
   return true;
 }
 
+// @brief 内容を出力する．
+void
+DgOrNode::print(
+  ostream& s
+) const
+{
+  s << "#" << id() << ": OR(";
+  const char* comma = "";
+  for ( SizeType i = 0; i < child_num(); ++ i ) {
+    auto cedge = child(i);
+    s << comma;
+    comma = ", ";
+    cedge.print(s);
+  }
+  s << ")" << endl;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス DgXorNode
@@ -118,6 +145,23 @@ DgXorNode::is_xor() const
   return true;
 }
 
+// @brief 内容を出力する．
+void
+DgXorNode::print(
+  ostream& s
+) const
+{
+  s << "#" << id() << ": XOR(";
+  const char* comma = "";
+  for ( SizeType i = 0; i < child_num(); ++ i ) {
+    auto cedge = child(i);
+    s << comma;
+    comma = ", ";
+    cedge.print(s);
+  }
+  s << ")" << endl;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス DgCplxNode
@@ -128,6 +172,23 @@ bool
 DgCplxNode::is_cplx() const
 {
   return true;
+}
+
+// @brief 内容を出力する．
+void
+DgCplxNode::print(
+  ostream& s
+) const
+{
+  s << "#" << id() << ": CPLX(";
+  const char* comma = "";
+  for ( SizeType i = 0; i < child_num(); ++ i ) {
+    auto cedge = child(i);
+    s << comma;
+    comma = ", ";
+    cedge.print(s);
+  }
+  s << ")" << endl;
 }
 
 END_NAMESPACE_DG

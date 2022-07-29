@@ -8,11 +8,56 @@
 
 #include "DgMgr.h"
 #include "DgNode.h"
+#include "DgEdge.h"
 #include "NodeMark.h"
 #include "ym/BddVarSet.h"
 
 
 BEGIN_NAMESPACE_DG
+
+BEGIN_NONAMESPACE
+
+void
+dfs(
+  DgEdge edge,
+  vector<DgNode*>& node_list,
+  unordered_set<SizeType>& node_set
+)
+{
+  if ( edge.is_const() ) {
+    return;
+  }
+  auto node = edge.node();
+  if ( node_set.count(node->id()) == 0 ) {
+    node_set.emplace(node->id());
+    node_list.push_back(node);
+    SizeType n = node->child_num();
+    for ( SizeType i = 0; i < n; ++ i ) {
+      dfs(node->child(i), node_list, node_set);
+    }
+  }
+}
+
+void
+print(
+  ostream& s,
+  DgEdge edge
+)
+{
+  vector<DgNode*> node_list;
+  unordered_set<SizeType> node_set;
+  dfs(edge, node_list, node_set);
+
+  s << "root: ";
+  edge.print(s);
+  s << endl;
+  for ( auto node: node_list ) {
+    node->print(s);
+  }
+  s << endl;
+}
+
+END_NONAMESPACE
 
 // @brief コンストラクタ
 DgMgr::DgMgr(
@@ -42,10 +87,10 @@ DgMgr::decomp_step(
 )
 {
   if ( func.is_zero() ) {
-    DgEdge::make_zero();
+    return DgEdge::zero();
   }
   if ( func.is_one() ) {
-    DgEdge::make_one();
+    return DgEdge::one();
   }
 
   DgEdge result;
@@ -61,6 +106,16 @@ DgMgr::decomp_step(
     result = merge(top_var.val(), r0, r1);
     // 結果を登録する．
     put_node(func, result);
+    {
+      cout << "decomp_step" << endl;
+      func.display(cout);
+      print(cout, result);
+    }
+  }
+  else {
+    cout << "decomp_step(2)" << endl;
+    func.display(cout);
+    print(cout, result);
   }
 
   return result;
@@ -74,38 +129,82 @@ DgMgr::merge(
   DgEdge r1
 )
 {
+  {
+    cout << "merge at " << top << endl;
+    cout << "r0" << endl;
+    print(cout, r0);
+    cout << "r1" << endl;
+    print(cout, r1);
+    cout << endl;
+  }
+
   // 一方もしくは両方の結果が定数の場合の処理
   if ( r0.is_zero() ) {
     if ( r1.is_one() ) {
       // 肯定のリテラル
-      return make_lit(top);
+      auto result = make_lit(top);
+      {
+	cout << " ==> ";
+	print(cout, result);
+      }
+      return result;
     }
     else {
       // リテラルとのAND ( x & r1 )
-      return make_lit_and(top, false, r1);
+      auto result = make_lit_and(top, false, r1);
+      {
+	cout << " ==> ";
+	print(cout, result);
+      }
+      return result;
     }
   }
   else if ( r0.is_one() ) {
     if ( r1.is_zero() ) {
       // 否定のリテラル
-      return make_lit(top) * true;
+      auto result = make_lit(top) * true;
+      {
+	cout << " ==> ";
+	print(cout, result);
+      }
+      return result;
     }
     else {
       // リテラルとのOR ( ~x | r1 )
-      return make_lit_or(top, true, r1);
+      auto result = make_lit_or(top, true, r1);
+      {
+	cout << " ==> ";
+	print(cout, result);
+      }
+      return result;
     }
   }
   else if ( r1.is_zero() ) {
     // リテラルとのAND ( ~x & r0 )
-    return make_lit_and(top, true, r0);
+    auto result = make_lit_and(top, true, r0);
+    {
+      cout << " ==> ";
+      print(cout, result);
+    }
+    return result;
   }
   else if ( r1.is_one() ) {
     // リテラルとのOR ( x | r0 )
-    return make_lit_or(top, false, r0);
+    auto result = make_lit_or(top, false, r0);
+    {
+      cout << " ==> ";
+      print(cout, result);
+    }
+    return result;
   }
   else if ( DgEdge::check_complement(r0, r1) ) {
     // リテラルとのXOR ( ~x & r0 | x & ~r0 )
-    return make_lit_xor(top, false, r0);
+    auto result = make_lit_xor(top, false, r0);
+    {
+      cout << " ==> ";
+      print(cout, result);
+    }
+    return result;
   }
 
   // ここまで来たらどちらも定数ではない．
@@ -156,12 +255,22 @@ DgMgr::merge(
   if ( common_list.size() >= 1 ) {
     // Case1-OR
     if ( inv0 == inv1 && node0->is_or() && node1->is_or() ) {
-      return case1_or(top, common_list, rest0_list, rest1_list) * inv0;
+      auto result = case1_or(top, common_list, rest0_list, rest1_list) * inv0;
+      {
+	cout << " ==> ";
+	print(cout, result);
+      }
+      return result;
     }
 
     // Case1-XOR
     if ( node0->is_xor() && node1->is_xor() ) {
-      return case1_xor(top, common_list, rest0_list, rest1_list, inv0, inv1);
+      auto result = case1_xor(top, common_list, rest0_list, rest1_list, inv0, inv1);
+      {
+	cout << " ==> ";
+	print(cout, result);
+      }
+      return result;
     }
   }
 
@@ -169,14 +278,24 @@ DgMgr::merge(
   if ( node0->is_or() ) {
     for ( SizeType i = 0; i < nc0; ++ i ) {
       if ( node0->child(i) * inv0 == r1 ) {
-	return case2_or(top, true, node0, inv0, i);
+	auto result = case2_or(top, true, node0, inv0, i);
+	{
+	  cout << " ==> ";
+	  print(cout, result);
+	}
+	return result;
       }
     }
   }
   if ( node1->is_or() ) {
     for ( SizeType i = 0; i < nc1; ++ i ) {
       if ( node1->child(i) * inv1 == r0 ) {
-	return case2_or(top, false, node1, inv1, i);
+	auto result = case2_or(top, false, node1, inv1, i);
+	{
+	  cout << " ==> ";
+	  print(cout, result);
+	}
+	return result;
       }
     }
   }
@@ -185,14 +304,24 @@ DgMgr::merge(
   if ( node0->is_xor() ) {
     for ( SizeType i = 0; i < nc0; ++ i ) {
       if ( node0->child(i).node() == node1 ) {
-	return case2_xor(top, true, node0, inv0, i, inv1);
+	auto result = case2_xor(top, true, node0, inv0, i, inv1);
+	{
+	  cout << " ==> ";
+	  print(cout, result);
+	}
+	return result;
       }
     }
   }
   if ( node1->is_xor() ) {
     for ( SizeType i = 0; i < nc1; ++ i ) {
       if ( node1->child(i).node() == node0 ) {
-	return case2_xor(top, false, node1, inv1, i, inv0);
+	auto result = case2_xor(top, false, node1, inv1, i, inv0);
+	{
+	  cout << " ==> ";
+	  print(cout, result);
+	}
+	return result;
       }
     }
   }
@@ -221,7 +350,12 @@ DgMgr::merge(
 
       if ( f0_0 == f1_0 && f0_1 == f1_1 ) {
 	// 一致した．
-	return case1_cplx(f, top, false, node0, node1, common_list, r0_1, r1_1);
+	auto result = case1_cplx(f, top, false, node0, node1, common_list, r0_1, r1_1);
+	{
+	  cout << " ==> ";
+	  print(cout, result);
+	}
+	return result;
       }
 
       // f0 に対して r0_1 が 0 に束縛した関数と
@@ -231,7 +365,12 @@ DgMgr::merge(
       // f1 に対して r1_1 を 0 に束縛した関数が等価かどうか調べる．
       if ( f0_0 == f1_1 && f0_1 == f1_0 ) {
 	// 一致した．
-	return case1_cplx(f, top, true, node0, node1, common_list, r0_1, r1_1);
+	auto result = case1_cplx(f, top, true, node0, node1, common_list, r0_1, r1_1);
+	{
+	  cout << " ==> ";
+	  print(cout, result);
+	}
+	return result;
       }
     }
     else if ( rest0_list.empty() && rest1_list.empty() ) {
@@ -244,21 +383,31 @@ DgMgr::merge(
 	auto f1_1 = f1 / chd.pat_1();
 	if ( f0_0 == f1_1 && f0_1 == f1_0 ) {
 	  // 一致した．
-	  return case1_cplx2(f, top, common_list, i);
+	  auto result = case1_cplx2(f, top, common_list, i);
+	  {
+	    cout << " ==> ";
+	    print(cout, result);
+	  }
+	  return result;
 	}
       }
     }
   }
 
-  auto sup0 = node0->sup_list();
-  auto sup1 = node1->sup_list();
+  auto sup0 = node0->support();
+  auto sup1 = node1->support();
   if ( !(sup0 && sup1) ) {
     // ITE(top, r1, r0) となる．
     vector<DgEdge> tmp_inputs(3);
     tmp_inputs[0] = make_lit(top);
     tmp_inputs[1] = r0;
     tmp_inputs[2] = r1;
-    return make_cplx(f, tmp_inputs);
+    auto result = make_cplx(f, tmp_inputs);
+    {
+      cout << " ==> ";
+      print(cout, result);
+    }
+    return result;
   }
 
   auto sup0_diff = sup0 - sup1;
@@ -267,17 +416,27 @@ DgMgr::merge(
     for ( SizeType i = 0; i < nc0; ++ i ) {
       auto cedge = node0->child(i);
       auto cnode = cedge.node();
-      auto& csup = cnode->sup_list();
+      auto& csup = cnode->support();
       if ( !(csup && sup1) ) {
 	// f0 に対して cedge が 0 になる割当を行うと f1 と一致する場合
 	auto f0_0 = f0 / cedge.pat_0();
 	if ( f0_0 == f1 ) {
-	  return case2_cplx(f, top, cedge, true, true, node0);
+	  auto result = case2_cplx(f, top, cedge, true, true, node0);
+	  {
+	    cout << " ==> ";
+	    print(cout, result);
+	  }
+	  return result;
 	}
 	// f0 に対して cedge が 1 になる割当を行うと f1 と一致する場合
 	auto f0_1 = f0 / cedge.pat_1();
 	if ( f0_1 == f1 ) {
-	  return case2_cplx(f, top, cedge, false, false, node0);
+	  auto result = case2_cplx(f, top, cedge, false, false, node0);
+	  {
+	    cout << " ==> ";
+	    print(cout, result);
+	  }
+	  return result;
 	}
       }
     }
@@ -286,17 +445,27 @@ DgMgr::merge(
     for ( SizeType i = 0; i < nc1; ++ i ) {
       auto cedge = node1->child(i);
       auto cnode = cedge.node();
-      auto& csup = cnode->sup_list();
+      auto& csup = cnode->support();
       if ( !(csup && sup0) ) {
 	// f1 に対して cedge が 0 になる割当を行うと f0 と一致する場合
 	auto f1_0 = f1 / cedge.pat_0();
 	if ( f1_0 == f0 ) {
-	  return case2_cplx(f, top, cedge, false, true, node1);
+	  auto result = case2_cplx(f, top, cedge, false, true, node1);
+	  {
+	    cout << " ==> ";
+	    print(cout, result);
+	  }
+	  return result;
 	}
 	// f1 に対して cedge が 1 になる割当を行うと f0 と一致する場合
 	auto f1_1 = f1 / cedge.pat_1();
 	if ( f1_1 == f0 ) {
-	  return case2_cplx(f, top, cedge, true, false, node1);
+	  auto result = case2_cplx(f, top, cedge, true, false, node1);
+	  {
+	    cout << " ==> ";
+	    print(cout, result);
+	  }
+	  return result;
 	}
       }
     }
@@ -344,7 +513,12 @@ DgMgr::merge(
   mark.find_bnode(node0, tmp_inputs);
   mark.find_bnode(node1, tmp_inputs);
 
-  return make_cplx(f, tmp_inputs);
+  auto result = make_cplx(f, tmp_inputs);
+  {
+    cout << " ==> ";
+    print(cout, result);
+  }
+  return result;
 }
 
 // @brief 共通でないファンインを求める．
@@ -477,8 +651,8 @@ DgMgr::case1_xor(
 {
   // rest0_list, rest1_list が空の場合でも merge() が
   // 適切に処理してくれる．
-  auto tmp0_edge = make_or(rest0_list) * inv0;
-  auto tmp1_edge = make_or(rest1_list) * inv1;
+  auto tmp0_edge = make_xor(rest0_list) * inv0;
+  auto tmp1_edge = make_xor(rest1_list) * inv1;
   auto new_edge = merge(index, tmp0_edge, tmp1_edge);
 
   vector<DgEdge> child_list{new_edge};
@@ -627,7 +801,10 @@ DgMgr::make_lit(
 )
 {
   auto f = mBddMgr.posi_literal(VarId{index});
-  auto node = new DgLitNode{f, index};
+  auto sup = f.get_support();
+  SizeType id = mNodeList.size();
+  auto node = new DgLitNode{id, f, sup};
+  mNodeList.push_back(node);
   return DgEdge{node};
 }
 
@@ -639,7 +816,7 @@ DgMgr::make_or(
 {
   if ( child_list.empty() ) {
     // 空の場合は定数0を返す．
-    return DgEdge::make_zero();
+    return DgEdge::zero();
   }
   if ( child_list.size() == 1 ) {
     // 子供が1人ならその子供を返す．
@@ -657,7 +834,7 @@ DgMgr::make_or(
     // child_list の中で肯定のORノードがあれば
     // その子ノードを本当の子ノードにする．
     vector<DgEdge> tmp_list;
-    SupportList sup_list;
+    BddVarSet support{mBddMgr};
     for ( auto child: child_list ) {
       if ( child.inv() == false && child.node()->is_or() ) {
 	for ( SizeType i = 0; i < child.node()->child_num(); ++ i ) {
@@ -667,13 +844,15 @@ DgMgr::make_or(
       else {
 	tmp_list.push_back(child);
       }
-      sup_list += child.node()->sup_list();
+      support += child.node()->support();
     }
     // top の昇順になるようにソートする．
     sort(tmp_list.begin(), tmp_list.end(),
 	 [](DgEdge e1, DgEdge e2)
 	 { return e1.node()->top() < e2.node()->top(); });
-    auto node = new DgOrNode(f, sup_list, tmp_list);
+    SizeType id = mNodeList.size();
+    auto node = new DgOrNode(id, f, support, tmp_list);
+    mNodeList.push_back(node);
     result = DgEdge{node};
     put_node(f, result);
   }
@@ -688,7 +867,7 @@ DgMgr::make_xor(
 {
   if ( child_list.empty() ) {
     // 空の場合は定数0を返す．
-    return DgEdge::make_zero();
+    return DgEdge::zero();
   }
   if ( child_list.size() == 1 ) {
     // 子供が1人ならその子供を返す．
@@ -709,7 +888,7 @@ DgMgr::make_xor(
     // ただし，XORノードの子供には反転属性をつけない．
     // 極性は根に移す．
     vector<DgEdge> tmp_list;
-    SupportList sup_list;
+    BddVarSet support{mBddMgr};
     bool oinv = false;
     for ( auto child: child_list ) {
       bool inv = child.inv();
@@ -724,18 +903,19 @@ DgMgr::make_xor(
       else {
 	tmp_list.push_back(child.normal_edge());
       }
-      sup_list += child.node()->sup_list();
+      support += child.node()->support();
     }
     // top の昇順になるようにソートする．
     sort(tmp_list.begin(), tmp_list.end(),
 	 [](DgEdge e1, DgEdge e2)
 	 { return e1.node()->top() < e2.node()->top(); });
-    if ( oinv ) {
-      f.invert();
-    }
-    auto node = new DgXorNode(f, sup_list, tmp_list);
-    result = DgEdge{node, oinv};
-    put_node(f, result);
+    auto f_normal = f * oinv;
+    SizeType id = mNodeList.size();
+    auto node = new DgXorNode(id, f_normal, support, tmp_list);
+    mNodeList.push_back(node);
+    result = DgEdge{node, false};
+    put_node(f_normal, result);
+    result *= oinv;
   }
   return result;
 }
@@ -787,18 +967,14 @@ DgMgr::make_cplx(
   auto f_normal = f * oinv;
   DgEdge result;
   if ( !find_node(f_normal, result) ) {
-    auto sup_bdd = f_normal.get_support();
-    auto var_list = sup_bdd.to_varlist();
-    vector<SizeType> sup_list;
-    sup_list.reserve(var_list.size());
-    for ( auto var: var_list ) {
-      sup_list.push_back(var.val());
-    }
+    auto support = f_normal.get_support();
     vector<DgEdge> tmp_list{child_list};
     sort(tmp_list.begin(), tmp_list.end(),
 	 [](DgEdge e1, DgEdge e2)
 	 { return e1.node()->top() < e2.node()->top(); });
-    auto node = new DgCplxNode{f_normal, sup_list, tmp_list};
+    SizeType id = mNodeList.size();
+    auto node = new DgCplxNode{id, f_normal, support, tmp_list};
+    mNodeList.push_back(node);
     result = DgEdge{node, false};
     put_node(f_normal, result);
   }
@@ -812,11 +988,13 @@ DgMgr::find_node(
   DgEdge& result
 ) const
 {
-  if ( mEdgeDict.count(f) == 0 ) {
+  auto inv = f.root_inv();
+  auto f_normal = f * inv;
+  if ( mEdgeDict.count(f_normal) == 0 ) {
     return false;
   }
   else {
-    result = mEdgeDict.at(f);
+    result = mEdgeDict.at(f_normal) * inv;
     return true;
   }
 }
@@ -828,8 +1006,20 @@ DgMgr::put_node(
   DgEdge result
 )
 {
-  mEdgeDict.emplace(f, result);
-  mEdgeDict.emplace(~f, ~result);
+  auto inv = f.root_inv();
+  auto f_normal = f * inv;
+  result *= inv;
+  {
+    cout << "put_node" << endl;
+    f_normal.display(cout);
+    print(cout, result);
+  }
+
+  if ( mEdgeDict.count(f_normal) > 0 ) {
+    ASSERT_COND( mEdgeDict.at(f_normal) == result );
+  }
+
+  mEdgeDict.emplace(f_normal, result);
 }
 
 END_NAMESPACE_DG

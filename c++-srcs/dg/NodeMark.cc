@@ -8,6 +8,7 @@
 
 #include "NodeMark.h"
 #include "DgNode.h"
+#include "DgEdge.h"
 
 
 BEGIN_NAMESPACE_DG

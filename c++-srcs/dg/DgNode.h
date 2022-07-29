@@ -10,187 +10,12 @@
 
 #include "dg.h"
 #include "ym/Bdd.h"
-#include "SupportList.h"
+#include "ym/BddVarSet.h"
 
 
 BEGIN_NAMESPACE_DG
 
-class DgNode;
-
-//////////////////////////////////////////////////////////////////////
-/// @class DgEdge DgNode.h "DgNode.h"
-/// @brief DgNode を指す枝を表すクラス
-//////////////////////////////////////////////////////////////////////
-class DgEdge
-{
-public:
-
-  /// @brief 空のコンストラクタ
-  DgEdge() = default;
-
-  /// @brief ノードと飯店フラグを指定したコンストラクタ
-  DgEdge(
-    DgNode* node,    ///< [in] ノード
-    bool inv = false ///< [in] 反転フラグ
-  );
-
-  /// @brief 定数0の枝を返す．
-  static
-  DgEdge
-  make_zero()
-  {
-    return DgEdge{0UL};
-  }
-
-  /// @brief 定数1の枝を返す．
-  static
-  DgEdge
-  make_one()
-  {
-    return DgEdge{1UL};
-  }
-
-  /// @brief デストラクタ
-  ~DgEdge() = default;
-
-
-public:
-  //////////////////////////////////////////////////////////////////////
-  // 外部インターフェイス
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 定数0の時に true を返す．
-  bool
-  is_zero() const
-  {
-    return mBody == 0UL;
-  }
-
-  /// @brief 定数1の時に true を返す．
-  bool
-  is_one() const
-  {
-    return mBody == 1UL;
-  }
-
-  /// @brief ノードを返す．
-  DgNode*
-  node() const
-  {
-    return reinterpret_cast<DgNode*>(mBody & ~1UL);
-  }
-
-  /// @brief 反転フラグを返す．
-  bool
-  inv() const
-  {
-    return static_cast<bool>(mBody & 1U);
-  }
-
-  /// @brief 反転していない枝を返す．
-  DgEdge
-  normal_edge() const
-  {
-    return DgEdge{mBody & ~1UL};
-  }
-
-  /// @brief グローバル関数を返す．
-  Bdd
-  global_func() const;
-
-  /// @brief グローバル関数が 1 となる入力割当を返す．
-  Bdd
-  pat_1() const;
-
-  /// @brief グローバル関数が 0 となる入力割当を返す．
-  Bdd
-  pat_0() const;
-
-  /// @brief 反転した枝を返す．
-  DgEdge
-  operator~() const
-  {
-    return DgEdge{mBody ^ 1UL};
-  }
-
-  /// @brief 自身を反転させる．
-  /// @return 自分自身を返す．
-  DgEdge&
-  negate()
-  {
-    mBody ^= 1UL;
-    return *this;
-  }
-
-  /// @brief 反転フラグをかける．
-  DgEdge
-  operator*(
-    bool inv ///< [in] 反転フラグ
-  )
-  {
-    return DgEdge{mBody ^ static_cast<ympuint>(inv)};
-  }
-
-  /// @brief 等価比較演算子
-  bool
-  operator==(
-    const DgEdge& right
-  ) const
-  {
-    return mBody == right.mBody;
-  }
-
-  /// @brief 非等価比較演算子
-  bool
-  operator!=(
-    const DgEdge& right
-  ) const
-  {
-    return !operator==(right);
-  }
-
-  /// @brief 2つの枝が極性違いのときに true を返す．
-  static
-  bool
-  check_complement(
-    const DgEdge& left,
-    const DgEdge& right
-  )
-  {
-    return (left.mBody ^ right.mBody) == 1UL;
-  }
-
-  /// @brief ハッシュ値を返す．
-  SizeType
-  hash() const
-  {
-    return (mBody * mBody) >> 20;
-  }
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief 内容を指定したコンストラクタ
-  DgEdge(
-    ympuint body
-  ) : mBody{body}
-  {
-  }
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
-  // 本体
-  ympuint mBody{0UL};
-
-};
-
+class DgEdge;
 
 //////////////////////////////////////////////////////////////////////
 /// @class DgNode DgNode.h "DgNode.h"
@@ -202,10 +27,14 @@ public:
 
   /// @brief コンストラクタ
   DgNode(
-    const Bdd& f,               ///< [in] グローバル関数
-    const SupportList& sup_list ///< [in] サポートリスト
-  ) : mGlobalFunc{f},
-      mSupList{sup_list}
+    SizeType id,             ///< [in] ID番号
+    const Bdd& f,            ///< [in] グローバル関数
+    const BddVarSet& support ///< [in] サポート
+  ) : mId{id},
+      mGlobalFunc{f},
+      mSupport{support},
+      mPat1{f.get_onepath()},
+      mPat0{f.get_zeropath()}
   {
   }
 
@@ -218,6 +47,12 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
+
+  /// @brief ID番号を返す．
+  SizeType
+  id() const {
+    return mId;
+  }
 
   /// @brief LITタイプの時に true を返す．
   virtual
@@ -234,11 +69,6 @@ public:
   bool
   is_xor() const;
 
-  /// @brief 入力が全て LIT タイプの時 true を返す．
-  virtual
-  bool
-  is_simple_cplx() const;
-
   /// @brief CPLXタイプの時に true を返す．
   virtual
   bool
@@ -246,31 +76,38 @@ public:
 
   /// @brief グローバル関数を返す．
   Bdd
-  global_func() const;
+  global_func() const
+  {
+    return mGlobalFunc;
+  }
 
   /// @brief 先頭の変数を返す．
   SizeType
   top() const
   {
-    return mSupList.top();
+    return mSupport.top_var().val();
   }
 
-  /// @brief サポートリストを返す．
-  const SupportList&
-  sup_list() const
+  /// @brief サポートを返す．
+  const BddVarSet&
+  support() const
   {
-    return mSupList;
+    return mSupport;
   }
 
   /// @brief グローバル関数が1となるパタンを得る．
-  virtual
   Bdd
-  pat_1() const;
+  pat_1() const
+  {
+    return mPat1;
+  }
 
   /// @brief グローバル関数が0となるパタンを得る．
-  virtual
   Bdd
-  pat_0() const;
+  pat_0() const
+  {
+    return mPat0;
+  }
 
   /// @brief 外部入力をセンシタイズするためのパタンを得る．
   vector<int>
@@ -292,57 +129,35 @@ public:
     SizeType pos ///< [in] 位置 ( 0 <= pos < child_num() )
   ) const;
 
+  /// @brief 内容を出力する．
+  virtual
+  void
+  print(
+    ostream& s ///< [in] 出力ストリーム
+  ) const = 0;
+
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
+  // ID番号
+  SizeType mId;
+
   // グローバル関数
   Bdd mGlobalFunc;
 
-  // サポートリスト
-  SupportList mSupList;
+  // サポート
+  BddVarSet mSupport;
+
+  // 出力が1となる入力パタン
+  Bdd mPat1;
+
+  // 出力が0となる入力パタン
+  Bdd mPat0;
 
 };
-
-// @brief グローバル関数を返す．
-inline
-Bdd
-DgEdge::global_func() const
-{
-  auto f = node()->global_func();
-  if ( inv() ) {
-    f = ~f;
-  }
-  return f;
-}
-
-// @brief グローバル関数が 1 となる入力割当を返す．
-inline
-Bdd
-DgEdge::pat_1() const
-{
-  if ( inv() ) {
-    return node()->pat_0();
-  }
-  else {
-    return node()->pat_1();
-  }
-}
-
-// @brief グローバル関数が 0 となる入力割当を返す．
-inline
-Bdd
-DgEdge::pat_0() const
-{
-  if ( inv() ) {
-    return node()->pat_1();
-  }
-  else {
-    return node()->pat_0();
-  }
-}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -356,9 +171,10 @@ public:
 
   /// @brief コンストラクタ
   DgLitNode(
-    const Bdd& f, ///< [in] グローバル関数
-    SizeType var  ///< [in] 変数インデックス
-  ) : DgNode{f, SupportList{{var}}}
+    SizeType id,             ///< [in] ID番号
+    const Bdd& f,            ///< [in] グローバル関数
+    const BddVarSet& support ///< [in] サポート
+  ) : DgNode{id, f, support}
   {
   }
 
@@ -375,6 +191,12 @@ public:
   bool
   is_lit() const override;
 
+  /// @brief 内容を出力する．
+  void
+  print(
+    ostream& s ///< [in] 出力ストリーム
+  ) const override;
+
 };
 
 
@@ -389,10 +211,11 @@ public:
 
   /// @brief コンストラクタ
   DgMidNode(
+    SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
-    const SupportList& sup_list,     ///< [in] サポートリスト
+    const BddVarSet& support,        ///< [in] サポート
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgNode{f, sup_list},
+  ) : DgNode{id, f, support},
       mChildList{child_list}
   {
   }
@@ -439,10 +262,11 @@ public:
 
   /// @brief コンストラクタ
   DgOrNode(
+    SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
-    const SupportList& sup_list,     ///< [in] サポートリスト
+    const BddVarSet& support,        ///< [in] サポートリスト
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgMidNode{f, sup_list, child_list}
+  ) : DgMidNode{id, f, support, child_list}
   {
   }
 
@@ -459,6 +283,12 @@ public:
   bool
   is_or() const override;
 
+  /// @brief 内容を出力する．
+  void
+  print(
+    ostream& s ///< [in] 出力ストリーム
+  ) const override;
+
 };
 
 
@@ -473,10 +303,11 @@ public:
 
   /// @brief コンストラクタ
   DgXorNode(
+    SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
-    const SupportList& sup_list,     ///< [in] サポートリスト
+    const BddVarSet& support,        ///< [in] サポートリスト
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgMidNode{f, sup_list, child_list}
+  ) : DgMidNode{id, f, support, child_list}
   {
   }
 
@@ -493,6 +324,12 @@ public:
   bool
   is_xor() const override;
 
+  /// @brief 内容を出力する．
+  void
+  print(
+    ostream& s ///< [in] 出力ストリーム
+  ) const override;
+
 };
 
 
@@ -507,10 +344,11 @@ public:
 
   /// @brief コンストラクタ
   DgCplxNode(
+    SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
-    const SupportList& sup_list,     ///< [in] サポートリスト
+    const BddVarSet& support,        ///< [in] サポートリスト
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgMidNode{f, sup_list, child_list}
+  ) : DgMidNode{id, f, support, child_list}
   {
   }
 
@@ -527,25 +365,14 @@ public:
   bool
   is_cplx() const override;
 
+  /// @brief 内容を出力する．
+  void
+  print(
+    ostream& s ///< [in] 出力ストリーム
+  ) const override;
+
 };
 
 END_NAMESPACE_DG
-
-BEGIN_NAMESPACE_STD
-
-// DgEdge をキーにしたハッシュ関数クラスの定義
-template <>
-struct hash<DG_NAMESPACE::DgEdge>
-{
-  SizeType
-  operator()(
-    const DG_NAMESPACE::DgEdge& dgedge
-  ) const
-  {
-    return dgedge.hash();
-  }
-};
-
-END_NAMESPACE_STD
 
 #endif // DGNODE_H

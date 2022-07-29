@@ -241,6 +241,9 @@ private:
   // BDDマネージャ
   BddMgr& mBddMgr;
 
+  // DgNode のリスト
+  vector<DgNode*> mNodeList;
+
   // 関数をキーにしてDgEdgeを記録する辞書
   unordered_map<Bdd, DgEdge> mEdgeDict;
 
