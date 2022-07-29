@@ -15,6 +15,55 @@
 
 BEGIN_NAMESPACE_MAGUS
 
+struct Info
+{
+  SizeType mOrNum{0};
+  SizeType mXorNum{0};
+  SizeType mCplxNum{0};
+
+  Info&
+  operator+=(
+    const Info& right
+  )
+  {
+    mOrNum += right.mOrNum;
+    mXorNum += right.mXorNum;
+    mCplxNum += right.mCplxNum;
+    return *this;
+  }
+
+};
+
+Info
+count(
+  nsDg::DgEdge edge
+)
+{
+  if ( edge.is_const() ) {
+    return Info{};
+  }
+  auto node = edge.node();
+  if ( node->is_lit() ) {
+    return Info{};
+  }
+
+  Info ans;
+  if ( node->is_or() ) {
+    ans.mOrNum = 1;
+  }
+  else if ( node->is_xor() ) {
+    ans.mXorNum = 1;
+  }
+  else {
+    ans.mCplxNum = 1;
+  }
+  SizeType nc = node->child_num();
+  for ( SizeType i = 0; i < nc; ++ i ) {
+    ans += count(node->child(i));
+  }
+  return ans;
+}
+
 int
 dg_test(
   int argc,
@@ -30,6 +79,7 @@ dg_test(
       cerr << filename << ": No such file." << endl;
       return 1;
     }
+    cout << filename.substr(filename.find_last_of('/')) << endl;
     string buf;
     vector<Bdd> func_list;
     while ( getline(s, buf) ) {
@@ -37,10 +87,20 @@ dg_test(
       func_list.push_back(f);
     }
     nsDg::DgMgr dgmgr{mgr};
+    SizeType o = 0;
     for ( auto f: func_list ) {
       auto dgedge = dgmgr.decomp(f);
-
+      auto info = count(dgedge);
+      ++ o;
+      cout << " #" << o << ": "
+	   << info.mOrNum
+	   << ", "
+	   << info.mXorNum
+	   << ", "
+	   << info.mCplxNum
+	   << endl;
     }
+    cout << endl;
   }
   return 0;
 }

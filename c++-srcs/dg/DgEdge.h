@@ -109,7 +109,7 @@ public:
     }
     else {
       auto f = node()->global_func();
-      return f * inv();
+      return f ^ inv();
     }
   }
 
@@ -155,7 +155,7 @@ public:
 
   /// @brief 反転フラグをかける．
   DgEdge
-  operator*(
+  operator^(
     bool inv ///< [in] 反転フラグ
   ) const
   {
@@ -164,7 +164,7 @@ public:
 
   /// @brief 反転フラグをかけて代入する．
   DgEdge&
-  operator*=(
+  operator^=(
     bool inv ///< [in] 反転フラグ
   )
   {
