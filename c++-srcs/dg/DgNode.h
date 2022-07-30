@@ -109,14 +109,6 @@ public:
     return mPat0;
   }
 
-  /// @brief 外部入力をセンシタイズするためのパタンを得る．
-  vector<int>
-  pat_i() const;
-
-  /// @brief pat_i でセンシタイズの対象となっている入力番号を返す．
-  SizeType
-  sense_ipos() const;
-
   /// @brief subfunction の数を得る．
   virtual
   SizeType
@@ -135,6 +127,19 @@ public:
   print(
     ostream& s ///< [in] 出力ストリーム
   ) const = 0;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスで用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief print の共通部分
+  void
+  print_base(
+    ostream& s,        ///< [in] 出力ストリーム
+    const string& type ///< [in] 種類を表す文字列
+  ) const;
 
 
 private:
@@ -238,6 +243,19 @@ public:
   child(
     SizeType pos ///< [in] 位置 ( 0 <= pos < child_num() )
   ) const override;
+
+
+protected:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスから用いられる関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief pint() の下請け処理を行う．
+  void
+  print_sub(
+    ostream& s,        ///< [in] 出力ストリーム
+    const string& type ///< [in] 種類を表す文字列
+  ) const;
 
 
 private:

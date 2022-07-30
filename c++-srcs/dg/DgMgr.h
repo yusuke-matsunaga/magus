@@ -111,7 +111,6 @@ public:
   case1_cplx(
     const Bdd& f,                      ///< [in] グローバル関数
     SizeType index,                    ///< [in] インデックス
-    bool inv,                          ///< [in] インデックスの極性
     DgNode* node0,                     ///< [in] ノード0
     DgNode* node1,                     ///< [in] ノード1
     const vector<DgEdge>& common_list, ///< [in] 共通の子ノードのリスト

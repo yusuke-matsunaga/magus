@@ -59,6 +59,19 @@ print(
   s << endl;
 }
 
+void
+print_sup(
+  ostream& s,
+  const BddVarSet& sup
+)
+{
+  auto v_list = sup.to_varlist();
+  for ( auto var: v_list ) {
+    cout << " " << var;
+  }
+  cout << endl;
+}
+
 END_NONAMESPACE
 
 // @brief コンストラクタ
@@ -367,7 +380,7 @@ DgMgr::merge(
 
       if ( f0_0 == f1_0 && f0_1 == f1_1 ) {
 	// 一致した．
-	auto result = case1_cplx(f, top, false, node0, node1, common_list, r0_1, r1_1);
+	auto result = case1_cplx(f, top, node0, node1, common_list, r0_1, r1_1);
 	return result;
       }
 
@@ -378,7 +391,7 @@ DgMgr::merge(
       // f1 に対して r1_1 を 0 に束縛した関数が等価かどうか調べる．
       if ( f0_0 == f1_1 && f0_1 == f1_0 ) {
 	// 一致した．
-	auto result = case1_cplx(f, top, true, node0, node1, common_list, r0_1, r1_1);
+	auto result = case1_cplx(f, top, node0, node1, common_list, ~r0_1, r1_1);
 	return result;
       }
     }
@@ -453,37 +466,30 @@ DgMgr::merge(
     }
   }
 
+  if ( debug ) {
+    cout << "last resort" << endl;
+  }
+
   // node0 と node1 の推移的な子ノードのうち，共通なノードを求める．
   // それらを新しい子供とした CPLX ノードを作る．
   // 面倒なのは OR/XOR ノードが極大化されているということ．
   NodeMark mark;
   // node0 の推移的ファンインに 1 のマークをつける．
-  for ( SizeType i = 0; i < node0->child_num(); ++ i ) {
-    mark.mark_recur(node0->child(i), 1);
-  }
+  mark.mark_recur(node0, 1);
   // node1 の推移的ファンインに 2 のマークをつける．
-  for ( SizeType i = 0; i < node1->child_num(); ++ i ) {
-    mark.mark_recur(node1->child(i), 2);
-  }
+  mark.mark_recur(node1, 2);
   // 自分には 3 のマークがなく，推移的ファンインに 3
   // のマークがついているノードのマークを 0 にする．
-  for ( SizeType i = 0; i < node0->child_num(); ++ i ) {
-    mark.tfimark_recur(node0->child(i));
-  }
-  for ( SizeType i = 0; i < node1->child_num(); ++ i ) {
-    mark.tfimark_recur(node1->child(i));
-  }
+  mark.tfimark_recur(node0);
+  mark.tfimark_recur(node1);
   // 境界ノードに印をつける．
   vector<DgNode*> or_list0;
   vector<DgNode*> xor_list0;
-  for ( SizeType i = 0; i < node0->child_num(); ++ i ) {
-    mark.get_boundary(node0->child(i), or_list0, xor_list0);
-  }
+  mark.get_boundary(node0, or_list0, xor_list0);
   vector<DgNode*> or_list1;
   vector<DgNode*> xor_list1;
-  for ( SizeType i = 0; i < node1->child_num(); ++ i ) {
-    mark.get_boundary(node1->child(i), or_list1, xor_list1);
-  }
+  mark.get_boundary(node1, or_list1, xor_list1);
+
   // 入力を求める．
   vector<DgEdge> tmp_inputs;
   find_uncommon_inputs(or_list0, mark, 1, tmp_inputs);
@@ -683,7 +689,6 @@ DgEdge
 DgMgr::case1_cplx(
   const Bdd& f,
   SizeType index,
-  bool inv,
   DgNode* node0,
   DgNode* node1,
   const vector<DgEdge>& common_list,
@@ -691,7 +696,27 @@ DgMgr::case1_cplx(
   DgEdge rest1
 )
 {
+  if ( debug ) {
+    cout << "merge at " << index << endl;
+    cout << "r0" << endl;
+    print(cout, rest0);
+    cout << "r1" << endl;
+    print(cout, rest1);
+    cout << endl;
+  }
   auto new_edge = merge(index, rest0, rest1);
+  if ( debug ) {
+    cout << "merge end" << endl;
+    f.display(cout);
+    cout << "merge at " << index << endl;
+    cout << "r0" << endl;
+    print(cout, rest0);
+    cout << "r1" << endl;
+    print(cout, rest1);
+    cout << endl;
+    cout << "  ==> ";
+    print(cout, new_edge);
+  }
   vector<DgEdge> tmp_list{new_edge};
   tmp_list.insert(tmp_list.end(), common_list.begin(), common_list.end());
   auto result = make_cplx(f, tmp_list);
@@ -1015,7 +1040,11 @@ DgMgr::make_cplx(
   DgEdge result;
   if ( !find_node(f_normal, result) ) {
     auto support = f_normal.get_support();
-    vector<DgEdge> tmp_list{child_list};
+    vector<DgEdge> tmp_list;
+    tmp_list.reserve(child_list.size());
+    for ( auto edge: child_list ) {
+      tmp_list.push_back(edge.normal_edge());
+    }
     sort(tmp_list.begin(), tmp_list.end(),
 	 [](DgEdge e1, DgEdge e2)
 	 { return e1.node()->top() < e2.node()->top(); });

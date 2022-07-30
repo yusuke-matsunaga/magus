@@ -46,7 +46,6 @@ NodeMark::tfimark_recur(
 	SizeType v1 = tfimark_recur(node->child(i));
 	if ( v1 == 3 ) {
 	  val = 3;
-	  break;
 	}
       }
     }

@@ -61,6 +61,16 @@ DgNode::child(
   return DgEdge::zero();
 }
 
+// @brief print の共通部分
+void
+DgNode::print_base(
+  ostream& s,
+  const string& type
+) const
+{
+  s << "#" << id() << ": " << type;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス DgLitNode
@@ -79,7 +89,8 @@ DgLitNode::print(
   ostream& s
 ) const
 {
-  s << "#" << id() << ": LIT(" << top() << ")" << endl;
+  print_base(s, "LIT");
+  s << "(" << top() << ")" << endl;
 }
 
 
@@ -104,6 +115,25 @@ DgMidNode::child(
   return mChildList[pos];
 }
 
+// @brief pint() の下請け処理を行う．
+void
+DgMidNode::print_sub(
+  ostream& s,
+  const string& type
+) const
+{
+  print_base(s, type);
+  s << "(";
+  const char* comma = "";
+  for ( SizeType i = 0; i < child_num(); ++ i ) {
+    auto cedge = child(i);
+    s << comma;
+    comma = ", ";
+    cedge.print(s);
+  }
+  s << ")" << endl;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // クラス DgOrNode
@@ -122,15 +152,7 @@ DgOrNode::print(
   ostream& s
 ) const
 {
-  s << "#" << id() << ": OR(";
-  const char* comma = "";
-  for ( SizeType i = 0; i < child_num(); ++ i ) {
-    auto cedge = child(i);
-    s << comma;
-    comma = ", ";
-    cedge.print(s);
-  }
-  s << ")" << endl;
+  print_sub(s, "OR");
 }
 
 
@@ -151,15 +173,7 @@ DgXorNode::print(
   ostream& s
 ) const
 {
-  s << "#" << id() << ": XOR(";
-  const char* comma = "";
-  for ( SizeType i = 0; i < child_num(); ++ i ) {
-    auto cedge = child(i);
-    s << comma;
-    comma = ", ";
-    cedge.print(s);
-  }
-  s << ")" << endl;
+  print_sub(s, "XOR");
 }
 
 
@@ -180,15 +194,7 @@ DgCplxNode::print(
   ostream& s
 ) const
 {
-  s << "#" << id() << ": CPLX(";
-  const char* comma = "";
-  for ( SizeType i = 0; i < child_num(); ++ i ) {
-    auto cedge = child(i);
-    s << comma;
-    comma = ", ";
-    cedge.print(s);
-  }
-  s << ")" << endl;
+  print_sub(s, "CPLX");
 }
 
 END_NAMESPACE_DG

@@ -309,4 +309,11 @@ TEST_F(DgNodeTest, cplx4)
   EXPECT_EQ( bdd, edge.global_func() );
 }
 
+TEST_F(DgNodeTest, cplx5)
+{
+  auto bdd = bddmgr().from_truth("1111100000001000");
+  auto edge = mgr().decomp(bdd);
+  EXPECT_EQ( bdd, edge.global_func() );
+}
+
 END_NAMESPACE_DG

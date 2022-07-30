@@ -15,6 +15,23 @@
 
 BEGIN_NAMESPACE_MAGUS
 
+BEGIN_NONAMESPACE
+
+inline
+string
+basename(
+  const string& pathname
+)
+{
+  auto pos = pathname.find_last_of('/');
+  if ( pos == string::npos ) {
+    return pathname;
+  }
+  return pathname.substr(pos + 1);
+}
+
+END_NONAMESPACE
+
 struct Info
 {
   SizeType mOrNum{0};
@@ -79,7 +96,7 @@ dg_test(
       cerr << filename << ": No such file." << endl;
       return 1;
     }
-    cout << filename.substr(filename.find_last_of('/')) << endl;
+    cout << basename(filename);
     string buf;
     vector<Bdd> func_list;
     while ( getline(s, buf) ) {

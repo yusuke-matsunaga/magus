@@ -224,7 +224,7 @@ public:
       if ( inv() ) {
 	s << "~";
       }
-      s << node()->id();
+      s << "#" << node()->id();
     }
   }
 
