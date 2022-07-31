@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_DG
 
 BEGIN_NONAMESPACE
 
-bool debug = false;
+bool debug = true;
 
 void
 dfs(

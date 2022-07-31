@@ -109,6 +109,13 @@ public:
     return mPat0;
   }
 
+  /// @brief ローカル関数を求める．
+  virtual
+  Bdd
+  local_func(
+    BddMgr& mgr ///< [in] BDDマネージャ
+  ) const = 0;
+
   /// @brief subfunction の数を得る．
   virtual
   SizeType
@@ -195,6 +202,12 @@ public:
   /// @brief LITタイプの時に true を返す．
   bool
   is_lit() const override;
+
+  /// @brief ローカル関数を求める．
+  Bdd
+  local_func(
+    BddMgr& mgr ///< [in] BDDマネージャ
+  ) const override;
 
   /// @brief 内容を出力する．
   void
@@ -301,6 +314,12 @@ public:
   bool
   is_or() const override;
 
+  /// @brief ローカル関数を求める．
+  Bdd
+  local_func(
+    BddMgr& mgr ///< [in] BDDマネージャ
+  ) const override;
+
   /// @brief 内容を出力する．
   void
   print(
@@ -342,6 +361,12 @@ public:
   bool
   is_xor() const override;
 
+  /// @brief ローカル関数を求める．
+  Bdd
+  local_func(
+    BddMgr& mgr ///< [in] BDDマネージャ
+  ) const override;
+
   /// @brief 内容を出力する．
   void
   print(
@@ -382,6 +407,12 @@ public:
   /// @brief CPLXタイプの時に true を返す．
   bool
   is_cplx() const override;
+
+  /// @brief ローカル関数を求める．
+  Bdd
+  local_func(
+    BddMgr& mgr ///< [in] BDDマネージャ
+  ) const override;
 
   /// @brief 内容を出力する．
   void

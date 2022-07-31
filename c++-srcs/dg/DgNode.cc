@@ -8,6 +8,7 @@
 
 #include "DgNode.h"
 #include "DgEdge.h"
+#include "ym/BddMgr.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -83,6 +84,16 @@ DgLitNode::is_lit() const
   return true;
 }
 
+// @brief ローカル関数を求める．
+Bdd
+DgLitNode::local_func(
+  BddMgr& mgr
+) const
+{
+  auto f = mgr.literal(VarId{0});
+  return f;
+}
+
 // @brief 内容を出力する．
 void
 DgLitNode::print(
@@ -146,6 +157,20 @@ DgOrNode::is_or() const
   return true;
 }
 
+// @brief ローカル関数を求める．
+Bdd
+DgOrNode::local_func(
+  BddMgr& mgr
+) const
+{
+  SizeType n = child_num();
+  auto f = mgr.literal(VarId{0});
+  for ( SizeType i = 1; i < n; ++ i ) {
+    f |= mgr.literal(VarId{i});
+  }
+  return f;
+}
+
 // @brief 内容を出力する．
 void
 DgOrNode::print(
@@ -165,6 +190,20 @@ bool
 DgXorNode::is_xor() const
 {
   return true;
+}
+
+// @brief ローカル関数を求める．
+Bdd
+DgXorNode::local_func(
+  BddMgr& mgr
+) const
+{
+  SizeType n = child_num();
+  auto f = mgr.literal(VarId{0});
+  for ( SizeType i = 1; i < n; ++ i ) {
+    f ^= mgr.literal(VarId{i});
+  }
+  return f;
 }
 
 // @brief 内容を出力する．
@@ -188,6 +227,38 @@ DgCplxNode::is_cplx() const
   return true;
 }
 
+// @brief ローカル関数を求める．
+Bdd
+DgCplxNode::local_func(
+  BddMgr& mgr
+) const
+{
+  unordered_map<VarId, Literal> varmap;
+  auto gf = global_func();
+  SizeType n = child_num();
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto node = child(i).node();
+    auto f = node->global_func();
+    Bdd f0;
+    Bdd f1;
+    auto top = f.root_decomp(f0, f1);
+    auto f_diff = f1 & ~f0;
+    bool inv;
+    if ( f_diff.is_zero() ) {
+      f_diff = f0 & ~f1;
+      inv = true;
+    }
+    else {
+      inv = false;
+    }
+    auto pat = f_diff.get_onepath();
+    gf /= pat;
+    varmap.emplace(top, Literal{VarId{i}, inv});
+  }
+  return mgr.copy(gf.remap_vars(varmap));
+}
+
+
 // @brief 内容を出力する．
 void
 DgCplxNode::print(
@@ -195,6 +266,10 @@ DgCplxNode::print(
 ) const
 {
   print_sub(s, "CPLX");
+
+  BddMgr mgr;
+  auto f = local_func(mgr);
+  f.display(s);
 }
 
 END_NAMESPACE_DG
