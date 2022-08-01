@@ -12,6 +12,7 @@
 #include "FraigHandle.h"
 #include "ym/bnet.h"
 #include "ym/Expr.h"
+#include "ym/Bdd.h"
 #include "ym/SatBool3.h"
 #include "ym/SatSolverType.h"
 
@@ -243,6 +244,20 @@ public:
     const vector<FraigHandle>& inputs ///< [in] 入力のハンドルのリスト
   );
 
+  /// @brief 真理値表に対応するノード(木)を作る．
+  FraigHandle
+  make_tv(
+    const TvFunc& func,               ///< [in] 対象の真理値表
+    const vector<FraigHandle>& inputs ///< [in] 入力のハンドルのリスト
+  );
+
+  /// @brief BDDに対応するノード(木)を作る．
+  FraigHandle
+  make_bdd(
+    const Bdd& func,                  ///< [in] 対象のBDD
+    const vector<FraigHandle>& inputs ///< [in] 入力のハンドルのリスト
+  );
+
   /// @brief コファクターを計算する．
   FraigHandle
   make_cofactor(
@@ -319,6 +334,22 @@ private:
     const vector<FraigHandle>& edge_list, ///< [in] 入力のハンドルのリスト
     SizeType start_pos,			  ///< [in] 開始位置
     SizeType end_pos			  ///< [in] 終了位置
+  );
+
+  /// @brief make_tv() の下請け関数
+  FraigHandle
+  _make_tv(
+    const TvFunc& func,                ///< [in] 対象の真理値表
+    const vector<FraigHandle>& inputs, ///< [in] 入力のハンドルのリスト
+    SizeType pos                       ///< [in] 次に処理する変数
+  );
+
+  /// @brief Shanon 展開のマージを行う．
+  FraigHandle
+  merge(
+    FraigHandle cedge, ///< [in] 展開を行った入力のハンドル
+    FraigHandle edge0, ///< [in] 0のコファクターの結果
+    FraigHandle edge1  ///< [in] 1のコファクターの結果
   );
 
 

@@ -33,6 +33,9 @@ read_network(
   else if ( ext == "bench" ) {
     network = BnNetwork::read_iscas89(filename);
   }
+  else if ( ext == "truth" ) {
+    network = BnNetwork::read_truth(filename);
+  }
   else {
     cerr << "Unknown filetype: " << ext << endl;
     return BnNetwork{};

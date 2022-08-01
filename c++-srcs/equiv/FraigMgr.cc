@@ -143,6 +143,106 @@ FraigMgr::make_expr(
   return make_zero();
 }
 
+// @brief 真理値表に対応するノード(木)を作る．
+FraigHandle
+FraigMgr::make_tv(
+  const TvFunc& func,
+  const vector<FraigHandle>& inputs
+)
+{
+  // 単純に Shannon's decomposition を用いる．
+  auto ans = _make_tv(func, inputs, 0);
+  return ans;
+}
+
+// @brief make_tv() の下請け関数
+FraigHandle
+FraigMgr::_make_tv(
+  const TvFunc& func,
+  const vector<FraigHandle>& inputs,
+  SizeType pos
+)
+{
+  if ( func.is_zero() ) {
+    return FraigHandle::zero();
+  }
+  if ( func.is_one() ) {
+    return FraigHandle::one();
+  }
+
+  for ( ; pos < inputs.size(); ++ pos ) {
+    VarId var{pos};
+    auto f0 = func.cofactor(var, true);
+    auto f1 = func.cofactor(var, false);
+    if ( f0 != f1 ) {
+      auto r0 = _make_tv(f0, inputs, pos + 1);
+      auto r1 = _make_tv(f1, inputs, pos + 1);
+      return merge(inputs[pos], r0, r1);
+    }
+  }
+  ASSERT_NOT_REACHED;
+  return FraigHandle::zero(); // ダミー
+}
+
+// @brief BDDに対応するノード(木)を作る．
+FraigHandle
+FraigMgr::make_bdd(
+  const Bdd& func,
+  const vector<FraigHandle>& inputs
+)
+{
+  if ( func.is_zero() ) {
+    return FraigHandle::zero();
+  }
+  if ( func.is_one() ) {
+    return FraigHandle::one();
+  }
+  Bdd f0;
+  Bdd f1;
+  auto top = func.root_decomp(f0, f1);
+  auto r0 = make_bdd(f0, inputs);
+  auto r1 = make_bdd(f1, inputs);
+  return merge(inputs[top.val()], r0, r1);
+}
+
+// @brief Shanon 展開のマージを行う．
+FraigHandle
+FraigMgr::merge(
+  FraigHandle cedge,
+  FraigHandle edge0,
+  FraigHandle edge1
+)
+{
+  if ( edge0.is_zero() ) {
+    if ( edge1.is_zero() ) {
+      return edge0;
+    }
+    if ( edge1.is_one() ) {
+      return cedge;
+    }
+    return make_and(cedge, edge1);
+  }
+  if ( edge0.is_one() ) {
+    if ( edge1.is_zero() ) {
+      return ~cedge;
+    }
+    if ( edge1.is_one() ) {
+      return edge0;
+    }
+    return make_or(~cedge, edge1);
+  }
+  if ( edge1.is_zero() ) {
+    return make_and(~cedge, edge0);
+  }
+  if ( edge1.is_one() ) {
+    return make_or(cedge, edge0);
+  }
+  auto tmp0 = make_and(~cedge, edge0);
+  auto tmp1 = make_and(cedge, edge1);
+  auto ans = make_or(tmp0, tmp1);
+  return ans;
+}
+
 // @brief コファクターを計算する．
 FraigHandle
 FraigMgr::make_cofactor(
@@ -269,11 +369,11 @@ FraigMgr::import_subnetwork(
       break;
 
     case BnNodeType::TvFunc:
-      {
-	TvFunc tv = network.func(node.func_id());
-	// 未完
-      }
-      ASSERT_NOT_REACHED;
+      ans = make_tv(network.func(node.func_id()), fanin_handles);
+      break;
+
+    case BnNodeType::Bdd:
+      ans = make_bdd(node.bdd(), fanin_handles);
       break;
 
     default:
