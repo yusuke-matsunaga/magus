@@ -258,6 +258,14 @@ public:
     const vector<FraigHandle>& inputs ///< [in] 入力のハンドルのリスト
   );
 
+  /// @brief Shanon 展開のマージを行う．
+  FraigHandle
+  merge(
+    FraigHandle cedge, ///< [in] 展開を行った入力のハンドル
+    FraigHandle edge0, ///< [in] 0のコファクターの結果
+    FraigHandle edge1  ///< [in] 1のコファクターの結果
+  );
+
   /// @brief コファクターを計算する．
   FraigHandle
   make_cofactor(
@@ -342,14 +350,6 @@ private:
     const TvFunc& func,                ///< [in] 対象の真理値表
     const vector<FraigHandle>& inputs, ///< [in] 入力のハンドルのリスト
     SizeType pos                       ///< [in] 次に処理する変数
-  );
-
-  /// @brief Shanon 展開のマージを行う．
-  FraigHandle
-  merge(
-    FraigHandle cedge, ///< [in] 展開を行った入力のハンドル
-    FraigHandle edge0, ///< [in] 0のコファクターの結果
-    FraigHandle edge1  ///< [in] 1のコファクターの結果
   );
 
 

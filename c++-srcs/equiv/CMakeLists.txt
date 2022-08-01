@@ -22,6 +22,7 @@ set ( equiv_SOURCES
   FraigMgrImpl.cc
   FraigNode.cc
   FraigSat.cc
+  Bdd2Aig.cc
   )
 
 

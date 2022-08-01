@@ -9,6 +9,7 @@
 #include "FraigMgr.h"
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
+#include "Bdd2Aig.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnNode.h"
 #include "ym/BnNodeType.h"
@@ -191,18 +192,8 @@ FraigMgr::make_bdd(
   const vector<FraigHandle>& inputs
 )
 {
-  if ( func.is_zero() ) {
-    return FraigHandle::zero();
-  }
-  if ( func.is_one() ) {
-    return FraigHandle::one();
-  }
-  Bdd f0;
-  Bdd f1;
-  auto top = func.root_decomp(f0, f1);
-  auto r0 = make_bdd(f0, inputs);
-  auto r1 = make_bdd(f1, inputs);
-  return merge(inputs[top.val()], r0, r1);
+  Bdd2Aig bdd2aig{*this};
+  return bdd2aig.conv(func, inputs);
 }
 
 // @brief Shanon 展開のマージを行う．

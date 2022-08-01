@@ -71,7 +71,7 @@ public:
 
   /// @brief 極性をかけ合わせる．
   FraigHandle
-  operator*(
+  operator^(
     bool inv ///< [in] 極性
   ) const
   {
