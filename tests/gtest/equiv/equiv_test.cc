@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_MAGUS
 
 TEST(EquivTest, EquivTest1)
 {
-  string filename1 = "C499.blif";
+  string filename1 = "blif/C499.blif";
   string path1 = DATAPATH + filename1;
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
@@ -25,7 +25,7 @@ TEST(EquivTest, EquivTest1)
   SizeType ni = network1.input_num();
   SizeType no = network1.output_num();
 
-  string filename2 = "C1355.blif";
+  string filename2 = "blif/C1355.blif";
   string path2 = DATAPATH + filename2;
   BnNetwork network2 = BnNetwork::read_blif(path2);
   ASSERT_TRUE( network2.node_num() != 0 );
@@ -43,7 +43,7 @@ TEST(EquivTest, EquivTest1)
 
 TEST(EquivTest, EquivTest2)
 {
-  string filename1 = "C499.blif";
+  string filename1 = "blif/C499.blif";
   string path1 = DATAPATH + filename1;
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
@@ -51,7 +51,7 @@ TEST(EquivTest, EquivTest2)
   SizeType ni = network1.input_num();
   SizeType no = network1.output_num();
 
-  string filename2 = "C1355.blif";
+  string filename2 = "blif/C1355.blif";
   string path2 = DATAPATH + filename2;
   BnNetwork network2 = BnNetwork::read_blif(path2);
   ASSERT_TRUE( network2.node_num() != 0 );
@@ -78,7 +78,7 @@ TEST(EquivTest, EquivTest2)
 
 TEST(EquivTest, EquivTest3)
 {
-  string filename1 = "C499.blif";
+  string filename1 = "blif/C499.blif";
   string path1 = DATAPATH + filename1;
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
@@ -86,7 +86,7 @@ TEST(EquivTest, EquivTest3)
   SizeType ni = network1.input_num();
   SizeType no = network1.output_num();
 
-  string filename2 = "C499_reordered.blif";
+  string filename2 = "blif/C499_reordered.blif";
   string path2 = DATAPATH + filename2;
   BnNetwork network2 = BnNetwork::read_blif(path2);
   ASSERT_TRUE( network2.node_num() != 0 );
@@ -136,7 +136,7 @@ TEST(EquivTest, EquivTest3)
 
 TEST(EquivTest, EquivTest4)
 {
-  string filename1 = "C499.blif";
+  string filename1 = "blif/C499.blif";
   string path1 = DATAPATH + filename1;
   BnNetwork network1 = BnNetwork::read_blif(path1);
   ASSERT_TRUE( network1.node_num() != 0 );
@@ -144,7 +144,7 @@ TEST(EquivTest, EquivTest4)
   SizeType ni = network1.input_num();
   SizeType no = network1.output_num();
 
-  string filename2 = "C499_reordered.blif";
+  string filename2 = "blif/C499_reordered.blif";
   string path2 = DATAPATH + filename2;
   BnNetwork network2 = BnNetwork::read_blif(path2);
   ASSERT_TRUE( network2.node_num() != 0 );
@@ -154,6 +154,32 @@ TEST(EquivTest, EquivTest4)
 
   EquivMgr eqmgr;
   EquivResult ans = eqmgr.check(network1, network2, true);
+  EXPECT_EQ( SatBool3::True, ans.result() );
+  for ( SizeType i: Range(no) ) {
+    EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
+  }
+}
+
+TEST(EquivTest, EquivTest5)
+{
+  string filename1 = "truth/ex00.truth";
+  string path1 = DATAPATH + filename1;
+  BnNetwork network1 = BnNetwork::read_truth(path1);
+  ASSERT_TRUE( network1.node_num() != 0 );
+
+  SizeType ni = network1.input_num();
+  SizeType no = network1.output_num();
+
+  string filename2 = "aig/ex00.aig";
+  string path2 = DATAPATH + filename2;
+  BnNetwork network2 = BnNetwork::read_aig(path2);
+  ASSERT_TRUE( network2.node_num() != 0 );
+
+  ASSERT_TRUE( network2.input_num() == ni );
+  ASSERT_TRUE( network2.output_num() == no );
+
+  EquivMgr eqmgr;
+  EquivResult ans = eqmgr.check(network1, network2);
   EXPECT_EQ( SatBool3::True, ans.result() );
   for ( SizeType i: Range(no) ) {
     EXPECT_EQ( SatBool3::True, ans.output_results()[i] );
