@@ -7,9 +7,26 @@
 /// All rights reserved.
 
 #include "Bdd2Aig.h"
+#include "FraigMgr.h"
 
 
 BEGIN_NAMESPACE_FRAIG
+
+// @brief BDDに対応するノード(木)を作る．
+FraigHandle
+FraigMgr::make_bdd(
+  const Bdd& func,
+  const vector<FraigHandle>& inputs
+)
+{
+  Bdd2Aig bdd2aig{*this};
+  return bdd2aig.conv(func, inputs);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// クラス Bdd2Aig
+//////////////////////////////////////////////////////////////////////
 
 // @brief BDD を AIG に変換する．
 FraigHandle
@@ -40,7 +57,7 @@ Bdd2Aig::conv(
     for ( auto node: indexed_node_list[max_index - i - 1] ) {
       auto r0 = edge2aig(node.edge0);
       auto r1 = edge2aig(node.edge1);
-      auto r = mMgr.merge(cedge, r0, r1);
+      auto r = mMgr.make_mux(cedge, r0, r1);
       mAigMap[node.id] = r;
     }
   }

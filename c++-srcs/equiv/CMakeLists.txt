@@ -23,6 +23,8 @@ set ( equiv_SOURCES
   FraigNode.cc
   FraigSat.cc
   Bdd2Aig.cc
+  Expr2Aig.cc
+  Tv2Aig.cc
   )
 
 

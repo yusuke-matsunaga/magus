@@ -9,7 +9,6 @@
 #include "FraigMgr.h"
 #include "FraigMgrImpl.h"
 #include "FraigNode.h"
-#include "Bdd2Aig.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnNode.h"
 #include "ym/BnNodeType.h"
@@ -99,106 +98,9 @@ FraigMgr::make_and(
   return mRep->make_and(handle1, handle2);
 }
 
-// @brief 論理式に対応するノード(木)をつくる．
-FraigHandle
-FraigMgr::make_expr(
-  const Expr& expr,
-  const vector<FraigHandle>& inputs
-)
-{
-  if ( expr.is_zero() ) {
-    return make_zero();
-  }
-  if ( expr.is_one() ) {
-    return make_one();
-  }
-  if ( expr.is_posi_literal() ) {
-    VarId var = expr.varid();
-    int id = var.val();
-    ASSERT_COND( id < inputs.size() );
-    return inputs[id];
-  }
-  if ( expr.is_nega_literal() ) {
-    VarId var = expr.varid();
-    int id = var.val();
-    ASSERT_COND( id < inputs.size() );
-    return ~inputs[id];
-  }
-
-  SizeType n = expr.child_num();
-  vector<FraigHandle> edge_list(n);
-  for ( SizeType i = 0; i < n; ++ i ) {
-    edge_list[i] = make_expr(expr.child(i), inputs);
-  }
-  if ( expr.is_and() ) {
-    return make_and(edge_list);
-  }
-  if ( expr.is_or() ) {
-    return make_or(edge_list);
-  }
-  if ( expr.is_xor() ) {
-    return make_xor(edge_list);
-  }
-
-  ASSERT_NOT_REACHED;
-  return make_zero();
-}
-
-// @brief 真理値表に対応するノード(木)を作る．
-FraigHandle
-FraigMgr::make_tv(
-  const TvFunc& func,
-  const vector<FraigHandle>& inputs
-)
-{
-  // 単純に Shannon's decomposition を用いる．
-  auto ans = _make_tv(func, inputs, 0);
-  return ans;
-}
-
-// @brief make_tv() の下請け関数
-FraigHandle
-FraigMgr::_make_tv(
-  const TvFunc& func,
-  const vector<FraigHandle>& inputs,
-  SizeType pos
-)
-{
-  if ( func.is_zero() ) {
-    return FraigHandle::zero();
-  }
-  if ( func.is_one() ) {
-    return FraigHandle::one();
-  }
-
-  for ( ; pos < inputs.size(); ++ pos ) {
-    VarId var{pos};
-    auto f0 = func.cofactor(var, true);
-    auto f1 = func.cofactor(var, false);
-    if ( f0 != f1 ) {
-      auto r0 = _make_tv(f0, inputs, pos + 1);
-      auto r1 = _make_tv(f1, inputs, pos + 1);
-      return merge(inputs[pos], r0, r1);
-    }
-  }
-  ASSERT_NOT_REACHED;
-  return FraigHandle::zero(); // ダミー
-}
-
-// @brief BDDに対応するノード(木)を作る．
-FraigHandle
-FraigMgr::make_bdd(
-  const Bdd& func,
-  const vector<FraigHandle>& inputs
-)
-{
-  Bdd2Aig bdd2aig{*this};
-  return bdd2aig.conv(func, inputs);
-}
-
 // @brief Shanon 展開のマージを行う．
 FraigHandle
-FraigMgr::merge(
+FraigMgr::make_mux(
   FraigHandle cedge,
   FraigHandle edge0,
   FraigHandle edge1

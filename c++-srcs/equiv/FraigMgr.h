@@ -258,12 +258,12 @@ public:
     const vector<FraigHandle>& inputs ///< [in] 入力のハンドルのリスト
   );
 
-  /// @brief Shanon 展開のマージを行う．
+  /// @brief MUXに対応するノード(木)を作る．
   FraigHandle
-  merge(
-    FraigHandle cedge, ///< [in] 展開を行った入力のハンドル
-    FraigHandle edge0, ///< [in] 0のコファクターの結果
-    FraigHandle edge1  ///< [in] 1のコファクターの結果
+  make_mux(
+    FraigHandle cedge, ///< [in] 選択信号
+    FraigHandle edge0, ///< [in] 0の入力
+    FraigHandle edge1  ///< [in] 1の入力
   );
 
   /// @brief コファクターを計算する．
