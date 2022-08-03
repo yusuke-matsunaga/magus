@@ -28,9 +28,7 @@ class DgMgr
 public:
 
   /// @brief コンストラクタ
-  DgMgr(
-    BddMgr& mgr ///< [in] BDDマネージャ
-  );
+  DgMgr();
 
   /// @brief デストラクタ
   ~DgMgr();
@@ -238,7 +236,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // BDDマネージャ
-  BddMgr& mBddMgr;
+  BddMgr mBddMgr;
 
   // DgNode のリスト
   vector<DgNode*> mNodeList;

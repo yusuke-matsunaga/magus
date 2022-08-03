@@ -103,7 +103,7 @@ dg_test(
       auto f = mgr.from_truth(buf);
       func_list.push_back(f);
     }
-    nsDg::DgMgr dgmgr{mgr};
+    nsDg::DgMgr dgmgr;
     SizeType o = 0;
     for ( auto f: func_list ) {
       auto dgedge = dgmgr.decomp(f);

@@ -35,27 +35,25 @@ public:
   DgMgr&
   mgr()
   {
-    return *mDgMgr;
+    return mDgMgr;
   }
 
 private:
 
   BddMgr mBddMgr;
 
-  DgMgr* mDgMgr;
+  DgMgr mDgMgr;
 
 };
 
 void
 DgNodeTest::SetUp()
 {
-  mDgMgr = new DgMgr{mBddMgr};
 }
 
 void
 DgNodeTest::TearDown()
 {
-  delete mDgMgr;
 }
 
 TEST_F(DgNodeTest, make_lit1)
@@ -67,7 +65,7 @@ TEST_F(DgNodeTest, make_lit1)
   EXPECT_FALSE( edge.is_const() );
 
   auto lit = bddmgr().literal(VarId{0});
-  EXPECT_EQ( lit, edge.global_func() );
+  EXPECT_TRUE( lit.is_identical(edge.global_func()) );
 
   auto node = edge.node();
   auto inv = edge.inv();
@@ -89,7 +87,7 @@ TEST_F(DgNodeTest, make_lit2)
   EXPECT_FALSE( edge.is_const() );
 
   auto lit = bddmgr().literal(VarId{1});
-  EXPECT_EQ( lit, edge.global_func() );
+  EXPECT_TRUE( lit.is_identical(edge.global_func()) );
 
   auto node = edge.node();
   auto inv = edge.inv();
@@ -111,7 +109,7 @@ TEST_F(DgNodeTest, make_lit3)
   EXPECT_FALSE( edge.is_const() );
 
   auto lit = bddmgr().literal(VarId{2});
-  EXPECT_EQ( lit, edge.global_func() );
+  EXPECT_TRUE( lit.is_identical(edge.global_func()) );
 
   auto node = edge.node();
   auto inv = edge.inv();
@@ -285,35 +283,35 @@ TEST_F(DgNodeTest, cplx1)
 {
   auto bdd = bddmgr().from_truth("0100");
   auto edge = mgr().decomp(bdd);
-  EXPECT_EQ( bdd, edge.global_func() );
+  EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx2)
 {
   auto bdd = bddmgr().from_truth("01000101");
   auto edge = mgr().decomp(bdd);
-  EXPECT_EQ( bdd, edge.global_func() );
+  EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx3)
 {
   auto bdd = bddmgr().from_truth("10101001");
   auto edge = mgr().decomp(bdd);
-  EXPECT_EQ( bdd, edge.global_func() );
+  EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx4)
 {
   auto bdd = bddmgr().from_truth("1111110111111100");
   auto edge = mgr().decomp(bdd);
-  EXPECT_EQ( bdd, edge.global_func() );
+  EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx5)
 {
   auto bdd = bddmgr().from_truth("1111100000001000");
   auto edge = mgr().decomp(bdd);
-  EXPECT_EQ( bdd, edge.global_func() );
+  EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 END_NAMESPACE_DG

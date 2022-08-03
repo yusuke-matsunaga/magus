@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_DG
 
 BEGIN_NONAMESPACE
 
-bool debug = true;
+bool debug = false;
 
 void
 dfs(
@@ -75,9 +75,7 @@ print_sup(
 END_NONAMESPACE
 
 // @brief コンストラクタ
-DgMgr::DgMgr(
-  BddMgr& mgr
-) : mBddMgr{mgr}
+DgMgr::DgMgr()
 {
 }
 
@@ -95,7 +93,7 @@ DgMgr::decomp(
   const Bdd& func
 )
 {
-  return decomp_step(func);
+  return decomp_step(mBddMgr.copy(func));
 }
 
 // @brief decomp の下請け関数
