@@ -8,6 +8,7 @@
 
 #include "EquivMgr.h"
 #include "FraigMgr.h"
+#include "FraigEnc.h"
 #include "ym/BnNetwork.h"
 #include "ym/BnNode.h"
 #include "ym/Range.h"
@@ -128,8 +129,10 @@ EquivMgr::check(
     input1_handles[i] = fraig_mgr.make_input();
   }
 
+  FraigEnc enc{fraig_mgr};
+
   // network1 に対応する Fraig を作る．
-  auto output1_handles = fraig_mgr.import_subnetwork(network1, input1_handles);
+  auto output1_handles = enc(network1, input1_handles);
 
   // network2 に対応する Fraig を作る．
   vector<FraigHandle> input2_handles(ni);
@@ -137,7 +140,7 @@ EquivMgr::check(
     int pos1 = input2_list[i];
     input2_handles[i] = input1_handles[pos1];
   }
-  auto output2_handles = fraig_mgr.import_subnetwork(network2, input2_handles);
+  auto output2_handles = enc(network2, input2_handles);
 
   // 各出力の等価検証を行う．
   vector<SatBool3> eq_stats(no);

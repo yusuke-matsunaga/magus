@@ -23,6 +23,7 @@ END_NAMESPACE_MAGUS
 
 BEGIN_NAMESPACE_FRAIG
 
+class FraigEnc;
 class FraigMgr;
 class FraigHandle;
 
@@ -30,6 +31,7 @@ END_NAMESPACE_FRAIG
 
 BEGIN_NAMESPACE_MAGUS
 
+using nsFraig::FraigEnc;
 using nsFraig::FraigMgr;
 using nsFraig::FraigHandle;
 
