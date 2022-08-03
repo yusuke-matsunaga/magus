@@ -8,7 +8,7 @@
 # サブディレクトリの設定
 # ===================================================================
 
-add_subdirectory ( gtest/dg )
+add_subdirectory ( gtest/djdec )
 add_subdirectory ( gtest/equiv )
 add_subdirectory ( gtest/techmap/sbjgraph )
 add_subdirectory ( lua_magus )

@@ -34,6 +34,10 @@ target_link_libraries ( equiv_test
   ${YM_LIB_DEPENDS}
   )
 
+target_include_directories ( equiv_test
+  PRIVATE ${PROJECT_SOURCE_DIR}/c++-srcs/equiv
+  )
+
 
 # ===================================================================
 # dg_test
@@ -54,7 +58,7 @@ target_compile_options ( dg_test
   )
 
 target_include_directories ( dg_test
-  PRIVATE ${PROJECT_SOURCE_DIR}/c++-srcs/dg
+  PRIVATE ${PROJECT_SOURCE_DIR}/c++-srcs/djdec
   )
 
 target_link_libraries ( dg_test

@@ -8,7 +8,6 @@
 
 #include "LuaMagus.h"
 #include "EquivMgr.h"
-#include "ym/LuaBnet.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -107,7 +106,7 @@ equiv_cmd(
 END_NONAMESPACE
 
 void
-LuaMagus::init_equiv(
+init_equiv(
   vector<struct luaL_Reg>& mylib
 )
 {

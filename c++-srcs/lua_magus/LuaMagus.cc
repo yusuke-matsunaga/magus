@@ -12,6 +12,9 @@
 
 BEGIN_NAMESPACE_MAGUS
 
+extern
+void init_equiv(vector<struct luaL_Reg>&);
+
 // @brief Magus 拡張に関する初期化を行う．
 void
 LuaMagus::open_Magus()

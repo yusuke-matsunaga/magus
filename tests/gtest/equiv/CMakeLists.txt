@@ -26,3 +26,7 @@ ym_add_gtest ( magus_equiv_test
   DEFINITIONS
   "-DDATAPATH=\"${PROJECT_SOURCE_DIR}/tests/data/\""
   )
+
+target_include_directories ( magus_equiv_test
+  PRIVATE ${PROJECT_SOURCE_DIR}/c++-srcs/equiv
+  )
