@@ -27,10 +27,12 @@ public:
 
   /// @brief コンストラクタ
   DgNode(
+    BddMgr& mgr,             ///< [in] BDDマネージャ
     SizeType id,             ///< [in] ID番号
     const Bdd& f,            ///< [in] グローバル関数
     const BddVarSet& support ///< [in] サポート
-  ) : mId{id},
+  ) : mBddMgr{mgr},
+      mId{id},
       mGlobalFunc{f},
       mSupport{support},
       mPat1{f.get_onepath()},
@@ -112,9 +114,7 @@ public:
   /// @brief ローカル関数を求める．
   virtual
   Bdd
-  local_func(
-    BddMgr& mgr ///< [in] BDDマネージャ
-  ) const = 0;
+  local_func() const = 0;
 
   /// @brief subfunction の数を得る．
   virtual
@@ -141,6 +141,13 @@ protected:
   // 継承クラスで用いられる関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief BDDマネージャを返す．
+  BddMgr&
+  mgr() const
+  {
+    return mBddMgr;
+  }
+
   /// @brief print の共通部分
   void
   print_base(
@@ -153,6 +160,10 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // BDDマネージャ
+  // 本体は DgMgr が持っている．
+  BddMgr& mBddMgr;
 
   // ID番号
   SizeType mId;
@@ -183,10 +194,11 @@ public:
 
   /// @brief コンストラクタ
   DgLitNode(
+    BddMgr& mgr,             ///< [in] BDDマネージャ
     SizeType id,             ///< [in] ID番号
     const Bdd& f,            ///< [in] グローバル関数
     const BddVarSet& support ///< [in] サポート
-  ) : DgNode{id, f, support}
+  ) : DgNode{mgr, id, f, support}
   {
   }
 
@@ -205,9 +217,7 @@ public:
 
   /// @brief ローカル関数を求める．
   Bdd
-  local_func(
-    BddMgr& mgr ///< [in] BDDマネージャ
-  ) const override;
+  local_func() const override;
 
   /// @brief 内容を出力する．
   void
@@ -229,11 +239,12 @@ public:
 
   /// @brief コンストラクタ
   DgMidNode(
+    BddMgr& mgr,                     ///< [in] BDDマネージャ
     SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
     const BddVarSet& support,        ///< [in] サポート
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgNode{id, f, support},
+  ) : DgNode{mgr, id, f, support},
       mChildList{child_list}
   {
   }
@@ -293,11 +304,12 @@ public:
 
   /// @brief コンストラクタ
   DgOrNode(
+    BddMgr& mgr,                     ///< [in] BDDマネージャ
     SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
     const BddVarSet& support,        ///< [in] サポートリスト
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgMidNode{id, f, support, child_list}
+  ) : DgMidNode{mgr, id, f, support, child_list}
   {
   }
 
@@ -316,9 +328,7 @@ public:
 
   /// @brief ローカル関数を求める．
   Bdd
-  local_func(
-    BddMgr& mgr ///< [in] BDDマネージャ
-  ) const override;
+  local_func() const override;
 
   /// @brief 内容を出力する．
   void
@@ -340,11 +350,12 @@ public:
 
   /// @brief コンストラクタ
   DgXorNode(
+    BddMgr& mgr,                     ///< [in] BDDマネージャ
     SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
     const BddVarSet& support,        ///< [in] サポートリスト
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgMidNode{id, f, support, child_list}
+  ) : DgMidNode{mgr, id, f, support, child_list}
   {
   }
 
@@ -363,9 +374,7 @@ public:
 
   /// @brief ローカル関数を求める．
   Bdd
-  local_func(
-    BddMgr& mgr ///< [in] BDDマネージャ
-  ) const override;
+  local_func() const override;
 
   /// @brief 内容を出力する．
   void
@@ -387,11 +396,12 @@ public:
 
   /// @brief コンストラクタ
   DgCplxNode(
+    BddMgr& mgr,                     ///< [in] BDDマネージャ
     SizeType id,                     ///< [in] ID番号
     const Bdd& f,                    ///< [in] グローバル関数
     const BddVarSet& support,        ///< [in] サポートリスト
     const vector<DgEdge>& child_list ///< [in] 子ノードの枝のリスト
-  ) : DgMidNode{id, f, support, child_list}
+  ) : DgMidNode{mgr, id, f, support, child_list}
   {
   }
 
@@ -410,9 +420,7 @@ public:
 
   /// @brief ローカル関数を求める．
   Bdd
-  local_func(
-    BddMgr& mgr ///< [in] BDDマネージャ
-  ) const override;
+  local_func() const override;
 
   /// @brief 内容を出力する．
   void

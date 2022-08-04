@@ -11,6 +11,9 @@
 #include "DgEdge.h"
 #include "NodeMark.h"
 #include "ym/BddVarSet.h"
+#include "ym/BnNetwork.h"
+#include "ym/BnNodeType.h"
+#include "ym/BnPort.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -82,18 +85,109 @@ DgMgr::DgMgr()
 // @brief デストラクタ
 DgMgr::~DgMgr()
 {
-  for ( auto node: mNodeList ) {
-    delete node;
-  }
 }
 
-// @brief 与えられた関数の Disjoint Graph を作る．
-DgEdge
-DgMgr::decomp(
-  const Bdd& func
+BEGIN_NONAMESPACE
+
+SizeType
+make_network(
+  DgEdge edge,
+  BnNetwork& network,
+  const vector<SizeType>& input_list
 )
 {
-  return decomp_step(mBddMgr.copy(func));
+  if ( edge.is_zero() ) {
+    return network.new_logic({}, BnNodeType::C0, 0);
+  }
+  if ( edge.is_one() ) {
+    return network.new_logic({}, BnNodeType::C1, 0);
+  }
+
+  auto node = edge.node();
+  auto inv = edge.inv();
+
+  if ( node->is_lit() ) {
+    auto id = node->top();
+    ASSERT_COND( 0 <= id && id < input_list.size() );
+    return input_list[id];
+  }
+
+  auto nc = node->child_num();
+  vector<SizeType> fanin_id_list(nc);
+  for ( SizeType i = 0; i < nc; ++ i ) {
+    fanin_id_list[i] = make_network(node->child(i), network, input_list);
+  }
+  if ( node->is_or() ) {
+    if ( inv ) {
+      return network.new_logic({}, BnNodeType::Nor, fanin_id_list);
+    }
+    else {
+      return network.new_logic({}, BnNodeType::Or, fanin_id_list);
+    }
+  }
+  if ( node->is_xor() ) {
+    if ( inv ) {
+      return network.new_logic({}, BnNodeType::Xnor, fanin_id_list);
+    }
+    else {
+      return network.new_logic({}, BnNodeType::Xor, fanin_id_list);
+    }
+  }
+  if ( node->is_cplx() ) {
+    auto lf = node->local_func() ^ inv;
+    return network.new_logic({}, lf, fanin_id_list);
+  }
+  ASSERT_NOT_REACHED;
+  return -1;
+}
+
+END_NONAMESPACE
+
+// @brief 与えられた関数の Disjoint Decomposition を行う．
+BnNetwork
+DgMgr::decomp(
+  const Bdd& func,
+  SizeType ni
+)
+{
+  auto root = make_dg(func);
+
+  BnNetwork network;
+
+  // 入力を作る．
+  vector<SizeType> input_list(ni);
+  for ( SizeType i = 0; i < ni; ++ i ) {
+    ostringstream buf;
+    buf << "i" << i;
+    auto ip_id = network.new_input_port(buf.str());
+    auto& port = network.port(ip_id);
+    auto inode_id = port.bit(0);
+    input_list[i] = inode_id;
+  }
+  // 本体を作る．
+  auto node_id = make_network(root, network, input_list);
+
+  // 出力を作る．
+  auto op_id = network.new_output_port("o");
+  auto& port = network.port(op_id);
+  auto onode_id = port.bit(0);
+  network.connect(node_id, onode_id, 0);
+
+  network.wrap_up();
+
+  return network;
+}
+
+// @brief 与えられた関数の DgGraph を得る(デバッグ用)．
+DgEdge
+DgMgr::make_dg(
+  const Bdd& func ///< [in] 分解を行う関数
+)
+{
+  mNodeList.clear();
+  mEdgeDict.clear();
+  auto root = decomp_step(mBddMgr.copy(func));
+  return root;
 }
 
 // @brief decomp の下請け関数
@@ -857,8 +951,8 @@ DgMgr::make_lit(
   }
   auto sup = f.get_support();
   SizeType id = mNodeList.size();
-  auto node = new DgLitNode{id, f, sup};
-  mNodeList.push_back(node);
+  auto node = new DgLitNode{mBddMgr, id, f, sup};
+  mNodeList.push_back(unique_ptr<DgNode>{node});
   result = DgEdge{node};
   put_node(f, result);
   return result;
@@ -914,8 +1008,8 @@ DgMgr::make_or(
 	 [](DgEdge e1, DgEdge e2)
 	 { return e1.node()->top() < e2.node()->top(); });
     SizeType id = mNodeList.size();
-    auto node = new DgOrNode(id, f, support, tmp_list);
-    mNodeList.push_back(node);
+    auto node = new DgOrNode(mBddMgr, id, f, support, tmp_list);
+    mNodeList.push_back(unique_ptr<DgNode>{node});
     result = DgEdge{node};
     put_node(f, result);
   }
@@ -981,8 +1075,8 @@ DgMgr::make_xor(
 	 { return e1.node()->top() < e2.node()->top(); });
     auto f_normal = f ^ oinv;
     SizeType id = mNodeList.size();
-    auto node = new DgXorNode(id, f_normal, support, tmp_list);
-    mNodeList.push_back(node);
+    auto node = new DgXorNode(mBddMgr, id, f_normal, support, tmp_list);
+    mNodeList.push_back(unique_ptr<DgNode>{node});
     result = DgEdge{node, false};
     put_node(f_normal, result);
     result ^= oinv;
@@ -1047,8 +1141,8 @@ DgMgr::make_cplx(
 	 [](DgEdge e1, DgEdge e2)
 	 { return e1.node()->top() < e2.node()->top(); });
     SizeType id = mNodeList.size();
-    auto node = new DgCplxNode{id, f_normal, support, tmp_list};
-    mNodeList.push_back(node);
+    auto node = new DgCplxNode{mBddMgr, id, f_normal, support, tmp_list};
+    mNodeList.push_back(unique_ptr<DgNode>{node});
     result = DgEdge{node, false};
     put_node(f_normal, result);
   }

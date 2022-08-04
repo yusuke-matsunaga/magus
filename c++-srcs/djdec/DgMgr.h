@@ -11,6 +11,7 @@
 #include "dg.h"
 #include "ym/Bdd.h"
 #include "ym/BddMgr.h"
+#include "ym/bnet.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -39,10 +40,17 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief 与えられた関数の Disjoint Graph を作る．
-  /// @return Disjoint Graph の根の枝を返す．
-  DgEdge
+  /// @brief 与えられた関数の Disjoint Decomposition を求める．
+  /// @return 分解結果の BnNetwork を返す．
+  BnNetwork
   decomp(
+    const Bdd& func, ///< [in] 分解を行う関数
+    SizeType ni      ///< [in] 入力数
+  );
+
+  /// @brief 与えられた関数の DgGraph を得る．
+  DgEdge
+  make_dg(
     const Bdd& func ///< [in] 分解を行う関数
   );
 
@@ -239,7 +247,7 @@ private:
   BddMgr mBddMgr;
 
   // DgNode のリスト
-  vector<DgNode*> mNodeList;
+  vector<unique_ptr<DgNode>> mNodeList;
 
   // 関数をキーにしてDgEdgeを記録する辞書
   unordered_map<Bdd, DgEdge> mEdgeDict;

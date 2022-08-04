@@ -282,35 +282,35 @@ TEST_F(DgNodeTest, make_xor3)
 TEST_F(DgNodeTest, cplx1)
 {
   auto bdd = bddmgr().from_truth("0100");
-  auto edge = mgr().decomp(bdd);
+  auto edge = mgr().make_dg(bdd);
   EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx2)
 {
   auto bdd = bddmgr().from_truth("01000101");
-  auto edge = mgr().decomp(bdd);
+  auto edge = mgr().make_dg(bdd);
   EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx3)
 {
   auto bdd = bddmgr().from_truth("10101001");
-  auto edge = mgr().decomp(bdd);
+  auto edge = mgr().make_dg(bdd);
   EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx4)
 {
   auto bdd = bddmgr().from_truth("1111110111111100");
-  auto edge = mgr().decomp(bdd);
+  auto edge = mgr().make_dg(bdd);
   EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 
 TEST_F(DgNodeTest, cplx5)
 {
   auto bdd = bddmgr().from_truth("1111100000001000");
-  auto edge = mgr().decomp(bdd);
+  auto edge = mgr().make_dg(bdd);
   EXPECT_TRUE( bdd.is_identical(edge.global_func()) );
 }
 

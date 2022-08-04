@@ -86,11 +86,9 @@ DgLitNode::is_lit() const
 
 // @brief ローカル関数を求める．
 Bdd
-DgLitNode::local_func(
-  BddMgr& mgr
-) const
+DgLitNode::local_func() const
 {
-  auto f = mgr.literal(VarId{0});
+  auto f = mgr().literal(VarId{0});
   return f;
 }
 
@@ -159,14 +157,12 @@ DgOrNode::is_or() const
 
 // @brief ローカル関数を求める．
 Bdd
-DgOrNode::local_func(
-  BddMgr& mgr
-) const
+DgOrNode::local_func() const
 {
   SizeType n = child_num();
-  auto f = mgr.literal(VarId{0});
+  auto f = mgr().literal(VarId{0});
   for ( SizeType i = 1; i < n; ++ i ) {
-    f |= mgr.literal(VarId{i});
+    f |= mgr().literal(VarId{i});
   }
   return f;
 }
@@ -194,14 +190,12 @@ DgXorNode::is_xor() const
 
 // @brief ローカル関数を求める．
 Bdd
-DgXorNode::local_func(
-  BddMgr& mgr
-) const
+DgXorNode::local_func() const
 {
   SizeType n = child_num();
-  auto f = mgr.literal(VarId{0});
+  auto f = mgr().literal(VarId{0});
   for ( SizeType i = 1; i < n; ++ i ) {
-    f ^= mgr.literal(VarId{i});
+    f ^= mgr().literal(VarId{i});
   }
   return f;
 }
@@ -229,9 +223,7 @@ DgCplxNode::is_cplx() const
 
 // @brief ローカル関数を求める．
 Bdd
-DgCplxNode::local_func(
-  BddMgr& mgr
-) const
+DgCplxNode::local_func() const
 {
   unordered_map<VarId, Literal> varmap;
   auto gf = global_func();
@@ -255,9 +247,8 @@ DgCplxNode::local_func(
     gf /= pat;
     varmap.emplace(top, Literal{VarId{i}, inv});
   }
-  return mgr.copy(gf.remap_vars(varmap));
+  return gf.remap_vars(varmap);
 }
-
 
 // @brief 内容を出力する．
 void
@@ -267,8 +258,7 @@ DgCplxNode::print(
 {
   print_sub(s, "CPLX");
 
-  BddMgr mgr;
-  auto f = local_func(mgr);
+  auto f = local_func();
   f.display(s);
 }
 

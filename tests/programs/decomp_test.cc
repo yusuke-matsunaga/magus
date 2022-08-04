@@ -1,6 +1,6 @@
 
-/// @file dg_test.cc
-/// @brief dg_test の実装ファイル
+/// @file decomp_test.cc
+/// @brief decomp_test の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2022 Yusuke Matsunaga
@@ -10,7 +10,7 @@
 #include "ym/BddMgr.h"
 #include "ym/Bdd.h"
 #include "DgMgr.h"
-#include "DgEdge.h"
+#include "ym/BnNetwork.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -32,57 +32,8 @@ basename(
 
 END_NONAMESPACE
 
-struct Info
-{
-  SizeType mOrNum{0};
-  SizeType mXorNum{0};
-  SizeType mCplxNum{0};
-
-  Info&
-  operator+=(
-    const Info& right
-  )
-  {
-    mOrNum += right.mOrNum;
-    mXorNum += right.mXorNum;
-    mCplxNum += right.mCplxNum;
-    return *this;
-  }
-
-};
-
-Info
-count(
-  nsDg::DgEdge edge
-)
-{
-  if ( edge.is_const() ) {
-    return Info{};
-  }
-  auto node = edge.node();
-  if ( node->is_lit() ) {
-    return Info{};
-  }
-
-  Info ans;
-  if ( node->is_or() ) {
-    ans.mOrNum = 1;
-  }
-  else if ( node->is_xor() ) {
-    ans.mXorNum = 1;
-  }
-  else {
-    ans.mCplxNum = 1;
-  }
-  SizeType nc = node->child_num();
-  for ( SizeType i = 0; i < nc; ++ i ) {
-    ans += count(node->child(i));
-  }
-  return ans;
-}
-
 int
-dg_test(
+decomp_test(
   int argc,
   char** argv
 )
@@ -99,23 +50,23 @@ dg_test(
     cout << basename(filename);
     string buf;
     vector<Bdd> func_list;
+    SizeType ni = 0;
     while ( getline(s, buf) ) {
       auto f = mgr.from_truth(buf);
       func_list.push_back(f);
+      SizeType ni_exp = buf.size();
+      while ( (1 << ni) < ni_exp ) {
+	++ ni;
+      }
+      ASSERT_COND( (1 << ni) == ni_exp );
     }
     nsDg::DgMgr dgmgr;
     SizeType o = 0;
     for ( auto f: func_list ) {
-      auto dgedge = dgmgr.make_dg(f);
-      auto info = count(dgedge);
+      auto network = dgmgr.decomp(f, ni);
+      cout << " #" << o << endl;
       ++ o;
-      cout << " #" << o << ": "
-	   << info.mOrNum
-	   << ", "
-	   << info.mXorNum
-	   << ", "
-	   << info.mCplxNum
-	   << endl;
+      network.write(cout);
     }
     cout << endl;
   }
@@ -131,5 +82,5 @@ main(
   char** argv
 )
 {
-  return MAGUS_NAMESPACE::dg_test(argc, argv);
+  return MAGUS_NAMESPACE::decomp_test(argc, argv);
 }

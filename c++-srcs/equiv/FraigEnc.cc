@@ -249,19 +249,26 @@ FraigEnc::bdd2aig(
     }
   }
   ++ max_index;
-  vector<vector<BddInfo>> indexed_node_list(max_index);
-  for ( auto node: node_list ) {
-    indexed_node_list[node.index].push_back(node);
+  vector<vector<pair<SizeType, BddInfo>>> indexed_node_list(max_index);
+  {
+    SizeType id = 1;
+    for ( auto node: node_list ) {
+      indexed_node_list[node.index].push_back(make_pair(id, node));
+      ++ id;
+    }
   }
   // 下位のインデックスから AIG を作る．
   vector<FraigHandle> h_map(node_list.size() + 1);
   for ( SizeType i = 0; i < max_index; ++ i ) {
     auto cedge = fanin_handles[max_index - i - 1];
-    for ( auto node: indexed_node_list[max_index - i - 1] ) {
+    auto& node_list = indexed_node_list[max_index - i - 1];
+    for ( auto& p: node_list ) {
+      SizeType id = p.first;
+      auto& node = p.second;
       auto r0 = edge2aig(node.edge0, h_map);
       auto r1 = edge2aig(node.edge1, h_map);
       auto r = make_mux(cedge, r0, r1);
-      h_map[node.id] = r;
+      h_map[id] = r;
     }
   }
   return edge2aig(root_edge, h_map);
