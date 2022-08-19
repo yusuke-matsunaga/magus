@@ -18,7 +18,6 @@
 #include "ym/BnNetwork.h"
 #include "ym/BnPort.h"
 #include "ym/BnDff.h"
-#include "ym/BnLatch.h"
 #include "ym/TvFunc.h"
 #include "ym/Range.h"
 
@@ -159,6 +158,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
   }
 
   // DFFの生成
+#warning "TODO: type() 別のコード"
   int nf = sbjgraph.dff_num();
   for ( int i = 0; i < nf; ++ i ) {
     const SbjDff* dff = sbjgraph.dff(i);
@@ -174,8 +174,8 @@ MapGen::generate(const SbjGraph& sbjgraph,
     int dff_id = mapgraph.new_dff(string(), has_clear, has_preset);
     auto& bn_dff = mapgraph.dff(dff_id);
 
-    mNodeInfo[input->id()].set_map(bn_dff.input(), 0);
-    mNodeInfo[output->id()].set_map(bn_dff.output(), 0);
+    mNodeInfo[input->id()].set_map(bn_dff.data_in(), 0);
+    mNodeInfo[output->id()].set_map(bn_dff.data_out(), 0);
     mNodeInfo[clock->id()].set_map(bn_dff.clock(), 0);
     if ( has_clear ) {
       mNodeInfo[clear->id()].set_map(bn_dff.clear(), 0);
@@ -185,6 +185,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
     }
   }
 
+#if 0
   // ラッチの生成
   int nlatch = sbjgraph.latch_num();
   for ( int i = 0; i < nlatch; ++ i ) {
@@ -211,17 +212,17 @@ MapGen::generate(const SbjGraph& sbjgraph,
       mNodeInfo[preset->id()].set_map(bn_latch.preset(), 0);
     }
   }
+#endif
 
   // 外部入力の生成
   for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* node = sbjgraph.input(i);
     NodeInfo& node_info = mNodeInfo[node->id()];
-    int node_id = node_info.map_node();
+    SizeType node_id = node_info.map_node();
     if ( node_info.inv_req() ) {
       // NOT ゲートを表す LUT を作る．
       TvFunc tv = TvFunc::make_nega_literal(1, VarId(0));
-      int inv_id = mapgraph.new_logic(string(), tv);
-      mapgraph.connect(node_id, inv_id, 0);
+      int inv_id = mapgraph.new_logic(string(), tv, {node_id});
 
       ++ mLutNum;
 
@@ -253,7 +254,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       if ( inv ) {
 	if ( mConst1 == BNET_NULLID ) {
 	  TvFunc tv = TvFunc::make_one(0);
-	  mConst1 = mapgraph.new_logic(string(), tv);
+	  mConst1 = mapgraph.new_logic(string(), tv, {});
 	  mConst1 = node_id;
 
 	  ++ mLutNum;
@@ -267,7 +268,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       else {
 	if ( mConst0 == BNET_NULLID ) {
 	  TvFunc tv = TvFunc::make_zero(0);
-	  mConst0 = mapgraph.new_logic(string(), tv);
+	  mConst0 = mapgraph.new_logic(string(), tv, {});
 
 	  ++ mLutNum;
 
@@ -280,7 +281,7 @@ MapGen::generate(const SbjGraph& sbjgraph,
       depth = 0;
     }
     int onode_id = mNodeInfo[onode->id()].map_node();
-    mapgraph.connect(node_id, onode_id, 0);
+    mapgraph.set_output(onode_id, node_id);
     // depth の設定のため
     mNodeInfo[onode->id()].set_map(onode_id, depth);
   }

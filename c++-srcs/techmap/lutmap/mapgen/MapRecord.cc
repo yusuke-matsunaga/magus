@@ -6,7 +6,6 @@
 /// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "MapRecord.h"
 #include "SbjGraph.h"
 

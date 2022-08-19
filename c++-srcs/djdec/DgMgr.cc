@@ -12,7 +12,6 @@
 #include "NodeMark.h"
 #include "ym/BddVarSet.h"
 #include "ym/BnNetwork.h"
-#include "ym/BnNodeType.h"
 #include "ym/BnPort.h"
 
 
@@ -97,10 +96,10 @@ make_network(
 )
 {
   if ( edge.is_zero() ) {
-    return network.new_logic({}, BnNodeType::C0, 0);
+    return network.new_logic({}, BnNodeType::C0, {});
   }
   if ( edge.is_one() ) {
-    return network.new_logic({}, BnNodeType::C1, 0);
+    return network.new_logic({}, BnNodeType::C1, {});
   }
 
   auto node = edge.node();
@@ -171,7 +170,7 @@ DgMgr::decomp(
   auto op_id = network.new_output_port("o");
   auto& port = network.port(op_id);
   auto onode_id = port.bit(0);
-  network.connect(node_id, onode_id, 0);
+  network.set_output(onode_id, node_id);
 
   network.wrap_up();
 

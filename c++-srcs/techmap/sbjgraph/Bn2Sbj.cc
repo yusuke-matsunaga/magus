@@ -3,9 +3,8 @@
 /// @brief Bn2Sbj の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "Bn2Sbj.h"
 
@@ -20,7 +19,6 @@
 #include "ym/BnPort.h"
 #include "ym/BnNode.h"
 #include "ym/BnDff.h"
-#include "ym/BnLatch.h"
 #include "ym/Range.h"
 #include "ym/Expr.h"
 
@@ -42,11 +40,11 @@ Bn2Sbj::~Bn2Sbj()
 }
 
 // @brief BnNetwork を SbjGraph に変換する．
-// @param[in] src_network もとのネットワーク
-// @param[in] dst_network 変換されたネットワーク
 void
-Bn2Sbj::convert(const BnNetwork& src_network,
-		SbjGraph& dst_network)
+Bn2Sbj::convert(
+  const BnNetwork& src_network,
+  SbjGraph& dst_network
+)
 {
   dst_network.clear();
 
@@ -141,9 +139,10 @@ Bn2Sbj::convert(const BnNetwork& src_network,
   }
 
   // DFFノードの生成
+#warning "TODO: type() 別のコード"
   for ( int i: Range(src_network.dff_num()) ) {
     auto& bn_dff = src_network.dff(i);
-    int iid = bn_dff.input();
+    int iid = bn_dff.data_in();
     SbjHandle ihandle = node_map[iid];
     ASSERT_COND( !ihandle.inv() );
     SbjNode* sbj_input = ihandle.node();
@@ -153,7 +152,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     ASSERT_COND( !chandle.inv() );
     SbjNode* sbj_clock = chandle.node();
 
-    int oid = bn_dff.output();
+    int oid = bn_dff.data_out();
     SbjHandle ohandle = node_map[oid];
     ASSERT_COND( !ohandle.inv() );
     SbjNode* sbj_output = ohandle.node();
@@ -178,6 +177,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
 					  sbj_clock, sbj_clear, sbj_preset);
   }
 
+#if 0
   // ラッチノードの生成
   for ( int i: Range(src_network.latch_num()) ) {
     auto& bn_latch = src_network.latch(i);
@@ -215,6 +215,7 @@ Bn2Sbj::convert(const BnNetwork& src_network,
     SbjLatch* sbj_latch = dst_network.new_latch(sbj_input, sbj_output,
 						sbj_enable, sbj_clear, sbj_preset);
   }
+#endif
 
   // ポートの生成
   for ( int i: Range(src_network.port_num()) ) {

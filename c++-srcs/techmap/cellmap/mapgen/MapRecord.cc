@@ -6,13 +6,11 @@
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "MapRecord.h"
 
 #include "ym/BnNetwork.h"
 #include "ym/BnPort.h"
 #include "ym/BnDff.h"
-#include "ym/BnLatch.h"
 
 #include "SbjGraph.h"
 #include "SbjPort.h"

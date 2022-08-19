@@ -100,17 +100,17 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	// 定数1ノードを作る．
 	int const1_cell = record.const1_cell();
 	ASSERT_COND( const1_cell != -1 );
-	mapnode = mMapGraph->new_logic(string(), const1_cell);
+	mapnode = mMapGraph->new_logic(string(), const1_cell, {});
       }
       else {
 	// 定数0ノードを作る．
 	int const0_cell = record.const0_cell();
 	ASSERT_COND( const0_cell != -1 );
-	mapnode = mMapGraph->new_logic(string(), const0_cell);
+	mapnode = mMapGraph->new_logic(string(), const0_cell, {});
       }
     }
     SizeType omapnode = node_info(onode, false).mMapNode;
-    mMapGraph->connect(mapnode, omapnode, 0);
+    mMapGraph->set_output(omapnode, mapnode);
   }
 }
 
@@ -157,7 +157,7 @@ MapGen::gen_dff(
 {
   int dff_cell0_id = record.get_dff_cell(sbj_dff, false);
   int dff_cell1_id = record.get_dff_cell(sbj_dff, true);
-  int cell_id = -1;
+  SizeType cell_id = -1;
   bool inv = false;
   if ( dff_cell0_id == -1 ) {
     if ( dff_cell1_id == -1 ) {
@@ -175,7 +175,7 @@ MapGen::gen_dff(
   auto& dff = mMapGraph->dff(dff_id);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
-  SizeType output1 = dff.output();
+  SizeType output1 = dff.data_out();
   ASSERT_COND( output1 != BNET_NULLID );
   node_info(sbj_output, inv).mMapNode = output1;
 #if 0
@@ -185,8 +185,9 @@ MapGen::gen_dff(
   }
 #endif
 
+#warning "TODO: type() 別のコード"
   const SbjNode* sbj_input = sbj_dff->data_input();
-  int input = dff.input();
+  SizeType input = dff.data_in();
   node_info(sbj_input, false).mMapNode = input;
   add_mapreq(sbj_input, inv);
 
@@ -255,16 +256,17 @@ MapGen::back_trace(const SbjNode* node,
   int cell_id = record.get_node_cell(node, inv);
 
   // 新しいノードを作り mNodeMap に登録する．
-  mapnode = mMapGraph->new_logic(string(), cell_id);
-  node_info.mMapNode = mapnode;
-
-  int ni = match.leaf_num();
+  SizeType ni = match.leaf_num();
+  vector<SizeType> fanin_id_list(ni);
   for ( int i = 0; i < ni; ++ i ) {
     const SbjNode* inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);
-    int iid = back_trace(inode, iinv, record);
-    mMapGraph->connect(iid, mapnode, i);
+    SizeType iid = back_trace(inode, iinv, record);
+    fanin_id_list[i] = iid;
   }
+  mapnode = mMapGraph->new_logic(string(), cell_id, fanin_id_list);
+  node_info.mMapNode = mapnode;
+
 
   return mapnode;
 }
