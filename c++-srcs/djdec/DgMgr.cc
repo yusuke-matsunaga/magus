@@ -11,8 +11,6 @@
 #include "DgEdge.h"
 #include "NodeMark.h"
 #include "ym/BddVarSet.h"
-#include "ym/BnNetwork.h"
-#include "ym/BnPort.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -84,97 +82,6 @@ DgMgr::DgMgr()
 // @brief デストラクタ
 DgMgr::~DgMgr()
 {
-}
-
-BEGIN_NONAMESPACE
-
-SizeType
-make_network(
-  DgEdge edge,
-  BnNetwork& network,
-  const vector<SizeType>& input_list
-)
-{
-  if ( edge.is_zero() ) {
-    return network.new_logic({}, BnNodeType::C0, {});
-  }
-  if ( edge.is_one() ) {
-    return network.new_logic({}, BnNodeType::C1, {});
-  }
-
-  auto node = edge.node();
-  auto inv = edge.inv();
-
-  if ( node->is_lit() ) {
-    auto id = node->top();
-    ASSERT_COND( 0 <= id && id < input_list.size() );
-    return input_list[id];
-  }
-
-  auto nc = node->child_num();
-  vector<SizeType> fanin_id_list(nc);
-  for ( SizeType i = 0; i < nc; ++ i ) {
-    fanin_id_list[i] = make_network(node->child(i), network, input_list);
-  }
-  if ( node->is_or() ) {
-    if ( inv ) {
-      return network.new_logic({}, BnNodeType::Nor, fanin_id_list);
-    }
-    else {
-      return network.new_logic({}, BnNodeType::Or, fanin_id_list);
-    }
-  }
-  if ( node->is_xor() ) {
-    if ( inv ) {
-      return network.new_logic({}, BnNodeType::Xnor, fanin_id_list);
-    }
-    else {
-      return network.new_logic({}, BnNodeType::Xor, fanin_id_list);
-    }
-  }
-  if ( node->is_cplx() ) {
-    auto lf = node->local_func() ^ inv;
-    return network.new_logic({}, lf, fanin_id_list);
-  }
-  ASSERT_NOT_REACHED;
-  return -1;
-}
-
-END_NONAMESPACE
-
-// @brief 与えられた関数の Disjoint Decomposition を行う．
-BnNetwork
-DgMgr::decomp(
-  const Bdd& func,
-  SizeType ni
-)
-{
-  auto root = make_dg(func);
-
-  BnNetwork network;
-
-  // 入力を作る．
-  vector<SizeType> input_list(ni);
-  for ( SizeType i = 0; i < ni; ++ i ) {
-    ostringstream buf;
-    buf << "i" << i;
-    auto ip_id = network.new_input_port(buf.str());
-    auto& port = network.port(ip_id);
-    auto inode_id = port.bit(0);
-    input_list[i] = inode_id;
-  }
-  // 本体を作る．
-  auto node_id = make_network(root, network, input_list);
-
-  // 出力を作る．
-  auto op_id = network.new_output_port("o");
-  auto& port = network.port(op_id);
-  auto onode_id = port.bit(0);
-  network.set_output(onode_id, node_id);
-
-  network.wrap_up();
-
-  return network;
 }
 
 // @brief 与えられた関数の DgGraph を得る(デバッグ用)．

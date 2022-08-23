@@ -8,7 +8,6 @@
 /// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "magus.h"
 #include "ym/bnet.h"
 
@@ -26,8 +25,10 @@ public:
   /// @brief コンストラクタ
   /// @param[in] lut_size LUTの入力数
   /// @param[in] option オプション文字列
-  LutmapMgr(int lut_size = 5,
-	    const string& option = string());
+  LutmapMgr(
+    int lut_size = 5,
+    const string& option = string()
+  );
 
   /// @brief デストラクタ
   ~LutmapMgr();
@@ -41,28 +42,34 @@ public:
   /// @brief LUTの入力数を設定する
   /// @param[in] lut_size LUTの入力数
   void
-  set_lut_size(int lut_size);
+  set_lut_size(
+    int lut_size
+  );
 
   /// @brief オプション文字列を設定する．
   /// @param[in] option オプション文字列
   void
-  set_option(const string& option);
+  set_option(
+    const string& option
+  );
 
   /// @brief 面積最小化 DAG covering のヒューリスティック関数
   /// @param[in] src_network もとのネットワーク
   /// @param[out] dat_network マッピング結果
-  void
-  area_map(const BnNetwork& src_network,
-	   BnNetwork& dst_network);
+  BnNetwork
+  area_map(
+    const BnNetwork& src_network
+  );
 
   /// @brief 段数最小化 DAG covering のヒューリスティック関数
   /// @param[in] src_network もとのネットワーク
   /// @param[in] slack 最小段数に対するスラック
   /// @param[out] dat_network マッピング結果
-  void
-  delay_map(const BnNetwork& src_network,
-	    int slack,
-	    BnNetwork& dst_network);
+  BnNetwork
+  delay_map(
+    const BnNetwork& src_network,
+    int slack
+  );
 
   /// @brief 直前のマッピング結果のLUT数を返す．
   int

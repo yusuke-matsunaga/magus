@@ -8,10 +8,9 @@
 /// Copyright (C) 2016, 2018 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "lutmap.h"
 #include "sbj_nsdef.h"
-#include "ym/bnet.h"
+#include "ym/BnModifier.h"
 
 
 BEGIN_NAMESPACE_LUTMAP
@@ -22,7 +21,8 @@ class MapRecord;
 /// @class MapGen MapGen.h "MapGen.h"
 /// @brief マッピング結果を BnNetwork にセットするクラス
 //////////////////////////////////////////////////////////////////////
-class MapGen
+class MapGen :
+  public BnModifier
 {
 public:
 
@@ -38,29 +38,23 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief マッピング結果を BnNetwork にセットする．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] record マッピング結果
-  /// @param[out] mapgraph マッピング結果を格納するネットワーク
-  /// @param[out] lut_num LUT数
-  /// @param[out] depth 最大段数
-  void
-  generate(const SbjGraph& sbjgraph,
-	   const MapRecord& record,
-	   BnNetwork& mapgraph,
-	   int& lut_num,
-	   int& depth);
+  /// @brief マッピング結果を BnNetwork に変換する．
+  BnNetwork
+  generate(
+    const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
+    const MapRecord& record,  ///< [in] マッピング結果
+    int& lut_num,             ///< [out] LUT数
+    int& depth                ///< [out] 最大段数
+  );
 
   /// @brief マッピング結果から見積もりを行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] record マッピング結果
-  /// @param[out] lut_num LUT数
-  /// @param[out] depth 最大段数
   void
-  estimate(const SbjGraph& sbjgraph,
-	   const MapRecord& record,
-	   int& lut_num,
-	   int& depth);
+  estimate(
+    const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
+    const MapRecord& record,  ///< [in] マッピング結果
+    int& lut_num,             ///< [out] LUT数
+    int& depth                ///< [out] 最大段数
+  );
 
   /// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
   const vector<const SbjNode*>&
@@ -167,30 +161,28 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 作業領域の初期化を行う．
-  /// @param[in] node_num ノード数
   void
-  init(int node_num);
+  init(
+    int node_num ///< [in] ノード数
+  );
 
   /// @brief generate 用のバックトレースを行う．
-  /// @param[in] node 対象のノード
-  /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
-  /// @param[in] record マッピング結果
-  /// @param[out] mapnetwork マッピング結果のネットワーク
   /// @return (node, inv) を実現するノード番号を返す．
   int
-  gen_back_trace(const SbjNode* node,
-		 bool inv,
-		 const MapRecord& record,
-		 BnNetwork& mapnetwork);
+  gen_back_trace(
+    const SbjNode* node,     ///< [in] 対象のノード
+    bool inv,                ///< [in] 極性を表すフラグ．inv = true の時，反転を表す．
+    const MapRecord& record, ///< [in] マッピング結果
+    BnModifier& mapnetwork   ///< [in] マッピング結果のネットワーク
+  );
 
   /// @brief estimate 用のバックトレースを行う．
-  /// @param[in] node 対象のノード
-  /// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
-  /// @param[in] record マッピング結果
   void
-  est_back_trace(const SbjNode* node,
-		 bool inv,
-		 const MapRecord& record);
+  est_back_trace(
+    const SbjNode* node,    ///< [in] 対象のノード
+    bool inv,               ///< [in] 極性を表すフラグ．inv = true の時，反転を表す．
+    const MapRecord& record ///< [in] マッピング結果
+  );
 
 
 private:

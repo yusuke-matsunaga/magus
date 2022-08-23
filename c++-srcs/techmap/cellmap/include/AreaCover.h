@@ -11,7 +11,7 @@
 
 #include "cellmap_nsdef.h"
 #include "SbjNode.h"
-#include "ym/bnet.h"
+#include "ym/BnNetwork.h"
 #include "ym/clib.h"
 #include "ym/ClibFFInfo.h"
 
@@ -41,10 +41,11 @@ public:
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cell_library セルを管理するオブジェクト
   /// @param[out] mapnetwork マッピング結果
-  void
-  operator()(const SbjGraph& sbjgraph,
-	     const ClibCellLibrary& cell_library,
-	     BnNetwork& mapnetwork);
+  BnNetwork
+  operator()(
+    const SbjGraph& sbjgraph,
+    const ClibCellLibrary& cell_library
+  );
 
 
 private:

@@ -6,7 +6,6 @@
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "MapGen.h"
 #include "MapRecord.h"
 #include "SbjPort.h"
@@ -23,22 +22,14 @@
 
 BEGIN_NAMESPACE_CELLMAP
 
-// コンストラクタ
-MapGen::MapGen()
-{
-}
-
-// デストラクタ
-MapGen::~MapGen()
-{
-}
-
 BEGIN_NONAMESPACE
 
 inline
 ymuint
-encode(ymuint pos,
-       ymuint sense)
+encode(
+  ymuint pos,
+  ymuint sense
+)
 {
   return pos | (sense << 3);
 }
@@ -46,19 +37,14 @@ encode(ymuint pos,
 END_NONAMESPACE
 
 // @brief マッピング結果を BnNetwork にセットする．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] record マッピング結果
-// @param[out] mapgraph マッピング結果を格納するネットワーク
 void
-MapGen::generate(const SbjGraph& sbjgraph,
-		 const MapRecord& record,
-		 BnNetwork& mapgraph)
+MapGen::generate(
+  const SbjGraph& sbjgraph,
+  const MapRecord& record
+)
 {
-  mapgraph.clear();
-
-  mapgraph.set_name(sbjgraph.name());
-
-  mMapGraph = &mapgraph;
+  clear();
+  set_name(sbjgraph.name());
 
   mMapReqList.clear();
   mMapReqList.reserve(sbjgraph.output_num());
@@ -100,17 +86,17 @@ MapGen::generate(const SbjGraph& sbjgraph,
 	// 定数1ノードを作る．
 	int const1_cell = record.const1_cell();
 	ASSERT_COND( const1_cell != -1 );
-	mapnode = mMapGraph->new_logic(string(), const1_cell, {});
+	mapnode = new_logic(string(), const1_cell, {});
       }
       else {
 	// 定数0ノードを作る．
 	int const0_cell = record.const0_cell();
 	ASSERT_COND( const0_cell != -1 );
-	mapnode = mMapGraph->new_logic(string(), const0_cell, {});
+	mapnode = new_logic(string(), const0_cell, {});
       }
     }
     SizeType omapnode = node_info(onode, false).mMapNode;
-    mMapGraph->set_output(omapnode, mapnode);
+    set_output(omapnode, mapnode);
   }
 }
 
@@ -131,11 +117,11 @@ MapGen::gen_port(
       iovect[i] = BnDir::OUTPUT;
     }
   }
-  SizeType port_id = mMapGraph->new_port(sbj_port->name(), iovect);
-  auto& dst_port = mMapGraph->port(port_id);
+  SizeType port_id = new_port(sbj_port->name(), iovect);
+  auto& dst_port = port(port_id);
   for ( SizeType j = 0; j < nb; ++ j ) {
     const SbjNode* sbj_node = sbj_port->bit(j);
-    auto& node = mMapGraph->node(dst_port.bit(j));
+    auto& node = this->node(dst_port.bit(j));
     if ( sbj_node->is_input() ) {
       ASSERT_COND( node.is_input() );
       node_info(sbj_node, false).mMapNode = node.id();
@@ -171,8 +157,8 @@ MapGen::gen_dff(
   }
   const ClibCell& cell = record.cell_library().cell(cell_id);
   //ClibFFInfo ff_info = cell.ff_info();
-  int dff_id = mMapGraph->new_dff(string(), cell_id);
-  auto& dff = mMapGraph->dff(dff_id);
+  int dff_id = new_dff(string(), cell_id);
+  auto& dff = this->dff(dff_id);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
   SizeType output1 = dff.data_out();
@@ -224,15 +210,19 @@ MapGen::gen_dff(
 
 // @brief ラッチの生成を行う．
 void
-MapGen::gen_latch(const SbjLatch* sbj_latch)
+MapGen::gen_latch(
+  const SbjLatch* sbj_latch
+)
 {
 #warning "未完";
 }
 
 // @brief マッピング要求を追加する．
 void
-MapGen::add_mapreq(const SbjNode* sbj_node,
-		   bool inv)
+MapGen::add_mapreq(
+  const SbjNode* sbj_node,
+  bool inv
+)
 {
   mMapReqList.push_back(MapReq(sbj_node, inv));
 }
@@ -240,9 +230,11 @@ MapGen::add_mapreq(const SbjNode* sbj_node,
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
 int
-MapGen::back_trace(const SbjNode* node,
-		   bool inv,
-		   const MapRecord& record)
+MapGen::back_trace(
+  const SbjNode* node,
+  bool inv,
+  const MapRecord& record
+)
 {
   NodeInfo& node_info = this->node_info(node, inv);
   int mapnode = node_info.mMapNode;
@@ -264,17 +256,18 @@ MapGen::back_trace(const SbjNode* node,
     SizeType iid = back_trace(inode, iinv, record);
     fanin_id_list[i] = iid;
   }
-  mapnode = mMapGraph->new_logic(string(), cell_id, fanin_id_list);
+  mapnode = new_logic(string(), cell_id, fanin_id_list);
   node_info.mMapNode = mapnode;
-
 
   return mapnode;
 }
 
 // @brief node に関係する情報を得る．
 MapGen::NodeInfo&
-MapGen::node_info(const SbjNode* node,
-		  bool inv)
+MapGen::node_info(
+  const SbjNode* node,
+  bool inv
+)
 {
   return mNodeInfo[node->id() * 2 + inv];
 }

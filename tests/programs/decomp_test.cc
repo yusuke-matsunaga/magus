@@ -9,7 +9,7 @@
 #include "magus.h"
 #include "ym/BddMgr.h"
 #include "ym/Bdd.h"
-#include "DgMgr.h"
+#include "DjDecomp.h"
 #include "ym/BnNetwork.h"
 
 
@@ -48,6 +48,7 @@ decomp_test(
       return 1;
     }
     cout << basename(filename);
+#if 0
     string buf;
     vector<Bdd> func_list;
     SizeType ni = 0;
@@ -69,6 +70,15 @@ decomp_test(
       network.write(cout);
     }
     cout << endl;
+#eelse
+    auto network = BnNetwork::read_truth(filename);
+    DjDecomp op;
+    op.decomp(network);
+    BnNetwork dg_network{std::move(op)};
+    cout << " #" << o << endl;
+    ++ o;
+    dg_network.write(cout);
+#endif
   }
   return 0;
 }

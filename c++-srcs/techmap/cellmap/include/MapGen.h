@@ -8,12 +8,11 @@
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "cellmap_nsdef.h"
 #include "SbjGraph.h"
 #include "Cut.h"
 #include "ym/clib.h"
-#include "ym/bnet.h"
+#include "ym/BnModifier.h"
 #include "ym/ClibFFInfo.h"
 #include "ym/ClibLatchInfo.h"
 
@@ -26,15 +25,16 @@ class MapRecord;
 /// @class MapGen MapGen.h "MapGen.h"
 /// @brief マッピング結果を BnNetwork にセットするクラス
 //////////////////////////////////////////////////////////////////////
-class MapGen
+class MapGen :
+  public BnModifier
 {
 public:
 
   /// @brief コンストラクタ
-  MapGen();
+  MapGen() = default;
 
   /// @brief デストラクタ
-  ~MapGen();
+  ~MapGen() = default;
 
 
 public:
@@ -42,14 +42,12 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief マッピング結果を BnNetwork にセットする．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] record マッピング結果
-  /// @param[out] mapgraph マッピング結果を格納するネットワーク
+  /// @brief マッピング結果を BnNetwork に変換する．
   void
-  generate(const SbjGraph& sbjgraph,
-	   const MapRecord& record,
-	   BnNetwork& mapgraph);
+  generate(
+    const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
+    const MapRecord& record   ///< [in] マッピング結果
+  );
 
 
 private:
@@ -99,44 +97,53 @@ private:
 
   /// @brief ポートの生成を行う．
   void
-  gen_port(const SbjPort* sbj_port);
+  gen_port(
+    const SbjPort* sbj_port
+  );
 
   /// @brief D-FF の生成を行う．
   void
-  gen_dff(const SbjDff* sbj_dff,
-	  const MapRecord& record);
+  gen_dff(
+    const SbjDff* sbj_dff,
+    const MapRecord& record
+  );
 
   /// @brief ラッチの生成を行う．
   void
-  gen_latch(const SbjLatch* sbj_latch);
+  gen_latch(
+    const SbjLatch* sbj_latch
+  );
 
   /// @brief マッピング要求を追加する．
   void
-  add_mapreq(const SbjNode* node,
-	     bool inv);
+  add_mapreq(
+    const SbjNode* node,
+    bool inv
+  );
 
   /// @brief 最終結果を作るためのバックトレースを行う．
   /// @param[in] node 対象のノード
   /// @param[in] inv 極性
   /// @param[in] record セルの割当結果
   int
-  back_trace(const SbjNode* node,
-	     bool inv,
-	     const MapRecord& record);
+  back_trace(
+    const SbjNode* node,
+    bool inv,
+    const MapRecord& record
+  );
 
   /// @brief node に関係する情報を得る．
   NodeInfo&
-  node_info(const SbjNode* node,
-	    bool inv);
+  node_info(
+    const SbjNode* node,
+    bool inv
+  );
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // 答えのマップグラフ
-  BnNetwork* mMapGraph;
 
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは SbjNode の ID 番号

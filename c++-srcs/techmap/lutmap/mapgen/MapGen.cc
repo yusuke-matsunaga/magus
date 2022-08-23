@@ -20,6 +20,8 @@
 #include "ym/BnDff.h"
 #include "ym/TvFunc.h"
 #include "ym/Range.h"
+#include "ym/BnModifier.h"
+
 
 #define LUTMAP_DEBUG_MAPGEN 0
 
@@ -90,9 +92,10 @@ MapGen::~MapGen()
 }
 
 // @brief 作業領域の初期化を行う．
-// @param[in] node_num ノード数
 void
-MapGen::init(int node_num)
+MapGen::init(
+  int node_num
+)
 {
   // 作業領域の初期化
   // 具体的な初期化は NodeInfo のコンストラクタが行っている．
@@ -106,21 +109,19 @@ MapGen::init(int node_num)
 }
 
 // @brief マッピング結果を BnNetwork にセットする．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] record マッピング結果
-// @param[out] mapgraph マッピング結果を格納するネットワーク
-// @param[out] lut_num LUT数
-// @param[out] depth 最大段数
-void
-MapGen::generate(const SbjGraph& sbjgraph,
-		 const MapRecord& record,
-		 BnNetwork& mapgraph,
-		 int& lut_num,
-		 int& depth)
+BnNetwork
+MapGen::generate(
+  const SbjGraph& sbjgraph,
+  const MapRecord& record,
+  int& lut_num,
+  int& depth
+)
 {
 #if LUTMAP_DEBUG_MAPGEN
   cout << "MapGen::generate() start" << endl;
 #endif
+
+  BnModifier mapgraph;
 
   mapgraph.clear();
   mapgraph.set_name(sbjgraph.name());
@@ -286,9 +287,6 @@ MapGen::generate(const SbjGraph& sbjgraph,
     mNodeInfo[onode->id()].set_map(onode_id, depth);
   }
 
-  bool stat = mapgraph.wrap_up();
-  ASSERT_COND( stat );
-
   lut_num = mLutNum;
   depth = max_depth;
 
@@ -305,19 +303,18 @@ MapGen::generate(const SbjGraph& sbjgraph,
 #if LUTMAP_DEBUG_MAPGEN
   cout << "MapGen::generate() end" << endl;
 #endif
+
+  return BnNetwork{std::move(mapgraph)};
 }
 
 // @brief 最終結果を作るためのバックトレースを行う．
-// @param[in] node 対象のノード
-// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
-// @param[in] record マッピング結果
-// @param[out] mapnetwork マッピング結果のネットワーク
-// @return (node, inv) を実現するノード番号を返す．
 int
-MapGen::gen_back_trace(const SbjNode* node,
-		       bool output_inv,
-		       const MapRecord& record,
-		       BnNetwork& mapnetwork)
+MapGen::gen_back_trace(
+  const SbjNode* node,
+  bool output_inv,
+  const MapRecord& record,
+  BnModifier& mapnetwork
+)
 {
 #if LUTMAP_DEBUG_MAPGEN
   cout << "back_trace(" << node->id_str() << ", " << output_inv << ")" << endl;
@@ -393,15 +390,13 @@ MapGen::gen_back_trace(const SbjNode* node,
 }
 
 // @brief マッピング結果から見積もりを行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] record マッピング結果
-// @param[out] lut_num LUT数
-// @param[out] depth 最大段数
 void
-MapGen::estimate(const SbjGraph& sbjgraph,
-		 const MapRecord& record,
-		 int& lut_num,
-		 int& depth)
+MapGen::estimate(
+  const SbjGraph& sbjgraph,
+  const MapRecord& record,
+  int& lut_num,
+  int& depth
+)
 {
 #if LUTMAP_DEBUG_MAPEST
   cout << "MapGen::estimate() start" << endl;
@@ -495,13 +490,12 @@ MapGen::estimate(const SbjGraph& sbjgraph,
 }
 
 // @brief 最終結果を作るためのバックトレースを行う．
-// @param[in] node 対象のノード
-// @param[in] inv 極性を表すフラグ．inv = true の時，反転を表す．
-// @param[in] record マッピング結果
 void
-MapGen::est_back_trace(const SbjNode* node,
-		       bool inv,
-		       const MapRecord& record)
+MapGen::est_back_trace(
+  const SbjNode* node,
+  bool inv,
+  const MapRecord& record
+)
 {
 #if LUTMAP_DEBUG_MAPGEN
   cout << "back_trace(" << node->id_str() << ", " << inv << ")" << endl;

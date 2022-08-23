@@ -11,7 +11,6 @@
 #include "dg.h"
 #include "ym/Bdd.h"
 #include "ym/BddMgr.h"
-#include "ym/bnet.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -39,14 +38,6 @@ public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
-
-  /// @brief 与えられた関数の Disjoint Decomposition を求める．
-  /// @return 分解結果の BnNetwork を返す．
-  BnNetwork
-  decomp(
-    const Bdd& func, ///< [in] 分解を行う関数
-    SizeType ni      ///< [in] 入力数
-  );
 
   /// @brief 与えられた関数の DgGraph を得る．
   DgEdge

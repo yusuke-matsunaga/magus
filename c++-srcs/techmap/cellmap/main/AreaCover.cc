@@ -6,7 +6,6 @@
 /// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "AreaCover.h"
 #include "ym/ClibCell.h"
 #include "ym/ClibCellList.h"
@@ -49,10 +48,11 @@ AreaCover::~AreaCover()
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cell_mgr セルを管理するオブジェクト
 // @param[out] mapnetwork マッピング結果
-void
-AreaCover::operator()(const SbjGraph& sbjgraph,
-		      const ClibCellLibrary& cell_library,
-		      BnNetwork& mapnetwork)
+BnNetwork
+AreaCover::operator()(
+  const SbjGraph& sbjgraph,
+  const ClibCellLibrary& cell_library
+)
 {
   if ( debug ) {
     SbjDumper::dump(cout, sbjgraph);
@@ -82,8 +82,8 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 
   // 最終的なネットワークを生成する．
   MapGen gen;
-
-  gen.generate(sbjgraph, maprec, mapnetwork);
+  gen.generate(sbjgraph, maprec);
+  return BnNetwork{std::move(gen)};
 }
 
 // @brief FF のマッピングを行う．
@@ -91,9 +91,11 @@ AreaCover::operator()(const SbjGraph& sbjgraph,
 // @param[in] cell_mgr セルを管理するオブジェクト
 // @param[in] maprec マッピング結果を保持するオブジェクト
 void
-AreaCover::ff_map(const SbjGraph& sbjgraph,
-		  const ClibCellLibrary& cell_library,
-		  MapRecord& maprec)
+AreaCover::ff_map(
+  const SbjGraph& sbjgraph,
+  const ClibCellLibrary& cell_library,
+  MapRecord& maprec
+)
 {
   // FFの割り当て情報を作る．
   for (ymuint i = 0; i < 8; ++ i) {
@@ -169,9 +171,11 @@ AreaCover::ff_map(const SbjGraph& sbjgraph,
 // @param[in] cell_library セルを管理するオブジェクト
 // @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const SbjGraph& sbjgraph,
-		       const ClibCellLibrary& cell_library,
-		       MapRecord& maprec)
+AreaCover::record_cuts(
+  const SbjGraph& sbjgraph,
+  const ClibCellLibrary& cell_library,
+  MapRecord& maprec
+)
 {
   int n = sbjgraph.node_num();
   mCostArray.resize(n * 2);
@@ -317,10 +321,12 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 // @param[in] inv 極性
 // @param[in] inv_func インバータの関数グループ
 void
-AreaCover::add_inv(const SbjNode* node,
-		   bool inv,
-		   const ClibCellGroup& inv_func,
-		   MapRecord& maprec)
+AreaCover::add_inv(
+  const SbjNode* node,
+  bool inv,
+  const ClibCellGroup& inv_func,
+  MapRecord& maprec
+)
 {
   if ( maprec.get_node_match(node, !inv).leaf_num() == 1 ) {
     // 逆極性の解が自分の解＋インバーターだった
@@ -348,8 +354,10 @@ AreaCover::add_inv(const SbjNode* node,
 
 // @brief node から各入力にいたる経路の重みを計算する．
 void
-AreaCover::calc_weight(const SbjNode* node,
-		       double cur_weight)
+AreaCover::calc_weight(
+  const SbjNode* node,
+  double cur_weight
+)
 {
   for ( ; ; ) {
     int c = mLeafNum[node->id()];
