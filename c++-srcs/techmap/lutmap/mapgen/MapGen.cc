@@ -223,7 +223,7 @@ MapGen::generate(
     if ( node_info.inv_req() ) {
       // NOT ゲートを表す LUT を作る．
       TvFunc tv = TvFunc::make_nega_literal(1, VarId(0));
-      int inv_id = mapgraph.new_logic(string(), tv, {node_id});
+      int inv_id = mapgraph.new_logic_tv({}, tv, {node_id});
 
       ++ mLutNum;
 
@@ -255,7 +255,7 @@ MapGen::generate(
       if ( inv ) {
 	if ( mConst1 == BNET_NULLID ) {
 	  TvFunc tv = TvFunc::make_one(0);
-	  mConst1 = mapgraph.new_logic(string(), tv, {});
+	  mConst1 = mapgraph.new_logic_tv({}, tv, {});
 	  mConst1 = node_id;
 
 	  ++ mLutNum;
@@ -269,7 +269,7 @@ MapGen::generate(
       else {
 	if ( mConst0 == BNET_NULLID ) {
 	  TvFunc tv = TvFunc::make_zero(0);
-	  mConst0 = mapgraph.new_logic(string(), tv, {});
+	  mConst0 = mapgraph.new_logic_tv({}, tv, {});
 
 	  ++ mLutNum;
 
@@ -282,7 +282,7 @@ MapGen::generate(
       depth = 0;
     }
     int onode_id = mNodeInfo[onode->id()].map_node();
-    mapgraph.set_output(onode_id, node_id);
+    mapgraph.set_output_src(onode_id, node_id);
     // depth の設定のため
     mNodeInfo[onode->id()].set_map(onode_id, depth);
   }
@@ -375,7 +375,7 @@ MapGen::gen_back_trace(
   TvFunc tv = cut->make_tv(output_inv, input_inv);
 
   // 新しいノードを作る．
-  node_id = mapnetwork.new_logic(string(), tv, fanin_id_list);
+  node_id = mapnetwork.new_logic_tv({}, tv, fanin_id_list);
 
   ++ mLutNum;
 

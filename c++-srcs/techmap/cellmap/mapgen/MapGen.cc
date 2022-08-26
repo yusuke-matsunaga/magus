@@ -84,19 +84,19 @@ MapGen::generate(
       SizeType node_id = 0;
       if ( inv ) {
 	// 定数1ノードを作る．
-	int const1_cell = record.const1_cell();
-	ASSERT_COND( const1_cell != -1 );
-	mapnode = new_logic(string(), const1_cell, {});
+	SizeType const1_cell = record.const1_cell();
+	ASSERT_COND( const1_cell != CLIB_NULLID );
+	mapnode = new_logic_cell({}, const1_cell, {});
       }
       else {
 	// 定数0ノードを作る．
-	int const0_cell = record.const0_cell();
-	ASSERT_COND( const0_cell != -1 );
-	mapnode = new_logic(string(), const0_cell, {});
+	SizeType const0_cell = record.const0_cell();
+	ASSERT_COND( const0_cell != CLIB_NULLID );
+	mapnode = new_logic_cell({}, const0_cell, {});
       }
     }
     SizeType omapnode = node_info(onode, false).mMapNode;
-    set_output(omapnode, mapnode);
+    set_output_src(omapnode, mapnode);
   }
 }
 
@@ -245,7 +245,7 @@ MapGen::back_trace(
 
   // node を根とするマッチを取り出す．
   const Cut& match = record.get_node_match(node, inv);
-  int cell_id = record.get_node_cell(node, inv);
+  SizeType cell_id = record.get_node_cell(node, inv);
 
   // 新しいノードを作り mNodeMap に登録する．
   SizeType ni = match.leaf_num();
@@ -256,7 +256,7 @@ MapGen::back_trace(
     SizeType iid = back_trace(inode, iinv, record);
     fanin_id_list[i] = iid;
   }
-  mapnode = new_logic(string(), cell_id, fanin_id_list);
+  mapnode = new_logic_cell({}, cell_id, fanin_id_list);
   node_info.mMapNode = mapnode;
 
   return mapnode;
