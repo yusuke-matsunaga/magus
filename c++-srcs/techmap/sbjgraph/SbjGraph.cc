@@ -346,10 +346,11 @@ SbjGraph::new_expr(const Expr& expr,
 
   ASSERT_COND( expr.is_op() );
 
-  int nc = expr.child_num();
-  vector<SbjHandle> tmp_list(nc);
-  for ( int i = 0;i < nc; ++ i ) {
-    tmp_list[i] = new_expr(expr.child(i), ihandle_list);
+  vector<SbjHandle> tmp_list;
+  tmp_list.reserve(expr.operand_num());
+  for ( auto& expr1: expr.operand_list() ) {
+    auto h = new_expr(expr1, ihandle_list);
+    tmp_list.push_back(h);
   }
 
   if ( expr.is_and() ) {

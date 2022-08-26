@@ -18,6 +18,7 @@
 #include "ym/BnNetwork.h"
 #include "ym/BnPort.h"
 #include "ym/BnNode.h"
+#include "ym/BnNodeList.h"
 #include "ym/BnDff.h"
 #include "ym/Range.h"
 #include "ym/Expr.h"
@@ -55,15 +56,15 @@ Bn2Sbj::convert(
   vector<SbjHandle> node_map(src_network.node_num());
 
   // 外部入力ノードの生成
-  for ( int id: src_network.input_id_list() ) {
+  for ( auto& node: src_network.input_list() ) {
     SbjNode* sbj_node = dst_network.new_input(false);
-    node_map[id] = SbjHandle(sbj_node);
+    node_map[node.id()] = SbjHandle(sbj_node);
   }
 
   // 論理ノードの生成
-  for ( auto id: src_network.logic_id_list() ) {
-    auto& bn_node = src_network.node(id);
-    int ni = bn_node.fanin_num();
+  for ( auto& bn_node: src_network.logic_list() ) {
+    auto id = bn_node.id();
+    auto ni = bn_node.fanin_num();
     vector<SbjHandle> ihandle_list(ni);
     for ( int j: Range(ni) ) {
       int iid = bn_node.fanin_id(j);
@@ -132,10 +133,10 @@ Bn2Sbj::convert(
   }
 
   // 外部出力ノードの生成
-  for ( auto id: src_network.output_src_id_list() ) {
-    SbjHandle ihandle = node_map[id];
+  for ( auto& node: src_network.output_src_list() ) {
+    SbjHandle ihandle = node_map[node.id()];
     SbjNode* sbj_node = dst_network.new_output(ihandle);
-    node_map[id] = SbjHandle(sbj_node);
+    node_map[node.id()] = SbjHandle(sbj_node);
   }
 
   // DFFノードの生成

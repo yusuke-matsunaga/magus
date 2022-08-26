@@ -157,10 +157,11 @@ FraigEnc::expr2aig(
     return ~fanin_handles[id];
   }
 
-  SizeType n = expr.child_num();
-  vector<FraigHandle> edge_list(n);
-  for ( SizeType i = 0; i < n; ++ i ) {
-    edge_list[i] = expr2aig(expr.child(i), fanin_handles);
+  vector<FraigHandle> edge_list;
+  edge_list.reserve(expr.operand_num());
+  for ( auto& opr: expr.operand_list() ) {
+    auto ih = expr2aig(opr, fanin_handles);
+    edge_list.push_back(ih);
   }
   if ( expr.is_and() ) {
     return make_and(edge_list);
