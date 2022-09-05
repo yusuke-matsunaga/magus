@@ -124,7 +124,7 @@ FraigEnc::operator()(
   SizeType no = network.output_num();
   vector<FraigHandle> output_handles(no);
   for ( auto i: Range(no) ) {
-    SizeType iid = network.output_src_id(i);
+    SizeType iid = network.output_node(i).output_src();
     output_handles[i] = h_map[iid];
   }
 

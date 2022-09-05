@@ -133,8 +133,8 @@ Bn2Sbj::convert(
   }
 
   // 外部出力ノードの生成
-  for ( auto& node: src_network.output_src_list() ) {
-    SbjHandle ihandle = node_map[node.id()];
+  for ( auto& node: src_network.output_list() ) {
+    SbjHandle ihandle = node_map[node.output_src()];
     SbjNode* sbj_node = dst_network.new_output(ihandle);
     node_map[node.id()] = SbjHandle(sbj_node);
   }
