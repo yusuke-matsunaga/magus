@@ -77,6 +77,7 @@ set ( decomp_test_SOURCES
 add_executable ( decomp_test
   ${decomp_test_SOURCES}
   $<TARGET_OBJECTS:magus_dg_obj_d>
+  $<TARGET_OBJECTS:magus_equiv_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
   )
 
@@ -86,6 +87,7 @@ target_compile_options ( decomp_test
 
 target_include_directories ( decomp_test
   PRIVATE ${PROJECT_SOURCE_DIR}/c++-srcs/djdec
+  PRIVATE ${PROJECT_SOURCE_DIR}/c++-srcs/equiv
   )
 
 target_link_libraries ( decomp_test

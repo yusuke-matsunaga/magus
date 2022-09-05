@@ -24,8 +24,8 @@ FraigEnc::operator()(
   const vector<FraigHandle>& input_handles
 )
 {
-  // network のノードの番号をキーとして対応するハンドルを収める配列
-  vector<FraigHandle> h_map(network.node_num());
+  // network のノードの番号をキーとして対応するハンドルを収める連想配列
+  unordered_map<SizeType, FraigHandle> h_map;
 
   //////////////////////////////////////////////////////////////////////
   // 外部入力に対応するハンドルを登録する．
@@ -34,7 +34,7 @@ FraigEnc::operator()(
   ASSERT_COND( input_handles.size() == ni );
   for ( auto i: Range(ni) ) {
     SizeType id = network.input_id(i);
-    h_map[id] = input_handles[i];
+    h_map.emplace(id, input_handles[i]);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -47,9 +47,11 @@ FraigEnc::operator()(
 
     // ファンインのノードに対応するハンドルを求める．
     SizeType ni = node.fanin_num();
-    vector<FraigHandle> fanin_handles(ni);
-    for ( SizeType i = 0; i < ni; ++ i ) {
-      fanin_handles[i] = h_map[node.fanin_id(i)];
+    vector<FraigHandle> fanin_handles;
+    fanin_handles.reserve(ni);
+    for ( SizeType iid: node.fanin_id_list() ) {
+      ASSERT_COND( h_map.count(iid) > 0 );
+      fanin_handles.push_back(h_map.at(iid));
     }
 
     // 個々の関数タイプに従って fraig を生成する．
@@ -115,17 +117,19 @@ FraigEnc::operator()(
     }
 
     // 登録しておく．
-    h_map[id] = ans;
+    h_map.emplace(id, ans);
   }
 
   //////////////////////////////////////////////////////////////////////
   // 外部出力のマップを作成する．
   //////////////////////////////////////////////////////////////////////
   SizeType no = network.output_num();
-  vector<FraigHandle> output_handles(no);
-  for ( auto i: Range(no) ) {
-    SizeType iid = network.output_node(i).output_src();
-    output_handles[i] = h_map[iid];
+  vector<FraigHandle> output_handles;
+  output_handles.reserve(no);
+  for ( auto& node: network.output_list() ) {
+    SizeType iid = node.output_src();
+    ASSERT_COND( h_map.count(iid) > 0 );
+    output_handles.push_back(h_map.at(iid));
   }
 
   return output_handles;
@@ -217,7 +221,7 @@ inline
 FraigHandle
 edge2aig(
   SizeType edge,
-  const vector<FraigHandle>& h_map
+  const unordered_map<SizeType, FraigHandle>& h_map
 )
 {
   if ( edge == 0 ) {
@@ -228,7 +232,8 @@ edge2aig(
   }
   SizeType node = BddInfo::edge2node(edge);
   bool inv = BddInfo::edge2inv(edge);
-  return h_map[node] ^ inv;
+  ASSERT_COND( h_map.count(node) > 0 );
+  return h_map.at(node) ^ inv;
 }
 
 END_NONAMESPACE
@@ -259,7 +264,7 @@ FraigEnc::bdd2aig(
     }
   }
   // 下位のインデックスから AIG を作る．
-  vector<FraigHandle> h_map(node_list.size() + 1);
+  unordered_map<SizeType, FraigHandle> h_map;
   for ( SizeType i = 0; i < max_index; ++ i ) {
     auto cedge = fanin_handles[max_index - i - 1];
     auto& node_list = indexed_node_list[max_index - i - 1];
@@ -269,7 +274,7 @@ FraigEnc::bdd2aig(
       auto r0 = edge2aig(node.edge0, h_map);
       auto r1 = edge2aig(node.edge1, h_map);
       auto r = make_mux(cedge, r0, r1);
-      h_map[id] = r;
+      h_map.emplace(id, r);
     }
   }
   return edge2aig(root_edge, h_map);

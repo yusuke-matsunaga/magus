@@ -18,6 +18,7 @@ include_directories (
 set ( dg_SOURCES
   DgMgr.cc
   DgNode.cc
+  DjDecomp.cc
   NodeMark.cc
   )
 

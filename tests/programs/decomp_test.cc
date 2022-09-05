@@ -10,7 +10,9 @@
 #include "ym/BddMgr.h"
 #include "ym/Bdd.h"
 #include "DjDecomp.h"
+#include "EquivMgr.h"
 #include "ym/BnNetwork.h"
+#include "ym/SatBool3.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -47,38 +49,19 @@ decomp_test(
       cerr << filename << ": No such file." << endl;
       return 1;
     }
-    cout << basename(filename);
-#if 0
-    string buf;
-    vector<Bdd> func_list;
-    SizeType ni = 0;
-    while ( getline(s, buf) ) {
-      auto f = mgr.from_truth(buf);
-      func_list.push_back(f);
-      SizeType ni_exp = buf.size();
-      while ( (1 << ni) < ni_exp ) {
-	++ ni;
-      }
-      ASSERT_COND( (1 << ni) == ni_exp );
-    }
-    nsDg::DgMgr dgmgr;
-    SizeType o = 0;
-    for ( auto f: func_list ) {
-      auto network = dgmgr.decomp(f, ni);
-      cout << " #" << o << endl;
-      ++ o;
-      network.write(cout);
-    }
-    cout << endl;
-#eelse
+    cout << basename(filename) << endl;
     auto network = BnNetwork::read_truth(filename);
-    DjDecomp op;
+    network.write(cout);
+    nsDg::DjDecomp op;
     op.decomp(network);
     BnNetwork dg_network{std::move(op)};
-    cout << " #" << o << endl;
-    ++ o;
     dg_network.write(cout);
-#endif
+
+    EquivMgr eqmgr;
+    auto ans = eqmgr.check(network, dg_network);
+    if ( ans.result() != SatBool3::True ) {
+      cout << "Not equiv" << endl;
+    }
   }
   return 0;
 }
