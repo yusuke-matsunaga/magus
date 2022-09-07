@@ -5,7 +5,7 @@
 /// @brief MapGen のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "lutmap.h"
@@ -27,10 +27,10 @@ class MapGen :
 public:
 
   /// @brief コンストラクタ
-  MapGen();
+  MapGen() = default;
 
   /// @brief デストラクタ
-  ~MapGen();
+  ~MapGen() = default;
 
 
 public:
@@ -43,8 +43,8 @@ public:
   generate(
     const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
     const MapRecord& record,  ///< [in] マッピング結果
-    int& lut_num,             ///< [out] LUT数
-    int& depth                ///< [out] 最大段数
+    SizeType& lut_num,        ///< [out] LUT数
+    SizeType& depth           ///< [out] 最大段数
   );
 
   /// @brief マッピング結果から見積もりを行う．
@@ -52,8 +52,8 @@ public:
   estimate(
     const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
     const MapRecord& record,  ///< [in] マッピング結果
-    int& lut_num,             ///< [out] LUT数
-    int& depth                ///< [out] 最大段数
+    SizeType& lut_num,        ///< [out] LUT数
+    SizeType& depth           ///< [out] 最大段数
   );
 
   /// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
@@ -87,9 +87,9 @@ private:
     /// @brief マップ結果を設定する．
     void
     set_map(
-      int node_id,     ///< [in] ノード番号
-      int depth,       ///< [in] 段数
-      bool inv = false ///< [in] 反転フラグ
+      SizeType node_id, ///< [in] ノード番号
+      SizeType depth,   ///< [in] 段数
+      bool inv = false  ///< [in] 反転フラグ
     )
     {
       int idx = inv ? 1 : 0;
@@ -98,7 +98,7 @@ private:
     }
 
     /// @brief 参照回数を返す．
-    int
+    SizeType
     ref_count(
       bool inv = false ///< [in] 反転フラグ
     ) const
@@ -115,7 +115,7 @@ private:
     }
 
     /// @brief マップ結果を返す．
-    int
+    SizeType
     map_node(
       bool inv = false ///< [in] 反転フラグ
     ) const
@@ -125,7 +125,7 @@ private:
     }
 
     /// @brief 段数を返す．
-    int
+    SizeType
     depth(
       bool inv = false ///< [in] 反転フラグ
     ) const
@@ -142,7 +142,7 @@ private:
 
     // 使われている回数
     // 正極性と負極性の2通りを保持する．
-    int mRefCount[2]{0, 0};
+    SizeType mRefCount[2]{0, 0};
 
     // マップ結果のノード番号
     // 正極性と負極性の2通りを保持する．
@@ -150,7 +150,7 @@ private:
 
     // 段数
     // 正極性と負極性の2通りを保持する．
-    int mDepth[2]{0, 0};
+    SizeType mDepth[2]{0, 0};
 
   };
 
@@ -163,12 +163,12 @@ private:
   /// @brief 作業領域の初期化を行う．
   void
   init(
-    int node_num ///< [in] ノード数
+    SizeType node_num ///< [in] ノード数
   );
 
   /// @brief generate 用のバックトレースを行う．
   /// @return (node, inv) を実現するノード番号を返す．
-  int
+  SizeType
   gen_back_trace(
     const SbjNode* node,     ///< [in] 対象のノード
     bool inv,                ///< [in] 極性を表すフラグ．inv = true の時，反転を表す．
@@ -200,7 +200,7 @@ private:
   SizeType mConst1;
 
   // LUT数の見積もりに使う作業領域
-  int mLutNum;
+  SizeType mLutNum;
 
   // ファンアウトポイントのリスト
   vector<const SbjNode*> mFanoutPointList;

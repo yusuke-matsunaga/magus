@@ -5,9 +5,8 @@
 /// @brief CutResubImpl のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "CrHeap.h"
@@ -40,14 +39,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カットの置き換えを行って LUT 数の削減を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder サブジェクトグラフ上のカット集合
-  /// @param[inout] maprec マッピング結果
   void
-  resub(const SbjGraph& sbjgraph,
-	const CutHolder& cut_holder,
-	MapRecord& maprec,
-	int slack = -1);
+  resub(
+    const SbjGraph& sbjgraph,    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder, ///< [in] サブジェクトグラフ上のカット集合
+    MapRecord& maprec,           ///< [in] マッピング結果
+    int slack = -1               ///< [in] 段数のスラック
+  );
 
 
 private:
@@ -57,47 +55,65 @@ private:
 
   // node の最適カットを選ぶ．
   void
-  back_trace(const SbjNode* node,
-	     MapRecord& maprec,
-	     CrNode* from);
+  back_trace(
+    const SbjNode* node,
+    MapRecord& maprec,
+    CrNode* from
+  );
 
   // ゲインの計算を行う．
-  ymuint
-  calc_gain(CrNode* crnode);
+  SizeType
+  calc_gain(
+    CrNode* crnode
+  );
 
   // 構造のみで置き換えが可能かどうか判断する．
   bool
-  check_structure(CrNode* node);
+  check_structure(
+    CrNode* node
+  );
 
   // node を冗長にする置き換えカットを求める．
   bool
-  find_subst(CrNode* node,
-	     vector<const Cut*>& subst_list);
+  find_subst(
+    CrNode* node,
+    vector<const Cut*>& subst_list
+  );
 
   // node を冗長にする置き換えカットを求める．
   bool
-  find_subst2(CrNode* node,
-	      vector<const Cut*>& subst_list);
+  find_subst2(
+    CrNode* node,
+    vector<const Cut*>& subst_list
+  );
 
   // カットの置き換えを行い，段数の情報を更新する．
   void
-  update(CrNode* node,
-	 const vector<const Cut*>& subst_list);
+  update(
+    CrNode* node,
+    const vector<const Cut*>& subst_list
+  );
 
   // node のカットを old_cut から new_cut に置き換える．
   void
-  subst_cut_fanouts(CrNode* node,
-		    const Cut* old_cut,
-		    const Cut* new_cut);
+  subst_cut_fanouts(
+    CrNode* node,
+    const Cut* old_cut,
+    const Cut* new_cut
+  );
 
   // nodeのファンアウトリストにadd_nodeを追加する．
   bool
-  add_fo_list(vector<CrNode*>& fo_list,
-	      CrNode* add_node);
+  add_fo_list(
+    vector<CrNode*>& fo_list,
+    CrNode* add_node
+  );
 
   // ゲイン計算用のキューにつむ．
   void
-  put_gq(CrNode* node);
+  put_gq(
+    CrNode* node
+  );
 
   // ゲイン計算用のキューから取り出す．
   CrNode*
@@ -105,7 +121,9 @@ private:
 
   // レベル計算用のキューにつむ．
   void
-  put_lq(CrNode* node);
+  put_lq(
+    CrNode* node
+  );
 
   // レベル計算用のキューから取り出す．
   CrNode*
@@ -113,7 +131,9 @@ private:
 
   // 要求レベル計算用のキューにつむ．
   void
-  put_rq(CrNode* node);
+  put_rq(
+    CrNode* node
+  );
 
   // 要求レベル計算用のキューから取り出す．
   CrNode*
@@ -121,12 +141,16 @@ private:
 
   // カットの根に対応するノードを取り出す．
   CrNode*
-  cut_root(const Cut* cut);
+  cut_root(
+    const Cut* cut
+  );
 
   // カットの入力に対応するノードを取り出す．
   CrNode*
-  cut_input(const Cut* cut,
-	    ymuint pos);
+  cut_input(
+    const Cut* cut,
+    SizeType pos
+  );
 
   // CrNode を確保する．
   CrNode*
@@ -134,7 +158,9 @@ private:
 
   // CrNode を解放する．
   void
-  free_node(CrNode* node);
+  free_node(
+    CrNode* node
+  );
 
 
 private:

@@ -3,9 +3,8 @@
 /// @brief DelayCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "DelayCover.h"
 #include "Cut.h"
@@ -16,12 +15,11 @@
 BEGIN_NAMESPACE_LUTMAP
 
 // コンストラクタ
-// @param[in] fanout_mode ファンアウトモードの時に true にするフラグ
-// @param[in] slack 最小段数に対するスラック
-DelayCover::DelayCover(bool fanout_mode,
-		       int slack) :
-  DagCover(fanout_mode),
-  mSlack(slack)
+DelayCover::DelayCover(
+  bool fanout_mode,
+  int slack
+) : DagCover{fanout_mode},
+    mSlack{slack}
 {
 }
 
@@ -31,15 +29,14 @@ DelayCover::~DelayCover()
 }
 
 // @brief best cut の記録を行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-// @param[out] maprec マッピング結果を記録するオブジェクト
 void
-DelayCover::record_cuts(const SbjGraph& sbjgraph,
-			const CutHolder& cut_holder,
-			MapRecord& maprec)
+DelayCover::record_cuts(
+  const SbjGraph& sbjgraph,
+  const CutHolder& cut_holder,
+  MapRecord& maprec
+)
 {
-  int n = sbjgraph.node_num();
+  SizeType n = sbjgraph.node_num();
 
   maprec.init(sbjgraph);
 
@@ -49,15 +46,16 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   for ( int i = 0; i < n; ++ i ) {
     mNodeInfo[i].mCostList.set_mgr(&mCostMgr);
   }
-  int limit = cut_holder.limit();
+  SizeType limit = cut_holder.limit();
   mWeight.resize(limit);
   mIcostLists.resize(limit);
+  mIcostListEnds.resize(limit);
 
   // 入力のコストの設定
-  int ni = sbjgraph.input_num();
+  SizeType ni = sbjgraph.input_num();
   for ( int i = 0; i < ni; ++ i ) {
-    const SbjNode* node = sbjgraph.input(i);
-    NodeInfo& t = mNodeInfo[node->id()];
+    auto node = sbjgraph.input(i);
+    auto& t = mNodeInfo[node->id()];
     t.mCostList.insert(nullptr, 0, 0.0);
     t.mMinDepth = 0;
   }
@@ -70,19 +68,19 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
   }
 
   // 最小段数の最大値をもとめる．
-  int no = sbjgraph.output_num();
+  SizeType no = sbjgraph.output_num();
   vector<const SbjNode*> onode_list;
   onode_list.reserve(no);
-  int min_depth = 0;
+  SizeType min_depth = 0;
   for ( int i = 0; i < no; ++ i ) {
-    const SbjNode* onode = sbjgraph.output(i);
-    const SbjNode* node = onode->output_fanin();
+    auto onode = sbjgraph.output(i);
+    auto node = onode->output_fanin();
     if ( node == nullptr) continue;
     if ( node->is_logic() ) {
       onode_list.push_back(node);
     }
-    NodeInfo& node_info = mNodeInfo[node->id()];
-    int depth = node_info.mMinDepth;
+    auto& node_info = mNodeInfo[node->id()];
+    SizeType depth = node_info.mMinDepth;
     if ( min_depth < depth ) {
       min_depth = depth;
     }
@@ -96,25 +94,27 @@ DelayCover::record_cuts(const SbjGraph& sbjgraph,
 
   // 要求された段数制約を満たす中でコスト最小の解を選ぶ．
   for ( int i = 0; i < nl; ++ i ) {
-    const SbjNode* node = sbjgraph.logic(nl - i - 1);
+    auto node = sbjgraph.logic(nl - i - 1);
     select(node, maprec);
   }
 }
 
 // node のカットを選択する．
 void
-DelayCover::record(const SbjNode* node,
-		   const CutHolder& cut_holder)
+DelayCover::record(
+  const SbjNode* node,
+  const CutHolder& cut_holder
+)
 {
-  int min_depth = INT_MAX;
-  NodeInfo& t = mNodeInfo[node->id()];
+  SizeType min_depth = INT_MAX;
+  auto& t = mNodeInfo[node->id()];
   for ( auto cut: cut_holder.cut_list(node) ) {
-    int ni = cut->input_num();
+    SizeType ni = cut->input_num();
 
     if ( fanout_mode() ) {
       // ファンアウトモード
       for ( int i = 0; i < ni; ++ i ) {
-	const SbjNode* inode = cut->input(i);
+	auto inode = cut->input(i);
 	mWeight[i] = 1.0 / inode->fanout_num();
       }
     }
@@ -126,17 +126,18 @@ DelayCover::record(const SbjNode* node,
       calc_weight(node, cut, 1.0);
     }
 
-    int max_input_depth = 0;
+    SizeType max_input_depth = 0;
     for ( int i = 0; i < ni; ++ i ) {
-      const SbjNode* inode = cut->input(i);
-      NodeInfo& u = mNodeInfo[inode->id()];
+      auto inode = cut->input(i);
+      auto& u = mNodeInfo[inode->id()];
       if ( max_input_depth < u.mMinDepth ) {
 	max_input_depth = u.mMinDepth;
       }
       mIcostLists[i] = u.mCostList.begin();
+      mIcostListEnds[i] = u.mCostList.end();
     }
 
-    int cur_depth = max_input_depth + 1;
+    SizeType cur_depth = max_input_depth + 1;
     if ( min_depth > cur_depth ) {
       min_depth = cur_depth;
     }
@@ -144,15 +145,15 @@ DelayCover::record(const SbjNode* node,
     // mIcostLists から解を作る．
     for ( ; ; ) {
       // 各入力のなかでもっとも深い値を求める．
-      int idepth = 0;
+      SizeType idepth = 0;
       double area = 1.0;
       bool empty = false;
       for ( int i = 0; i < ni; ++ i ) {
-	if ( mIcostLists[i].is_end() ) {
+	if ( mIcostLists[i] == mIcostListEnds[i] ) {
 	  empty = true;
 	  break;
 	}
-	ADCost<double>* cost = *mIcostLists[i];
+	auto cost = *mIcostLists[i];
 	if ( idepth < cost->depth() ) {
 	  idepth = cost->depth();
 	}
@@ -161,14 +162,14 @@ DelayCover::record(const SbjNode* node,
       if ( empty ) {
 	break;
       }
-      int depth = idepth + 1;
+      SizeType depth = idepth + 1;
 
       // (depth, area) を登録
       t.mCostList.insert(cut, depth, area);
 
       // 深さが idepth に等しい解を次に進める．
       for ( int i = 0; i < ni; ++ i ) {
-	ADCost<double>* cost = *mIcostLists[i];
+	auto cost = *mIcostLists[i];
 	if ( cost->depth() == idepth ) {
 	  ++ mIcostLists[i];
 	}
@@ -180,9 +181,11 @@ DelayCover::record(const SbjNode* node,
 
 // node から各入力にいたる経路の重みを計算する．
 void
-DelayCover::calc_weight(const SbjNode* node,
-			const Cut* cut,
-			double cur_weight)
+DelayCover::calc_weight(
+  const SbjNode* node,
+  const Cut* cut,
+  double cur_weight
+)
 {
   for ( ; ; ) {
     for ( int i = 0; i < cut->input_num(); ++ i ) {
@@ -193,7 +196,7 @@ DelayCover::calc_weight(const SbjNode* node,
 	return;
       }
     }
-    const SbjNode* inode0 = node->fanin(0);
+    auto inode0 = node->fanin(0);
     calc_weight(inode0, cut, cur_weight / inode0->fanout_num());
     node = node->fanin(1);
     cur_weight /= node->fanout_num();
@@ -202,20 +205,20 @@ DelayCover::calc_weight(const SbjNode* node,
 
 // node のカットを選択する．
 void
-DelayCover::select(const SbjNode* node,
-		   MapRecord& maprec)
+DelayCover::select(
+  const SbjNode* node,
+  MapRecord& maprec
+)
 {
-  NodeInfo& t = mNodeInfo[node->id()];
-  int rd = t.mReqDepth;
+  auto& t = mNodeInfo[node->id()];
+  SizeType rd = t.mReqDepth;
   if ( rd == 0 ) {
     // このノードは必要ではない．
     return;
   }
 
   const Cut* cut = nullptr;
-  for ( ADCostIterator<double> p = t.mCostList.begin();
-       !p.is_end(); ++ p) {
-    ADCost<double>* cost = *p;
+  for ( auto cost: t.mCostList ) {
     if ( cost->depth() <= rd ) {
       cut = cost->cut();
       break;
@@ -225,8 +228,8 @@ DelayCover::select(const SbjNode* node,
   maprec.set_cut(node, cut);
   -- rd;
   for ( int i = 0; i < cut->input_num(); ++ i ) {
-    const SbjNode* inode = cut->input(i);
-    NodeInfo& u = mNodeInfo[inode->id()];
+    auto inode = cut->input(i);
+    auto& u = mNodeInfo[inode->id()];
     if ( u.mReqDepth == 0 || u.mReqDepth > rd ) {
       u.mReqDepth = rd;
     }

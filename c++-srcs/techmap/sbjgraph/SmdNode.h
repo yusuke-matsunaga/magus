@@ -5,9 +5,8 @@
 /// @brief SmdNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 
@@ -29,15 +28,24 @@ public:
 
   /// @brief 入力側のノードを得る．
   SmdNode*
-  from();
+  from()
+  {
+    return mFrom;
+  }
 
   /// @brief 出力側のノードを得る．
   SmdNode*
-  to();
+  to()
+  {
+    return mTo;
+  }
 
   /// @brief 出力側のノードのファンイン番号 ( 0 or 1 ) を得る．
-  int
-  pos();
+  SizeType
+  pos()
+  {
+    return (mFlags & 1U);
+  }
 
 
 public:
@@ -47,15 +55,24 @@ public:
 
   /// @brief flow が流れている時 true を返す．
   bool
-  flow() const;
+  flow() const
+  {
+    return static_cast<bool>((mFlags >> 1) & 1U);
+  }
 
   /// @brief flow フラグをセットする．
   void
-  set_flow();
+  set_flow()
+  {
+    mFlags |= 2U;
+  }
 
   /// @brief flow フラグをクリアする．
   void
-  clear_flow();
+  clear_flow()
+  {
+    mFlags &= ~2U;
+  }
 
 
 private:
@@ -84,10 +101,10 @@ class SmdNode
 public:
 
   /// @brief コンストラクタ
-  SmdNode();
+  SmdNode() = default;
 
   /// @brief デストラクタ
-  ~SmdNode();
+  ~SmdNode() = default;
 
 
 public:
@@ -96,44 +113,78 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号の取得
-  int
-  id() const;
+  SizeType
+  id() const
+  {
+    return (mId >> 1);
+  }
 
   /// @brief 入力ノードの時に true を返す．
   bool
-  is_input() const;
+  is_input() const
+  {
+    return !is_logic();
+  }
 
   /// @brief 論理ノードの時に true を返す．
   bool
-  is_logic() const;
+  is_logic() const
+  {
+    return static_cast<bool>(mId & 1U);
+  }
 
   /// @brief 1つ目のファンインを得る．
   SmdNode*
-  fanin0();
+  fanin0()
+  {
+    return mFanin0.from();
+  }
 
   /// @brief 2つ目のファンインを得る．
   SmdNode*
-  fanin1();
+  fanin1()
+  {
+    return mFanin1.from();
+  }
 
   /// @brief 1つ目のファンインの枝を得る．
   SmdEdge*
-  fanin0_edge();
+  fanin0_edge()
+  {
+    return &mFanin0;
+  }
 
   /// @brief 2つ目のファンインの枝を得る．
   SmdEdge*
-  fanin1_edge();
+  fanin1_edge()
+  {
+    return &mFanin1;
+  }
 
   /// @brief ファンアウト数を得る．
-  int
-  fanout_num();
+  SizeType
+  fanout_num()
+  {
+    return mFanoutArray.size();
+  }
 
   /// @brief pos 番目のファンアウトの枝を取り出す．
   SmdEdge*
-  fanout_edge(int pos);
+  fanout_edge(
+    SizeType pos
+  )
+  {
+    ASSERT_COND( pos >=0 && pos < fanout_num() );
+
+    return mFanoutArray[pos];
+  }
 
   /// @brief 深さを得る．
-  int
-  depth() const;
+  SizeType
+  depth() const
+  {
+    return mDepth;
+  }
 
 
 public:
@@ -142,23 +193,45 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を設定する．
-  /// @param[in] id ID番号
-  /// @param[in] input 入力ノードの時 true にセットするフラグ
   void
-  set_id(int id,
-	 bool input = false);
+  set_id(
+    SizeType id,
+    bool input = false
+  )
+  {
+    mId = (id << 1) | static_cast<int>(input);
+  }
 
   /// @brief 1つ目のファンインを設定する．
   void
-  set_fanin0(SmdNode* from);
+  set_fanin0(
+    SmdNode* from
+  )
+  {
+    mFanin0.mFrom = from;
+    mFanin0.mTo = this;
+    mFanin0.mFlags = 0U;
+  }
 
   /// @brief 2つ目のファンインを設定する．
   void
-  set_fanin1(SmdNode* from);
+  set_fanin1(
+    SmdNode* from
+  )
+  {
+    mFanin1.mFrom = from;
+    mFanin1.mTo = this;
+    mFanin1.mFlags = 1U;
+  }
 
   /// @brief ファンアウト配列を設定する．
   void
-  set_fanout_array(const vector<SmdEdge*>& foedge_list);
+  set_fanout_array(
+    const vector<SmdEdge*>& foedge_list
+  )
+  {
+    mFanoutArray = foedge_list;
+  }
 
 
 public:
@@ -169,49 +242,90 @@ public:
   /// @brief range マークを調べる．
   /// @note 副作用として range マークを付ける．
   bool
-  check_rmark();
+  check_rmark()
+  {
+    ymuint old_mark = mMark;
+    mMark |= kRangeMask;
+    return static_cast<bool>((old_mark >> kRangeShift) & 1U);
+  }
 
   /// @brief range マークを返す．
   bool
-  rmark();
+  rmark()
+  {
+    return static_cast<bool>((mMark >> kRangeShift) & 1U);
+  }
 
   /// @brief target マークを返す．
   bool
-  tmark();
+  tmark()
+  {
+    return static_cast<bool>((mMark >> kTargetShift) & 1U);
+  }
 
   /// @brief target マークを付ける．
   void
-  set_tmark();
+  set_tmark()
+  {
+    mMark |= kTargetMask;
+  }
 
   /// @brief flow 用のマークを返す．
   bool
-  fmark();
+  fmark()
+  {
+    return static_cast<bool>((mMark >> kFlowShift) & 1U);
+  }
 
   /// @brief flow 用のマークを付ける．
   void
-  set_fmark();
+  set_fmark()
+  {
+    mMark |= kFlowMask;
+  }
 
   /// @brief range/target/flow マークを消す．
   void
-  clear_rtfmark();
+  clear_rtfmark()
+  {
+    mMark &= ~(kRangeMask | kTargetMask | kFlowMask);
+  }
 
   /// @brief 入力側の visit フラグを調べる．
   /// @note 副作用として v1 マークを付ける．
   bool
-  check_vmark1();
+  check_vmark1()
+  {
+    ymuint old_mark = mMark;
+    mMark |= kV1Mask;
+    return static_cast<bool>((old_mark >> kV1Shift) & 1U);
+  }
 
   /// @brief 出力側の visit フラグを調べる．
   /// @note 副作用として v2 マークを付ける．
   bool
-  check_vmark2();
+  check_vmark2()
+  {
+    ymuint old_mark = mMark;
+    mMark |= kV2Mask;
+    return static_cast<bool>((old_mark >> kV2Shift) & 1U);
+  }
 
   /// @brief visit フラグを消す．
   void
-  clear_vmark();
+  clear_vmark()
+  {
+    mMark &= ~(kV1Mask | kV2Mask);
+  }
 
   /// @brief 深さを設定する．
   void
-  set_depth(int depth);
+  set_depth(
+    SizeType depth
+  )
+  {
+    mDepth = depth;
+  }
 
 
 private:
@@ -220,7 +334,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号 + 入力/論理フラグ
-  int mId;
+  SizeType mId;
 
   // 1つ目のファンインの枝
   SmdEdge mFanin0;
@@ -228,17 +342,14 @@ private:
   // 2つ目のファンインの枝
   SmdEdge mFanin1;
 
-  // ファンアウト数
-  int mFanoutNum;
-
   // ファンアウトの枝のポインタの配列
-  SmdEdge** mFanoutArray;
+  vector<SmdEdge*> mFanoutArray;
 
   // get_min_depth() 用の作業領域
   ymuint mMark;
 
   // 深さ
-  int mDepth;
+  SizeType mDepth;
 
 
 private:
@@ -274,238 +385,6 @@ private:
   const ymuint kV2Mask = 1U << kV2Shift;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 入力側のノードを得る．
-inline
-SmdNode*
-SmdEdge::from()
-{
-  return mFrom;
-}
-
-// @brief 出力側のノードを得る．
-inline
-SmdNode*
-SmdEdge::to()
-{
-  return mTo;
-}
-
-// @brief 出力側のノードのファンイン番号 ( 0 or 1 ) を得る．
-inline
-int
-SmdEdge::pos()
-{
-  return (mFlags & 1U);
-}
-
-// @brief flow が流れている時 true を返す．
-inline
-bool
-SmdEdge::flow() const
-{
-  return static_cast<bool>((mFlags >> 1) & 1U);
-}
-
-// @brief flow フラグをセットする．
-inline
-void
-SmdEdge::set_flow()
-{
-  mFlags |= 2U;
-}
-
-// @brief flow フラグをクリアする．
-inline
-void
-SmdEdge::clear_flow()
-{
-  mFlags &= ~2U;
-}
-
-// @brief ID番号の取得
-inline
-int
-SmdNode::id() const
-{
-  return (mId >> 1);
-}
-
-// @brief 入力ノードの時に true を返す．
-inline
-bool
-SmdNode::is_input() const
-{
-  return !is_logic();
-}
-
-// @brief 論理ノードの時に true を返す．
-inline
-bool
-SmdNode::is_logic() const
-{
-  return static_cast<bool>(mId & 1U);
-}
-
-// @brief 1つ目のファンインを得る．
-inline
-SmdNode*
-SmdNode::fanin0()
-{
-  return mFanin0.from();
-}
-
-// @brief 2つ目のファンインを得る．
-inline
-SmdNode*
-SmdNode::fanin1()
-{
-  return mFanin1.from();
-}
-
-// @brief 1つ目のファンインの枝を得る．
-inline
-SmdEdge*
-SmdNode::fanin0_edge()
-{
-  return &mFanin0;
-}
-
-// @brief 2つ目のファンインの枝を得る．
-inline
-SmdEdge*
-SmdNode::fanin1_edge()
-{
-  return &mFanin1;
-}
-
-// @brief ファンアウト数を得る．
-inline
-int
-SmdNode::fanout_num()
-{
-  return mFanoutNum;
-}
-
-// @brief pos 番目のファンアウトの枝を取り出す．
-inline
-SmdEdge*
-SmdNode::fanout_edge(int pos)
-{
-  ASSERT_COND( pos >=0 && pos < fanout_num() );
-
-  return mFanoutArray[pos];
-}
-
-// @brief 深さを得る．
-inline
-int
-SmdNode::depth() const
-{
-  return mDepth;
-}
-
-// @brief range マークを調べる．
-// @note 副作用として range マークを付ける．
-inline
-bool
-SmdNode::check_rmark()
-{
-  ymuint old_mark = mMark;
-  mMark |= kRangeMask;
-  return static_cast<bool>((old_mark >> kRangeShift) & 1U);
-}
-
-// @brief range マークを返す．
-inline
-bool
-SmdNode::rmark()
-{
-  return static_cast<bool>((mMark >> kRangeShift) & 1U);
-}
-
-// @brief target マークを返す．
-inline
-bool
-SmdNode::tmark()
-{
-  return static_cast<bool>((mMark >> kTargetShift) & 1U);
-}
-
-// @brief target マークを付ける．
-inline
-void
-SmdNode::set_tmark()
-{
-  mMark |= kTargetMask;
-}
-
-// @brief flow 用のマークを返す．
-inline
-bool
-SmdNode::fmark()
-{
-  return static_cast<bool>((mMark >> kFlowShift) & 1U);
-}
-
-// @brief flow 用のマークを付ける．
-inline
-void
-SmdNode::set_fmark()
-{
-  mMark |= kFlowMask;
-}
-
-// @brief range/target/flow マークを消す．
-inline
-void
-SmdNode::clear_rtfmark()
-{
-  mMark &= ~(kRangeMask | kTargetMask | kFlowMask);
-}
-
-// @brief 入力側の visit フラグを調べる．
-// @note 副作用として v1 マークを付ける．
-inline
-bool
-SmdNode::check_vmark1()
-{
-  ymuint old_mark = mMark;
-  mMark |= kV1Mask;
-  return static_cast<bool>((old_mark >> kV1Shift) & 1U);
-}
-
-// @brief 出力側の visit フラグを調べる．
-// @note 副作用として v2 マークを付ける．
-inline
-bool
-SmdNode::check_vmark2()
-{
-  ymuint old_mark = mMark;
-  mMark |= kV2Mask;
-  return static_cast<bool>((old_mark >> kV2Shift) & 1U);
-}
-
-// @brief visit フラグを消す．
-inline
-void
-SmdNode::clear_vmark()
-{
-  mMark &= ~(kV1Mask | kV2Mask);
-}
-
-// @brief 深さを設定する．
-inline
-void
-SmdNode::set_depth(int depth)
-{
-  mDepth = depth;
-}
 
 END_NAMESPACE_SBJ
 

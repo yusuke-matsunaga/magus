@@ -5,11 +5,11 @@
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "lutmap.h"
+#include "SbjGraph.h"
 #include "SbjNode.h"
 
 
@@ -31,13 +31,17 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  MapRecord();
+  MapRecord() = default;
 
   /// @brief コピーコンストラクタ
-  MapRecord(const MapRecord& src);
+  MapRecord(
+    const MapRecord& src
+  ) : mCutArray{src.mCutArray}
+  {
+  }
 
   /// @brief デストラクタ
-  ~MapRecord();
+  ~MapRecord() = default;
 
 
 public:
@@ -48,19 +52,32 @@ public:
   /// @brief @brief 作業領域を初期化する．
   /// @param[in] sbjgraph サブジェクトグラフ
   void
-  init(const SbjGraph& sbjgraph);
+  init(
+    const SbjGraph& sbjgraph
+  )
+  {
+    mCutArray.clear();
+    mCutArray.resize(sbjgraph.node_num(), nullptr);
+  }
 
   /// @brief カットを記録する．
-  /// @param[in] node 該当のノード
-  /// @param[in] cut 対応するカット
   void
-  set_cut(const SbjNode* node,
-	  const Cut* cut);
+  set_cut(
+    const SbjNode* node, ///< [in] 該当のノード
+    const Cut* cut       ///< [in] 対応するカット
+  )
+  {
+    mCutArray[node->id()] = cut;
+  }
 
   /// @brief カットを取り出す．
-  /// @param[in] node 該当のノード
   const Cut*
-  get_cut(const SbjNode* node) const;
+  get_cut(
+    const SbjNode* node ///< [in] 該当のノード
+  ) const
+  {
+    return mCutArray[node->id()];
+  }
 
 
 private:
@@ -72,31 +89,6 @@ private:
   vector<const Cut*> mCutArray;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @blif カットを記録する．
-// @param[in] node 該当のノード
-// @param[in] cut 対応するカット
-inline
-void
-MapRecord::set_cut(const SbjNode* node,
-		   const Cut* cut)
-{
-  mCutArray[node->id()] = cut;
-}
-
-// @brief カットを取り出す．
-// @param[in] node 該当のノード
-inline
-const Cut*
-MapRecord::get_cut(const SbjNode* node) const
-{
-  return mCutArray[node->id()];
-}
 
 END_NAMESPACE_LUTMAP
 

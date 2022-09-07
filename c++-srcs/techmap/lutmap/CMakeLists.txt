@@ -29,6 +29,7 @@ set ( main_SOURCES
   main/LbCalc.cc
   main/DgGraph.cc
   main/LutmapMgr.cc
+  main/MapGen.cc
   )
 
 set ( mct1_SOURCES
@@ -45,11 +46,6 @@ set ( mct2_SOURCES
 
 set ( sa_SOURCES
   sa/SaSearch.cc
-  )
-
-set ( mapgen_SOURCES
-  mapgen/MapGen.cc
-  mapgen/MapRecord.cc
   )
 
 set ( cut_resub_SOURCES
@@ -69,6 +65,5 @@ ym_add_object_library (magus_lutmap
   ${mct1_SOURCES}
   ${mct2_SOURCES}
   ${sa_SOURCES}
-  ${mapgen_SOURCES}
   ${cut_resub_SOURCES}
   )

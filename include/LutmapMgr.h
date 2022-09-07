@@ -26,7 +26,7 @@ public:
   /// @param[in] lut_size LUTの入力数
   /// @param[in] option オプション文字列
   LutmapMgr(
-    int lut_size = 5,
+    SizeType lut_size = 5,
     const string& option = string()
   );
 
@@ -43,8 +43,11 @@ public:
   /// @param[in] lut_size LUTの入力数
   void
   set_lut_size(
-    int lut_size
-  );
+    SizeType lut_size
+  )
+  {
+    mLutSize = lut_size;
+  }
 
   /// @brief オプション文字列を設定する．
   /// @param[in] option オプション文字列
@@ -72,18 +75,18 @@ public:
   );
 
   /// @brief 直前のマッピング結果のLUT数を返す．
-  int
-  lut_num();
+  SizeType
+  lut_num()
+  {
+    return mLutNum;
+  }
 
   /// @brief 直前のマッピング結果の段数を返す．
-  int
-  depth();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  SizeType
+  depth()
+  {
+    return mDepth;
+  }
 
 
 private:
@@ -92,7 +95,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // LUTの入力数
-  int mLutSize;
+  SizeType mLutSize;
 
   // オプション文字列
   string mOption;
@@ -107,42 +110,12 @@ private:
   bool mDoCutResub;
 
   // 直前のマッピング結果のLUT数
-  int mLutNum;
+  SizeType mLutNum;
 
   // 直前のマッピング結果の段数
-  int mDepth;
+  SizeType mDepth;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief LUTの入力数を設定する
-// @param[in] lut_size LUTの入力数
-inline
-void
-LutmapMgr::set_lut_size(int lut_size)
-{
-  mLutSize = lut_size;
-}
-
-// @brief 直前のマッピング結果のLUT数を返す．
-inline
-int
-LutmapMgr::lut_num()
-{
-  return mLutNum;
-}
-
-// @brief 直前のマッピング結果の段数を返す．
-inline
-int
-LutmapMgr::depth()
-{
-  return mDepth;
-}
 
 END_NAMESPACE_MAGUS
 

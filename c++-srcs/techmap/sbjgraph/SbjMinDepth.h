@@ -5,9 +5,8 @@
 /// @brief SbjMinDepth のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 #include "SbjGraph.h"
@@ -26,8 +25,9 @@ class SbjMinDepth
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  SbjMinDepth(const SbjGraph& sbjgraph);
+  SbjMinDepth(
+    const SbjGraph& sbjgraph ///< [in] 対象のサブジェクトグラフ
+  );
 
   /// @brief デストラクタ
   ~SbjMinDepth();
@@ -39,12 +39,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 各ノードの minimum depth を求める．
-  /// @param[in] k LUT の最大入力数
-  /// @param[out] depth_array 各ノードの深さを収める配列
   /// @return 出力の最大深さを返す．
-  int
-  operator()(int k,
-	     vector<int>& depth_array);
+  SizeType
+  operator()(
+    SizeType k,              ///< [in] LUT の最大入力数
+    vector<SizeType>& depth_array ///< [out] 各ノードの深さを収める配列
+  );
 
 
 private:
@@ -54,23 +54,31 @@ private:
 
   // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
   bool
-  find_k_cut(SmdNode* node,
-	     int k,
-	     int d);
+  find_k_cut(
+    SmdNode* node,
+    SizeType k,
+    SizeType d
+  );
 
   // node およびその TFI に rmark を付ける．
   // depth が d のノードに tmark を付ける．
   void
-  mark_tfi(SmdNode* node,
-	   int d);
+  mark_tfi(
+    SmdNode* node,
+    SizeType d
+  );
 
   // node のファンアウトを探索する．
   bool
-  dfs_fanout(SmdNode* node);
+  dfs_fanout(
+    SmdNode* node
+  );
 
   bool
-  dfs(SmdNode* cur_node,
-      int dir);
+  dfs(
+    SmdNode* cur_node,
+    int dir
+  );
 
 
 private:
@@ -91,17 +99,12 @@ private:
   vector<SmdNode*> mTfiNodeList;
 
   // ノード数
-  int mNodeNum;
+  SizeType mNodeNum;
 
   // ノードごとの作業領域
   SmdNode* mNodeArray;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE_SBJ
 

@@ -3,9 +3,8 @@
 /// @brief CrLevelQ の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "CrLevelQ.h"
 #include "CrNode.h"
@@ -30,9 +29,10 @@ CrLevelQ::~CrLevelQ()
 }
 
 // @brief 作業領域の初期化を行う．
-// @param[in] max_level 最大レベル
 void
-CrLevelQ::init(ymuint max_level)
+CrLevelQ::init(
+  SizeType max_level
+)
 {
   mLevelQ.clear();
   mLevelQ.resize(max_level + 1);
@@ -42,9 +42,8 @@ CrLevelQ::init(ymuint max_level)
 void
 CrLevelQ::clear()
 {
-  for (vector<list<CrNode*> >::iterator p = mLevelQ.begin();
-       p != mLevelQ.end(); ++ p) {
-    p->clear();
+  for ( auto p: mLevelQ ) {
+    p.clear();
   }
   mNum = 0;
   mMaxLevel = 0;
@@ -53,9 +52,11 @@ CrLevelQ::clear()
 
 // @brief ノードを追加する．
 void
-CrLevelQ::put(CrNode* node)
+CrLevelQ::put(
+  CrNode* node
+)
 {
-  ymuint l = node->sbjnode()->level();
+  SizeType l = node->sbjnode()->level();
   mLevelQ[l].push_back(node);
   if ( mNum == 0 ) {
     mMinLevel = l;
@@ -77,10 +78,10 @@ CrNode*
 CrLevelQ::getmin()
 {
   if ( mNum > 0 ) {
-    for (ymuint l = mMinLevel; l <= mMaxLevel; ++ l ) {
-      list<CrNode*>& lq = mLevelQ[l];
+    for ( SizeType l = mMinLevel; l <= mMaxLevel; ++ l ) {
+      auto& lq = mLevelQ[l];
       if ( !lq.empty() ) {
-	CrNode* node = lq.front();
+	auto node = lq.front();
 	lq.pop_front();
 	mMinLevel = l;
 	-- mNum;
@@ -97,10 +98,10 @@ CrNode*
 CrLevelQ::getmax()
 {
   if ( mNum > 0 ) {
-    for (ymuint l = mMaxLevel; l >= mMinLevel; -- l ) {
-      list<CrNode*>& lq = mLevelQ[l];
+    for ( SizeType l = mMaxLevel; l >= mMinLevel; -- l ) {
+      auto& lq = mLevelQ[l];
       if ( !lq.empty() ) {
-	CrNode* node = lq.front();
+	auto node = lq.front();
 	lq.pop_front();
 	mMaxLevel = l;
 	-- mNum;

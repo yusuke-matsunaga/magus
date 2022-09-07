@@ -5,9 +5,8 @@
 /// @brief SbjPort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 
@@ -31,13 +30,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] name 名前
-  /// @param[in] body 入出力ノードのベクタ
-  SbjPort(const string& name,
-	  const vector<SbjNode*>& body);
+  SbjPort(
+    const string& name,          ///< [in] 名前
+    const vector<SbjNode*>& body ///< [in] 入出力ノードのベクタ
+  ) : mName(name),
+      mBody(body)
+  {
+  }
 
   /// @brief デストラクタ
-  ~SbjPort();
+  ~SbjPort() = default;
 
 
 public:
@@ -47,16 +49,28 @@ public:
 
   /// @brief 名前を得る．
   string
-  name() const;
+  name() const
+  {
+    return mName;
+  }
 
   /// @brief ビット数を得る．
-  int
-  bit_width() const;
+  SizeType
+  bit_width() const
+  {
+    return mBody.size();
+  }
 
   /// @brief pos ビット目の内容を得る．
-  /// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
   const SbjNode*
-  bit(int pos) const;
+  bit(
+    SizeType pos ///< [in] ビット位置 ( 0 <= pos < bit_width() )
+  ) const
+  {
+    ASSERT_COND( pos >= 0 && pos < bit_width() );
+
+    return mBody[pos];
+  }
 
 
 private:
@@ -71,55 +85,6 @@ private:
   vector<SbjNode*> mBody;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// inline 関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] name 名前
-// @param[in] body 入出力ノードのベクタ
-inline
-SbjPort::SbjPort(const string& name,
-		 const vector<SbjNode*>& body) :
-  mName(name),
-  mBody(body)
-{
-}
-
-// @brief デストラクタ
-inline
-SbjPort::~SbjPort()
-{
-}
-
-// @brief 名前を得る．
-inline
-string
-SbjPort::name() const
-{
-  return mName;
-}
-
-// @brief ビット数を得る．
-inline
-int
-SbjPort::bit_width() const
-{
-  return mBody.size();
-}
-
-// @brief pos ビット目の内容を得る．
-// @param[in] pos ビット位置 ( 0 <= pos < bit_width() )
-inline
-const SbjNode*
-SbjPort::bit(int pos) const
-{
-  ASSERT_COND( pos >= 0 && pos < bit_width() );
-
-  return mBody[pos];
-}
 
 END_NAMESPACE_SBJ
 

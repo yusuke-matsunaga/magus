@@ -5,9 +5,8 @@
 /// @brief CrHeap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 
@@ -25,22 +24,28 @@ class CrHeap
 public:
 
   /// @brief コンストラクタ
-  CrHeap();
+  CrHeap() = default;
 
   /// @brief デストラクタ
-  ~CrHeap();
+  ~CrHeap() = default;
 
 
 public:
+  //////////////////////////////////////////////////////////////////////
+  // 外部インターフェイス
+  //////////////////////////////////////////////////////////////////////
 
   /// @brief 初期化する．
-  /// @param[in] max_n 最大要素数
   void
-  init(ymuint max_n);
+  init(
+    SizeType max_n ///< [in] 最大要素数
+  );
 
   /// @brief ヒープに追加する．
   void
-  put(CrNode* n);
+  put(
+    CrNode* node ///< [in] 追加するノード
+  );
 
   /// @brief ヒープの先頭要素を抜き出す．
   CrNode*
@@ -48,32 +53,47 @@ public:
 
   /// @brief ヒープから削除する．
   void
-  remove(CrNode* n);
+  remove(
+    CrNode* node ///< [in] 削除するノード
+  );
 
-  // 値の更新に伴ってヒープの再構築を行う．
+  /// @brief 値の更新に伴ってヒープの再構築を行う．
   void
-  update(CrNode* n,
-	 ymuint gain);
+  update(
+    CrNode* node, ///< [in] ノード
+    SizeType gain ///< [in] 値
+  );
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で使われる下請け関数
+  //////////////////////////////////////////////////////////////////////
 
-  // 引数の位置にある要素を適当な位置まで沈めてゆく
+  /// @brief 引数の位置にある要素を適当な位置まで沈めてゆく
   void
-  move_down(ymuint pos);
+  move_down(
+    SizeType pos ///< [in] 位置
+  );
 
-  // 引数の位置にある要素を適当な位置まで上げてゆく
+  /// @brief 引数の位置にある要素を適当な位置まで上げてゆく
   void
-  move_up(ymuint pos);
+  move_up(
+    SizeType pos ///< [in] 位置
+  );
 
-  // pos の位置に node を置く
+  /// @brief pos の位置にノードを置く
   void
-  set(ymuint pos,
-      CrNode* node);
+  set(
+    SizeType pos, ///< [in] 位置
+    CrNode* node  ///< [in] ノード
+  );
 
-  // pos の位置の要素を返す．
+  /// @brief pos の位置の要素を返す．
   CrNode*
-  get(ymuint pos);
+  get(
+    SizeType pos ///< [in] 位置
+  );
 
 
 private:
@@ -85,7 +105,7 @@ private:
   vector<CrNode*> mHeap;
 
   // ヒープ木の要素数
-  ymuint32 mNum;
+  SizeType mNum{0};
 
 };
 

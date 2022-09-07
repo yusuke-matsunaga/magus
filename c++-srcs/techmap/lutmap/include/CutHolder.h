@@ -5,9 +5,8 @@
 /// @brief CutHolder のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "EnumCutOp.h"
 #include "Cut.h"
@@ -39,11 +38,19 @@ public:
 
   /// @brief node を根とするカットのリストを取り出す．
   const CutList&
-  cut_list(const SbjNode* node) const;
+  cut_list(
+    const SbjNode* node ///< [in] ノード
+  ) const
+  {
+    return mCutList[node->id()];
+  }
 
   /// @brief 現在のカットを列挙したときのカットサイズを返す．
-  int
-  limit() const;
+  SizeType
+  limit() const
+  {
+    return mLimit;
+  }
 
   /// @brief 保持しているカットのリストを削除する．
   void
@@ -56,50 +63,50 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 処理の最初に呼ばれる関数
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] limit カットサイズ
   void
-  all_init(const SbjGraph& sbjgraph,
-	   int limit) override;
+  all_init(
+    const SbjGraph& sbjgraph, ///< [in] 対象のサブジェクトグラフ
+    SizeType limit            ///< [in] カットサイズ
+  ) override;
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
-  /// @param[in] node 根のノード
-  /// @param[in] cur_pos node の処理順
   void
-  node_init(const SbjNode* node,
-	    int cur_pos) override;
+  node_init(
+    const SbjNode* node, ///< [in] 根のノード
+    SizeType cur_pos     ///< [in] node の処理順
+  ) override;
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
-  /// @param[in] root 根のノード
   void
-  found(const SbjNode* root) override;
+  found(
+    const SbjNode* root ///< [in] 根のノード
+  ) override;
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
-  /// @param[in] root 根のノード
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ノードの配列
   void
-  found(const SbjNode* root,
-	int ni,
-	const SbjNode* inputs[]) override;
+  found(
+    const SbjNode* root,     ///< [in] 根のノード
+    SizeType ni,             ///< [in] 入力数
+    const SbjNode* inputs[]  ///< [in] 入力ノードの配列
+  ) override;
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
-  /// @param[in] node 根のノード
-  /// @param[in] cur_pos node の処理順
-  /// @param[in] ncuts 列挙されたカット数
   void
-  node_end(const SbjNode* node,
-	   int cur_pos,
-	   int ncuts) override;
+  node_end(
+    const SbjNode* node, ///< [in] 根のノード
+    SizeType cur_pos,    ///< [in] node の処理順
+    SizeType ncuts       ///< [in] 列挙されたカット数
+  ) override;
 
   /// @brief 処理の最後に呼ばれる関数
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] limit カットサイズ
-  /// @note sbjgraph, limit, mode は 対となる all_init で
+  ///
+  /// sbjgraph, limit, mode は 対となる all_init で
   /// 用いられたものと同じものが与えられる．
   void
-  all_end(const SbjGraph& sbjgraph,
-	  int limit) override;
+  all_end(
+    const SbjGraph& sbjgraph, ///< [in] 対象のサブジェクトグラフ
+    SizeType limit            ///< [in] カットサイズ
+  ) override;
 
 
 private:
@@ -111,33 +118,12 @@ private:
   CutMgr mMgr;
 
   // カットサイズ
-  int mLimit;
+  SizeType mLimit;
 
   // 各ノードのカットのリスト
   CutList* mCutList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief node を根とするカットのリストを取り出す．
-inline
-const CutList&
-CutHolder::cut_list(const SbjNode* node) const
-{
-  return mCutList[node->id()];
-}
-
-// @brief 現在のカットを列挙したときのカットサイズを返す．
-inline
-int
-CutHolder::limit() const
-{
-  return mLimit;
-}
 
 END_NAMESPACE_LUTMAP
 

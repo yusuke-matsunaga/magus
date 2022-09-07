@@ -5,9 +5,8 @@
 /// @brief CrNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "sbj_nsdef.h"
@@ -28,155 +27,289 @@ class CrNode
 public:
 
   /// @brief コンストラクタ
-  CrNode();
+  CrNode() = default;
 
   /// @brief デストラクタ
-  ~CrNode();
+  ~CrNode() = default;
 
 
 public:
 
   /// @brief 対応する SbjNode を設定する．
   void
-  set_sbjnode(const SbjNode* node);
+  set_sbjnode(
+    const SbjNode* node ///< [in] ノード
+  );
 
   /// @brief 対応する SbjNode を返す．
   const SbjNode*
-  sbjnode() const;
+  sbjnode() const
+  {
+    return mNode;
+  }
 
   /// @brief 外部入力ノードのとき true を返す．
   bool
-  is_input() const;
+  is_input() const
+  {
+    return mFlags.test(INPUT_BIT);
+  }
 
   /// @brief 外部出力ノードにファンアウトしているとき true を返す．
   bool
-  is_output() const;
+  is_output() const
+  {
+    return mFlags.test(OUTPUT_BIT);
+  }
 
   /// @brief 削除済みのマークをつける．
   void
-  set_deleted();
+  set_deleted()
+  {
+    mFlags.set(DELETE_BIT);
+  }
 
   /// @brief 削除済みのとき true を返す．
   bool
-  deleted() const;
+  deleted() const
+  {
+    return mFlags.test(DELETE_BIT);
+  }
 
   /// @brief GQ マークをつける．
   void
-  set_GQ();
+  set_GQ()
+  {
+    mFlags.set(GQ_BIT);
+  }
 
   /// @brief GQ マークを消す．
   void
-  clear_GQ();
+  clear_GQ()
+  {
+    mFlags.reset(GQ_BIT);
+  }
 
   /// @brief GQ に入っているとき true を返す．
   bool
-  in_GQ() const;
+  in_GQ() const
+  {
+    return mFlags.test(GQ_BIT);
+  }
 
   /// @brief LQ マークをつける．
   void
-  set_LQ();
+  set_LQ()
+  {
+    mFlags.set(LQ_BIT);
+  }
 
   /// @brief LQ マークを消す．
   void
-  clear_LQ();
+  clear_LQ()
+  {
+    mFlags.reset(LQ_BIT);
+  }
 
   /// @brief LQ に入っているとき true を返す．
   bool
-  in_LQ() const;
+  in_LQ() const
+  {
+    return mFlags.test(LQ_BIT);
+  }
 
   /// @brief RQ マークをつける．
   void
-  set_RQ();
+  set_RQ()
+  {
+    mFlags.set(RQ_BIT);
+  }
 
   /// @brief RQ マークを消す．
   void
-  clear_RQ();
+  clear_RQ()
+  {
+    mFlags.reset(RQ_BIT);
+  }
 
   /// @brief RQ に入っているとき true を返す．
   bool
-  in_RQ() const;
+  in_RQ() const
+  {
+    return mFlags.test(RQ_BIT);
+  }
 
   /// @brief カットをセットする．
   void
-  set_cut(const Cut* cut);
+  set_cut(
+    const Cut* cut ///< [in] カット
+  )
+  {
+    mCurCut = cut;
+  }
 
   /// @brief 現在のカットを返す．
   const Cut*
-  cut() const;
+  cut() const
+  {
+    return mCurCut;
+  }
 
   /// @brief ファンアウトリストに追加する．
-  /// @note 重複していたら追加せず false を返す．
+  ///
+  /// 重複していたら追加せず false を返す．
   /// 通常は追加して true を返す．
   bool
-  add_fanout(CrNode* add_node);
+  add_fanout(
+    CrNode* node ///< [in] 追加するノード
+  );
 
   /// @brief ファンアウトリストから削除する．
   void
-  delete_fanout(CrNode* del_node);
+  delete_fanout(
+    CrNode* node ///< [in] 削除するノード
+  );
 
   /// @brief ファンアウトリストを得る．
   const vector<CrNode*>&
-  fanout_list();
+  fanout_list()
+  {
+    return mFanoutList;
+  }
 
   /// @brief ゲインをセットする．
   void
-  set_gain(ymuint gain);
+  set_gain(
+    SizeType gain ///< [in] 値
+  )
+  {
+    mCurGain = gain;
+  }
 
   /// @brief ゲインを得る．
-  ymuint
-  gain() const;
+  SizeType
+  gain() const
+  {
+    return mCurGain;
+  }
 
   /// @brief レベルをセットする．
   void
-  set_level(ymuint level);
+  set_level(
+    SizeType level ///< [in] 値
+  )
+  {
+    mLevel = level;
+  }
 
   /// @brief レベルを返す．
-  ymuint
-  level() const;
+  SizeType
+  level() const
+  {
+    return mLevel;
+  }
 
   /// @brief 要求レベルをセットする．
   void
-  set_req_level(ymuint req_Level);
+  set_req_level(
+    SizeType val ///< [in] 値
+  )
+  {
+    mReqLevel = val;
+  }
 
   /// @brief 要求レベルを返す．
-  ymuint
-  req_level() const;
+  SizeType
+  req_level() const
+  {
+    return mReqLevel;
+  }
 
   /// @brief lock マークをつける．
   void
-  lock();
+  lock()
+  {
+    mFlags.set(LOCK_BIT);
+  }
 
   /// @brief lock マークを消す．
   void
-  unlock();
+  unlock()
+  {
+    mFlags.reset(LOCK_BIT);
+  }
 
   /// @brief lock マークを返す．
   bool
-  is_locked() const;
+  is_locked() const
+  {
+    return mFlags.test(LOCK_BIT);
+  }
 
   /// @brief old マークをつける．
   void
-  set_oldmark();
+  set_oldmark()
+  {
+    mFlags.set(OLD_BIT);
+  }
 
   /// @brief old マークを消す．
   void
-  clear_oldmark();
+  clear_oldmark()
+  {
+    mFlags.reset(OLD_BIT);
+  }
 
   /// @brief old マークを返す．
   bool
-  oldmark();
+  oldmark()
+  {
+    return mFlags.test(OLD_BIT);
+  }
 
   /// @brief new マークをつける．
   void
-  set_newmark();
+  set_newmark()
+  {
+    mFlags.set(NEW_BIT);
+  }
 
   /// @brief new マークを消す．
   void
-  clear_newmark();
+  clear_newmark()
+  {
+    mFlags.reset(NEW_BIT);
+  }
 
   /// @brief new マークを返す．
   bool
-  newmark();
+  newmark()
+  {
+    return mFlags.test(NEW_BIT);
+  }
+
+  /// @brief ヒープ上の位置を返す．
+  SizeType
+  heap_index() const
+  {
+    return mHeapIndex;
+  }
+
+  /// @brief ヒープに入っていたら true を返す．
+  bool
+  in_heap() const
+  {
+    return mHeapIndex != static_cast<SizeType>(-1);
+  }
+
+  /// @brief ヒープ上の位置をセットする．
+  void
+  set_heap_index(
+    SizeType pos ///< [in] 設定する位置
+  )
+  {
+    mHeapIndex = pos;
+  }
 
 
 public:
@@ -184,76 +317,65 @@ public:
   // 代役候補のカットのリスト
   vector<const Cut*> mAltCutList;
 
-  ymuint mTmpLevel;
+  SizeType mTmpLevel;
 
 
 private:
+  //////////////////////////////////////////////////////////////////////
+  // 内部で用いられる定数
+  //////////////////////////////////////////////////////////////////////
+
+  static
+  const int INPUT_BIT = 0;
+  static
+  const int OUTPUT_BIT = 1;
+  static
+  const int DELETE_BIT = 2;
+  static
+  const int GQ_BIT = 3;
+  static
+  const int LQ_BIT = 4;
+  static
+  const int RQ_BIT = 5;
+  static
+  const int LOCK_BIT = 6;
+  static
+  const int OLD_BIT = 7;
+  static
+  const int NEW_BIT = 8;
+  static
+  const int BIT_NUM = 9;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
 
   // 根のノード
-  const SbjNode* mNode;
+  const SbjNode* mNode{nullptr};
 
   // このノードを根とする最適カット
-  const Cut* mCurCut;
+  const Cut* mCurCut{nullptr};
 
   // ファンアウト先のカットの根のノードのリスト
   vector<CrNode*> mFanoutList;
 
   // 種々のフラグ
-  ymuint32 mFlags;
+  bitset<BIT_NUM> mFlags{0U};
 
   // 現在のゲイン
-  ymuint32 mCurGain;
+  SizeType mCurGain{0};
 
   // ヒープ上のインデックス
   // ヒープに入っていない時は -1
-  int mHeapIndex;
+  int mHeapIndex{-1};
 
   // CrNode のネットワーク中の段数
-  ymuint32 mLevel;
+  SizeType mLevel{0};
 
   // CrNode のネットワーク中の要求段数
-  ymuint32 mReqLevel;
-
-
-private:
-
-  static
-  const int kInputShift = 0;
-  static
-  const int kOutputShift = 1;
-  static
-  const int kDeletedShift = 2;
-  static
-  const int kGQShift = 3;
-  static
-  const int kLQShift = 4;
-  static
-  const int kRQShift = 5;
-  static
-  const int kLockShift = 6;
-  static
-  const int kOldShift = 7;
-  static
-  const int kNewShift = 8;
-
-  static
-  const ymuint kInputMask = 1U << kInputShift;
-  static
-  const ymuint kOutputMask = 1U << kOutputShift;
-  static
-  const ymuint kDeletedMask = 1U << kDeletedShift;
-  static
-  const ymuint kGQMask = 1U << kGQShift;
-  static
-  const ymuint kLQMask = 1U << kLQShift;
-  static
-  const ymuint kRQMask = 1U << kRQShift;
-  static
-  const ymuint kLockMask = 1U << kLockShift;
-  static
-  const ymuint kOldMask = 1U << kOldShift;
-  static
-  const ymuint kNewMask = 1U << kNewShift;
+  SizeType mReqLevel{0};
 
 };
 
@@ -261,269 +383,10 @@ private:
 /// @relates CrNode
 /// @brief CrHeap のための比較関数
 bool
-compare(CrNode* node1,
-	CrNode* node2);
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 対応する SbjNode を返す．
-inline
-const SbjNode*
-CrNode::sbjnode() const
-{
-  return mNode;
-}
-
-// @brief カットをセットする．
-inline
-void
-CrNode::set_cut(const Cut* cut)
-{
-  mCurCut = cut;
-}
-
-// @brief 現在のカットを返す．
-inline
-const Cut*
-CrNode::cut() const
-{
-  return mCurCut;
-}
-
-// @brief 外部入力ノードのとき true を返す．
-inline
-bool
-CrNode::is_input() const
-{
-  return static_cast<bool>((mFlags >> kInputShift) & 1U);
-}
-
-// @brief 外部出力ノードにファンアウトしているとき true を返す．
-inline
-bool
-CrNode::is_output() const
-{
-  return static_cast<bool>((mFlags >> kOutputShift) & 1U);
-}
-
-// @brief 削除済みのマークをつける．
-inline
-void
-CrNode::set_deleted()
-{
-  mFlags |= kDeletedMask;
-}
-
-// @brief 削除済みのとき true を返す．
-inline
-bool
-CrNode::deleted() const
-{
-  return static_cast<bool>((mFlags >> kDeletedShift) & 1U);
-}
-
-// @brief GQ マークをつける．
-inline
-void
-CrNode::set_GQ()
-{
-  mFlags |= (1U << kGQShift);
-}
-
-// @brief GQ マークを消す．
-inline
-void
-CrNode::clear_GQ()
-{
-  mFlags &= ~(1U << kGQShift);
-}
-
-// @brief GQ に入っているとき true を返す．
-inline
-bool
-CrNode::in_GQ() const
-{
-  return static_cast<bool>((mFlags >> kGQShift) & 1U);
-}
-
-// @brief LQ マークをつける．
-inline
-void
-CrNode::set_LQ()
-{
-  mFlags |= (1U << kLQShift);
-}
-
-// @brief LQ マークを消す．
-inline
-void
-CrNode::clear_LQ()
-{
-  mFlags &= ~(1U << kLQShift);
-}
-
-// @brief LQ に入っているとき true を返す．
-inline
-bool
-CrNode::in_LQ() const
-{
-  return static_cast<bool>((mFlags >> kLQShift) & 1U);
-}
-
-// @brief RQ マークをつける．
-inline
-void
-CrNode::set_RQ()
-{
-  mFlags |= (1U << kRQShift);
-}
-
-// @brief RQ マークを消す．
-inline
-void
-CrNode::clear_RQ()
-{
-  mFlags &= ~(1U << kRQShift);
-}
-
-// @brief RQ に入っているとき true を返す．
-inline
-bool
-CrNode::in_RQ() const
-{
-  return static_cast<bool>((mFlags >> kRQShift) & 1U);
-}
-
-// @brief ファンアウトリストを得る．
-inline
-const vector<CrNode*>&
-CrNode::fanout_list()
-{
-  return mFanoutList;
-}
-
-// @brief ゲインをセットする．
-inline
-void
-CrNode::set_gain(ymuint gain)
-{
-  mCurGain = gain;
-}
-
-// @brief ゲインを得る．
-inline
-ymuint
-CrNode::gain() const
-{
-  return mCurGain;
-}
-
-// @brief レベルをセットする．
-inline
-void
-CrNode::set_level(ymuint level)
-{
-  mLevel = level;
-}
-
-// @brief レベルを返す．
-inline
-ymuint
-CrNode::level() const
-{
-  return mLevel;
-}
-
-// @brief 要求レベルをセットする．
-inline
-void
-CrNode::set_req_level(ymuint req_level)
-{
-  mReqLevel = req_level;
-}
-
-// @brief 要求レベルを返す．
-inline
-ymuint
-CrNode::req_level() const
-{
-  return mReqLevel;
-}
-
-// @brief lock マークをつける．
-inline
-void
-CrNode::lock()
-{
-  mFlags |= kLockMask;
-}
-
-// @brief lock マークを消す．
-inline
-void
-CrNode::unlock()
-{
-  mFlags &= ~kLockMask;
-}
-
-// @brief lock マークを返す．
-inline
-bool
-CrNode::is_locked() const
-{
-  return static_cast<bool>((mFlags >> kLockShift) & 1U);
-}
-
-// @brief old マークをつける．
-inline
-void
-CrNode::set_oldmark()
-{
-  mFlags |= kOldMask;
-}
-
-// @brief old マークを消す．
-inline
-void
-CrNode::clear_oldmark()
-{
-  mFlags &= ~kOldMask;
-}
-
-// @brief old マークを返す．
-inline
-bool
-CrNode::oldmark()
-{
-  return static_cast<bool>((mFlags >> kOldShift) & 1U);
-}
-
-// @brief new マークをつける．
-inline
-void
-CrNode::set_newmark()
-{
-  mFlags |= kNewMask;
-}
-
-// @brief new マークを消す．
-inline
-void
-CrNode::clear_newmark()
-{
-  mFlags &= ~kNewMask;
-}
-
-// @brief new マークを返す．
-inline
-bool
-CrNode::newmark()
-{
-  return static_cast<bool>((mFlags >> kNewShift) & 1U);
-}
+compare(
+  CrNode* node1, ///< [in] ノード1
+  CrNode* node2  ///< [in] ノード2
+);
 
 END_NAMESPACE_LUTMAP
 

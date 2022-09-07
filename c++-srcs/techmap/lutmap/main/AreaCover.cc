@@ -3,9 +3,8 @@
 /// @brief AreCover の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "AreaCover.h"
 #include "Cut.h"
@@ -18,8 +17,9 @@
 BEGIN_NAMESPACE_LUTMAP
 
 // コンストラクタ
-AreaCover::AreaCover(bool fanout_mode) :
-  DagCover(fanout_mode)
+AreaCover::AreaCover(
+  bool fanout_mode
+) : DagCover{fanout_mode}
 {
 }
 
@@ -29,45 +29,45 @@ AreaCover::~AreaCover()
 }
 
 // @brief best cut の記録を行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-// @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const SbjGraph& sbjgraph,
-		       const CutHolder& cut_holder,
-		       MapRecord& maprec)
+AreaCover::record_cuts(
+  const SbjGraph& sbjgraph,
+  const CutHolder& cut_holder,
+  MapRecord& maprec
+)
 {
-  record_cuts(sbjgraph, cut_holder, vector<const SbjNode*>(0), vector<const SbjNode*>(0), maprec);
+  record_cuts(sbjgraph, cut_holder,
+	      {},
+	      {},
+	      maprec);
 }
 
 // @brief best cut の記録を行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-// @param[in] boundary_list 境界ノードのリスト
-// @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const SbjGraph& sbjgraph,
-		       const CutHolder& cut_holder,
-		       const vector<const SbjNode*>& boundary_list,
-		       MapRecord& maprec)
+AreaCover::record_cuts(
+  const SbjGraph& sbjgraph,
+  const CutHolder& cut_holder,
+  const vector<const SbjNode*>& boundary_list,
+  MapRecord& maprec
+)
 {
-  record_cuts(sbjgraph, cut_holder, boundary_list, vector<const SbjNode*>(0), maprec);
+  record_cuts(sbjgraph, cut_holder,
+	      boundary_list,
+	      {},
+	      maprec);
 }
 
 // @brief best cut の記録を行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-// @param[in] boundary_list 境界ノードのリスト
-// @param[in] dupnode_list 重複ノードのリスト
-// @param[out] maprec マッピング結果を記録するオブジェクト
 void
-AreaCover::record_cuts(const SbjGraph& sbjgraph,
-		       const CutHolder& cut_holder,
-		       const vector<const SbjNode*>& boundary_list,
-		       const vector<const SbjNode*>& dupnode_list,
-		       MapRecord& maprec)
+AreaCover::record_cuts(
+  const SbjGraph& sbjgraph,
+  const CutHolder& cut_holder,
+  const vector<const SbjNode*>& boundary_list,
+  const vector<const SbjNode*>& dupnode_list,
+  MapRecord& maprec
+)
 {
-  int n = sbjgraph.node_num();
+  SizeType n = sbjgraph.node_num();
 
   // 作業領域の初期化
   mBestCost.clear();
@@ -90,25 +90,25 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
   maprec.init(sbjgraph);
 
   // 入力のコストを設定
-  int ni = sbjgraph.input_num();
-  for ( int i = 0; i < ni; ++ i ) {
-    const SbjNode* node = sbjgraph.input(i);
+  SizeType ni = sbjgraph.input_num();
+  for ( SizeType i = 0; i < ni; ++ i ) {
+    auto node = sbjgraph.input(i);
     maprec.set_cut(node, nullptr);
     mBestCost[node->id()] = 0.0;
   }
 
   // 論理ノードのコストを入力側から計算
-  int nl = sbjgraph.logic_num();
-  for ( int i = 0; i < nl; ++ i ) {
-    const SbjNode* node = sbjgraph.logic(i);
+  SizeType nl = sbjgraph.logic_num();
+  for ( SizeType i = 0; i < nl; ++ i ) {
+    auto node = sbjgraph.logic(i);
 
     double min_cost = DBL_MAX;
     const Cut* best_cut = nullptr;
     for ( auto cut: cut_holder.cut_list(node) ) {
-      int ni = cut->input_num();
+      SizeType ni = cut->input_num();
       bool ng = false;
-      for ( int i = 0; i < ni; ++ i ) {
-	const SbjNode* inode = cut->input(i);
+      for ( SizeType i = 0; i < ni; ++ i ) {
+	auto inode = cut->input(i);
 	if ( mBestCost[inode->id()] == DBL_MAX ) {
 	  ng = true;
 	  break;
@@ -118,8 +118,8 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
       if ( fanout_mode() ) {
 	// ファンアウトモード
-	for ( int i = 0; i < ni; ++ i)  {
-	  const SbjNode* inode = cut->input(i);
+	for ( SizeType i = 0; i < ni; ++ i)  {
+	  auto inode = cut->input(i);
 	  switch ( mBoundaryMark[inode->id()] ) {
 	  case 0:
 	    mWeight[i] = 1.0 / inode->fanout_num();
@@ -137,12 +137,12 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       }
       else {
 	// フローモード
-	for ( int i = 0; i < ni; ++ i ) {
+	for ( SizeType i = 0; i < ni; ++ i ) {
 	  mWeight[i] = 0.0;
 	}
 	calc_weight(node, cut, 1.0);
-	for ( int i = 0; i < ni; ++ i ) {
-	  const SbjNode* inode = cut->input(i);
+	for ( SizeType i = 0; i < ni; ++ i ) {
+	  auto inode = cut->input(i);
 	  switch ( mBoundaryMark[inode->id()] ) {
 	  case 0:
 	    break;
@@ -159,8 +159,8 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
       }
 
       double cur_cost = 1.0;
-      for ( int i = 0; i < ni; ++ i ) {
-	const SbjNode* inode = cut->input(i);
+      for ( SizeType i = 0; i < ni; ++ i ) {
+	auto inode = cut->input(i);
 	cur_cost += mBestCost[inode->id()] * mWeight[i];
       }
       if ( min_cost > cur_cost ) {
@@ -176,12 +176,14 @@ AreaCover::record_cuts(const SbjGraph& sbjgraph,
 
 // node から各入力にいたる経路の重みを計算する．
 void
-AreaCover::calc_weight(const SbjNode* node,
-		       const Cut* cut,
-		       double cur_weight)
+AreaCover::calc_weight(
+  const SbjNode* node,
+  const Cut* cut,
+  double cur_weight
+)
 {
   for ( ; ; ) {
-    for ( int i = 0; i < cut->input_num(); ++ i ) {
+    for ( SizeType i = 0; i < cut->input_num(); ++ i ) {
       if ( cut->input(i) == node ) {
 	// node は cut の葉だった．
 	if  ( !node->pomark() ) {
@@ -190,7 +192,7 @@ AreaCover::calc_weight(const SbjNode* node,
 	return;
       }
     }
-    const SbjNode* inode0 = node->fanin(0);
+    auto inode0 = node->fanin(0);
     double cur_weight0 = cur_weight / inode0->fanout_num();
     calc_weight(inode0, cut, cur_weight0);
     node = node->fanin(1);

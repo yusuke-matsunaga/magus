@@ -5,9 +5,8 @@
 /// @brief DelayCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "DagCover.h"
 #include "ADCost.h"
@@ -30,10 +29,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] fanout_mode ファンアウトモードの時に true にするフラグ
-  /// @param[in] slack 最小段数に対するスラック
-  DelayCover(bool fanout_mode,
-	     int slack);
+  DelayCover(
+    bool fanout_mode, ///< [in] ファンアウトモードの時に true にするフラグ
+    int slack         ///< [in] 最小段数に対するスラック
+  );
 
   /// @brief デストラクタ
   ~DelayCover();
@@ -45,14 +44,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
-  virtual
   void
-  record_cuts(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder,
-	      MapRecord& maprec);
+  record_cuts(
+    const SbjGraph& sbjgraph,    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder, ///< [in] 各ノードのカットを保持するオブジェクト
+    MapRecord& maprec            ///< [out] マッピング結果を記録するオブジェクト
+  ) override;
 
 
 private:
@@ -62,19 +59,25 @@ private:
 
   // node のカットを記録する．
   void
-  record(const SbjNode* node,
-	 const CutHolder& cut_holder);
+  record(
+    const SbjNode* node,
+    const CutHolder& cut_holder
+  );
 
   // node のカットを選択する．
   void
-  select(const SbjNode* node,
-	 MapRecord& maprec);
+  select(
+    const SbjNode* node,
+    MapRecord& maprec
+  );
 
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(const SbjNode* node,
-	      const Cut* cut,
-	      double cur_weight);
+  calc_weight(
+    const SbjNode* node,
+    const Cut* cut,
+    double cur_weight
+  );
 
 
 private:
@@ -85,17 +88,9 @@ private:
   // ノードごとの作業領域
   struct NodeInfo
   {
-
-    // コンストラクタ
-    NodeInfo() :
-      mMinDepth(0),
-      mReqDepth(0)
-    {
-    }
-
     ADCostList<double> mCostList;
-    int mMinDepth;
-    int mReqDepth;
+    int mMinDepth{0};
+    int mReqDepth{0};
   };
 
 
@@ -118,6 +113,9 @@ private:
 
   // カットの葉の ADCost の反復子を格納する配列
   vector<ADCostIterator<double>> mIcostLists;
+
+  // カットの葉の ADCost の末尾の反復子を格納する配列
+  vector<ADCostIterator<double>> mIcostListEnds;
 
 };
 

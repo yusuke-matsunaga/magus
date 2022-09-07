@@ -3,9 +3,8 @@
 /// @brief EnumCut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "EnumCut.h"
 
@@ -33,12 +32,14 @@ EnumCut::~EnumCut()
 }
 
 // 入力数が limit 以下のクラスタを列挙する．
-int
-EnumCut::operator()(const SbjGraph& sbjgraph,
-		    int limit,
-		    EnumCutOp* op)
+SizeType
+EnumCut::operator()(
+  const SbjGraph& sbjgraph,
+  SizeType limit,
+  EnumCutOp* op
+)
 {
-  int n = sbjgraph.node_num();
+  SizeType n = sbjgraph.node_num();
   mNodeTemp.clear();
   mNodeTemp.resize(n);
 
@@ -51,10 +52,10 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
   mInputs = new const SbjNode*[limit];
 
-  int ni = sbjgraph.input_num();
-  int nl = sbjgraph.logic_num();
+  SizeType ni = sbjgraph.input_num();
+  SizeType nl = sbjgraph.logic_num();
 
-  mInodeStack = new int[nl];
+  mInodeStack = new SizeType[nl];
   mIsPos = &mInodeStack[0];
 
   // 外部入力用の(ダミーの)クラスタを作る．
@@ -152,7 +153,9 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
 
 // node のカットになったノードに c1mark を付け，mMarkedNodes に入れる．
 void
-EnumCut::mark_cnode(const SbjNode* node)
+EnumCut::mark_cnode(
+  const SbjNode* node
+)
 {
   for ( auto node: cnode_list(node) ) {
     if ( !temp1mark(node) ) {
@@ -165,7 +168,9 @@ EnumCut::mark_cnode(const SbjNode* node)
 
 // node の TFI に c1mark を付ける．
 void
-EnumCut::mark_cnode2(const SbjNode* node)
+EnumCut::mark_cnode2(
+  const SbjNode* node
+)
 {
   if ( !temp1mark(node) ) {
     set_temp1mark(node);
@@ -180,7 +185,9 @@ EnumCut::mark_cnode2(const SbjNode* node)
 
 // node のカットになったノードに c1mark を付け，marked_nodes に入れる．
 void
-EnumCut::mark_cnode3(const SbjNode* node)
+EnumCut::mark_cnode3(
+  const SbjNode* node
+)
 {
   for ( auto node: cnode_list(node) ) {
     if ( !temp1mark(node) ) {
@@ -197,8 +204,10 @@ EnumCut::mark_cnode3(const SbjNode* node)
 #if 0
 // root_depth よりも小さな depth を持つノードを frontier stack に積む．
 void
-EnumCut::get_frontier(const SbjNode* node,
-		      int root_depth)
+EnumCut::get_frontier(
+  const SbjNode* node,
+  int root_depth
+)
 {
   if ( state(node) ) {
     return;
@@ -242,7 +251,9 @@ EnumCut::clear_frontier(const SbjNode* node)
 // frontier stack にノードをプッシュする
 inline
 void
-EnumCut::push_node(const SbjNode* node)
+EnumCut::push_node(
+  const SbjNode* node
+)
 {
   if ( mFsPos == mFrontierStack + mFsSize ) {
     const SbjNode** old_stack = mFrontierStack;
@@ -428,8 +439,10 @@ EnumCut::enum_recur()
 
 // cmark の付いているノードを cnode_list に入れて cmark を消す．
 void
-EnumCut::set_cut_node_list_recur(const SbjNode* node,
-				 vector<const SbjNode*>& cnode_list)
+EnumCut::set_cut_node_list_recur(
+  const SbjNode* node,
+  vector<const SbjNode*>& cnode_list
+)
 {
   if ( !cmark(node) ) {
     return;

@@ -2,12 +2,11 @@
 #define DAGCOVER_H
 
 /// @file DagCover.h
-/// @brief AreCover のヘッダファイル
+/// @brief DagCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "sbj_nsdef.h"
@@ -30,12 +29,15 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] fanout_mode ファンアウトモード
-  DagCover(bool fanout_mode);
+  DagCover(
+    bool fanout_mode ///< [in] ファンアウトモード
+  ): mFoMode{fanout_mode}
+  {
+  }
 
   /// @brief デストラクタ
   virtual
-  ~DagCover() { }
+  ~DagCover() = default;
 
 
 public:
@@ -44,24 +46,20 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
   virtual
   void
-  record_cuts(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder,
-	      MapRecord& maprec) = 0;
+  record_cuts(
+    const SbjGraph& sbjgraph,    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder, ///< [in] 各ノードのカットを保持するオブジェクト
+    MapRecord& maprec            ///< [out] マッピング結果を記録するオブジェクト
+  ) = 0;
 
   /// @brief ファンアウトモードの時 true を返す．
   bool
-  fanout_mode();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  fanout_mode()
+  {
+    return mFoMode;
+  }
 
 
 private:
@@ -73,27 +71,6 @@ private:
   bool mFoMode;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] fanout_mode ファンアウトモード
-inline
-DagCover::DagCover(bool fanout_mode) :
-  mFoMode(fanout_mode)
-{
-}
-
-// @brief ファンアウトモードの時 true を返す．
-inline
-bool
-DagCover::fanout_mode()
-{
-  return mFoMode;
-}
 
 END_NAMESPACE_LUTMAP
 

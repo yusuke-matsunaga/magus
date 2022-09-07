@@ -5,9 +5,8 @@
 /// @brief Cut のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "SbjGraph.h"
@@ -42,15 +41,21 @@ class Cut
 private:
 
   /// @brief コンストラクタ
-  /// @param[in] root カットの根のノード
-  /// @param[in] ni カットの入力数
-  /// @param[in] inputs カットの入力のノードの配列
-  Cut(const SbjNode* root,
-      int ni,
-      const SbjNode* inputs[]);
+  Cut(
+    const SbjNode* root,    ///< [in] カットの根のノード
+    SizeType ni,            ///< [in] カットの入力数
+    const SbjNode* inputs[] ///< [in] カットの入力のノードの配列
+  ) : mRoot{root},
+      mLink{nullptr},
+      mNi{ni}
+  {
+    for ( SizeType i = 0; i < ni; ++ i ) {
+      mInputs[i] = inputs[i];
+    }
+  }
 
   /// @brief デストラクタ
-  ~Cut();
+  ~Cut() = default;
 
 
 public:
@@ -60,43 +65,58 @@ public:
 
   /// @brief 根のノードを得る．
   const SbjNode*
-  root() const;
+  root() const
+  {
+    return mRoot;
+  }
 
   /// @brief 入力のサイズを得る．
-  int
-  input_num() const;
+  SizeType
+  input_num() const
+  {
+    return mNi;
+  }
 
   /// @brief pos 番目の入力を得る．
   const SbjNode*
-  input(int pos) const;
+  input(
+    SizeType pos
+  ) const
+  {
+    ASSERT_COND( 0 <= pos && pos < input_num() );
+    return mInputs[pos];
+  }
 
   /// @brief 論理シミュレーションを行う．
-  /// @param[in] vals 葉のノードの値
   /// @return 値のノードの値を返す．
   ///
   /// vals[i] が input(i) の葉の値に対応する．
   /// 値は64ビットのビットベクタで表す．
   ymuint64
-  eval(const vector<ymuint64>& vals) const;
+  eval(
+    const vector<ymuint64>& vals ///< [in] 葉のノードの値
+  ) const;
 
   /// @brief 論理関数を表す真理値表を得る．
-  /// @param[in] inv 出力を反転する時 true にするフラグ
   TvFunc
-  make_tv(bool inv) const;
+  make_tv(
+    bool inv ///< [in] 出力を反転する時 true にするフラグ
+  ) const;
 
   /// @brief 論理関数を表す真理値表を得る．
-  /// @param[in] oinv 出力を反転する時 true にするフラグ
-  /// @param[in] iinv 入力を反転極性の配列
   TvFunc
-  make_tv(bool oinv,
-	  const vector<bool>& iinv) const;
+  make_tv(
+    bool oinv,               ///< [in] 出力を反転する時 true にするフラグ
+    const vector<bool>& iinv ///< [in] 入力の反転極性の配列
+  ) const;
 
   /// @brief デバッグ用の表示ルーティン
-  /// @param[in] s 出力先のストリーム
   ///
   /// 根のノード番号と葉のノード番号を1行で表示する．
   void
-  print(ostream& s) const;
+  print(
+    ostream& s ///< [in] 出力先のストリーム
+  ) const;
 
 
 private:
@@ -111,64 +131,12 @@ private:
   Cut* mLink;
 
   // 入力数
-  int mNi;
+  SizeType mNi;
 
   // 入力のノード配列
   const SbjNode* mInputs[1];
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] root カットの根のノード
-// @param[in] ni カットの入力数
-// @param[in] inputs カットの入力のノードの配列
-inline
-Cut::Cut(const SbjNode* root,
-	 int ni,
-	 const SbjNode* inputs[]) :
-  mRoot(root),
-  mLink(nullptr),
-  mNi(ni)
-{
-  for ( int i = 0; i < ni; ++ i ) {
-    mInputs[i] = inputs[i];
-  }
-}
-
-// @brief デストラクタ
-inline
-Cut::~Cut()
-{
-}
-
-// 根のノードを得る．
-inline
-const SbjNode*
-Cut::root() const
-{
-  return mRoot;
-}
-
-// 入力のサイズを得る．
-inline
-int
-Cut::input_num() const
-{
-  return mNi;
-}
-
-// pos 番目の入力を得る．
-inline
-const SbjNode*
-Cut::input(int pos) const
-{
-  return mInputs[pos];
-}
 
 END_NAMESPACE_LUTMAP
 

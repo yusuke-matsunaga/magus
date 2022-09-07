@@ -3,9 +3,8 @@
 /// @brief LutMap2 の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "LutMap2.h"
 #include "Bn2Sbj.h"
@@ -35,26 +34,17 @@ LutMap2::~LutMap2()
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数
-// @param[in] src_network もとのネットワーク
-// @param[in] limit カットサイズ
-// @param[in] mode モード
-//  - 0: fanout フロー, resub なし
-//  - 1: weighted フロー, resub なし
-//  - 2: fanout フロー, resub あり
-//  - 3: weighted フロー, resub あり
-// @param[in] count 試行回数
-// @param[out] map_network マッピング結果
-// @param[out] lut_num LUT数
-// @param[out] depth 段数
 void
-LutMap2::area_map(const BnNetwork& src_network,
-		  int limit,
-		  int mode,
-		  int count,
-		  bool verbose,
-		  BnNetwork& map_network,
-		  int& lut_num,
-		  int& depth)
+LutMap2::area_map(
+  const BnNetwork& src_network,
+  int limit,
+  int mode,
+  int count,
+  bool verbose,
+  BnNetwork& map_network,
+  int& lut_num,
+  int& depth
+)
 {
 
   SbjGraph sbjgraph;

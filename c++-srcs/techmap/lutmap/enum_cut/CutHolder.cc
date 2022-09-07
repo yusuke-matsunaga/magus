@@ -3,9 +3,8 @@
 /// @brief CutHolder の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "CutHolder.h"
 #include "Cut.h"
@@ -36,46 +35,58 @@ CutHolder::clear()
 
 // 最初に呼ばれる関数
 void
-CutHolder::all_init(const SbjGraph& sbjgraph,
-		    int limit)
+CutHolder::all_init(
+  const SbjGraph& sbjgraph,
+  SizeType limit
+)
 {
   clear();
-  int n = sbjgraph.node_num();
+  SizeType n = sbjgraph.node_num();
   mLimit = limit;
   mCutList = new CutList[n];
 }
 
 void
-CutHolder::node_init(const SbjNode* node,
-		     int pos)
+CutHolder::node_init(
+  const SbjNode* node,
+  SizeType pos
+)
 {
 }
 
 void
-CutHolder::found(const SbjNode* root)
+CutHolder::found(
+  const SbjNode* root
+)
 {
 }
 
 void
-CutHolder::found(const SbjNode* root,
-		 int ni,
-		 const SbjNode* inputs[])
+CutHolder::found(
+  const SbjNode* root,
+  SizeType ni,
+  const SbjNode* inputs[]
+)
 {
-  Cut* cut = mMgr.new_cut(root, ni, inputs);
+  auto cut = mMgr.new_cut(root, ni, inputs);
   mCutList[root->id()].push_back(cut);
 }
 
 void
-CutHolder::node_end(const SbjNode* node,
-		    int pos,
-		    int ncuts)
+CutHolder::node_end(
+  const SbjNode* node,
+  SizeType pos,
+  SizeType ncuts
+)
 {
 }
 
 // 最後に呼ばれる関数
 void
-CutHolder::all_end(const SbjGraph& sbjgraph,
-		   int limit)
+CutHolder::all_end(
+  const SbjGraph& sbjgraph,
+  SizeType limit
+)
 {
 }
 

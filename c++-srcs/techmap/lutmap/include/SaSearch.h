@@ -5,9 +5,8 @@
 /// @brief SaSearch のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "AreaCover.h"
@@ -30,14 +29,12 @@ class SaSearch
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder カットフォルダー
-  /// @param[in] cut_size カットサイズ
-  /// @param[in] flow_mode area_cover のモード
-  SaSearch(const SbjGraph& sbjgraph,
-	   const CutHolder& cut_holder,
-	   ymuint cut_size,
-	   bool flow_mode);
+  SaSearch(
+    const SbjGraph& sbjgraph,    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder, ///< [in] カットフォルダー
+    SizeType cut_size,           ///< [in] カットサイズ
+    bool flow_mode               ///< [in] area_cover のモード
+  );
 
   /// @brief デストラクタ
   ~SaSearch();
@@ -49,12 +46,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 探索を行う．
-  /// @param[in] search_limit 試行回数
-  /// @brief verbose フラグをセットする．
-  /// @brief 最良解を返す．
+  /// @return 最良解を返す．
   const MapRecord&
-  search(ymuint search_limit,
-	 bool verbose);
+  search(
+    SizeType search_limit, ///< [in] 試行回数
+    bool verbose           ///< [in] verbose フラグ
+  );
 
 
 private:
@@ -63,8 +60,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 現在の割り当てのもとで評価を行う．
-  ymuint
-  evaluate(const vector<bool>& state);
+  SizeType
+  evaluate(
+    const vector<bool>& state
+  );
 
 
 private:
@@ -79,13 +78,13 @@ private:
   const CutHolder& mCutHolder;
 
   // カットサイズ
-  ymuint mCutSize;
+  SizeType mCutSize;
 
   // ファンアウトポイントのリスト
   vector<const SbjNode*> mFanoutPointList;
 
   // ファンアウトポイントの入力サイズのリスト
-  vector<ymuint> mInputSizeList;
+  vector<SizeType> mInputSizeList;
 
   // 初期温度
   double mInitTemp;
@@ -100,19 +99,19 @@ private:
   AreaCover mAreaCover;
 
   // 上界
-  ymuint mUpperBound;
+  SizeType mUpperBound;
 
   // 下界
-  ymuint mLowerBound;
+  SizeType mLowerBound;
 
   // 上界と下界の幅
   double mWidth;
 
   // トータルの試行回数
-  ymuint mNumAll;
+  SizeType mNumAll;
 
   // 最良値
-  ymuint mMinimumLutNum;
+  SizeType mMinimumLutNum;
 
   // 最良解
   MapRecord mBestRecord;
@@ -124,11 +123,6 @@ private:
   bool mVerbose;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
 
 END_NAMESPACE_LUTMAP
 

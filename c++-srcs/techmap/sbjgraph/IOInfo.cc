@@ -3,9 +3,8 @@
 /// @brief IOInfo の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2017, 2018 Yusuke Matsunaga
+/// Copyright (C) 2017, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "IOInfo.h"
 
@@ -15,11 +14,6 @@ BEGIN_NAMESPACE_SBJ
 //////////////////////////////////////////////////////////////////////
 // クラス IOInfo
 //////////////////////////////////////////////////////////////////////
-
-// @brief デストラクタ
-IOInfo::~IOInfo()
-{
-}
 
 // @brief ポートに関連付けられている時に true を返す．
 bool
@@ -40,7 +34,7 @@ IOInfo::port() const
 // @brief 関連付けられているポート上のビット位置を返す．
 //
 // is_port_type() == true の時のみ意味のある関数
-int
+SizeType
 IOInfo::port_bitpos() const
 {
   return 0;
@@ -140,17 +134,11 @@ IOInfo::latch() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] port 関連付けられているポート
-// @param[in] bit そのビット位置
-IOPortInfo::IOPortInfo(SbjPort* port,
-		       int bit) :
-  mPort(port),
-  mBit(bit)
-{
-}
-
-// @brief デストラクタ
-IOPortInfo::~IOPortInfo()
+IOPortInfo::IOPortInfo(
+  SbjPort* port,
+  SizeType bit
+) : mPort{port},
+    mBit{bit}
 {
 }
 
@@ -173,7 +161,7 @@ IOPortInfo::port() const
 // @brief 関連付けられているポート上のビット位置を返す．
 //
 // is_port_type() == true の時のみ意味のある関数
-int
+SizeType
 IOPortInfo::port_bitpos() const
 {
   return mBit;
@@ -185,14 +173,9 @@ IOPortInfo::port_bitpos() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] dff 関連付けられているDFF
-IODffInfo::IODffInfo(SbjDff* dff) :
-  mDff(dff)
-{
-}
-
-// @brief デストラクタ
-IODffInfo::~IODffInfo()
+IODffInfo::IODffInfo(
+  SbjDff* dff
+) : mDff{dff}
 {
 }
 
@@ -211,14 +194,9 @@ IODffInfo::dff() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] dff 関連付けられているDFF
-IODffInputInfo::IODffInputInfo(SbjDff* dff) :
-  IODffInfo(dff)
-{
-}
-
-// @brief デストラクタ
-IODffInputInfo::~IODffInputInfo()
+IODffInputInfo::IODffInputInfo(
+  SbjDff* dff
+) : IODffInfo{dff}
 {
 }
 
@@ -235,14 +213,9 @@ IODffInputInfo::is_dff_input() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] dff 関連付けられているDFF
-IODffOutputInfo::IODffOutputInfo(SbjDff* dff) :
-  IODffInfo(dff)
-{
-}
-
-// @brief デストラクタ
-IODffOutputInfo::~IODffOutputInfo()
+IODffOutputInfo::IODffOutputInfo(
+  SbjDff* dff
+) : IODffInfo{dff}
 {
 }
 
@@ -259,14 +232,9 @@ IODffOutputInfo::is_dff_output() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] dff 関連付けられているDFF
-IODffClockInfo::IODffClockInfo(SbjDff* dff) :
-  IODffInfo(dff)
-{
-}
-
-// @brief デストラクタ
-IODffClockInfo::~IODffClockInfo()
+IODffClockInfo::IODffClockInfo(
+  SbjDff* dff
+) : IODffInfo{dff}
 {
 }
 
@@ -283,14 +251,9 @@ IODffClockInfo::is_dff_clock() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] dff 関連付けられているDFF
-IODffClearInfo::IODffClearInfo(SbjDff* dff) :
-  IODffInfo(dff)
-{
-}
-
-// @brief デストラクタ
-IODffClearInfo::~IODffClearInfo()
+IODffClearInfo::IODffClearInfo(
+  SbjDff* dff
+) : IODffInfo{dff}
 {
 }
 
@@ -307,14 +270,9 @@ IODffClearInfo::is_dff_clear() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] dff 関連付けられているDFF
-IODffPresetInfo::IODffPresetInfo(SbjDff* dff) :
-  IODffInfo(dff)
-{
-}
-
-// @brief デストラクタ
-IODffPresetInfo::~IODffPresetInfo()
+IODffPresetInfo::IODffPresetInfo(
+  SbjDff* dff
+) : IODffInfo{dff}
 {
 }
 
@@ -331,14 +289,9 @@ IODffPresetInfo::is_dff_preset() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] latch 関連付けられているラッチ
-IOLatchInfo::IOLatchInfo(SbjLatch* latch) :
-  mLatch(latch)
-{
-}
-
-// @brief デストラクタ
-IOLatchInfo::~IOLatchInfo()
+IOLatchInfo::IOLatchInfo(
+  SbjLatch* latch
+) : mLatch{latch}
 {
 }
 
@@ -357,14 +310,9 @@ IOLatchInfo::latch() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] latch 関連付けられているラッチ
-IOLatchInputInfo::IOLatchInputInfo(SbjLatch* latch) :
-  IOLatchInfo(latch)
-{
-}
-
-// @brief デストラクタ
-IOLatchInputInfo::~IOLatchInputInfo()
+IOLatchInputInfo::IOLatchInputInfo(
+  SbjLatch* latch
+) : IOLatchInfo{latch}
 {
 }
 
@@ -381,14 +329,9 @@ IOLatchInputInfo::is_latch_input() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] latch 関連付けられているラッチ
-IOLatchOutputInfo::IOLatchOutputInfo(SbjLatch* latch) :
-  IOLatchInfo(latch)
-{
-}
-
-// @brief デストラクタ
-IOLatchOutputInfo::~IOLatchOutputInfo()
+IOLatchOutputInfo::IOLatchOutputInfo(
+  SbjLatch* latch
+) : IOLatchInfo{latch}
 {
 }
 
@@ -405,14 +348,9 @@ IOLatchOutputInfo::is_latch_output() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] latch 関連付けられているラッチ
-IOLatchEnableInfo::IOLatchEnableInfo(SbjLatch* latch) :
-  IOLatchInfo(latch)
-{
-}
-
-// @brief デストラクタ
-IOLatchEnableInfo::~IOLatchEnableInfo()
+IOLatchEnableInfo::IOLatchEnableInfo(
+  SbjLatch* latch
+) : IOLatchInfo{latch}
 {
 }
 
@@ -429,14 +367,9 @@ IOLatchEnableInfo::is_latch_enable() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] latch 関連付けられているラッチ
-IOLatchClearInfo::IOLatchClearInfo(SbjLatch* latch) :
-  IOLatchInfo(latch)
-{
-}
-
-// @brief デストラクタ
-IOLatchClearInfo:: ~IOLatchClearInfo()
+IOLatchClearInfo::IOLatchClearInfo(
+  SbjLatch* latch
+) : IOLatchInfo{latch}
 {
 }
 
@@ -453,14 +386,9 @@ IOLatchClearInfo::is_latch_clear() const
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] latch 関連付けられているラッチ
-IOLatchPresetInfo::IOLatchPresetInfo(SbjLatch* latch) :
-  IOLatchInfo(latch)
-{
-}
-
-// @brief デストラクタ
-IOLatchPresetInfo::~IOLatchPresetInfo()
+IOLatchPresetInfo::IOLatchPresetInfo(
+  SbjLatch* latch
+) : IOLatchInfo{latch}
 {
 }
 

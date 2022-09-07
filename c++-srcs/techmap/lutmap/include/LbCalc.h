@@ -5,9 +5,8 @@
 /// @brief LbCalc のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "sbj_nsdef.h"
@@ -39,11 +38,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @breif 下界の計算をする．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder カットを保持するオブジェクト
-  int
-  lower_bound(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder);
+  SizeType
+  lower_bound(
+    const SbjGraph& sbjgraph,   ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder ///< [in] カットを保持するオブジェクト
+  );
 
 
 private:
@@ -53,8 +52,10 @@ private:
 
   /// @brief カットのカバーしているノードを求める．
   void
-  get_node_list(const Cut* cut,
-		vector<const SbjNode*>& node_list);
+  get_node_list(
+    const Cut* cut,
+    vector<const SbjNode*>& node_list
+  );
 
 
 private:

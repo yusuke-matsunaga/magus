@@ -26,15 +26,16 @@ BEGIN_NAMESPACE_LUTMAP
 // @param[in] cut_holder カットフォルダー
 // @param[in] cut_size カットサイズ
 // @param[in] flow_mode area_cover のモード
-SaSearch::SaSearch(const SbjGraph& sbjgraph,
-		   const CutHolder& cut_holder,
-		   ymuint cut_size,
-		   bool flow_mode) :
-  mSbjGraph(sbjgraph),
-  mCutHolder(cut_holder),
-  mCutSize(cut_size),
-  mAreaCover(flow_mode),
-  mVerbose(false)
+SaSearch::SaSearch(
+  const SbjGraph& sbjgraph,
+  const CutHolder& cut_holder,
+  SizeType cut_size,
+  bool flow_mode
+) : mSbjGraph{sbjgraph},
+    mCutHolder{cut_holder},
+    mCutSize{cut_size},
+    mAreaCover{flow_mode},
+    mVerbose{false}
 {
   mInitTemp  = 5.0;
   mEndTemp   = 0.001;
@@ -66,8 +67,10 @@ SaSearch::~SaSearch()
 // @brief verbose フラグをセットする．
 // @brief 最良解を返す．
 const MapRecord&
-SaSearch::search(ymuint search_limit,
-		 bool verbose)
+SaSearch::search(
+  SizeType search_limit,
+  bool verbose
+)
 {
   mVerbose = verbose;
   ymuint nf = mFanoutPointList.size();
@@ -147,14 +150,16 @@ SaSearch::evaluate(const vector<bool>& state)
 #else
 
 // @brief 現在の割り当てのもとで評価を行う．
-ymuint
-SaSearch::evaluate(const vector<bool>& state)
+SizeType
+SaSearch::evaluate(
+  const vector<bool>& state
+)
 {
-  ymuint nf = mFanoutPointList.size();
+  SizeType nf = mFanoutPointList.size();
   vector<const SbjNode*> boundary_list;
   boundary_list.reserve(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
-    const SbjNode* fpnode = mFanoutPointList[i];
+  for (SizeType i = 0; i < nf; ++ i) {
+    auto fpnode = mFanoutPointList[i];
     if ( state[i] ) {
       boundary_list.push_back(fpnode);
     }
@@ -164,8 +169,8 @@ SaSearch::evaluate(const vector<bool>& state)
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
 
   MapGen gen;
-  int lut_num;
-  int depth;
+  SizeType lut_num;
+  SizeType depth;
   gen.estimate(mSbjGraph, record, lut_num, depth);
 
   if ( mMinimumLutNum > lut_num ) {

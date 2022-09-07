@@ -3,9 +3,8 @@
 /// @brief Cut の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 //
-/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "Cut.h"
 #include "SbjNode.h"
@@ -18,8 +17,10 @@ BEGIN_NONAMESPACE
 // valmap に終端のノード番号をキーとしてビットベクタ値を登録する．
 // その時の node の値を計算する．
 ymuint64
-eval_node(const SbjNode* node,
-	  unordered_map<int, ymuint64>& valmap)
+eval_node(
+  const SbjNode* node,
+  unordered_map<int, ymuint64>& valmap
+)
 {
   if ( node == nullptr ) {
     return 0ULL;
@@ -63,10 +64,12 @@ eval_node(const SbjNode* node,
 
 // カットの表している論理関数を評価する．
 ymuint64
-eval_cut(const Cut* cut,
-	 const vector<ymuint64>& vals)
+eval_cut(
+  const Cut* cut,
+  const vector<ymuint64>& vals
+)
 {
-  int ni = cut->input_num();
+  SizeType ni = cut->input_num();
   ASSERT_COND( ni == vals.size() );
 
   unordered_map<int, ymuint64> valmap;
@@ -80,15 +83,12 @@ eval_cut(const Cut* cut,
 END_NONAMESPACE
 
 // @brief 論理シミュレーションを行う．
-// @param[in] vals 葉のノードの値
-// @return 値のノードの値を返す．
-//
-// vals[i] が input(i) の葉の値に対応する．
-// 値は64ビットのビットベクタで表す．
 ymuint64
-Cut::eval(const vector<ymuint64>& vals) const
+Cut::eval(
+  const vector<ymuint64>& vals
+) const
 {
-  int ni = input_num();
+  SizeType ni = input_num();
   ASSERT_COND( ni == vals.size() );
 
   // ノードの ID 番号をキーにして値を保持するハッシュ表
@@ -103,22 +103,23 @@ Cut::eval(const vector<ymuint64>& vals) const
 }
 
 // @brief 論理関数を表す真理値表を得る．
-// @param[in] inv 出力を反転する時 true にするフラグ
 TvFunc
-Cut::make_tv(bool inv) const
+Cut::make_tv(
+  bool inv
+) const
 {
   return make_tv(inv, vector<bool>(input_num(), false));
 }
 
 // @brief 論理関数を表す真理値表を得る．
-// @param[in] oinv 出力を反転する時 true にするフラグ
-// @param[in] iinv 入力を反転極性の配列
 TvFunc
-Cut::make_tv(bool oinv,
-	     const vector<bool>& iinv) const
+Cut::make_tv(
+  bool oinv,
+  const vector<bool>& iinv
+) const
 {
-  int ni = input_num();
-  int np = 1 << ni;
+  SizeType ni = input_num();
+  SizeType np = 1 << ni;
 
   vector<int> tv(np);
 
@@ -177,9 +178,10 @@ Cut::make_tv(bool oinv,
 }
 
 // デバッグ用の表示関数
-// @param[in] s 出力先のストリーム
 void
-Cut::print(ostream& s) const
+Cut::print(
+  ostream& s
+) const
 {
   if ( root() == nullptr ) {
     s << "null cut" << endl;

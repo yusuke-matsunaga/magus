@@ -3,9 +3,8 @@
 /// @brief LutmapMgr の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "LutmapMgr.h"
 #include "Bn2Sbj.h"
@@ -29,11 +28,11 @@ BEGIN_NAMESPACE_MAGUS
 // @param[in] lut_size LUTの入力数
 // @param[in] option オプション文字列
 LutmapMgr::LutmapMgr(
-  int lut_size,
+  SizeType lut_size,
   const string& option
-) : mLutSize(lut_size),
-    mFanoutMode(false),
-    mDoCutResub(false)
+) : mLutSize{lut_size},
+    mFanoutMode{false},
+    mDoCutResub{false}
 {
   set_option(option);
 }
@@ -81,9 +80,6 @@ LutmapMgr::area_map(
 }
 
 // @brief 段数最小化 DAG covering のヒューリスティック関数
-// @param[in] src_network もとのネットワーク
-// @param[in] slack 最小段数に対するスラック
-// @param[out] mapnetwork マッピング結果
 BnNetwork
 LutmapMgr::delay_map(
   const BnNetwork& src_network,

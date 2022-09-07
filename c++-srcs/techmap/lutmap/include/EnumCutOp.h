@@ -5,9 +5,8 @@
 /// @brief EnumCutOp のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "SbjGraph.h"
@@ -42,14 +41,14 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カットの列挙を行う．
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] limit 入力数の制限
   /// @return 全 cut 数を返す．
   ///
   /// 内部で下の仮想関数が呼び出される．
-  int
-  enum_cut(const SbjGraph& sbjgraph,
-	   int limit);
+  SizeType
+  enum_cut(
+    const SbjGraph& sbjgraph, ///< [in] 対象のサブジェクトグラフ
+    SizeType limit            ///< [in] 入力数の制限
+  );
 
 
 private:
@@ -58,63 +57,65 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 処理の最初に呼ばれる関数
-  /// @param[in] sbjgraph 対象のサブジェクトグラフ
-  /// @param[in] limit カットサイズ
   ///
   /// デフォルトの実装ではなにもしない．
   virtual
   void
-  all_init(const SbjGraph& sbjgraph,
-	   int limit);
+  all_init(
+    const SbjGraph& sbjgraph, ///< [in] 対象のサブジェクトグラフ
+    SizeType limit            ///< [in] カットサイズ
+  );
 
   /// @brief node を根とするカットを列挙する直前に呼ばれる関数
-  /// @param[in] node 根のノード
-  /// @param[in] cur_pos node の処理順
   ///
   /// デフォルトの実装ではなにもしない．
   virtual
   void
-  node_init(const SbjNode* node,
-	    int cur_pos);
+  node_init(
+    const SbjNode* node, ///< [in] 根のノード
+    SizeType cur_pos     ///< [in] node の処理順
+  );
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(singlton cut)
-  /// @param[in] root 根のノード
   ///
   /// デフォルトの実装ではなにもしない．
   virtual
   void
-  found(const SbjNode* root);
+  found(
+    const SbjNode* root ///< [in] 根のノード
+  );
 
   /// @brief cut が一つ見つかったときに呼ばれる関数(non-trivial cut)
-  /// @param[in] root 根のノード
-  /// @param[in] ni 入力数
-  /// @param[in] inputs 入力ノードの配列
   ///
   /// デフォルトの実装ではなにもしない．
   virtual
   void
-  found(const SbjNode* root,
-	int ni,
-	const SbjNode* inputs[]);
+  found(
+    const SbjNode* root,    ///< [in] 根のノード
+    SizeType ni,            ///< [in] 入力数
+    const SbjNode* inputs[] ///< [in] 入力ノードの配列
+  );
 
   /// @brief node を根とするカットを列挙し終わった直後に呼ばれる関数
-  /// @param[in] node 根のノード
-  /// @param[in] cur_pos node の処理順
-  /// @param[in] ncuts 列挙されたカット数
   ///
   /// デフォルトの実装ではなにもしない．
   virtual
   void
-  node_end(const SbjNode* node,
-	   int cur_pos,
-	   int ncuts);
+  node_end(
+    const SbjNode* node, ///< [in] 根のノード
+    SizeType cur_pos,    ///< [in] node の処理順
+    SizeType ncuts       ///< [in] 列挙されたカット数
+  );
 
   /// @brief 処理の最後に呼ばれる関数
-  /// @note デフォルトの実装ではなにもしない．
+  ///
+  /// デフォルトの実装ではなにもしない．
   virtual
   void
-  all_end(const SbjGraph& sbjgraph,
-	  int limit);
+  all_end(
+    const SbjGraph& sbjgraph, ///< [in] 対象のサブジェクトグラフ
+    SizeType limit	      ///< [in] カットサイズ
+  );
 
 };
 

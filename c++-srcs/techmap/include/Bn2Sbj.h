@@ -5,9 +5,8 @@
 /// @brief Bn2Sbj のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 #include "ym/bnet.h"
@@ -26,10 +25,10 @@ class Bn2Sbj
 public:
 
   /// @brief コンストラクタ
-  Bn2Sbj();
+  Bn2Sbj() = default;
 
   /// @brief デストラクタ
-  ~Bn2Sbj();
+  ~Bn2Sbj() = default;
 
 
 public:
@@ -38,24 +37,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief BnNetwork を SbjGraph に変換する．
-  /// @param[in] src_network もとのネットワーク
-  /// @param[in] dst_network 変換されたネットワーク
   void
-  convert(const BnNetwork& src_network,
-	  SbjGraph& dst_network);
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  convert(
+    const BnNetwork& src_network, ///< [in] もとのネットワーク
+    SbjGraph& dst_network         ///< [out] 変換されたネットワーク
+  );
 
 };
 

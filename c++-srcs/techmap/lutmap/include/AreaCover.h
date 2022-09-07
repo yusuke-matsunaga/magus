@@ -5,9 +5,8 @@
 /// @brief AreCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "DagCover.h"
 
@@ -29,8 +28,9 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] fanout_mode ファンアウトモード
-  AreaCover(bool fanout_mode);
+  AreaCover(
+    bool fanout_mode ///< [in] ファンアウトモード
+  );
 
   /// @brief デストラクタ
   ~AreaCover();
@@ -42,37 +42,31 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
-  record_cuts(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder,
-	      MapRecord& maprec) override;
+  record_cuts(
+    const SbjGraph& sbjgraph,    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder, ///< [in] 各ノードのカットを保持するオブジェクト
+    MapRecord& maprec            ///< [out] マッピング結果を記録するオブジェクト
+  ) override;
 
   /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[in] boundary_list 境界ノードのリスト
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
-  record_cuts(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder,
-	      const vector<const SbjNode*>& boundary_list,
-	      MapRecord& maprec);
+  record_cuts(
+    const SbjGraph& sbjgraph,                    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder,                 ///< [in] 各ノードのカットを保持するオブジェクト
+    const vector<const SbjNode*>& boundary_list, ///< [in] 境界ノードのリスト
+    MapRecord& maprec                            ///< [out] マッピング結果を記録するオブジェクト
+  );
 
   /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder 各ノードのカットを保持するオブジェクト
-  /// @param[in] boundary_list 境界ノードのリスト
-  /// @param[in] dupnode_list 重複ノードのリスト
-  /// @param[out] maprec マッピング結果を記録するオブジェクト
   void
-  record_cuts(const SbjGraph& sbjgraph,
-	      const CutHolder& cut_holder,
-	      const vector<const SbjNode*>& boundary_list,
-	      const vector<const SbjNode*>& dupnode_list,
-	      MapRecord& maprec);
+  record_cuts(
+    const SbjGraph& sbjgraph,                    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder,                 ///< [in] 各ノードのカットを保持するオブジェクト
+    const vector<const SbjNode*>& boundary_list, ///< [in] 境界ノードのリスト
+    const vector<const SbjNode*>& dupnode_list,  ///< [out] 重複ノードのリスト
+    MapRecord& maprec                            ///< [out] マッピング結果を記録するオブジェクト
+  );
 
 
 private:
@@ -82,9 +76,11 @@ private:
 
   // node から各入力にいたる経路の重みを計算する．
   void
-  calc_weight(const SbjNode* node,
-	      const Cut* cut,
-	      double cur_weight);
+  calc_weight(
+    const SbjNode* node, ///< [in] ノード
+    const Cut* cut,      ///< [in] カット
+    double cur_weight    ///< [in] 現在の重み
+  );
 
 
 private:

@@ -5,9 +5,8 @@
 /// @brief SbjEdge のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 
@@ -28,14 +27,18 @@ class SbjEdge
 public:
 
   /// @brief 空のコンストラクタ
-  SbjEdge();
+  SbjEdge() = default;
 
   /// @brief ノードと位置を指定したコンストラクタ
-  SbjEdge(const SbjNode* node,
-	  int pos);
+  SbjEdge(
+    const SbjNode* node, ///< [in] ノード
+    SizeType pos         ///< [in] ファンイン番号
+  ) : mToPos{reinterpret_cast<ympuint>(node) | pos}
+  {
+  }
 
   /// @brief デストラクタ
-  ~SbjEdge();
+  ~SbjEdge() = default;
 
 
 public:
@@ -46,11 +49,17 @@ public:
   /// @brief 出力側のノードを得る．
   /// @return 出力側のノードを返す．
   const SbjNode*
-  to() const;
+  to() const
+  {
+    return reinterpret_cast<const SbjNode*>(mToPos & ~1ULL);
+  }
 
   /// @brief 出力側のノードの何番目の入力かを示す．
-  int
-  pos() const;
+  SizeType
+  pos() const
+  {
+    return static_cast<int>(mToPos & 1ULL);
+  }
 
 
 private:
@@ -59,51 +68,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 出力側のノード+入力位置
-  ympuint mToPos;
+  ympuint mToPos{0ULL};
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// inline 関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// コンストラクタ
-inline
-SbjEdge::SbjEdge() :
-  mToPos(0ULL)
-{
-}
-
-// @brief ノードと位置を指定したコンストラクタ
-inline
-SbjEdge::SbjEdge(const SbjNode* node,
-		 int pos) :
-  mToPos(reinterpret_cast<ympuint>(node) | pos)
-{
-}
-
-// デストラクタ
-inline
-SbjEdge::~SbjEdge()
-{
-}
-
-// 出力側のノードを得る．
-inline
-const SbjNode*
-SbjEdge::to() const
-{
-  return reinterpret_cast<const SbjNode*>(mToPos & ~1ULL);
-}
-
-// 出力側のノードの何番目の入力かを示す．
-inline
-int
-SbjEdge::pos() const
-{
-  return static_cast<int>(mToPos & 1ULL);
-}
 
 END_NAMESPACE_SBJ
 

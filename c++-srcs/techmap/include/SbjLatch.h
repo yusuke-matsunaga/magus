@@ -5,9 +5,8 @@
 /// @brief SbjLatch のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 
@@ -37,15 +36,24 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  SbjLatch(int id,
-	   SbjNode* input,
-	   SbjNode* output,
-	   SbjNode* enable,
-	   SbjNode* clear,
-	   SbjNode* preset);
+  SbjLatch(
+    SizeType id,     ///< [in] ID番号
+    SbjNode* input,  ///< [in] データ入力ノード
+    SbjNode* output, ///< [in] データ出力ノード
+    SbjNode* enable, ///< [in] イネーブル端子ノード
+    SbjNode* clear,  ///< [in] クリア端子ノード
+    SbjNode* preset  ///< [in] プリセット端子ノード
+  ) : mId(id),
+      mDataInput(input),
+      mEnable(enable),
+      mClear(clear),
+      mPreset(preset),
+      mDataOutput(output)
+  {
+  }
 
   /// @brief デストラクタ
-  ~SbjLatch();
+  ~SbjLatch() = default;
 
 
 public:
@@ -54,34 +62,46 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を得る．
-  int
-  id() const;
+  SizeType
+  id() const
+  {
+    return mId;
+  }
 
   /// @brief データ入力を得る．
   const SbjNode*
-  data_input() const;
+  data_input() const
+  {
+    return mDataInput;
+  }
 
   /// @brief イネーブル入力を得る．
   const SbjNode*
-  enable() const;
+  enable() const
+  {
+    return mEnable;
+  }
 
   /// @brief リセット入力を得る．
   const SbjNode*
-  clear() const;
+  clear() const
+  {
+    return mClear;
+  }
 
   /// @brief セット入力を得る．
   const SbjNode*
-  preset() const;
+  preset() const
+  {
+    return mPreset;
+  }
 
   /// @brief データ出力を得る．
   const SbjNode*
-  data_output() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内容の設定に用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  data_output() const
+  {
+    return mDataOutput;
+  }
 
 
 private:
@@ -90,7 +110,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  int mId;
+  SizeType mId;
 
   // データ入力
   SbjNode* mDataInput;
@@ -108,82 +128,6 @@ private:
   SbjNode* mDataOutput;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// inline 関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-SbjLatch::SbjLatch(int id,
-		   SbjNode* input,
-		   SbjNode* output,
-		   SbjNode* enable,
-		   SbjNode* clear,
-		   SbjNode* preset) :
-  mId(id),
-  mDataInput(input),
-  mEnable(enable),
-  mClear(clear),
-  mPreset(preset),
-  mDataOutput(output)
-{
-}
-
-// @brief デストラクタ
-inline
-SbjLatch::~SbjLatch()
-{
-}
-
-// @brief ID番号を得る．
-inline
-int
-SbjLatch::id() const
-{
-  return mId;
-}
-
-// @brief データ入力を得る．
-inline
-const SbjNode*
-SbjLatch::data_input() const
-{
-  return mDataInput;
-}
-
-// @brief イネーブル入力を得る．
-inline
-const SbjNode*
-SbjLatch::enable() const
-{
-  return mEnable;
-}
-
-// @brief リセット入力を得る．
-inline
-const SbjNode*
-SbjLatch::clear() const
-{
-  return mClear;
-}
-
-// @brief セット入力を得る．
-inline
-const SbjNode*
-SbjLatch::preset() const
-{
-  return mPreset;
-}
-
-// @brief データ出力を得る．
-inline
-const SbjNode*
-SbjLatch::data_output() const
-{
-  return mDataOutput;
-}
 
 END_NAMESPACE_SBJ
 

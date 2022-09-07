@@ -5,9 +5,8 @@
 /// @brief CutResub のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 #include "sbj_nsdef.h"
@@ -41,15 +40,13 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カットの置き換えを行って LUT 数の削減を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cut_holder サブジェクトグラフ上のカット集合
-  /// @param[in] slack 段数のスラック(-1 で段数制約なし)
-  /// @param[inout] maprec マッピング結果
   void
-  operator()(const SbjGraph& sbjgraph,
-	     const CutHolder& cut_holder,
-	     MapRecord& maprec,
-	     int slack = -1);
+  operator()(
+    const SbjGraph& sbjgraph,    ///< [in] サブジェクトグラフ
+    const CutHolder& cut_holder, ///< [in] サブジェクトグラフ上のカット集合
+    MapRecord& maprec,           ///< [inout] マッピング結果
+    int slack = -1               ///< [in] 段数のスラック(-1 で段数制約なし)
+  );
 
 
 private:

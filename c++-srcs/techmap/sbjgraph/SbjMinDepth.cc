@@ -3,9 +3,8 @@
 /// @brief SbjMinDepth の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "SbjMinDepth.h"
 #include "SmdNode.h"
@@ -16,111 +15,54 @@
 BEGIN_NAMESPACE_SBJ
 
 //////////////////////////////////////////////////////////////////////
-// クラス SmdNode
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-SmdNode::SmdNode() :
-  mFanoutNum(0),
-  mFanoutArray(nullptr)
-{
-}
-
-// @brief デストラクタ
-SmdNode::~SmdNode()
-{
-  delete [] mFanoutArray;
-}
-
-// @brief ID番号を設定する．
-// @param[in] id ID番号
-// @param[in] logic 論理ノードの時 true にセットするフラグ
-void
-SmdNode::set_id(int id,
-		bool logic)
-{
-  mId = (id << 1) | static_cast<int>(logic);
-}
-
-// @brief 1つ目のファンインを設定する．
-void
-SmdNode::set_fanin0(SmdNode* from)
-{
-  mFanin0.mFrom = from;
-  mFanin0.mTo = this;
-  mFanin0.mFlags = 0U;
-}
-
-// @brief 2つ目のファンインを設定する．
-void
-SmdNode::set_fanin1(SmdNode* from)
-{
-  mFanin1.mFrom = from;
-  mFanin1.mTo = this;
-  mFanin1.mFlags = 1U;
-}
-
-// @brief ファンアウト配列を設定する．
-void
-SmdNode::set_fanout_array(const vector<SmdEdge*>& foedge_list)
-{
-  mFanoutNum = foedge_list.size();
-  mFanoutArray = new SmdEdge*[mFanoutNum];
-  for ( int i = 0; i < mFanoutNum; ++ i ) {
-    mFanoutArray[i] = foedge_list[i];
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // クラス SbjMinDepth
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] sbjgraph 対象のサブジェクトグラフ
-SbjMinDepth::SbjMinDepth(const SbjGraph& sbjgraph) :
-  mSbjGraph(sbjgraph)
+SbjMinDepth::SbjMinDepth(
+  const SbjGraph& sbjgraph
+) : mSbjGraph{sbjgraph}
 {
-  int n = sbjgraph.node_num();
+  SizeType n = sbjgraph.node_num();
 
   mTfiNodeList.reserve(n);
 
   mNodeNum = n;
   mNodeArray = new SmdNode[n];
 
-  vector<vector<SmdEdge*> > foedge_list_array(n);
+  vector<vector<SmdEdge*>> foedge_list_array(n);
 
   // sbjgraph の構造を SmdNode にコピーする．
   mInputList.reserve(sbjgraph.input_list().size());
   for ( auto sbjnode: sbjgraph.input_list() ) {
-    int id = sbjnode->id();
-    SmdNode* node = &mNodeArray[id];
+    SizeType id = sbjnode->id();
+    auto node = &mNodeArray[id];
     node->set_id(id, false);
     mInputList.push_back(node);
   }
 
   mLogicNodeList.reserve(sbjgraph.logic_num());
   for ( auto sbjnode: sbjgraph.logic_list() ) {
-    int id = sbjnode->id();
-    SmdNode* node = &mNodeArray[id];
+    SizeType id = sbjnode->id();
+    auto node = &mNodeArray[id];
     node->set_id(id, true);
     mLogicNodeList.push_back(node);
 
-    const SbjNode* isbjnode0 = sbjnode->fanin0();
-    SmdNode* inode0 = &mNodeArray[isbjnode0->id()];
+    auto isbjnode0 = sbjnode->fanin0();
+    auto inode0 = &mNodeArray[isbjnode0->id()];
     node->set_fanin0(inode0);
-    SmdEdge* edge0 = node->fanin0_edge();
+    auto edge0 = node->fanin0_edge();
     foedge_list_array[inode0->id()].push_back(edge0);
 
-    const SbjNode* isbjnode1 = sbjnode->fanin1();
-    SmdNode* inode1 = &mNodeArray[isbjnode1->id()];
+    auto isbjnode1 = sbjnode->fanin1();
+    auto inode1 = &mNodeArray[isbjnode1->id()];
     node->set_fanin1(inode1);
-    SmdEdge* edge1 = node->fanin1_edge();
+    auto edge1 = node->fanin1_edge();
     foedge_list_array[inode1->id()].push_back(edge1);
   }
 
-  for ( int i = 0; i < n; ++ i ) {
-    SmdNode* node = &mNodeArray[i];
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto node = &mNodeArray[i];
     node->set_fanout_array(foedge_list_array[node->id()]);
   }
 }
@@ -132,13 +74,11 @@ SbjMinDepth::~SbjMinDepth()
 }
 
 // @brief 各ノードの minimum depth を求める．
-// @param[in] sbjgraph 対象のサブジェクトグラフ
-// @param[in] k LUT の最大入力数
-// @param[out] depth_array 各ノードの深さを収める配列
-// @return 出力の最大深さを返す．
-int
-SbjMinDepth::operator()(int k,
-			vector<int>& depth_array)
+SizeType
+SbjMinDepth::operator()(
+  SizeType k,
+  vector<SizeType>& depth_array
+)
 {
   depth_array.clear();
   depth_array.resize(mNodeNum, 0);
@@ -150,15 +90,16 @@ SbjMinDepth::operator()(int k,
     node->set_depth(0);
     depth_array[node->id()] = 0;
   }
-  int ans = 0;
+
+  SizeType ans = 0;
   for ( auto node: mLogicNodeList ) {
     node->clear_rtfmark();
     node->clear_vmark();
     // ファンインの depth の最大値を max_depth に入れる．
-    SmdNode* inode0 = node->fanin0();
-    int max_depth = inode0->depth();
-    SmdNode* inode1 = node->fanin1();
-    int d1 = inode1->depth();
+    auto inode0 = node->fanin0();
+    SizeType max_depth = inode0->depth();
+    auto inode1 = node->fanin1();
+    SizeType d1 = inode1->depth();
     if ( max_depth < d1 ) {
       max_depth = d1;
     }
@@ -180,9 +121,11 @@ SbjMinDepth::operator()(int k,
 
 // node を根とする深さ d - 1 の k-feasible cut が存在するかどうか調べる．
 bool
-SbjMinDepth::find_k_cut(SmdNode* node,
-			int k,
-			int d)
+SbjMinDepth::find_k_cut(
+  SmdNode* node,
+  SizeType k,
+  SizeType d
+)
 {
   if ( d == 0 ) {
     return false;
@@ -197,7 +140,7 @@ SbjMinDepth::find_k_cut(SmdNode* node,
   // PI から tmark の付いたノードまで至る素な経路が
   // k + 1 本以上あれば k-feasible cut は存在しない．
   bool found = true;
-  int c = 0;
+  SizeType c = 0;
   for ( auto start: mInputList ) {
     if ( !start->rmark() ) {
       continue;
@@ -228,8 +171,10 @@ SbjMinDepth::find_k_cut(SmdNode* node,
 // node およびその TFI に rmark を付ける．
 // depth が d のノードに tmark を付ける．
 void
-SbjMinDepth::mark_tfi(SmdNode* node,
-		      int d)
+SbjMinDepth::mark_tfi(
+  SmdNode* node,
+  SizeType d
+)
 {
   if ( !node->check_rmark() ) {
     mTfiNodeList.push_back(node);
@@ -245,12 +190,14 @@ SbjMinDepth::mark_tfi(SmdNode* node,
 
 // node のファンアウトを探索する．
 bool
-SbjMinDepth::dfs_fanout(SmdNode* node)
+SbjMinDepth::dfs_fanout(
+  SmdNode* node
+)
 {
-  int n = node->fanout_num();
-  for ( int i = 0; i < n; ++ i ) {
-    SmdEdge* edge = node->fanout_edge(i);
-    SmdNode* to_node = edge->to();
+  SizeType n = node->fanout_num();
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto edge = node->fanout_edge(i);
+    auto to_node = edge->to();
     if ( !to_node->rmark() ) {
       // target の TFI ではない．
       continue;
@@ -267,8 +214,10 @@ SbjMinDepth::dfs_fanout(SmdNode* node)
 }
 
 bool
-SbjMinDepth::dfs(SmdNode* cur_node,
-		 int dir)
+SbjMinDepth::dfs(
+  SmdNode* cur_node,
+  int dir
+)
 {
   if ( cur_node->tmark() ) {
     // target にたどり着いた
@@ -277,10 +226,10 @@ SbjMinDepth::dfs(SmdNode* cur_node,
 
   if ( dir == 0 ) {
     // 前向き
-    SmdEdge* edge0 = cur_node->fanin0_edge();
-    SmdEdge* edge1 = cur_node->fanin1_edge();
+    auto edge0 = cur_node->fanin0_edge();
+    auto edge1 = cur_node->fanin1_edge();
     if ( edge0->flow() ) {
-      SmdNode* from_node = edge0->from();
+      auto from_node = edge0->from();
       if ( !from_node->check_vmark2() ) {
 	bool stat = dfs(from_node, 1);
 	if ( stat ) {
@@ -290,7 +239,7 @@ SbjMinDepth::dfs(SmdNode* cur_node,
       }
     }
     else if ( edge1->flow() ) {
-      SmdNode* from_node = edge1->from();
+      auto from_node = edge1->from();
       if ( !from_node->check_vmark2() ) {
 	bool stat = dfs(from_node, 1);
 	if ( stat ) {
@@ -308,9 +257,9 @@ SbjMinDepth::dfs(SmdNode* cur_node,
   }
   else {
     if ( cur_node->is_logic() && !cur_node->check_vmark1() ) {
-      SmdEdge* edge0 = cur_node->fanin0_edge();
+      auto edge0 = cur_node->fanin0_edge();
       if ( edge0->flow() ) {
-	SmdNode* from_node = edge0->from();
+	auto from_node = edge0->from();
 	if ( !from_node->check_vmark2() ) {
 	  bool stat = dfs(from_node, 1);
 	  if ( stat ) {
@@ -319,9 +268,9 @@ SbjMinDepth::dfs(SmdNode* cur_node,
 	  }
 	}
       }
-      SmdEdge* edge1 = cur_node->fanin1_edge();
+      auto edge1 = cur_node->fanin1_edge();
       if ( edge1->flow() ) {
-	SmdNode* from_node = edge1->from();
+	auto from_node = edge1->from();
 	if ( !from_node->check_vmark2() ) {
 	  bool stat = dfs(from_node, 1);
 	  if ( stat ) {

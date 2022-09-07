@@ -5,7 +5,7 @@
 /// @brief IOInfo のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2017, 2018 Yusuke Matsunaga
+/// Copyright (C) 2017, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "sbj_nsdef.h"
@@ -25,7 +25,7 @@ public:
 
   /// @brief デストラクタ
   virtual
-  ~IOInfo();
+  ~IOInfo() = default;
 
   /// @brief ポートに関連付けられている時に true を返す．
   virtual
@@ -43,7 +43,7 @@ public:
   ///
   /// is_port_type() == true の時のみ意味のある関数
   virtual
-  int
+  SizeType
   port_bitpos() const;
 
   /// @brief DFFの入力の時 true を返す．
@@ -123,14 +123,13 @@ public IOInfo
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] port 関連付けられているポート
-  /// @param[in] bit そのビット位置
-  IOPortInfo(SbjPort* port,
-	     int bit);
+  IOPortInfo(
+    SbjPort* port, ///< [in] 関連付けられているポート
+    SizeType bit   ///< [in] そのビット位置
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IOPortInfo();
+  ~IOPortInfo() = default;
 
 
 public:
@@ -139,29 +138,20 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ポートに関連付けられている時に true を返す．
-  virtual
   bool
-  is_port_type() const;
+  is_port_type() const override;
 
   /// @brief 関連付けられているポートを返す．
   ///
   /// is_port_type() == true の時のみ意味のある関数
-  virtual
   SbjPort*
-  port() const;
+  port() const override;
 
   /// @brief 関連付けられているポート上のビット位置を返す．
   ///
   /// is_port_type() == true の時のみ意味のある関数
-  virtual
-  int
-  port_bitpos() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  SizeType
+  port_bitpos() const override;
 
 
 private:
@@ -173,7 +163,7 @@ private:
   SbjPort* mPort;
 
   // ビット位置
-  int mBit;
+  SizeType mBit;
 
 };
 
@@ -188,12 +178,12 @@ class IODffInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] dff 関連付けられているDFF
-  IODffInfo(SbjDff* dff);
+  IODffInfo(
+    SbjDff* dff ///< [in] 関連付けられているDFF
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IODffInfo();
+  ~IODffInfo() = default;
 
 
 public:
@@ -204,15 +194,8 @@ public:
   /// @brief 関連するDFFを返す．
   ///
   /// DFF関係のノードの時のみ意味のある関数．
-  virtual
   SbjDff*
-  dff() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  dff() const override;
 
 
 private:
@@ -236,12 +219,12 @@ class IODffInputInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] dff 関連付けられているDFF
-  IODffInputInfo(SbjDff* dff);
+  IODffInputInfo(
+    SbjDff* dff ///< [in] 関連付けられているDFF
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IODffInputInfo();
+  ~IODffInputInfo() = default;
 
 
 public:
@@ -250,22 +233,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief DFFの入力の時 true を返す．
-  virtual
   bool
-  is_dff_input() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_dff_input() const override;
 
 };
 
@@ -280,12 +249,12 @@ class IODffOutputInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] dff 関連付けられているDFF
-  IODffOutputInfo(SbjDff* dff);
+  IODffOutputInfo(
+    SbjDff* dff ///< [in] 関連付けられているDFF
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IODffOutputInfo();
+  ~IODffOutputInfo() = default;
 
 
 public:
@@ -294,22 +263,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief DFFの出力の時 true を返す．
-  virtual
   bool
-  is_dff_output() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_dff_output() const override;
 
 };
 
@@ -324,12 +279,12 @@ class IODffClockInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] dff 関連付けられているDFF
-  IODffClockInfo(SbjDff* dff);
+  IODffClockInfo(
+    SbjDff* dff ///< [in] 関連付けられているDFF
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IODffClockInfo();
+  ~IODffClockInfo() = default;
 
 
 public:
@@ -338,22 +293,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief DFFのクロック端子の時 true を返す．
-  virtual
   bool
-  is_dff_clock() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_dff_clock() const override;
 
 };
 
@@ -368,12 +309,12 @@ class IODffClearInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] dff 関連付けられているDFF
-  IODffClearInfo(SbjDff* dff);
+  IODffClearInfo(
+    SbjDff* dff ///< [in] 関連付けられているDFF
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IODffClearInfo();
+  ~IODffClearInfo() = default;
 
 
 public:
@@ -382,22 +323,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief DFFのクリア端子の時 true を返す．
-  virtual
   bool
-  is_dff_clear() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_dff_clear() const override;
 
 };
 
@@ -412,12 +339,12 @@ class IODffPresetInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] dff 関連付けられているDFF
-  IODffPresetInfo(SbjDff* dff);
+  IODffPresetInfo(
+    SbjDff* dff ///< [in] 関連付けられているDFF
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IODffPresetInfo();
+  ~IODffPresetInfo() = default;
 
 
 public:
@@ -426,22 +353,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief DFFのセット端子の時 true を返す．
-  virtual
   bool
-  is_dff_preset() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_dff_preset() const override;
 
 };
 
@@ -456,12 +369,12 @@ class IOLatchInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] latch 関連付けられているラッチ
-  IOLatchInfo(SbjLatch* latch);
+  IOLatchInfo(
+    SbjLatch* latch ///< [in] 関連付けられているラッチ
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IOLatchInfo();
+  ~IOLatchInfo() = default;
 
 
 public:
@@ -472,15 +385,8 @@ public:
   /// @brief 関連付けられているラッチを返す．
   ///
   /// ラッチ関係のノードの時のみ意味のある関数．
-  virtual
   SbjLatch*
-  latch() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  latch() const override;
 
 
 private:
@@ -504,12 +410,12 @@ class IOLatchInputInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] latch 関連付けられているラッチ
-  IOLatchInputInfo(SbjLatch* latch);
+  IOLatchInputInfo(
+    SbjLatch* latch ///< [in] 関連付けられているラッチ
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IOLatchInputInfo();
+  ~IOLatchInputInfo() = default;
 
 
 public:
@@ -518,22 +424,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ラッチの入力の時 true を返す．
-  virtual
   bool
-  is_latch_input() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_latch_input() const override;
 
 };
 
@@ -548,12 +440,12 @@ class IOLatchOutputInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] latch 関連付けられているラッチ
-  IOLatchOutputInfo(SbjLatch* latch);
+  IOLatchOutputInfo(
+    SbjLatch* latch ///< [in] 関連付けられているラッチ
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IOLatchOutputInfo();
+  ~IOLatchOutputInfo() = default;
 
 
 public:
@@ -562,22 +454,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ラッチの出力の時 truue を返す．
-  virtual
   bool
-  is_latch_output() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_latch_output() const override;
 
 };
 
@@ -592,11 +470,12 @@ class IOLatchEnableInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] latch 関連付けられているラッチ
-  IOLatchEnableInfo(SbjLatch* latch);
+  IOLatchEnableInfo(
+    SbjLatch* latch ///< [in] 関連付けられているラッチ
+  );
 
   /// @brief デストラクタ
-  ~IOLatchEnableInfo();
+  ~IOLatchEnableInfo() = default;
 
 
 public:
@@ -605,22 +484,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ラッチのイネーブル端子の時 true を返す．
-  virtual
   bool
-  is_latch_enable() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_latch_enable() const override;
 
 };
 
@@ -635,11 +500,12 @@ class IOLatchClearInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] latch 関連付けられているラッチ
-  IOLatchClearInfo(SbjLatch* latch);
+  IOLatchClearInfo(
+    SbjLatch* latch ///< [in] 関連付けられているラッチ
+  );
 
   /// @brief デストラクタ
-  ~IOLatchClearInfo();
+  ~IOLatchClearInfo() = default;
 
 
 public:
@@ -648,22 +514,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ラッチのクリア端子の時 true を返す．
-  virtual
   bool
-  is_latch_clear() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_latch_clear() const override;
 
 };
 
@@ -678,12 +530,12 @@ class IOLatchPresetInfo :
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] latch 関連付けられているラッチ
-  IOLatchPresetInfo(SbjLatch* latch);
+  IOLatchPresetInfo(
+    SbjLatch* latch ///< [in] 関連付けられているラッチ
+  );
 
   /// @brief デストラクタ
-  virtual
-  ~IOLatchPresetInfo();
+  ~IOLatchPresetInfo() = default;
 
 
 public:
@@ -692,22 +544,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ラッチのセット端子の時 true を返す．
-  virtual
   bool
-  is_latch_preset() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // データメンバ
-  //////////////////////////////////////////////////////////////////////
-
+  is_latch_preset() const override;
 
 };
 

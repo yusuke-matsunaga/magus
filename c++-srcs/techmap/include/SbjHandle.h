@@ -5,9 +5,8 @@
 /// @brief SbjHandle のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 
@@ -23,14 +22,17 @@ class SbjHandle
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] node ノード
-  /// @param[in] inv 極性
   explicit
-  SbjHandle(SbjNode* node = nullptr,
-	    bool inv = false);
+  SbjHandle(
+    SbjNode* node = nullptr, ///< [in] ノード
+    bool inv = false         ///< [in] 極性
+  )
+  {
+    set(node, inv);
+  }
 
   /// @brief デストラクタ
-  ~SbjHandle();
+  ~SbjHandle() = default;
 
 
 public:
@@ -41,12 +43,18 @@ public:
   /// @brief 定数0を返す．
   static
   SbjHandle
-  make_zero();
+  make_zero()
+  {
+    return SbjHandle{static_cast<ympuint>(0ULL)};
+  }
 
   /// @brief 定数1を返す．
   static
   SbjHandle
-  make_one();
+  make_one()
+  {
+    return SbjHandle(static_cast<ympuint>(1ULL));
+  }
 
 
 public:
@@ -56,31 +64,63 @@ public:
 
   /// @brief ノードを返す．
   SbjNode*
-  node() const;
+  node() const
+  {
+    return reinterpret_cast<SbjNode*>(mData & ~1ULL);
+  }
 
   /// @brief 極性を返す．
   bool
-  inv() const;
+  inv() const
+  {
+    return static_cast<bool>(mData & 1ULL);
+  }
 
   /// @brief 定数0を表しているかどうか調べる．
   bool
-  is_const0() const;
+  is_const0() const
+  {
+    return mData == 0ULL;
+  }
 
   /// @brief 定数1を表しているかどうか調べる．
   bool
-  is_const1() const;
+  is_const1() const
+  {
+    return mData == 1ULL;
+  }
 
   /// @brief 極性を反転させた結果を返す．
   SbjHandle
-  operator~() const;
+  operator~() const
+  {
+    return SbjHandle(mData ^ 1ULL);
+  }
 
   /// @brief 反転属性を持たないハンドルを返す．
   SbjHandle
-  normalize() const;
+  normalize() const
+  {
+    return SbjHandle{mData & ~1ULL};
+  }
 
   /// @brief 等価比較演算子
   bool
-  operator==(const SbjHandle& right) const;
+  operator==(
+    const SbjHandle& right ///< [in] オペランド
+  ) const
+  {
+    return mData == right.mData;
+  }
+
+  /// @brief 非等価比較演算子
+  bool
+  operator!=(
+    const SbjHandle& right ///< [in] オペランド
+  ) const
+  {
+    return !operator==(right);
+  }
 
 
 public:
@@ -90,12 +130,20 @@ public:
 
   /// @brief 内容を設定する．
   void
-  set(SbjNode* node,
-      bool inv);
+  set(
+    SbjNode* node, ///< [in] ノード
+    bool inv       ///< [in] 極性
+  )
+  {
+    mData = reinterpret_cast<ympuint>(node) | static_cast<ympuint>(inv);
+  }
 
   /// @brief 極性を反転させる．
   void
-  invert();
+  invert()
+  {
+    mData ^= 1ULL;
+  }
 
 
 private:
@@ -104,7 +152,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief データを直接指定したコンストラクタ
-  SbjHandle(ympuint data);
+  SbjHandle(
+    ympuint data ///< [in] データ
+  ) : mData{data}
+  {
+  }
 
 
 private:
@@ -116,139 +168,6 @@ private:
   ympuint mData;
 
 };
-
-/// @relates SbjHandle
-/// @brief 非等価比較演算子
-bool
-operator!=(const SbjHandle& left,
-	   const SbjHandle& right);
-
-
-//////////////////////////////////////////////////////////////////////
-// inline 関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-// @param[in] node ノード
-// @param[in] inv 極性
-inline
-SbjHandle::SbjHandle(SbjNode* node,
-		     bool inv)
-{
-  set(node, inv);
-}
-
-// @brief データを直接指定したコンストラクタ
-inline
-SbjHandle::SbjHandle(ympuint data) :
-  mData(data)
-{
-}
-
-// @brief デストラクタ
-inline
-SbjHandle::~SbjHandle()
-{
-}
-
-// @brief 定数0を返す．
-inline
-SbjHandle
-SbjHandle::make_zero()
-{
-  return SbjHandle(static_cast<ympuint>(0ULL));
-}
-
-// @brief 定数1を返す．
-inline
-SbjHandle
-SbjHandle::make_one()
-{
-  return SbjHandle(static_cast<ympuint>(1ULL));
-}
-
-// @brief ノードを返す．
-inline
-SbjNode*
-SbjHandle::node() const
-{
-  return reinterpret_cast<SbjNode*>(mData & ~1ULL);
-}
-
-// @brief 極性を返す．
-inline
-bool
-SbjHandle::inv() const
-{
-  return static_cast<bool>(mData & 1ULL);
-}
-
-// @brief 定数0を表しているかどうか調べる．
-inline
-bool
-SbjHandle::is_const0() const
-{
-  return mData == 0ULL;
-}
-
-// @brief 定数1を表しているかどうか調べる．
-inline
-bool
-SbjHandle::is_const1() const
-{
-  return mData == 1ULL;
-}
-
-// @brief 極性を反転させた結果を返す．
-inline
-SbjHandle
-SbjHandle::operator~() const
-{
-  return SbjHandle(mData ^ 1ULL);
-}
-
-// @brief 反転属性を持たないハンドルを返す．
-inline
-SbjHandle
-SbjHandle::normalize() const
-{
-  return SbjHandle(mData & ~1ULL);
-}
-
-// @brief 内容を設定する．
-inline
-void
-SbjHandle::set(SbjNode* node,
-	       bool inv)
-{
-  mData = reinterpret_cast<ympuint>(node) | static_cast<ympuint>(inv);
-}
-
-// @brief 極性を反転させる．
-inline
-void
-SbjHandle::invert()
-{
-  mData ^= 1ULL;
-}
-
-// @brief 等価比較演算子
-inline
-bool
-SbjHandle::operator==(const SbjHandle& right) const
-{
-  return mData == right.mData;
-}
-
-// @relates SbjHandle
-// @brief 非等価比較演算子
-inline
-bool
-operator!=(const SbjHandle& left,
-	   const SbjHandle& right)
-{
-  return !left.operator==(right);
-}
 
 END_NAMESPACE_SBJ
 

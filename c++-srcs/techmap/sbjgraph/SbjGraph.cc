@@ -3,9 +3,8 @@
 /// @brief SbjGraph の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "SbjGraph.h"
 #include "SbjPort.h"
@@ -26,14 +25,10 @@ BEGIN_NAMESPACE_SBJ
 // クラス SbjGraph
 ///////////////////////////////////////////////////////////////////////
 
-// コンストラクタ
-SbjGraph::SbjGraph() :
-  mLevel(0)
-{
-}
-
 // コピーコンストラクタ
-SbjGraph::SbjGraph(const SbjGraph& src)
+SbjGraph::SbjGraph(
+  const SbjGraph& src
+)
 {
   vector<SbjNode*> nodemap;
   _copy(src, nodemap);
@@ -41,7 +36,9 @@ SbjGraph::SbjGraph(const SbjGraph& src)
 
 // 代入演算子
 SbjGraph&
-SbjGraph::operator=(const SbjGraph& src)
+SbjGraph::operator=(
+  const SbjGraph& src
+)
 {
   if ( &src != this ) {
     clear();
@@ -60,10 +57,12 @@ SbjGraph::~SbjGraph()
 
 // 複製する．
 void
-SbjGraph::_copy(const SbjGraph& src,
-		vector<SbjNode*>& nodemap)
+SbjGraph::_copy(
+  const SbjGraph& src,
+  vector<SbjNode*>& nodemap
+)
 {
-  int n = src.node_num();
+  SizeType n = src.node_num();
   nodemap.clear();
   nodemap.resize(n);
 
@@ -72,56 +71,56 @@ SbjGraph::_copy(const SbjGraph& src,
 
   // 外部入力の生成
   for ( auto src_node: src.input_list() ) {
-    SbjNode* dst_node = new_input(src_node->is_bipol());
+    auto dst_node = new_input(src_node->is_bipol());
     nodemap[src_node->id()] = dst_node;
   }
 
   // 論理ノードの生成
   for ( auto src_node: src.logic_list() ) {
-    const SbjNode* src_inode0 = src_node->fanin0();
-    SbjNode* input0 = nodemap[src_inode0->id()];
+    auto src_inode0 = src_node->fanin0();
+    auto input0 = nodemap[src_inode0->id()];
     ASSERT_COND( input0 );
-    SbjHandle ihandle0(input0, src_node->fanin0_inv());
+    SbjHandle ihandle0{input0, src_node->fanin0_inv()};
 
-    const SbjNode* src_inode1 = src_node->fanin1();
-    SbjNode* input1 = nodemap[src_inode1->id()];
+    auto src_inode1 = src_node->fanin1();
+    auto input1 = nodemap[src_inode1->id()];
     ASSERT_COND( input1 );
-    SbjHandle ihandle1(input1, src_node->fanin1_inv());
+    SbjHandle ihandle1{input1, src_node->fanin1_inv()};
 
-    SbjNode* dst_node = _new_logic_node(src_node->type(), ihandle0, ihandle1);
+    auto dst_node = _new_logic_node(src_node->type(), ihandle0, ihandle1);
     nodemap[src_node->id()] = dst_node;
   }
 
   // 外部出力の生成
   for ( auto src_onode: src.output_list() ) {
-    const SbjNode* src_inode = src_onode->output_fanin();
-    SbjNode* dst_inode = nullptr;
+    auto src_inode = src_onode->output_fanin();
+    SbjNode* dst_inode{nullptr};
     if ( src_inode ) {
       dst_inode = nodemap[src_inode->id()];
     }
-    SbjNode* dst_node = new_output(SbjHandle(dst_inode, src_onode->output_fanin_inv()));
+    auto dst_node = new_output(SbjHandle(dst_inode, src_onode->output_fanin_inv()));
     nodemap[src_onode->id()] = dst_node;
   }
 
   // DFF の生成
   for ( auto src_dff: src.dff_list() ) {
-    const SbjNode* src_input = src_dff->data_input();
-    SbjNode* dst_input = nodemap[src_input->id()];
+    auto src_input = src_dff->data_input();
+    auto dst_input = nodemap[src_input->id()];
 
-    const SbjNode* src_output = src_dff->data_output();
-    SbjNode* dst_output = nodemap[src_output->id()];
+    auto src_output = src_dff->data_output();
+    auto dst_output = nodemap[src_output->id()];
 
-    const SbjNode* src_clock = src_dff->clock();
-    SbjNode* dst_clock = nodemap[src_clock->id()];
+    auto src_clock = src_dff->clock();
+    auto dst_clock = nodemap[src_clock->id()];
 
-    const SbjNode* src_clear = src_dff->clear();
-    SbjNode* dst_clear = nullptr;
+    auto src_clear = src_dff->clear();
+    SbjNode* dst_clear{nullptr};
     if ( src_clear ) {
       dst_clear = nodemap[src_clear->id()];
     }
 
-    const SbjNode* src_preset = src_dff->preset();
-    SbjNode* dst_preset = nullptr;
+    auto src_preset = src_dff->preset();
+    SbjNode* dst_preset{nullptr};
     if ( src_preset ) {
       dst_preset = nodemap[src_preset->id()];
     }
@@ -131,23 +130,23 @@ SbjGraph::_copy(const SbjGraph& src,
 
   // ラッチの生成
   for ( auto src_latch: src.latch_list() ) {
-    const SbjNode* src_input = src_latch->data_input();
-    SbjNode* dst_input = nodemap[src_input->id()];
+    auto src_input = src_latch->data_input();
+    auto dst_input = nodemap[src_input->id()];
 
-    const SbjNode* src_output = src_latch->data_output();
-    SbjNode* dst_output = nodemap[src_output->id()];
+    auto src_output = src_latch->data_output();
+    auto dst_output = nodemap[src_output->id()];
 
-    const SbjNode* src_enable = src_latch->enable();
-    SbjNode* dst_enable = nodemap[src_enable->id()];
+    auto src_enable = src_latch->enable();
+    auto dst_enable = nodemap[src_enable->id()];
 
-    const SbjNode* src_clear = src_latch->clear();
-    SbjNode* dst_clear = nullptr;
+    auto src_clear = src_latch->clear();
+    SbjNode* dst_clear{nullptr};
     if ( src_clear ) {
       dst_clear = nodemap[src_clear->id()];
     }
 
-    const SbjNode* src_preset = src_latch->preset();
-    SbjNode* dst_preset = nullptr;
+    auto src_preset = src_latch->preset();
+    SbjNode* dst_preset{nullptr};
     if ( src_preset ) {
       dst_preset = nodemap[src_preset->id()];
     }
@@ -157,11 +156,11 @@ SbjGraph::_copy(const SbjGraph& src,
 
   // ポートの複製
   for ( auto src_port: src.port_list() ) {
-    int nb = src_port->bit_width();
+    SizeType nb = src_port->bit_width();
     vector<SbjNode*> tmp(nb);
     for ( int j = 0; j < nb; ++ j ) {
-      const SbjNode* src_node = src_port->bit(j);
-      SbjNode* dst_node = nodemap[src_node->id()];
+      auto src_node = src_port->bit(j);
+      auto dst_node = nodemap[src_node->id()];
       tmp[j] = dst_node;
     }
     add_port(src_port->name(), tmp);
@@ -217,23 +216,23 @@ SbjGraph::clear()
 }
 
 // @brief ポートを追加する(ベクタ版)．
-// @param[in] name ポート名
-// @param[in] body 対応付ける入出力ノードのベクタ
 void
-SbjGraph::add_port(const string& name,
-		   const vector<SbjNode*>& body)
+SbjGraph::add_port(
+  const string& name,
+  const vector<SbjNode*>& body
+)
 {
-  SbjPort* port = new SbjPort(name, body);
+  auto port = new SbjPort{name, body};
   mPortArray.push_back(port);
-  int n = body.size();
-  for ( int i = 0; i < n; ++ i ) {
-    SbjNode* node = body[i];
+  SizeType n = body.size();
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto node = body[i];
     if ( node->is_input() ) {
-      IOInfo* info = new IOPortInfo(port, i);
+      auto info = new IOPortInfo{port, i};
       mInputInfoArray[node->subid()] = info;
     }
     else if ( node->is_output() ) {
-      IOInfo* info = new IOPortInfo(port, i);
+      auto info = new IOPortInfo{port, i};
       mOutputInfoArray[node->subid()] = info;
     }
     else {
@@ -243,9 +242,10 @@ SbjGraph::add_port(const string& name,
 }
 
 // @brief 入出力ノードに関連づけられたポートを得る．
-// @param[in] node 入出力ノード
 const SbjPort*
-SbjGraph::port(const SbjNode* node) const
+SbjGraph::port(
+  const SbjNode* node
+) const
 {
   if ( node->is_input() ) {
     return mInputInfoArray[node->subid()]->port();
@@ -259,9 +259,10 @@ SbjGraph::port(const SbjNode* node) const
 }
 
 // @brief 入出力ノードのポートにおけるビット位置を得る．
-// @param[in] node 入出力ノード
-int
-SbjGraph::port_pos(const SbjNode* node) const
+SizeType
+SbjGraph::port_pos(
+  const SbjNode* node
+) const
 {
   if ( node->is_input() ) {
     return mInputInfoArray[node->subid()]->port_bitpos();
@@ -276,11 +277,13 @@ SbjGraph::port_pos(const SbjNode* node) const
 
 // 入力ノードを作る．
 SbjNode*
-SbjGraph::new_input(bool bipol)
+SbjGraph::new_input(
+  bool bipol
+)
 {
-  int id = mNodeArray.size();
-  int subid = mInputArray.size();
-  SbjNode* node = new SbjNode(id, bipol, subid);
+  SizeType id = mNodeArray.size();
+  SizeType subid = mInputArray.size();
+  auto node = new SbjNode{id, bipol, subid};
 
   // ノードリストの登録
   mNodeArray.push_back(node);
@@ -296,11 +299,13 @@ SbjGraph::new_input(bool bipol)
 
 // 出力ノードを作る．
 SbjNode*
-SbjGraph::new_output(SbjHandle ihandle)
+SbjGraph::new_output(
+  SbjHandle ihandle
+)
 {
-  int id = mNodeArray.size();
-  int subid = mOutputArray.size();
-  SbjNode* node = new SbjNode(id, subid, ihandle);
+  SizeType id = mNodeArray.size();
+  SizeType subid = mOutputArray.size();
+  auto node = new SbjNode{id, subid, ihandle};
 
   // ノードリストの登録
   mNodeArray.push_back(node);
@@ -319,14 +324,11 @@ SbjGraph::new_output(SbjHandle ihandle)
 }
 
 // @brief 論理式から論理ノード(の木)を作る．
-// @param[in] expr 論理式
-// @param[in] ihandle_list 入力ハンドルのリスト
-// @return 作成したノードのハンドルを返す．
-//
-// 入力が定数の時も考慮している．
 SbjHandle
-SbjGraph::new_expr(const Expr& expr,
-		   const vector<SbjHandle>& ihandle_list)
+SbjGraph::new_expr(
+  const Expr& expr,
+  const vector<SbjHandle>& ihandle_list
+)
 {
   if ( expr.is_zero() ) {
     return SbjHandle::make_zero();
@@ -368,14 +370,11 @@ SbjGraph::new_expr(const Expr& expr,
 }
 
 // @brief ANDノードを作る．
-// @param[in] ihandle1 1番めの入力ハンドル
-// @param[in] ihandle2 2番めの入力ハンドル
-// @return 作成したノードのハンドルを返す．
-//
-// ihandle1/ihandle2 が定数の時も考慮している．
 SbjHandle
-SbjGraph::new_and(SbjHandle ihandle1,
-		  SbjHandle ihandle2)
+SbjGraph::new_and(
+  SbjHandle ihandle1,
+  SbjHandle ihandle2
+)
 {
   if ( ihandle1.is_const0() ) {
     // 入力1が0固定
@@ -405,23 +404,21 @@ SbjGraph::new_and(SbjHandle ihandle1,
     }
   }
 
-  SbjNode* sbjnode = _new_logic_node(SbjNodeType::And, ihandle1, ihandle2);
-  return SbjHandle(sbjnode, false);
+  auto sbjnode = _new_logic_node(SbjNodeType::And, ihandle1, ihandle2);
+  return SbjHandle{sbjnode, false};
 }
 
 // @brief ANDノードを作る．
-// @param[in] ihandle_list 入力ハンドルのリスト
-// @return 作成したノードのハンドルを返す．
-//
-// 入力が定数の時も考慮している．
 SbjHandle
-SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
+SbjGraph::new_and(
+  const vector<SbjHandle>& ihandle_list
+)
 {
-  int n = ihandle_list.size();
+  SizeType n = ihandle_list.size();
   vector<SbjHandle> tmp_list;
   tmp_list.reserve(n);
-  for ( int i = 0; i < n; ++ i ) {
-    SbjHandle h = ihandle_list[i];
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto h = ihandle_list[i];
     if ( h.is_const0() ) {
       return SbjHandle::make_zero();
     }
@@ -436,49 +433,46 @@ SbjGraph::new_and(const vector<SbjHandle>& ihandle_list)
 }
 
 // @brief new_and の下請け関数
-// @param[in] ihandle_list 入力ハンドルのリスト
-// @param[in] start 開始位置
-// @param[in] num 要素数
 SbjHandle
-SbjGraph::_new_and_tree(const vector<SbjHandle>& ihandle_list,
-			int start,
-			int num)
+SbjGraph::_new_and_tree(
+  const vector<SbjHandle>& ihandle_list,
+  SizeType start,
+  SizeType end
+)
 {
+  SizeType num = end - start;
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
 
-  int h = num / 2;
-  SbjHandle l = _new_and_tree(ihandle_list, start, h);
-  SbjHandle r = _new_and_tree(ihandle_list, start + h, num - h);
+  SizeType h = (start + end) / 2;
+  auto l = _new_and_tree(ihandle_list, start, h);
+  auto r = _new_and_tree(ihandle_list, h, end);
   return new_and(l, r);
 }
 
 // @brief ORノードを作る．
-// @param[in] ihandle1 1番めの入力ハンドル
-// @param[in] ihandle2 2番めの入力ハンドル
-// @return 作成したノードのハンドルを返す．
-// @note ihandle1/ihandle2 が定数の時も考慮している．
 SbjHandle
-SbjGraph::new_or(SbjHandle ihandle1,
-		 SbjHandle ihandle2)
+SbjGraph::new_or(
+  SbjHandle ihandle1,
+  SbjHandle ihandle2
+)
 {
   return ~new_and(~ihandle1, ~ihandle2);
 }
 
 // @brief ORノードを作る．
-// @param[in] ihandle_list 入力ハンドルのリスト
-// @return 作成したノードのハンドルを返す．
-// @note 入力が定数の時も考慮している．
 SbjHandle
-SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
+SbjGraph::new_or(
+  const vector<SbjHandle>& ihandle_list
+)
 {
-  int n = ihandle_list.size();
+  SizeType n = ihandle_list.size();
   vector<SbjHandle> tmp_list;
   tmp_list.reserve(n);
-  for ( int i = 0; i < n; ++ i ) {
-    SbjHandle h = ihandle_list[i];
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto h = ihandle_list[i];
     if ( h.is_const1() ) {
       return SbjHandle::make_one();
     }
@@ -493,34 +487,31 @@ SbjGraph::new_or(const vector<SbjHandle>& ihandle_list)
 }
 
 // @brief new_or の下請け関数
-// @param[in] ihandle_list 入力ハンドルのリスト
-// @param[in] start 開始位置
-// @param[in] num 要素数
 SbjHandle
-SbjGraph::_new_or_tree(const vector<SbjHandle>& ihandle_list,
-		       int start,
-		       int num)
+SbjGraph::_new_or_tree(
+  const vector<SbjHandle>& ihandle_list,
+  SizeType start,
+  SizeType end
+)
 {
+  SizeType num = end - start;
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
 
-  int h = num / 2;
-  SbjHandle l = _new_or_tree(ihandle_list, start, h);
-  SbjHandle r = _new_or_tree(ihandle_list, start + h, num - h);
+  SizeType h = (start + end) / 2;
+  auto l = _new_or_tree(ihandle_list, start, h);
+  auto r = _new_or_tree(ihandle_list, h, end);
   return new_or(l, r);
 }
 
 // @brief XORノードを作る．
-// @param[in] ihandle1 1番めの入力ハンドル
-// @param[in] ihandle2 2番めの入力ハンドル
-// @return 作成したノードのハンドルを返す．
-//
-// ihandle1/ihandle2 が定数の時も考慮している．
 SbjHandle
-SbjGraph::new_xor(SbjHandle ihandle1,
-		  SbjHandle ihandle2)
+SbjGraph::new_xor(
+  SbjHandle ihandle1,
+  SbjHandle ihandle2
+)
 {
   if ( ihandle1.is_const0() ) {
     // 入力1が0固定
@@ -551,25 +542,23 @@ SbjGraph::new_xor(SbjHandle ihandle1,
   }
 
   bool inv = ihandle1.inv() ^ ihandle2.inv();
-  SbjNode* node = _new_logic_node(SbjNodeType::Xor,
-				  ihandle1.normalize(), ihandle2.normalize());
-  return SbjHandle(node, inv);
+  auto node = _new_logic_node(SbjNodeType::Xor,
+			      ihandle1.normalize(), ihandle2.normalize());
+  return SbjHandle{node, inv};
 }
 
 // @brief XORノードを作る．
-// @param[in] ihandle_list 入力ハンドルのリスト
-// @return 作成したノードのハンドルを返す．
-//
-// 入力が定数の時も考慮している．
 SbjHandle
-SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
+SbjGraph::new_xor(
+  const vector<SbjHandle>& ihandle_list
+)
 {
-  int n = ihandle_list.size();
+  SizeType n = ihandle_list.size();
   vector<SbjHandle> tmp_list;
   tmp_list.reserve(n);
   bool inv = false;
-  for ( int i = 0; i < n; ++ i ) {
-    SbjHandle h = ihandle_list[i];
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto h = ihandle_list[i];
     if ( h.is_const1() ) {
       inv = !inv;
     }
@@ -587,37 +576,36 @@ SbjGraph::new_xor(const vector<SbjHandle>& ihandle_list)
 }
 
 // @brief new_xor の下請け関数
-// @param[in] ihandle_list 入力ハンドルのリスト
-// @param[in] start 開始位置
-// @param[in] num 要素数
 SbjHandle
-SbjGraph::_new_xor_tree(const vector<SbjHandle>& ihandle_list,
-			int start,
-			int num)
+SbjGraph::_new_xor_tree(
+  const vector<SbjHandle>& ihandle_list,
+  SizeType start,
+  SizeType end
+)
 {
+  SizeType num = end - start;
   ASSERT_COND( num > 0 );
   if ( num == 1 ) {
     return ihandle_list[start];
   }
 
-  int h = num / 2;
-  SbjHandle l = _new_xor_tree(ihandle_list, start, h);
-  SbjHandle r = _new_xor_tree(ihandle_list, start + h, num - h);
+  SizeType h = (start + end) / 2;
+  auto l = _new_xor_tree(ihandle_list, start, h);
+  auto r = _new_xor_tree(ihandle_list, h, end);
   return new_xor(l, r);
 }
 
 // @brief 新しい論理ノードを作る．
-// @param[in] type ノードのタイプ
-// @param[in] ihandle1 1番めのファンインのハンドル
-// @param[in] ihandle2 2番めのファンインのハンドル
 inline
 SbjNode*
-SbjGraph::_new_logic_node(SbjNodeType type,
-			  SbjHandle ihandle1,
-			  SbjHandle ihandle2)
+SbjGraph::_new_logic_node(
+  SbjNodeType type,
+  SbjHandle ihandle1,
+  SbjHandle ihandle2
+)
 {
-  int id = mNodeArray.size();
-  SbjNode* node = new SbjNode(id, type, ihandle1, ihandle2);
+  SizeType id = mNodeArray.size();
+  auto node = new SbjNode{id, type, ihandle1, ihandle2};
 
   // ノードリストに登録
   mNodeArray.push_back(node);
@@ -630,14 +618,16 @@ SbjGraph::_new_logic_node(SbjNodeType type,
 
 // DFFノードを作る．
 SbjDff*
-SbjGraph::new_dff(SbjNode* input,
-		  SbjNode* output,
-		  SbjNode* clock,
-		  SbjNode* clear,
-		  SbjNode* preset)
+SbjGraph::new_dff(
+  SbjNode* input,
+  SbjNode* output,
+  SbjNode* clock,
+  SbjNode* clear,
+  SbjNode* preset
+)
 {
-  int id = mDffList.size();
-  SbjDff* dff = new SbjDff(id, input, output, clock, clear, preset);
+  SizeType id = mDffList.size();
+  auto dff = new SbjDff{id, input, output, clock, clear, preset};
 
   // DFFリストに登録
   mDffList.push_back(dff);
@@ -657,11 +647,10 @@ SbjGraph::new_dff(SbjNode* input,
 }
 
 // @brief node に関連付けられている DFF を得る．
-// @param[in] node 対象のノード
-//
-// node が DFF に関連付けられていない場合には nullptr を返す．
 const SbjDff*
-SbjGraph::dff(const SbjNode* node) const
+SbjGraph::dff(
+  const SbjNode* node
+) const
 {
   if ( node->is_input() ) {
     return mInputInfoArray[node->subid()]->dff();
@@ -673,9 +662,10 @@ SbjGraph::dff(const SbjNode* node) const
 }
 
 // @brief node がDFFの入力だった時に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_dff_input(const SbjNode* node) const
+SbjGraph::is_dff_input(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_dff_input();
@@ -684,9 +674,10 @@ SbjGraph::is_dff_input(const SbjNode* node) const
 }
 
 // @brief node がDFFの出力だった時に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_dff_output(const SbjNode* node) const
+SbjGraph::is_dff_output(
+  const SbjNode* node
+) const
 {
   if ( node->is_input() ) {
     return mInputInfoArray[node->subid()]->is_dff_output();
@@ -695,9 +686,10 @@ SbjGraph::is_dff_output(const SbjNode* node) const
 }
 
 // @brief node がDFFのクロック端子だった時に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_dff_clock(const SbjNode* node) const
+SbjGraph::is_dff_clock(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_dff_clock();
@@ -706,9 +698,10 @@ SbjGraph::is_dff_clock(const SbjNode* node) const
 }
 
 // @brief node がDFFのクリア端子だった時に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_dff_clear(const SbjNode* node) const
+SbjGraph::is_dff_clear(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_dff_clear();
@@ -717,9 +710,10 @@ SbjGraph::is_dff_clear(const SbjNode* node) const
 }
 
 // @brief node がDFFのセット端子だった時に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_dff_preset(const SbjNode* node) const
+SbjGraph::is_dff_preset(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_dff_preset();
@@ -729,14 +723,16 @@ SbjGraph::is_dff_preset(const SbjNode* node) const
 
 // ラッチノードを作る．
 SbjLatch*
-SbjGraph::new_latch(SbjNode* input,
-		    SbjNode* output,
-		    SbjNode* enable,
-		    SbjNode* clear,
-		    SbjNode* preset)
+SbjGraph::new_latch(
+  SbjNode* input,
+  SbjNode* output,
+  SbjNode* enable,
+  SbjNode* clear,
+  SbjNode* preset
+)
 {
-  int id = mLatchList.size();
-  SbjLatch* latch = new SbjLatch(id, input, output, enable, clear, preset);
+  SizeType id = mLatchList.size();
+  auto latch = new SbjLatch{id, input, output, enable, clear, preset};
 
   // ラッチリストに登録
   mLatchList.push_back(latch);
@@ -756,11 +752,10 @@ SbjGraph::new_latch(SbjNode* input,
 }
 
 // @brief node に関連付けられているラッチを返す．
-// @param[in] node 対象のノード
-//
-// 関連付けられていないばあいには nullptr を返す．
 const SbjLatch*
-SbjGraph::latch(const SbjNode* node) const
+SbjGraph::latch(
+  const SbjNode* node
+) const
 {
   if ( node->is_input() ) {
     return mInputInfoArray[node->subid()]->latch();
@@ -772,9 +767,10 @@ SbjGraph::latch(const SbjNode* node) const
 }
 
 // @brief node がラッチの入力だった場合に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_latch_input(const SbjNode* node) const
+SbjGraph::is_latch_input(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_latch_input();
@@ -783,9 +779,10 @@ SbjGraph::is_latch_input(const SbjNode* node) const
 }
 
 // @brief node がラッチの出力だった場合に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_latch_output(const SbjNode* node) const
+SbjGraph::is_latch_output(
+  const SbjNode* node
+) const
 {
   if ( node->is_input() ) {
     return mInputInfoArray[node->subid()]->is_latch_output();
@@ -794,9 +791,10 @@ SbjGraph::is_latch_output(const SbjNode* node) const
 }
 
 // @brief node がラッチのイネーブル端子だった場合に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_latch_enable(const SbjNode* node) const
+SbjGraph::is_latch_enable(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_latch_enable();
@@ -805,9 +803,10 @@ SbjGraph::is_latch_enable(const SbjNode* node) const
 }
 
 // @brief node がラッチのクリア端子だった場合に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_latch_clear(const SbjNode* node) const
+SbjGraph::is_latch_clear(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_latch_clear();
@@ -816,9 +815,10 @@ SbjGraph::is_latch_clear(const SbjNode* node) const
 }
 
 // @brief node がラッチのセット端子だった場合に true を返す．
-// @param[in] node 対象のノード
 bool
-SbjGraph::is_latch_preset(const SbjNode* node) const
+SbjGraph::is_latch_preset(
+  const SbjNode* node
+) const
 {
   if ( node->is_output() ) {
     return mOutputInfoArray[node->subid()]->is_latch_preset();
@@ -827,14 +827,13 @@ SbjGraph::is_latch_preset(const SbjNode* node) const
 }
 
 // @brief 各ノードの minimum depth を求める．
-// @param[in] k LUT の最大入力数
-// @param[out] depth_array 各ノードの深さを収める配列
-// @return 出力の最大深さを返す．
-int
-SbjGraph::get_min_depth(int k,
-			vector<int>& depth_array) const
+SizeType
+SbjGraph::get_min_depth(
+  SizeType k,
+  vector<SizeType>& depth_array
+) const
 {
-  SbjMinDepth smd(*this);
+  SbjMinDepth smd{*this};
 
   return smd(k, depth_array);
 }

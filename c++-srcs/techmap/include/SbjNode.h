@@ -5,9 +5,8 @@
 /// @brief SbjNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 #include "SbjHandle.h"
@@ -58,32 +57,29 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ(入力)
-  /// @param[in] id ID番号
-  /// @param[in] bipol 両極性が利用可能な時に true になるフラグ
-  /// @param[in] subid 入力/出力番号
-  SbjNode(int id,
-	  bool bipol,
-	  int subid);
+  SbjNode(
+    SizeType id,   ///< [in] ID番号
+    bool bipol,    ///< [in] 両極性が利用可能な時に true になるフラグ
+    SizeType subid ///< [in] 入力/出力番号
+  );
 
   /// @brief コンストラクタ(出力)
-  /// @param[in] id ID番号
-  /// @param[in] subid 入力/出力番号
-  /// @param[in] input ファンインのハンドル
-  SbjNode(int id,
-	  int subid,
-	  SbjHandle input);
+  SbjNode(
+    SizeType id,    ///< [in] ID番号
+    SizeType subid, ///< [in] 入力/出力番号
+    SbjHandle input ///< [in]  ファンインのハンドル
+  );
 
   /// @brief コンストラクタ(AND/XOR)
-  /// @param[in] id ID番号
-  /// @param[in] type ノードタイプ
-  /// @param[in] input0, input1 ファンインのハンドル
-  SbjNode(int id,
-	  SbjNodeType type,
-	  SbjHandle input0,
-	  SbjHandle input1);
+  SbjNode(
+    SizeType id,      ///< [in] ID番号
+    SbjNodeType type, ///< [in] ノードタイプ
+    SbjHandle input0, ///< [in] ファンイン0のハンドル
+    SbjHandle input1  ///< [in] ファンイン1のハンドル
+  );
 
   /// @brief デストラクタ
-  ~SbjNode();
+  ~SbjNode() = default;
 
 
 public:
@@ -95,8 +91,11 @@ public:
   /// @return ID 番号を返す．
   ///
   /// @sa SbjGraph
-  int
-  id() const;
+  SizeType
+  id() const
+  {
+    return mId;
+  }
 
   /// @brief ID を表す文字列の取得
   /// @note デバッグ時にしか意味を持たない
@@ -105,129 +104,238 @@ public:
 
   /// @brief タイプを得る．
   SbjNodeType
-  type() const;
+  type() const
+  {
+    return static_cast<SbjNodeType>(mFlags & kTypeMask);
+  }
 
   /// @brief 入力ノードの時に true を返す．
   bool
-  is_input() const;
+  is_input() const
+  {
+    return type() == SbjNodeType::Input;
+  }
 
   /// @brief 両極性が利用可能な入力ノードの時に true を返す．
   ///
   /// is_input() == false の時の値は不定
   bool
-  is_bipol() const;
+  is_bipol() const
+  {
+    return static_cast<bool>((mFlags >> kBiPolShift) & 1U);
+  }
 
   /// @brief 出力ノードの時に true を返す．
   bool
-  is_output() const;
+  is_output() const
+  {
+    return type() == SbjNodeType::Output;
+  }
 
   /// @brief 論理ノードの時に true を返す．
   bool
-  is_logic() const;
+  is_logic() const
+  {
+    return (type() == SbjNodeType::And) || (type() == SbjNodeType::Xor);
+  }
 
   /// @brief AND ノードの時に true を返す．
   bool
-  is_and() const;
+  is_and() const
+  {
+    return type() == SbjNodeType::And;
+  }
 
   /// @brief XOR ノードの時に true を返す．
   bool
-  is_xor() const;
+  is_xor() const
+  {
+    return type() == SbjNodeType::Xor;
+  }
 
   /// @brief サブID (入力／出力番号)を得る．
   /// @note 入力ノード/出力ノードの場合のみ意味を持つ．
-  int
-  subid() const;
+  SizeType
+  subid() const
+  {
+    ASSERT_COND( is_input() || is_output() );
+
+    return mSubId;
+  }
 
   /// @brief 出力ノードの場合のファンインのハンドルを得る．
   SbjHandle
-  output_fanin_handle() const;
+  output_fanin_handle() const
+  {
+    ASSERT_COND( is_output() );
+
+    return mFanins[0];
+  }
 
   /// @brief 出力ノードの場合のファンインを得る．
   const SbjNode*
-  output_fanin() const;
+  output_fanin() const
+  {
+    ASSERT_COND( is_output() );
+
+    return mFanins[0].node();
+  }
 
   /// @brief 出力ノードの場合のファンインの極性を返す．
   /// @return 反転していたら true を返す．
   bool
-  output_fanin_inv() const;
+  output_fanin_inv() const
+  {
+    ASSERT_COND( is_output() );
+
+    return mFanins[0].inv();
+  }
 
   /// @brief ファンインのハンドルを得る．
-  /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番めのファンインのハンドル
   ///
   /// 該当するファンインがなければ空のハンドルを返す．
   SbjHandle
-  fanin_handle(int pos) const;
+  fanin_handle(
+    SizeType pos ///< [in] 入力番号(0 or 1)
+  ) const
+  {
+    ASSERT_COND( is_logic() );
+    ASSERT_COND( pos == 0 || pos == 1 );
+
+    return mFanins[pos];
+  }
 
   /// @brief ファンイン0のハンドルを得る．
   /// @return ファンイン0のハンドル
   ///
   /// 該当するファンインがなければ空のハンドルを返す．
   SbjHandle
-  fanin0_handle() const;
+  fanin0_handle() const
+  {
+    ASSERT_COND( is_logic() );
+
+    return mFanins[0];
+  }
 
   /// @brief ファンイン1のハンドルを得る．
   /// @return ファンイン1のハンドル
   ///
   /// 該当するファンインがなければ空のハンドルを返す．
   SbjHandle
-  fanin1_handle() const;
+  fanin1_handle() const
+  {
+    ASSERT_COND( is_logic() );
+
+    return mFanins[1];
+  }
 
   /// @brief ファンインのノードを得る．
-  /// @param[in] pos 入力番号(0 or 1)
   /// @return pos 番めのファンインのノード
   ///
   /// 該当するファンインがなければ nullptr を返す．
   const SbjNode*
-  fanin(int pos) const;
+  fanin(
+    SizeType pos ///< [in] 入力番号(0 or 1)
+  ) const
+  {
+    ASSERT_COND( is_logic() );
+    ASSERT_COND( pos == 0 || pos == 1 );
+
+    return mFanins[pos].node();
+  }
 
   /// @brief ファンイン0のノードを得る．
   /// @return ファンイン0のノード
   ///
   /// 該当するファンインがなければ nullptr を返す．
   const SbjNode*
-  fanin0() const;
+  fanin0() const
+  {
+    ASSERT_COND( is_logic() );
+
+    return mFanins[0].node();
+  }
 
   /// @brief ファンイン1のノードを得る．
   /// @return ファンイン1のノード
   ///
   /// 該当するファンインがなければ nullptr を返す．
   const SbjNode*
-  fanin1() const;
+  fanin1() const
+  {
+    ASSERT_COND( is_logic() );
+
+    return mFanins[1].node();
+  }
 
   /// @brief ファンインの反転属性を得る．
-  /// @param[in] pos 入力番号 (0 or 1)
   bool
-  fanin_inv(int pos) const;
+  fanin_inv(
+    SizeType pos ///< [in] 入力番号(0 or 1)
+  ) const
+  {
+    ASSERT_COND( is_logic() );
+    ASSERT_COND( pos == 0 || pos == 1 );
+
+    return mFanins[pos].inv();
+  }
 
   /// @brief ファンイン0の反転属性を得る．
   bool
-  fanin0_inv() const;
+  fanin0_inv() const
+  {
+    ASSERT_COND( is_logic() );
+
+    return mFanins[0].inv();
+  }
 
   /// @brief ファンイン1の反転属性を得る．
   bool
-  fanin1_inv() const;
+  fanin1_inv() const
+  {
+    ASSERT_COND( is_logic() );
+
+    return mFanins[1].inv();
+  }
 
   /// @brief ファンアウト数を得る．
-  int
-  fanout_num() const;
+  SizeType
+  fanout_num() const
+  {
+    return mFanoutList.size();
+  }
 
   /// @brief ファンアウトのノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
   const SbjNode*
-  fanout(int pos) const;
+  fanout(
+    SizeType pos ///< [in] 位置番号 ( 0 <= pos < fanout_num() )
+  ) const
+  {
+    ASSERT_COND( pos >= 0 && pos < fanout_num() );
+    return mFanoutList[pos].to();
+  }
 
   /// @brief ファンアウトリストを得る．
   const vector<SbjEdge>&
-  fanout_list() const;
+  fanout_list() const
+  {
+    return mFanoutList;
+  }
 
   /// @brief 出力ノードにファンアウトしているとき true を返す．
   bool
-  pomark() const;
+  pomark() const
+  {
+    return static_cast<bool>((mFlags >> kPoShift) & 1U);
+  }
 
   /// @brief レベルを得る．
-  int
-  level() const;
+  SizeType
+  level() const
+  {
+    return static_cast<int>(mFlags >> kLevelShift);
+  }
 
   /// @}
   //////////////////////////////////////////////////////////////////////
@@ -239,10 +347,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID 番号
-  int mId;
+  SizeType mId;
 
   // 入力番号/出力番号
-  int mSubId;
+  SizeType mSubId;
 
   // タイプ (+いくつかのフラグ)
   // 0 -  1: タイプ(SbjNodeType)
@@ -279,269 +387,6 @@ private:
   constexpr ymuint kPoMask = 1U << kPoShift;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// inline 関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// ID 番号を得る．
-inline
-int
-SbjNode::id() const
-{
-  return mId;
-}
-
-// タイプを得る．
-inline
-SbjNodeType
-SbjNode::type() const
-{
-  return static_cast<SbjNodeType>(mFlags & kTypeMask);
-}
-
-// 入力ノードの時に true を返す．
-inline
-bool
-SbjNode::is_input() const
-{
-  return type() == SbjNodeType::Input;
-}
-
-// @brief 逆極性も利用可能な入力ノードの時に true を返す．
-//
-// is_input() == false の時の値は不定
-inline
-bool
-SbjNode::is_bipol() const
-{
-  return static_cast<bool>((mFlags >> kBiPolShift) & 1U);
-}
-
-// 出力ノードの時に true を返す．
-inline
-bool
-SbjNode::is_output() const
-{
-  return type() == SbjNodeType::Output;
-}
-
-// 論理ノードの時に true を返す．
-inline
-bool
-SbjNode::is_logic() const
-{
-  return (type() == SbjNodeType::And) || (type() == SbjNodeType::Xor);
-}
-
-// @brief AND ノードの時に true を返す．
-inline
-bool
-SbjNode::is_and() const
-{
-  return type() == SbjNodeType::And;
-}
-
-// @brief XOR ノードの時に true を返す．
-inline
-bool
-SbjNode::is_xor() const
-{
-  return type() == SbjNodeType::Xor;
-}
-
-// @brief サブID (入力／出力番号)を得る．
-inline
-int
-SbjNode::subid() const
-{
-  ASSERT_COND( is_input() || is_output() );
-
-  return mSubId;
-}
-
-// @brief 出力ノードの場合のファンインのハンドルを得る．
-inline
-SbjHandle
-SbjNode::output_fanin_handle() const
-{
-  ASSERT_COND( is_output() );
-
-  return mFanins[0];
-}
-
-// @brief 出力ノードの場合のファンインを得る．
-inline
-const SbjNode*
-SbjNode::output_fanin() const
-{
-  ASSERT_COND( is_output() );
-
-  return mFanins[0].node();
-}
-
-// @brief 出力ノードの極性を得る．
-inline
-bool
-SbjNode::output_fanin_inv() const
-{
-  ASSERT_COND( is_output() );
-
-  return mFanins[0].inv();
-}
-
-// @brief ファンインのハンドルを得る．
-// @param[in] pos 入力番号(0 or 1)
-// @return pos 番めのファンインのハンドル
-//
-// 該当するファンインがなければ空のハンドルを返す．
-inline
-SbjHandle
-SbjNode::fanin_handle(int pos) const
-{
-  ASSERT_COND( is_logic() );
-  ASSERT_COND( pos == 0 || pos == 1 );
-
-  return mFanins[pos];
-}
-
-// @brief ファンイン0のハンドルを得る．
-// @return ファンイン0のハンドル
-//
-// 該当するファンインがなければ空のハンドルを返す．
-inline
-SbjHandle
-SbjNode::fanin0_handle() const
-{
-  ASSERT_COND( is_logic() );
-
-  return mFanins[0];
-}
-
-// @brief ファンイン1のハンドルを得る．
-// @return ファンイン1のハンドル
-//
-// 該当するファンインがなければ空のハンドルを返す．
-inline
-SbjHandle
-SbjNode::fanin1_handle() const
-{
-  ASSERT_COND( is_logic() );
-
-  return mFanins[1];
-}
-
-// @brief ファンインのノードを得る．
-inline
-const SbjNode*
-SbjNode::fanin(int pos) const
-{
-  ASSERT_COND( is_logic() );
-  ASSERT_COND( pos == 0 || pos == 1 );
-
-  return mFanins[pos].node();
-}
-
-// @brief ファンイン0のノードを得る．
-// @return ファンイン0のノード
-//
-// 該当するファンインがなければ nullptr を返す．
-inline
-const SbjNode*
-SbjNode::fanin0() const
-{
-  ASSERT_COND( is_logic() );
-
-  return mFanins[0].node();
-}
-
-// @brief ファンイン1のノードを得る．
-// @return ファンイン1のノード
-//
-// 該当するファンインがなければ nullptr を返す．
-inline
-const SbjNode*
-SbjNode::fanin1() const
-{
-  ASSERT_COND( is_logic() );
-
-  return mFanins[1].node();
-}
-
-// @brief ファンインの反転属性を得る．
-// @param[in] pos 入力番号 (0 or 1)
-inline
-bool
-SbjNode::fanin_inv(int pos) const
-{
-  ASSERT_COND( is_logic() );
-  ASSERT_COND( pos == 0 || pos == 1 );
-
-  return mFanins[pos].inv();
-}
-
-// @brief ファンイン0の反転属性を得る．
-inline
-bool
-SbjNode::fanin0_inv() const
-{
-  ASSERT_COND( is_logic() );
-
-  return mFanins[0].inv();
-}
-
-// @brief ファンイン1の反転属性を得る．
-inline
-bool
-SbjNode::fanin1_inv() const
-{
-  ASSERT_COND( is_logic() );
-
-  return mFanins[1].inv();
-}
-
-// @brief ファンアウト数を得る．
-inline
-int
-SbjNode::fanout_num() const
-{
-  return mFanoutList.size();
-}
-
-// @brief ファンアウトのノードを得る．
-// @param[in] pos 位置番号 ( 0 <= pos < fanout_num() )
-inline
-const SbjNode*
-SbjNode::fanout(int pos) const
-{
-  ASSERT_COND( pos >= 0 && pos < fanout_num() );
-  return mFanoutList[pos].to();
-}
-
-// @brief ファンアウトリストを得る．
-inline
-const vector<SbjEdge>&
-SbjNode::fanout_list() const
-{
-  return mFanoutList;
-}
-
-// @brief 出力ノードにファンアウトしているとき true を返す．
-inline
-bool
-SbjNode::pomark() const
-{
-  return static_cast<bool>((mFlags >> kPoShift) & 1U);
-}
-
-// @brief レベルを得る．
-inline
-int
-SbjNode::level() const
-{
-  return static_cast<int>(mFlags >> kLevelShift);
-}
 
 END_NAMESPACE_SBJ
 

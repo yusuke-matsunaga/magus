@@ -5,9 +5,8 @@
 /// @brief CutList のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 
@@ -31,10 +30,10 @@ public:
   /// @brief コンストラクタ
   ///
   /// 内容は不定
-  CutListIterator();
+  CutListIterator() = default;
 
   /// @brief デストラクタ
-  ~CutListIterator();
+  ~CutListIterator() = default;
 
 
 private:
@@ -43,7 +42,11 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を指定したコンストラクタ
-  CutListIterator(Cut* cut);
+  CutListIterator(
+    Cut* cut
+  ) : mCut{cut}
+  {
+  }
 
 
 public:
@@ -53,17 +56,37 @@ public:
 
   /// @brief カットを得る．
   const Cut*
-  operator*() const;
+  operator*() const
+  {
+    return mCut;
+  }
 
   /// @brief 次の要素に移動する．
   void
-  operator++();
+  operator++()
+  {
+    if ( mCut ) {
+      mCut = mCut->mLink;
+    }
+  }
 
   /// @brief 等価比較演算子
-  friend
   bool
-  operator==(CutListIterator a,
-	     CutListIterator b);
+  operator==(
+    const CutListIterator b
+  ) const
+  {
+    return mCut == b.mCut;
+  }
+
+  /// @brief 非等価比較演算子
+  bool
+  operator!=(
+    const CutListIterator b
+  ) const
+  {
+    return !operator==(b);
+  }
 
 
 private:
@@ -72,15 +95,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 対象のカット
-  Cut* mCut;
+  Cut* mCut{nullptr};
 
 };
-
-/// @relates CutListIterator
-/// @brief 非等価比較演算子
-bool
-operator!=(CutListIterator a,
-	   CutListIterator b);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -97,10 +114,10 @@ public:
   /// @brief コンストラクタ
   ///
   /// 空のリストとして初期化される．
-  CutList();
+  CutList() = default;
 
   /// @brief デストラクタ
-  ~CutList();
+  ~CutList() = default;
 
 
 public:
@@ -110,28 +127,58 @@ public:
 
   /// @brief 内容をクリアする．
   void
-  clear();
+  clear()
+  {
+    mTop = nullptr;
+    mTail = nullptr;
+    mNum = 0;
+  }
 
   /// @brief カットを末尾に追加する．
-  /// @param[in] cut 対象のカット
   void
-  push_back(Cut* cut);
+  push_back(
+    Cut* cut ///< [in] 対象のカット
+  )
+  {
+    if ( mTail ) {
+      mTail->mLink = cut;
+      mTail = cut;
+    }
+    else {
+      mTop = mTail = cut;
+    }
+    ++ mNum;
+    // 念のため
+    cut->mLink = nullptr;
+  }
 
   /// @brief 先頭を表す反復子を返す．
   CutListIterator
-  begin() const;
+  begin() const
+  {
+    return CutListIterator{mTop};
+  }
 
   /// @brief 末尾を表す反復子を返す．
   CutListIterator
-  end() const;
+  end() const
+  {
+    return CutListIterator{nullptr};
+  }
 
   /// @brief 要素数を返す．
-  int
-  size() const;
+  SizeType
+  size() const
+  {
+    return mNum;
+  }
 
   /// @brief 空のとき true を返す．
   bool
-  empty() const;
+  empty() const
+  {
+    return mTop == nullptr;
+  }
 
 
 private:
@@ -140,151 +187,15 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 先頭の要素
-  Cut* mTop;
+  Cut* mTop{nullptr};
 
   // 末尾の要素
-  Cut* mTail;
+  Cut* mTail{nullptr};
 
   // 要素数
-  int mNum;
+  SizeType mNum{0};
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-CutListIterator::CutListIterator() :
-  mCut(nullptr)
-{
-}
-
-// @brief デストラクタ
-inline
-CutListIterator::~CutListIterator()
-{
-}
-
-// @brief 内容を指定したコンストラクタ
-inline
-CutListIterator::CutListIterator(Cut* cut) :
-  mCut(cut)
-{
-}
-
-// @brief カットを得る．
-inline
-const Cut*
-CutListIterator::operator*() const
-{
-  return mCut;
-}
-
-// @brief 次の要素に移動する．
-inline
-void
-CutListIterator::operator++()
-{
-  if ( mCut ) {
-    mCut = mCut->mLink;
-  }
-}
-
-// @brief 等価比較演算子
-inline
-bool
-operator==(CutListIterator a,
-	   CutListIterator b)
-{
-  return a.mCut == b.mCut;
-}
-
-// @relates CutListIterator
-// @brief 非等価比較演算子
-inline
-bool
-operator!=(CutListIterator a,
-	   CutListIterator b)
-{
-  return !operator==(a, b);
-}
-
-// @brief コンストラクタ
-inline
-CutList::CutList() :
-  mTop(nullptr),
-  mTail(nullptr),
-  mNum(0)
-{
-}
-
-// @brief デストラクタ
-inline
-CutList::~CutList()
-{
-}
-
-// @brief 内容をクリアする．
-inline
-void
-CutList::clear()
-{
-  mTop = nullptr;
-  mTail = nullptr;
-  mNum = 0;
-}
-
-// @brief カットを末尾に追加する．
-inline
-void
-CutList::push_back(Cut* cut)
-{
-  if ( mTail ) {
-    mTail->mLink = cut;
-    mTail = cut;
-  }
-  else {
-    mTop = mTail = cut;
-  }
-  ++ mNum;
-  // 念のため
-  cut->mLink = nullptr;
-}
-
-// @brief 先頭を表す反復子を返す．
-inline
-CutListIterator
-CutList::begin() const
-{
-  return CutListIterator(mTop);
-}
-
-// @brief 末尾を表す反復子を返す．
-inline
-CutListIterator
-CutList::end() const
-{
-  return CutListIterator(nullptr);
-}
-
-// @brief 要素数を返す．
-inline
-int
-CutList::size() const
-{
-  return mNum;
-}
-
-// @brief 空のとき true を返す．
-inline
-bool
-CutList::empty() const
-{
-  return mTop == nullptr;
-}
 
 END_NAMESPACE_LUTMAP
 

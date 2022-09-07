@@ -3,9 +3,8 @@
 /// @brief SbjDumper の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "SbjDumper.h"
 #include "SbjGraph.h"
@@ -18,18 +17,18 @@
 BEGIN_NAMESPACE_SBJ
 
 /// @brief 独自形式で出力する．
-/// @param[in] s 出力先のストリーム
-/// @param[in] sbjgraph 対象のサブジェクトグラフ
 void
-SbjDumper::dump(ostream& s,
-		const SbjGraph& sbjgraph)
+SbjDumper::dump(
+  ostream& s,
+  const SbjGraph& sbjgraph
+)
 {
   int id = 0;
   for ( auto port: sbjgraph.port_list() ) {
     s << "Port#" <<id << ":";
     ++ id;
     s << " " << port->name() << " = ";
-    int nb = port->bit_width();
+    auto nb = port->bit_width();
     ASSERT_COND( nb > 0 );
     if ( nb == 1 ) {
       const SbjNode* node = port->bit(0);
@@ -58,7 +57,7 @@ SbjDumper::dump(ostream& s,
   }
 
   for ( auto node: sbjgraph.output_list() ) {
-    const SbjNode* inode = node->output_fanin();
+    auto inode = node->output_fanin();
     s << "Output#" << node->subid() << ": " << node->id_str()
       << " : " << sbjgraph.port(node)->name()
       << "[" << sbjgraph.port_pos(node) << "]"
@@ -85,23 +84,23 @@ SbjDumper::dump(ostream& s,
   for ( auto dff: sbjgraph.dff_list() ) {
     s << "DFF(" << dff->id() << ") :";
 
-    const SbjNode* onode = dff->data_output();
+    auto onode = dff->data_output();
     s << "Q = " << onode->id_str();
 
-    const SbjNode* inode = dff->data_input();
+    auto inode = dff->data_input();
     s << "DATA = " << inode->id_str();
 
-    const SbjNode* cnode = dff->clock();
+    auto cnode = dff->clock();
     if ( cnode ) {
       s << ", CLOCK = " << cnode->id_str();
     }
 
-    const SbjNode* rnode = dff->clear();
+    auto rnode = dff->clear();
     if ( rnode ) {
       s << ", CLEAR = " << rnode->id_str();
     }
 
-    const SbjNode* snode = dff->preset();
+    auto snode = dff->preset();
     if ( snode ) {
       s << ", PRESET = " << snode->id_str();
     }
@@ -111,23 +110,23 @@ SbjDumper::dump(ostream& s,
   for ( auto latch: sbjgraph.latch_list() ) {
     s << "LATCH(" << latch->id() << ") :";
 
-    const SbjNode* onode = latch->data_output();
+    auto onode = latch->data_output();
     s << "Q = " << onode->id_str();
 
-    const SbjNode* inode = latch->data_input();
+    auto inode = latch->data_input();
     s << "DATA = " << inode->id_str();
 
-    const SbjNode* cnode = latch->enable();
+    auto cnode = latch->enable();
     if ( cnode ) {
       s << ", ENABLE = " << cnode->id_str();
     }
 
-    const SbjNode* rnode = latch->clear();
+    auto rnode = latch->clear();
     if ( rnode ) {
       s << ", CLEAR = " << rnode->id_str();
     }
 
-    const SbjNode* snode = latch->preset();
+    auto snode = latch->preset();
     if ( snode ) {
       s << ", PRESET = " << snode->id_str();
     }
@@ -147,11 +146,11 @@ SbjDumper::dump(ostream& s,
 }
 
 // @brief blif 形式で出力する．
-// @param[in] s 出力先のストリーム
-// @param[in] sbjgraph 対象のサブジェクトグラフ
 void
-SbjDumper::dump_blif(ostream& s,
-		     const SbjGraph& sbjgraph)
+SbjDumper::dump_blif(
+  ostream& s,
+  const SbjGraph& sbjgraph
+)
 {
   s << ".model " << sbjgraph.name() << endl;
   for ( auto node: sbjgraph.input_list() ) {
@@ -162,7 +161,7 @@ SbjDumper::dump_blif(ostream& s,
     s << ".outputs " << node->id_str() << endl;
   }
   for ( auto node: sbjgraph.output_list() ) {
-    const SbjNode* inode = node->fanin(0);
+    auto inode = node->fanin(0);
     if ( inode == 0 ) {
       s << ".names " << node->id_str() << endl;
       if ( node->output_fanin_inv() ) {
@@ -186,8 +185,8 @@ SbjDumper::dump_blif(ostream& s,
 
   // blif では DFF を .latch 文で表す．
   for ( auto dff: sbjgraph.dff_list() ) {
-    const SbjNode* onode = dff->data_output();
-    const SbjNode* inode = dff->data_input();
+    auto onode = dff->data_output();
+    auto inode = dff->data_input();
     s << ".latch " << onode->id_str() << " "
       << inode->id_str() << endl;
   }
@@ -229,8 +228,11 @@ SbjDumper::dump_blif(ostream& s,
 BEGIN_NONAMESPACE
 
 // ノード名を返す．
+inline
 string
-node_name(const SbjNode* node)
+node_name(
+  const SbjNode* node
+)
 {
   return node->id_str();
 }
@@ -239,29 +241,29 @@ END_NONAMESPACE
 
 
 // @brief Verilog-HDL 形式で出力する関数
-// @param[in] s 出力先のストリーム
-// @param[in] sbjgraph 対象のネットワーク
 void
-SbjDumper::dump_verilog(ostream& s,
-			const SbjGraph& sbjgraph)
+SbjDumper::dump_verilog(
+  ostream& s,
+  const SbjGraph& sbjgraph
+)
 {
   // module 文
   s << "module " << sbjgraph.name() << "(";
   const char* sep = "";
   for ( auto port: sbjgraph.port_list() ) {
     s << sep << "." << port->name() << "(";
-    int nb = port->bit_width();
+    SizeType nb = port->bit_width();
     ASSERT_COND( nb > 0  );
     if ( nb == 1 ) {
-      const SbjNode* node = port->bit(0);
+      auto node = port->bit(0);
       s << node_name(node);
     }
     else {
       s << "{";
       const char* comma = "";
       for ( int j = 0; j < nb; ++ j ) {
-	int idx = nb - j - 1;
-	const SbjNode* node = port->bit(idx);
+	SizeType idx = nb - j - 1;
+	auto node = port->bit(idx);
 	s << comma << node_name(node);
 	comma = ", ";
       }
@@ -286,7 +288,7 @@ SbjDumper::dump_verilog(ostream& s,
 
   // reg 定義
   for ( auto dff: sbjgraph.dff_list() ) {
-    const SbjNode* node = dff->data_output();
+    auto node = dff->data_output();
     s << "  reg    " << node_name(node) << ";" << endl;
   }
   s << endl;
@@ -299,7 +301,7 @@ SbjDumper::dump_verilog(ostream& s,
 
   // output 用の assign 文
   for ( auto node: sbjgraph.output_list() ) {
-    const SbjNode* inode = node->fanin(0);
+    auto inode = node->fanin(0);
     s << "  assign " << node_name(node) << " = ";
     if ( inode == 0 ) {
       if ( node->output_fanin_inv() ) {
@@ -335,11 +337,11 @@ SbjDumper::dump_verilog(ostream& s,
 
   // ff 用の always 文
   for ( auto dff: sbjgraph.dff_list() ) {
-    const SbjNode* node = dff->data_output();
-    const SbjNode* dnode = dff->data_input();
-    const SbjNode* cnode = dff->clock();
-    const SbjNode* snode = dff->preset();
-    const SbjNode* rnode = dff->clear();
+    auto node = dff->data_output();
+    auto dnode = dff->data_input();
+    auto cnode = dff->clock();
+    auto snode = dff->preset();
+    auto rnode = dff->clear();
     ASSERT_COND( cnode != nullptr );
     s << "  always @ ( ";
     s << "posedge";
@@ -382,11 +384,11 @@ SbjDumper::dump_verilog(ostream& s,
 
   // ラッチ用の always 文
   for ( auto latch: sbjgraph.latch_list() ) {
-    const SbjNode* node = latch->data_output();
-    const SbjNode* dnode = latch->data_input();
-    const SbjNode* cnode = latch->enable();
-    const SbjNode* snode = latch->preset();
-    const SbjNode* rnode = latch->clear();
+    auto node = latch->data_output();
+    auto dnode = latch->data_input();
+    auto cnode = latch->enable();
+    auto snode = latch->preset();
+    auto rnode = latch->clear();
     ASSERT_COND( cnode != nullptr );
     s << "  always @ ( ";
     s << "posedge";

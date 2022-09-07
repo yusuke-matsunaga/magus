@@ -5,7 +5,7 @@
 /// @brief ADCost のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2022 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "lutmap.h"
@@ -38,25 +38,34 @@ class ADCost
 public:
 
   /// @brief 空のコンストラクタ
-  ADCost();
+  ADCost() = default;
 
   /// @brief デストラクタ
-  ~ADCost();
+  ~ADCost() = default;
 
 
 public:
 
   /// @brief カットを取り出す．
   const Cut*
-  cut() const;
+  cut() const
+  {
+    return mCut;
+  }
 
   /// @brief 段数を取り出す．
   int
-  depth() const;
+  depth() const
+  {
+    return mDepth;
+  }
 
   /// @brief 面積を取り出す．
   AreaT
-  area() const;
+  area() const
+  {
+    return mArea;
+  }
 
 
 private:
@@ -65,16 +74,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // カット
-  const Cut* mCut;
+  const Cut* mCut{nullptr};
 
   // 深さ
-  int mDepth;
+  int mDepth{0};
 
   // 面積
   AreaT mArea;
 
   // 次の要素を指すリンク
-  ADCost* mLink;
+  ADCost* mLink{nullptr};
 
 };
 
@@ -91,30 +100,58 @@ class ADCostIterator
 public:
 
   /// @brief 空のコンストラクタ
-  ADCostIterator();
+  ADCostIterator() = default;
 
   /// @brief コピーコンストラクタ
-  /// @param[in] src コピー元のオブジェクト
-  ADCostIterator(const ADCostIterator& src);
+  ADCostIterator(
+    const ADCostIterator& src ///< [in] コピー元のオブジェクト
+  ) : mPtr{src.mPtr}
+  {
+  }
 
   /// @brief 要素を取り出す．
   ADCost<AreaT>*
-  operator*() const;
+  operator*() const
+  {
+    return mPtr;
+  }
 
   /// @brief 次の要素に移動する．
   void
-  operator++();
+  operator++()
+  {
+    if ( mPtr ) {
+      mPtr = mPtr->mLink;
+    }
+  }
 
-  /// @brief 末尾の時に true を返す．
+  /// @brief 等価比較演算子
   bool
-  is_end() const;
+  operator==(
+    const ADCostIterator& right
+  ) const
+  {
+    return mPtr == right.mPtr;
+  }
+
+  /// @brief 非等価比較演算子
+  bool
+  operator!=(
+    const ADCostIterator& right
+  ) const
+  {
+    return !operator==(right);
+  }
 
 
 private:
 
   /// @brief ポインタを指定したコンストラクタ
-  /// @param[in] ptr 要素を指すポインタ
-  ADCostIterator(ADCost<AreaT>* ptr);
+  ADCostIterator(
+    ADCost<AreaT>* ptr ///< [in] 要素を指すポインタ
+  ) : mPtr{ptr}
+  {
+  }
 
 
 private:
@@ -123,7 +160,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 実際の要素へのポインタ
-  ADCost<AreaT>* mPtr;
+  ADCost<AreaT>* mPtr{nullptr};
 
 };
 
@@ -138,11 +175,24 @@ class ADCostMgr
 public:
 
   /// @brief コンストラクタ
-  ADCostMgr();
+  ADCostMgr(
+  ) : mTopPage(nullptr),
+      mNextPos(0),
+      mAvail(nullptr)
+  {
+  }
 
   /// @brief デストラクタ
-  /// @note このオブジェクトが確保したすべてのメモリを開放する．
-  ~ADCostMgr();
+  ///
+  /// このオブジェクトが確保したすべてのメモリを開放する．
+  ~ADCostMgr()
+  {
+    for ( auto page = mTopPage; page; ) {
+      auto p = page;
+      page = p->mLink;
+      delete p;
+    }
+  }
 
 
 public:
@@ -150,16 +200,45 @@ public:
   /// @brief ADCost を確保する．
   /// @return 確保したオブジェクトを返す．
   ADCost<AreaT>*
-  alloc_cost();
+  alloc_cost()
+  {
+    if ( mAvail ) {
+      auto cost = mAvail;
+      mAvail = cost->mLink;
+      cost->mLink = nullptr;
+      return cost;
+    }
+    if ( mTopPage == nullptr || mNextPos >= kChunkSize ) {
+      auto page = new Page;
+      page->mLink = mTopPage;
+      mTopPage = page;
+      mNextPos = 0;
+    }
+    auto cost = &mTopPage->mChunk[mNextPos];
+    ++ mNextPos;
+    return cost;
+  }
 
   /// @brief ADCost を再利用リストにもどす
-  /// @param[in] cost 戻すオブジェクト
   void
-  delete_cost(ADCost<AreaT>* cost);
+  delete_cost(
+    ADCost<AreaT>* cost ///< [in] 戻すオブジェクト
+  )
+  {
+    cost->mLink = mAvail;
+    mAvail = cost;
+  }
 
   /// @brief 確保したページ数を返す．
-  ymuint
-  alloc_num() const;
+  SizeType
+  alloc_num() const
+  {
+    SizeType n = 0;
+    for ( auto page = mTopPage; page; page = page->mLink ) {
+      ++ n;
+    }
+    return n;
+  }
 
 
 private:
@@ -169,7 +248,7 @@ private:
 
   // 1ページのサイズ
   static
-  const ymuint kChunkSize = 1024;
+  const SizeType kChunkSize = 1024;
 
   // 1ページの構造体
   struct Page
@@ -191,7 +270,7 @@ private:
   Page* mTopPage;
 
   // 次に使用可能な位置
-  ymuint32 mNextPos;
+  SizeType mNextPos;
 
   // 再利用リスト
   ADCost<AreaT>* mAvail;
@@ -209,35 +288,103 @@ class ADCostList
 public:
 
   /// @brief コンストラクタ
-  /// @note 空のリストで初期化される．
-  ADCostList();
+  ///
+  /// 空のリストで初期化される．
+  ADCostList() = default;
 
   /// @brief デストラクタ
-  ~ADCostList();
+  ~ADCostList() = default;
 
   /// @brief ADCostMgr を設定する．
-  /// @param[in] mgr ADCost のメモリ管理を行うオブジェクト
   void
-  set_mgr(ADCostMgr<AreaT>* mgr);
+  set_mgr(
+    ADCostMgr<AreaT>* mgr ///< [in] ADCost のメモリ管理を行うオブジェクト
+  )
+  {
+    mMgr = mgr;
+  }
 
 
 public:
 
   /// @brief 先頭の反復子を取り出す．
   ADCostIterator<AreaT>
-  begin();
+  begin()
+  {
+    return ADCostIterator<AreaT>(mTop.mLink);
+  }
+
+  /// @brief 末尾の反復子を取り出す．
+  ADCostIterator<AreaT>
+  end()
+  {
+    return ADCostIterator<AreaT>(nullptr);
+  }
 
   /// @brief 要素を追加する．
-  /// @param[in] cut カット
-  /// @param[in] depth 深さ
-  /// @param[in] area 面積コスト
-  /// @note 適当な位置に挿入される．
-  /// @note ただし，深さと面積の両方で他の要素より悪い場合には追加されない．
-  /// @note 逆にこの要素によって無効化される要素があればそれは削除される．
+  ///
+  /// 適当な位置に挿入される．
+  /// ただし，深さと面積の両方で他の要素より悪い場合には追加されない．
+  /// 逆にこの要素によって無効化される要素があればそれは削除される．
   void
-  insert(const Cut* cut,
-	 int depth,
-	 AreaT area);
+  insert(
+    const Cut* cut, ///< [in] カット
+    int depth,      ///< [in] 深さ
+    AreaT area      ///< [in] 面積コスト
+  )
+  {
+    ADCost<AreaT>* prev = &mTop;
+    ADCost<AreaT>* cur;
+    while ( (cur = prev->mLink) ) {
+      if ( cur->mDepth > depth ) {
+	if ( cur->mArea >= area ) {
+	  // cur は不要
+	  ADCost<AreaT>* next = cur->mLink;
+	  cur->mLink = nullptr;
+	  prev->mLink = next;
+	  mMgr->delete_cost(cur);
+	}
+	else {
+	  prev = cur;
+	}
+      }
+      else if ( cur->mDepth == depth ) {
+	if ( cur->mArea <= area ) {
+	  // (depth, area) は不要
+	  break;
+	}
+	else {
+	  // cur は不要 (というか上書きする)
+	  cur->mCut = cut;
+	  cur->mArea = area;
+	  break;
+	}
+      }
+      else { // cur->mDepth < depth
+	if ( cur->mArea > area ) {
+	  // (depth, area) をここに追加
+	  ADCost<AreaT>* new_cost = mMgr->alloc_cost();
+	  new_cost->mCut = cut;
+	  new_cost->mDepth = depth;
+	  new_cost->mArea = area;
+	  prev->mLink = new_cost;
+	  new_cost->mLink = cur;
+	  break;
+	}
+	else { // cur->mArea <= area
+	  // (depth, area) は不要
+	  break;
+	}
+      }
+    }
+    if ( cur == nullptr ) {
+      cur = mMgr->alloc_cost();
+      cur->mCut = cut;
+      cur->mDepth = depth;
+      cur->mArea = area;
+      prev->mLink = cur;
+    }
+  }
 
 
 private:
@@ -252,288 +399,6 @@ private:
   ADCostMgr<AreaT>* mMgr;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////
-// クラス ADCost
-//////////////////////////////////////////////////////////////////////
-
-// @brief 空のコンストラクタ
-template <typename AreaT>
-inline
-ADCost<AreaT>::ADCost() :
-  mCut(nullptr),
-  mDepth(0),
-  mLink(nullptr)
-{
-}
-
-// @brief デストラクタ
-template <typename AreaT>
-inline
-ADCost<AreaT>::~ADCost()
-{
-}
-
-// @brief カットを取り出す．
-template <typename AreaT>
-inline
-const Cut*
-ADCost<AreaT>::cut() const
-{
-  return mCut;
-}
-
-// @brief 段数を取り出す．
-template <typename AreaT>
-inline
-int
-ADCost<AreaT>::depth() const
-{
-  return mDepth;
-}
-
-// @brief 面積を取り出す．
-template <typename AreaT>
-inline
-AreaT
-ADCost<AreaT>::area() const
-{
-  return mArea;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ADCostIterator
-//////////////////////////////////////////////////////////////////////
-
-// @brief 空のコンストラクタ
-template <typename AreaT>
-inline
-ADCostIterator<AreaT>::ADCostIterator() :
-  mPtr(nullptr)
-{
-}
-
-// @brief コピーコンストラクタ
-template <typename AreaT>
-inline
-ADCostIterator<AreaT>::ADCostIterator(const ADCostIterator& src) :
-  mPtr(src.mPtr)
-{
-}
-
-// @brief 要素を取り出す．
-template <typename AreaT>
-inline
-ADCost<AreaT>*
-ADCostIterator<AreaT>::operator*() const
-{
-  return mPtr;
-}
-
-// @brief 次の要素に移動する．
-template <typename AreaT>
-inline
-void
-ADCostIterator<AreaT>::operator++()
-{
-  if ( mPtr ) {
-    mPtr = mPtr->mLink;
-  }
-}
-
-// @brief 末尾の時に true を返す．
-template <typename AreaT>
-inline
-bool
-ADCostIterator<AreaT>::is_end() const
-{
-  return mPtr == nullptr;
-}
-
-// @brief ポインタを指定したコンストラクタ
-template <typename AreaT>
-inline
-ADCostIterator<AreaT>::ADCostIterator(ADCost<AreaT>* ptr) :
-  mPtr(ptr)
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ADCostMgr
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-template <typename AreaT>
-inline
-ADCostMgr<AreaT>::ADCostMgr() :
-  mTopPage(nullptr),
-  mNextPos(0),
-  mAvail(nullptr)
-{
-}
-
-// @brief デストラクタ
-template <typename AreaT>
-inline
-ADCostMgr<AreaT>::~ADCostMgr()
-{
-  for (Page* page = mTopPage; page; ) {
-    Page* p = page;
-    page = p->mLink;
-    delete p;
-  }
-}
-
-// @brief ADCost を確保する．
-template <typename AreaT>
-inline
-ADCost<AreaT>*
-ADCostMgr<AreaT>::alloc_cost()
-{
-  if ( mAvail ) {
-    ADCost<AreaT>* cost = mAvail;
-    mAvail = cost->mLink;
-    cost->mLink = nullptr;
-    return cost;
-  }
-  if ( mTopPage == nullptr || mNextPos >= kChunkSize ) {
-    Page* page = new Page;
-    page->mLink = mTopPage;
-    mTopPage = page;
-    mNextPos = 0;
-  }
-  ADCost<AreaT>* cost = &mTopPage->mChunk[mNextPos];
-  ++ mNextPos;
-  return cost;
-}
-
-// @brief ADCost を再利用リストにもどす
-template <typename AreaT>
-inline
-void
-ADCostMgr<AreaT>::delete_cost(ADCost<AreaT>* cost)
-{
-  cost->mLink = mAvail;
-  mAvail = cost;
-}
-
-// @brief 確保したページ数を返す．
-template <typename AreaT>
-inline
-ymuint
-ADCostMgr<AreaT>::alloc_num() const
-{
-  ymuint n = 0;
-  for (Page* page = mTopPage; page; page = page->mLink) {
-    ++ n;
-  }
-  return n;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// クラス ADCostList
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-template <typename AreaT>
-inline
-ADCostList<AreaT>::ADCostList()
-{
-}
-
-// @brief デストラクタ
-template <typename AreaT>
-inline
-ADCostList<AreaT>::~ADCostList()
-{
-}
-
-// @brief ADCostMgr を設定する．
-template <typename AreaT>
-inline
-void
-ADCostList<AreaT>::set_mgr(ADCostMgr<AreaT>* mgr)
-{
-  mMgr = mgr;
-}
-
-// @brief 先頭の反復子を取り出す．
-template <typename AreaT>
-inline
-ADCostIterator<AreaT>
-ADCostList<AreaT>::begin()
-{
-  return ADCostIterator<AreaT>(mTop.mLink);
-}
-
-// @brief 要素を追加する．
-template <typename AreaT>
-inline
-void
-ADCostList<AreaT>::insert(const Cut* cut,
-			  int depth,
-			  AreaT area)
-{
-  ADCost<AreaT>* prev = &mTop;
-  ADCost<AreaT>* cur;
-  while ( (cur = prev->mLink) ) {
-    if ( cur->mDepth > depth ) {
-      if ( cur->mArea >= area ) {
-	// cur は不要
-	ADCost<AreaT>* next = cur->mLink;
-	cur->mLink = nullptr;
-	prev->mLink = next;
-	mMgr->delete_cost(cur);
-      }
-      else {
-	prev = cur;
-      }
-    }
-    else if ( cur->mDepth == depth ) {
-      if ( cur->mArea <= area ) {
-	// (depth, area) は不要
-	break;
-      }
-      else {
-	// cur は不要 (というか上書きする)
-	cur->mCut = cut;
-	cur->mArea = area;
-	break;
-      }
-    }
-    else { // cur->mDepth < depth
-      if ( cur->mArea > area ) {
-	// (depth, area) をここに追加
-	ADCost<AreaT>* new_cost = mMgr->alloc_cost();
-	new_cost->mCut = cut;
-	new_cost->mDepth = depth;
-	new_cost->mArea = area;
-	prev->mLink = new_cost;
-	new_cost->mLink = cur;
-	break;
-      }
-      else { // cur->mArea <= area
-	// (depth, area) は不要
-	break;
-      }
-    }
-  }
-  if ( cur == nullptr ) {
-    cur = mMgr->alloc_cost();
-    cur->mCut = cut;
-    cur->mDepth = depth;
-    cur->mArea = area;
-    prev->mLink = cur;
-  }
-}
 
 END_NAMESPACE_LUTMAP
 

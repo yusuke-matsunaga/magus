@@ -5,9 +5,8 @@
 /// @brief SbjDff のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2016, 2018, 2022 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "sbj_nsdef.h"
 
@@ -35,21 +34,24 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] id ID番号
-  /// @param[in] input データ入力ノード
-  /// @param[in] output データ出力ノード
-  /// @param[in] clock クロックノード
-  /// @param[in] clear クリア端子ノード
-  /// @param[in] preset プリセット端子ノード
-  SbjDff(int id,
-	 SbjNode* input,
-	 SbjNode* output,
-	 SbjNode* clock,
-	 SbjNode* clear,
-	 SbjNode* preset);
+  SbjDff(
+    SizeType id,     ///< [in] ID番号
+    SbjNode* input,  ///< [in] データ入力ノード
+    SbjNode* output, ///< [in] データ出力ノード
+    SbjNode* clock,  ///< [in] クロック端子ノード
+    SbjNode* clear,  ///< [in] クリア端子ノード
+    SbjNode* preset  ///< [in] プリセット端子ノード
+  ) : mId(id),
+      mDataInput(input),
+      mClock(clock),
+      mClear(clear),
+      mPreset(preset),
+      mDataOutput(output)
+  {
+  }
 
   /// @brief デストラクタ
-  ~SbjDff();
+  ~SbjDff() = default;
 
 
 public:
@@ -58,34 +60,46 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を得る．
-  int
-  id() const;
+  SizeType
+  id() const
+  {
+    return mId;
+  }
 
   /// @brief データ入力を得る．
   const SbjNode*
-  data_input() const;
+  data_input() const
+  {
+    return mDataInput;
+  }
 
   /// @brief クロック入力を得る．
   const SbjNode*
-  clock() const;
+  clock() const
+  {
+    return mClock;
+  }
 
   /// @brief DFFノードの場合のリセット入力を得る．
   const SbjNode*
-  clear() const;
+  clear() const
+  {
+    return mClear;
+  }
 
   /// @brief セット入力を得る．
   const SbjNode*
-  preset() const;
+  preset() const
+  {
+    return mPreset;
+  }
 
   /// @brief データ出力を得る．
   const SbjNode*
-  data_output() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内容の設定に用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  data_output() const
+  {
+    return mDataOutput;
+  }
 
 
 private:
@@ -94,7 +108,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  int mId;
+  SizeType mId;
 
   // データ入力
   SbjNode* mDataInput;
@@ -112,82 +126,6 @@ private:
   SbjNode* mDataOutput;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// inline 関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-SbjDff::SbjDff(int id,
-	       SbjNode* input,
-	       SbjNode* output,
-	       SbjNode* clock,
-	       SbjNode* clear,
-	       SbjNode* preset) :
-  mId(id),
-  mDataInput(input),
-  mClock(clock),
-  mClear(clear),
-  mPreset(preset),
-  mDataOutput(output)
-{
-}
-
-// @brief デストラクタ
-inline
-SbjDff::~SbjDff()
-{
-}
-
-// @brief ID番号を得る．
-inline
-int
-SbjDff::id() const
-{
-  return mId;
-}
-
-// @brief データ入力を得る．
-inline
-const SbjNode*
-SbjDff::data_input() const
-{
-  return mDataInput;
-}
-
-// @brief クロック入力を得る．
-inline
-const SbjNode*
-SbjDff::clock() const
-{
-  return mClock;
-}
-
-// @brief リセット入力を得る．
-inline
-const SbjNode*
-SbjDff::clear() const
-{
-  return mClear;
-}
-
-// @brief セット入力を得る．
-inline
-const SbjNode*
-SbjDff::preset() const
-{
-  return mPreset;
-}
-
-// @brief データ出力を得る．
-inline
-const SbjNode*
-SbjDff::data_output() const
-{
-  return mDataOutput;
-}
 
 END_NAMESPACE_SBJ
 
