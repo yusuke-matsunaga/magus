@@ -13,7 +13,11 @@
 BEGIN_NAMESPACE_MAGUS
 
 extern
-void init_equiv(vector<struct luaL_Reg>&);
+void
+init_equiv(
+  lua_State* L
+);
+
 
 // @brief Magus 拡張に関する初期化を行う．
 void
@@ -21,11 +25,12 @@ LuaMagus::open_Magus()
 {
   L_openlibs();
 
-  vector<struct luaL_Reg> mylib;
-  LuaBdd::init(lua_state(), mylib);
-  LuaBnet::init(mylib);
-  init_equiv(mylib);
-  reg_module("magus", mylib);
+  create_module({});
+  reg_module(nullptr, "magus");
+  LuaBdd::init(lua_state(), "magus", "bdd");
+  LuaBnet::init(lua_state(), "magus", "bnet");
+  LuaClib::init(lua_state(), "magus", "clib");
+  init_equiv(lua_state());
 }
 
 END_NAMESPACE_MAGUS

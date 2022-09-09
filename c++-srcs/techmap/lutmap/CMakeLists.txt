@@ -28,8 +28,8 @@ set ( main_SOURCES
   main/DelayCover.cc
   main/LbCalc.cc
   main/DgGraph.cc
-  main/LutmapMgr.cc
   main/MapGen.cc
+  main/lutmap_cmd.cc
   )
 
 set ( mct1_SOURCES
@@ -59,11 +59,23 @@ set ( cut_resub_SOURCES
 #  ターゲットの設定
 # ===================================================================
 
-ym_add_object_library (magus_lutmap
+ym_add_object_library (magus_lualutmap
   ${enum_cut_SOURCES}
   ${main_SOURCES}
   ${mct1_SOURCES}
   ${mct2_SOURCES}
   ${sa_SOURCES}
   ${cut_resub_SOURCES}
+  )
+
+target_include_directories ( magus_lualutmap_obj
+  PRIVATE ${LUA_INCLUDE_DIR}
+  )
+
+target_include_directories ( magus_lualutmap_obj_p
+  PRIVATE ${LUA_INCLUDE_DIR}
+  )
+
+target_include_directories ( magus_lualutmap_obj_d
+  PRIVATE ${LUA_INCLUDE_DIR}
   )

@@ -27,7 +27,7 @@ add_executable ( lua_magus
   ${lua_magus_SOURCES}
   $<TARGET_OBJECTS:magus_equiv_obj>
   $<TARGET_OBJECTS:magus_sbjgraph_obj>
-  $<TARGET_OBJECTS:magus_lutmap_obj>
+  $<TARGET_OBJECTS:magus_lualutmap_obj>
   $<TARGET_OBJECTS:magus_cellmap_obj>
   $<TARGET_OBJECTS:magus_luaequiv_obj>
   $<TARGET_OBJECTS:ym_luaclib_obj>
@@ -68,7 +68,7 @@ add_executable ( lua_magus_p
   ${lua_magus_SOURCES}
   $<TARGET_OBJECTS:magus_equiv_obj_p>
   $<TARGET_OBJECTS:magus_sbjgraph_obj_p>
-  $<TARGET_OBJECTS:magus_lutmap_obj_p>
+  $<TARGET_OBJECTS:magus_lualutmap_obj_p>
   $<TARGET_OBJECTS:magus_cellmap_obj_p>
   $<TARGET_OBJECTS:magus_luaequiv_obj_p>
   $<TARGET_OBJECTS:ym_luaclib_obj_p>
@@ -109,7 +109,7 @@ add_executable (lua_magus_d
   ${lua_magus_SOURCES}
   $<TARGET_OBJECTS:magus_equiv_obj_d>
   $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
-  $<TARGET_OBJECTS:magus_lutmap_obj_d>
+  $<TARGET_OBJECTS:magus_lualutmap_obj_d>
   $<TARGET_OBJECTS:magus_cellmap_obj_d>
   $<TARGET_OBJECTS:magus_luaequiv_obj_d>
   $<TARGET_OBJECTS:ym_luaclib_obj_d>

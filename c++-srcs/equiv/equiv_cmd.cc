@@ -107,11 +107,18 @@ END_NONAMESPACE
 
 void
 init_equiv(
-  vector<struct luaL_Reg>& mylib
+  lua_State* L
 )
 {
-  // 生成関数を登録する．
-  mylib.push_back({"check_equiv", equiv_cmd});
+  static const struct luaL_Reg table[] = {
+    {"check", equiv_cmd},
+    {nullptr, nullptr}
+  };
+
+  luaL_newlib(L, table);
+
+  Luapp lua{L};
+  lua.reg_module("magus", "equiv");
 }
 
 END_NAMESPACE_MAGUS
