@@ -29,7 +29,6 @@ set ( main_SOURCES
   main/LbCalc.cc
   main/DgGraph.cc
   main/MapGen.cc
-  #main/lutmap_cmd.cc
   )
 
 set ( mct1_SOURCES

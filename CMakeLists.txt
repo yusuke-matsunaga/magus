@@ -106,6 +106,7 @@ foreach ( dir ${YM_SUBMODULE_LIST} )
 endforeach ()
 
 add_subdirectory ( c++-srcs )
+add_subdirectory ( py_magus )
 add_subdirectory ( tests )
 
 
