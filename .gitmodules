@@ -31,6 +31,3 @@
 [submodule "ym-codec"]
 	path = ym-codec
 	url = git@github.com:yusuke-matsunaga/ym-codec.git
-[submodule "ym-luapp"]
-	path = ym-luapp
-	url = git@github.com:yusuke-matsunaga/ym-luapp.git
