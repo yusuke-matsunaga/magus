@@ -11,7 +11,6 @@
 add_subdirectory ( equiv )
 add_subdirectory ( techmap )
 add_subdirectory ( djdec )
-add_subdirectory ( lua_magus )
 
 
 # ===================================================================

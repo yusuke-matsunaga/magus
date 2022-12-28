@@ -29,7 +29,7 @@ set ( main_SOURCES
   main/LbCalc.cc
   main/DgGraph.cc
   main/MapGen.cc
-  main/lutmap_cmd.cc
+  #main/lutmap_cmd.cc
   )
 
 set ( mct1_SOURCES
@@ -55,27 +55,16 @@ set ( cut_resub_SOURCES
   cut_resub/CutResubImpl.cc
   )
 
+
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
 
-ym_add_object_library (magus_lualutmap
+ym_add_object_library (magus_lutmap
   ${enum_cut_SOURCES}
   ${main_SOURCES}
   ${mct1_SOURCES}
   ${mct2_SOURCES}
   ${sa_SOURCES}
   ${cut_resub_SOURCES}
-  )
-
-target_include_directories ( magus_lualutmap_obj
-  PRIVATE ${LUA_INCLUDE_DIR}
-  )
-
-target_include_directories ( magus_lualutmap_obj_p
-  PRIVATE ${LUA_INCLUDE_DIR}
-  )
-
-target_include_directories ( magus_lualutmap_obj_d
-  PRIVATE ${LUA_INCLUDE_DIR}
   )
