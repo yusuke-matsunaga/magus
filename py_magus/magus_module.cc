@@ -10,9 +10,14 @@
 #include <Python.h>
 
 #include "magus.h"
-#include "ym/PyClibCellLibrary.h"
-#include "PyMt19937.h"
 
+
+BEGIN_NAMESPACE_YM
+
+extern "C" PyObject* PyInit_ymsat();
+extern "C" PyObject* PyInit_ymcell();
+
+END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_MAGUS
 
@@ -42,12 +47,13 @@ PyInit_magus()
     return nullptr;
   }
 
-  if ( !PyMt19937::init(m) ) {
-    goto error;
+  {
+    auto ymsat_module = PyInit_ymsat();
+    PyModule_AddObject(m, "ymsat", ymsat_module);
   }
-
-  if ( !PyClibCellLibrary::init(m) ) {
-    goto error;
+  {
+    auto ymcell_module = PyInit_ymcell();
+    PyModule_AddObject(m, "ymcell", ymcell_module);
   }
 
   return m;

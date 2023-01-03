@@ -22,7 +22,6 @@ include_directories(
 # ===================================================================
 
 set ( py_magus_SOURCES
-  PyMt19937.cc
   magus_module.cc
   )
 
@@ -39,6 +38,7 @@ add_executable( py_magus
   py_magus.cc
   $<TARGET_OBJECTS:py_magus_obj>
   $<TARGET_OBJECTS:py_ymcell_obj>
+  $<TARGET_OBJECTS:py_ymsat_obj>
   ${YM_SUBMODULE_OBJ_LIST}
   )
 
@@ -59,6 +59,7 @@ add_executable( py_magus_d
   py_magus.cc
   $<TARGET_OBJECTS:py_magus_obj_d>
   $<TARGET_OBJECTS:py_ymcell_obj_d>
+  $<TARGET_OBJECTS:py_ymsat_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
   )
 
