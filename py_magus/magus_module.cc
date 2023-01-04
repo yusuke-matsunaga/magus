@@ -50,15 +50,30 @@ PyInit_magus()
 
   {
     auto ymbase_module = PyInit_ymbase();
-    PyModule_AddObject(m, "ymbase", ymbase_module);
+    if ( ymbase_module ) {
+      PyModule_AddObject(m, "ymbase", ymbase_module);
+    }
+    else {
+      goto error;
+    }
   }
   {
     auto ymsat_module = PyInit_ymsat();
-    PyModule_AddObject(m, "ymsat", ymsat_module);
+    if ( ymsat_module ) {
+      PyModule_AddObject(m, "ymsat", ymsat_module);
+    }
+    else {
+      goto error;
+    }
   }
   {
     auto ymcell_module = PyInit_ymcell();
-    PyModule_AddObject(m, "ymcell", ymcell_module);
+    if ( ymcell_module ) {
+      PyModule_AddObject(m, "ymcell", ymcell_module);
+    }
+    else {
+      goto error;
+    }
   }
 
   return m;
