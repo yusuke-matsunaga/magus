@@ -14,6 +14,7 @@
 
 BEGIN_NAMESPACE_YM
 
+extern "C" PyObject* PyInit_ymbase();
 extern "C" PyObject* PyInit_ymsat();
 extern "C" PyObject* PyInit_ymcell();
 
@@ -47,6 +48,10 @@ PyInit_magus()
     return nullptr;
   }
 
+  {
+    auto ymbase_module = PyInit_ymbase();
+    PyModule_AddObject(m, "ymbase", ymbase_module);
+  }
   {
     auto ymsat_module = PyInit_ymsat();
     PyModule_AddObject(m, "ymsat", ymsat_module);
