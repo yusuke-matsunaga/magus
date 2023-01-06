@@ -10,6 +10,7 @@
 #include <Python.h>
 
 #include "magus.h"
+#include "ym/PyModule.h"
 
 
 BEGIN_NAMESPACE_YM
@@ -43,35 +44,26 @@ END_NONAMESPACE
 PyMODINIT_FUNC
 PyInit_magus()
 {
-  auto m = PyModule_Create(&magus_module);
+  auto m = PyModule::init(&magus_module);
   if ( m == nullptr ) {
     return nullptr;
   }
 
   {
     auto ymbase_module = PyInit_ymbase();
-    if ( ymbase_module ) {
-      PyModule_AddObject(m, "ymbase", ymbase_module);
-    }
-    else {
+    if ( !PyModule::reg_item(m, "ymbase", ymbase_module) ) {
       goto error;
     }
   }
   {
     auto ymsat_module = PyInit_ymsat();
-    if ( ymsat_module ) {
-      PyModule_AddObject(m, "ymsat", ymsat_module);
-    }
-    else {
+    if ( !PyModule::reg_item(m, "ymsat", ymsat_module) ) {
       goto error;
     }
   }
   {
     auto ymcell_module = PyInit_ymcell();
-    if ( ymcell_module ) {
-      PyModule_AddObject(m, "ymcell", ymcell_module);
-    }
-    else {
+    if ( !PyModule::reg_item(m, "ymcell", ymcell_module) ) {
       goto error;
     }
   }
