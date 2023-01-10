@@ -8,8 +8,9 @@
 # サブディレクトリの設定
 # ===================================================================
 
-add_subdirectory ( gtest )
-add_subdirectory ( programs )
+add_subdirectory ( djdec )
+add_subdirectory ( equiv )
+add_subdirectory ( techmap/sbjgraph )
 
 
 # ===================================================================
