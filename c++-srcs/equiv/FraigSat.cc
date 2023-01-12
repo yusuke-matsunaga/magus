@@ -347,8 +347,7 @@ FraigSat::dump_stats(
   mCheckEquivInfo.dump(s);
   s << endl;
 
-  SatStats stats;
-  mSolver.get_stats(stats);
+  auto stats = mSolver.get_stats();
   s << "----------------------------------" << endl;
   s << "sat stat:" << endl
     << "  restarts          : " << stats.mRestart << endl
