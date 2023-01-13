@@ -37,6 +37,8 @@ ym_add_object_library( py_magus
 add_executable( py_magus
   py_magus.cc
   $<TARGET_OBJECTS:py_magus_obj>
+  $<TARGET_OBJECTS:py_magus_equiv_obj>
+  $<TARGET_OBJECTS:py_ymbnet_obj>
   $<TARGET_OBJECTS:py_ymcell_obj>
   $<TARGET_OBJECTS:py_ymsat_obj>
   $<TARGET_OBJECTS:py_ymbase_obj>
@@ -59,6 +61,8 @@ target_link_libraries ( py_magus
 add_executable( py_magus_d
   py_magus.cc
   $<TARGET_OBJECTS:py_magus_obj_d>
+  $<TARGET_OBJECTS:py_magus_equiv_obj_d>
+  $<TARGET_OBJECTS:py_ymbnet_obj_d>
   $<TARGET_OBJECTS:py_ymcell_obj_d>
   $<TARGET_OBJECTS:py_ymsat_obj_d>
   $<TARGET_OBJECTS:py_ymbase_obj_d>

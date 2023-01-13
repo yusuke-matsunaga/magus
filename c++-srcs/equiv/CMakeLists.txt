@@ -3,6 +3,7 @@
 # インクルードパスの設定
 # ===================================================================
 include_directories (
+  ${Python3_INCLUDE_DIRS}
   )
 
 
@@ -30,5 +31,10 @@ set ( equiv_SOURCES
 # ===================================================================
 
 ym_add_object_library (magus_equiv
+  ${equiv_SOURCES}
+  )
+
+ym_add_object_library (py_magus_equiv
+  equiv_module.cc
   ${equiv_SOURCES}
   )

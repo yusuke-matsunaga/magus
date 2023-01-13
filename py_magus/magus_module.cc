@@ -18,10 +18,13 @@ BEGIN_NAMESPACE_YM
 extern "C" PyObject* PyInit_ymbase();
 extern "C" PyObject* PyInit_ymsat();
 extern "C" PyObject* PyInit_ymcell();
+extern "C" PyObject* PyInit_ymbnet();
 
 END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_MAGUS
+
+extern "C" PyObject* PyInit_equiv();
 
 BEGIN_NONAMESPACE
 
@@ -64,6 +67,18 @@ PyInit_magus()
   {
     auto ymcell_module = PyInit_ymcell();
     if ( !PyModule::reg_item(m, "ymcell", ymcell_module) ) {
+      goto error;
+    }
+  }
+  {
+    auto ymbnet_module = PyInit_ymbnet();
+    if ( !PyModule::reg_item(m, "ymbnet", ymbnet_module) ) {
+      goto error;
+    }
+  }
+  {
+    auto equiv_module = PyInit_equiv();
+    if ( !PyModule::reg_item(m, "equiv", equiv_module) ) {
       goto error;
     }
   }
