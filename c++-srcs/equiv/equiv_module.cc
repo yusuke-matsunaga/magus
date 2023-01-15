@@ -79,6 +79,7 @@ PyMethodDef equiv_methods[] = {
 // モジュール定義構造体
 PyModuleDef equiv_module = {
   PyModuleDef_HEAD_INIT,
+  //"magus.equiv",
   "equiv",
   PyDoc_STR("equiv: Extension module for equivalent checking"),
   -1,

@@ -16,9 +16,9 @@
 BEGIN_NAMESPACE_YM
 
 extern "C" PyObject* PyInit_ymbase();
-extern "C" PyObject* PyInit_ymsat();
-extern "C" PyObject* PyInit_ymcell();
 extern "C" PyObject* PyInit_ymbnet();
+extern "C" PyObject* PyInit_ymcell();
+extern "C" PyObject* PyInit_ymsat();
 
 END_NAMESPACE_YM
 
@@ -42,6 +42,27 @@ PyModuleDef magus_module = {
   magus_methods,
 };
 
+// サブモジュールを登録する．
+bool
+reg_submodule(
+  PyObject* module,      // 親モジュール
+  PyObject* sys_modules, // sys.modules オブジェクト
+  PyObject* submodule,   // 登録するサブモジュール
+  const char* name       // サブモジュール名
+)
+{
+  if ( !PyModule::reg_item(module, name, submodule) ) {
+    return false;
+  }
+  // これで from magus.equiv import XXX が行えるようになる．
+  string submod_name = string{"magus."} + name;
+  if ( PyDict_SetItemString(sys_modules,
+			    submod_name.c_str(), submodule) < 0 ) {
+    return false;
+  }
+  return true;
+}
+
 END_NONAMESPACE
 
 PyMODINIT_FUNC
@@ -52,35 +73,20 @@ PyInit_magus()
     return nullptr;
   }
 
-  {
-    auto ymbase_module = PyInit_ymbase();
-    if ( !PyModule::reg_item(m, "ymbase", ymbase_module) ) {
-      goto error;
-    }
+  if ( !PyModule::reg_submodule(m, "ymbase", PyInit_ymbase()) ) {
+    goto error;
   }
-  {
-    auto ymsat_module = PyInit_ymsat();
-    if ( !PyModule::reg_item(m, "ymsat", ymsat_module) ) {
-      goto error;
-    }
+  if ( !PyModule::reg_submodule(m, "ymbnet", PyInit_ymbnet()) ) {
+    goto error;
   }
-  {
-    auto ymcell_module = PyInit_ymcell();
-    if ( !PyModule::reg_item(m, "ymcell", ymcell_module) ) {
-      goto error;
-    }
+  if ( !PyModule::reg_submodule(m, "ymcell", PyInit_ymcell()) ) {
+    goto error;
   }
-  {
-    auto ymbnet_module = PyInit_ymbnet();
-    if ( !PyModule::reg_item(m, "ymbnet", ymbnet_module) ) {
-      goto error;
-    }
+  if ( !PyModule::reg_submodule(m, "ymsat", PyInit_ymsat()) ) {
+    goto error;
   }
-  {
-    auto equiv_module = PyInit_equiv();
-    if ( !PyModule::reg_item(m, "equiv", equiv_module) ) {
-      goto error;
-    }
+  if ( !PyModule::reg_submodule(m, "equiv", PyInit_equiv()) ) {
+    goto error;
   }
 
   return m;

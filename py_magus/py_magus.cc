@@ -13,8 +13,18 @@
 
 BEGIN_NAMESPACE_MAGUS
 
-extern "C"
-PyObject* PyInit_magus();
+extern "C" PyObject* PyInit_magus();
+
+static struct _inittab init_table[] = {
+  {"magus", PyInit_magus},
+  {nullptr, nullptr}
+};
+
+void
+magus_init()
+{
+  PyImport_ExtendInittab(init_table);
+}
 
 END_NAMESPACE_MAGUS
 
@@ -24,7 +34,7 @@ main(
   char** argv
 )
 {
-  PyImport_AppendInittab("magus", &MAGUS_NAMESPACE::PyInit_magus);
+  MAGUS_NAMESPACE::magus_init();
 
   return Py_BytesMain(argc, argv);
 }

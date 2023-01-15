@@ -34,6 +34,23 @@ ym_add_object_library( py_magus
   ${py_magus_SOURCES}
   )
 
+add_library( py_maguslib
+  SHARED
+  $<TARGET_OBJECTS:py_magus_obj>
+  $<TARGET_OBJECTS:py_magus_equiv_obj>
+  $<TARGET_OBJECTS:py_ymbnet_obj>
+  $<TARGET_OBJECTS:py_ymcell_obj>
+  $<TARGET_OBJECTS:py_ymsat_obj>
+  $<TARGET_OBJECTS:py_ymbase_obj>
+  ${YM_SUBMODULE_OBJ_LIST}
+  )
+
+set_target_properties( py_maguslib
+  PROPERTIES
+  PREFIX ""
+  OUTPUT_NAME "magus"
+  )
+
 add_executable( py_magus
   py_magus.cc
   $<TARGET_OBJECTS:py_magus_obj>
