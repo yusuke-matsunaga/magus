@@ -10,17 +10,13 @@
 #include <Python.h>
 
 #include "magus.h"
+#include "ym/py_ymbase.h"
+#include "ym/py_ymbnet.h"
+#include "ym/py_ymcell.h"
+#include "ym/py_ymsat.h"
+#include "ym/py_ymlogic.h"
 #include "ym/PyModule.h"
 
-
-BEGIN_NAMESPACE_YM
-
-extern "C" PyObject* PyInit_ymbase();
-extern "C" PyObject* PyInit_ymbnet();
-extern "C" PyObject* PyInit_ymcell();
-extern "C" PyObject* PyInit_ymsat();
-
-END_NAMESPACE_YM
 
 BEGIN_NAMESPACE_MAGUS
 
@@ -83,6 +79,9 @@ PyInit_magus()
     goto error;
   }
   if ( !PyModule::reg_submodule(m, "ymsat", PyInit_ymsat()) ) {
+    goto error;
+  }
+  if ( !PyModule::reg_submodule(m, "ymlogic", PyInit_ymlogic()) ) {
     goto error;
   }
   if ( !PyModule::reg_submodule(m, "equiv", PyInit_equiv()) ) {

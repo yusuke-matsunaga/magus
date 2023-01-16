@@ -41,6 +41,7 @@ add_library( py_maguslib
   $<TARGET_OBJECTS:py_ymbnet_obj>
   $<TARGET_OBJECTS:py_ymcell_obj>
   $<TARGET_OBJECTS:py_ymsat_obj>
+  $<TARGET_OBJECTS:py_ymlogic_obj>
   $<TARGET_OBJECTS:py_ymbase_obj>
   ${YM_SUBMODULE_OBJ_LIST}
   )
@@ -58,6 +59,7 @@ add_executable( py_magus
   $<TARGET_OBJECTS:py_ymbnet_obj>
   $<TARGET_OBJECTS:py_ymcell_obj>
   $<TARGET_OBJECTS:py_ymsat_obj>
+  $<TARGET_OBJECTS:py_ymlogic_obj>
   $<TARGET_OBJECTS:py_ymbase_obj>
   ${YM_SUBMODULE_OBJ_LIST}
   )
@@ -82,6 +84,7 @@ add_executable( py_magus_d
   $<TARGET_OBJECTS:py_ymbnet_obj_d>
   $<TARGET_OBJECTS:py_ymcell_obj_d>
   $<TARGET_OBJECTS:py_ymsat_obj_d>
+  $<TARGET_OBJECTS:py_ymlogic_obj_d>
   $<TARGET_OBJECTS:py_ymbase_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
   )
