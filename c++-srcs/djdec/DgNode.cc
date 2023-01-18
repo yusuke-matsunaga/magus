@@ -88,7 +88,7 @@ DgLitNode::is_lit() const
 Bdd
 DgLitNode::local_func() const
 {
-  auto f = mgr().literal(VarId{0});
+  auto f = mgr().literal(0);
   return f;
 }
 
@@ -160,9 +160,9 @@ Bdd
 DgOrNode::local_func() const
 {
   SizeType n = child_num();
-  auto f = mgr().literal(VarId{0});
+  auto f = mgr().literal(0);
   for ( SizeType i = 1; i < n; ++ i ) {
-    f |= mgr().literal(VarId{i});
+    f |= mgr().literal(i);
   }
   return f;
 }
@@ -193,9 +193,9 @@ Bdd
 DgXorNode::local_func() const
 {
   SizeType n = child_num();
-  auto f = mgr().literal(VarId{0});
+  auto f = mgr().literal(0);
   for ( SizeType i = 1; i < n; ++ i ) {
-    f ^= mgr().literal(VarId{i});
+    f ^= mgr().literal(i);
   }
   return f;
 }
@@ -225,7 +225,7 @@ DgCplxNode::is_cplx() const
 Bdd
 DgCplxNode::local_func() const
 {
-  unordered_map<VarId, Literal> varmap;
+  unordered_map<SizeType, Literal> varmap;
   auto gf = global_func();
   SizeType n = child_num();
   for ( SizeType i = 0; i < n; ++ i ) {
@@ -245,7 +245,7 @@ DgCplxNode::local_func() const
     }
     auto pat = f_diff.get_onepath();
     gf /= pat;
-    varmap.emplace(top, Literal{VarId{i}, inv});
+    varmap.emplace(top, Literal{i, inv});
   }
   return gf.remap_vars(varmap);
 }

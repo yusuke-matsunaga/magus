@@ -338,12 +338,12 @@ SbjGraph::new_expr(
   }
 
   if ( expr.is_posi_literal() ) {
-    VarId vid = expr.varid();
-    return ihandle_list[vid.val()];
+    auto vid = expr.varid();
+    return ihandle_list[vid];
   }
   if ( expr.is_nega_literal() ) {
-    VarId vid = expr.varid();
-    return ~ihandle_list[vid.val()];
+    auto vid = expr.varid();
+    return ~ihandle_list[vid];
   }
 
   ASSERT_COND( expr.is_op() );

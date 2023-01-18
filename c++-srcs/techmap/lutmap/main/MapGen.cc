@@ -209,7 +209,7 @@ MapGen::generate(
     SizeType node_id = node_info.map_node();
     if ( node_info.inv_req() ) {
       // NOT ゲートを表す LUT を作る．
-      TvFunc tv = TvFunc::make_nega_literal(1, VarId(0));
+      auto tv = TvFunc::make_nega_literal(1, 0);
       int inv_id = mapgraph.new_logic_tv({}, tv, {node_id});
 
       ++ mLutNum;

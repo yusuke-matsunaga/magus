@@ -3,7 +3,7 @@
 /// @brief DgNode_test の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2022 Yusuke Matsunaga
+/// Copyright (C) 2022, 2023 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "gtest/gtest.h"
@@ -64,7 +64,7 @@ TEST_F(DgNodeTest, make_lit1)
   EXPECT_FALSE( edge.is_one() );
   EXPECT_FALSE( edge.is_const() );
 
-  auto lit = bddmgr().literal(VarId{0});
+  auto lit = bddmgr().literal(0);
   EXPECT_TRUE( lit.is_identical(edge.global_func()) );
 
   auto node = edge.node();
@@ -86,7 +86,7 @@ TEST_F(DgNodeTest, make_lit2)
   EXPECT_FALSE( edge.is_one() );
   EXPECT_FALSE( edge.is_const() );
 
-  auto lit = bddmgr().literal(VarId{1});
+  auto lit = bddmgr().literal(1);
   EXPECT_TRUE( lit.is_identical(edge.global_func()) );
 
   auto node = edge.node();
@@ -108,7 +108,7 @@ TEST_F(DgNodeTest, make_lit3)
   EXPECT_FALSE( edge.is_one() );
   EXPECT_FALSE( edge.is_const() );
 
-  auto lit = bddmgr().literal(VarId{2});
+  auto lit = bddmgr().literal(2);
   EXPECT_TRUE( lit.is_identical(edge.global_func()) );
 
   auto node = edge.node();

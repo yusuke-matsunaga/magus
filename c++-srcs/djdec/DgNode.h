@@ -5,7 +5,7 @@
 /// @brief DgNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2022 Yusuke Matsunaga
+/// Copyright (C) 2022, 2023 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "dg.h"
@@ -87,7 +87,7 @@ public:
   SizeType
   top() const
   {
-    return mSupport.top_var().val();
+    return mSupport.top_var();
   }
 
   /// @brief サポートを返す．

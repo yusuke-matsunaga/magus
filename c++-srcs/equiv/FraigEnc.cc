@@ -149,16 +149,14 @@ FraigEnc::expr2aig(
     return make_one();
   }
   if ( expr.is_posi_literal() ) {
-    VarId var = expr.varid();
-    int id = var.val();
-    ASSERT_COND( id < fanin_handles.size() );
-    return fanin_handles[id];
+    auto var = expr.varid();
+    ASSERT_COND( var < fanin_handles.size() );
+    return fanin_handles[var];
   }
   if ( expr.is_nega_literal() ) {
-    VarId var = expr.varid();
-    int id = var.val();
-    ASSERT_COND( id < fanin_handles.size() );
-    return ~fanin_handles[id];
+    auto var = expr.varid();
+    ASSERT_COND( var < fanin_handles.size() );
+    return ~fanin_handles[var];
   }
 
   vector<FraigHandle> edge_list;
@@ -201,9 +199,8 @@ FraigEnc::tv2aig(
   }
 
   for ( ; pos < fanin_handles.size(); ++ pos ) {
-    VarId var{pos};
-    auto f0 = func.cofactor(var, true);
-    auto f1 = func.cofactor(var, false);
+    auto f0 = func.cofactor(pos, true);
+    auto f1 = func.cofactor(pos, false);
     if ( f0 != f1 ) {
       auto r0 = tv2aig(f0, pos + 1, fanin_handles);
       auto r1 = tv2aig(f1, pos + 1, fanin_handles);

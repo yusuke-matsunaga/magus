@@ -145,18 +145,18 @@ DgMgr::decomp_step(
   auto r1 = decomp_step(func1);
   // 結果をマージする．
   if ( debug ) {
-    cout << "merge at " << top_var.val() << endl;
+    cout << "merge at " << top_var << endl;
     cout << "r0" << endl;
     print(cout, r0);
     cout << "r1" << endl;
     print(cout, r1);
     cout << endl;
   }
-  result = merge(top_var.val(), r0, r1);
+  result = merge(top_var, r0, r1);
   if ( debug ) {
     cout << "merge end" << endl;
     func.display(cout);
-    cout << "merge at " << top_var.val() << endl;
+    cout << "merge at " << top_var << endl;
     cout << "r0" << endl;
     print(cout, r0);
     cout << "r1" << endl;
@@ -357,7 +357,7 @@ DgMgr::merge(
   // ここまで来ると CPLX タイプなのでグローバル関数が必要になる．
   auto f0 = r0.global_func();
   auto f1 = r1.global_func();
-  auto var = mBddMgr.posi_literal(VarId{top});
+  auto var = mBddMgr.posi_literal(top);
   auto f = ite(var, f1, f0);
   if ( node0->is_cplx() && node1->is_cplx() ) {
     if ( rest0_list.size() == 1 && rest1_list.size() == 1 ) {
@@ -850,7 +850,7 @@ DgMgr::make_lit(
   SizeType index
 )
 {
-  auto f = mBddMgr.posi_literal(VarId{index});
+  auto f = mBddMgr.posi_literal(index);
   DgEdge result;
   if ( find_node(f, result) ) {
     return result;
