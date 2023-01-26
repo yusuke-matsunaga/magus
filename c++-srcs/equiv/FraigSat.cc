@@ -56,8 +56,7 @@ FraigSat::reg_node(
   FraigNode* node
 )
 {
-  auto var = mSolver.new_variable();
-  mSolver.freeze_literal(var);
+  auto var = mSolver.new_variable(true);
   mLiteralDict.emplace(node->id(), var);
 }
 
@@ -121,13 +120,13 @@ FraigSat::check_const(
   Timer timer;
   timer.start();
 
-  SatLiteral lit{node_lit(node), inv};
+  auto lit = node_lit(node) * inv;
 
   // この関数の戻り値
-  SatBool3 code = SatBool3::X;
+  auto code = SatBool3::X;
 
   // lit = 1 が成り立つか調べる
-  SatBool3 stat = check_condition(lit);
+  auto stat = check_condition(lit);
   if ( stat == SatBool3::False ) {
     // 成り立たないということは lit = 0
     mSolver.add_clause(~lit);
@@ -161,8 +160,8 @@ FraigSat::check_equiv(
   bool inv
 )
 {
-  SatLiteral id1 = node_lit(node1);
-  SatLiteral id2 = node_lit(node2);
+  auto id1 = node_lit(node1);
+  auto id2 = node_lit(node2);
 
   if ( debug ) {
     cout << "CHECK EQUIV  "
@@ -177,16 +176,16 @@ FraigSat::check_equiv(
   Timer timer;
   timer.start();
 
-  SatLiteral lit1(id1);
-  SatLiteral lit2(id2, inv);
+  auto lit1 = id1;
+  auto lit2 = id2 * inv;
 
   // この関数の戻り値
-  SatBool3 code = SatBool3::X;
+  auto code = SatBool3::X;
 
   // 等価でない条件
   // - lit1 = 0 かつ lit2 = 1 が成り立つ
   // - lit0 = 1 かつ lit2 = 0 が成り立つ
-  SatBool3 stat = check_condition(~lit1,  lit2);
+  auto stat = check_condition(~lit1,  lit2);
   if ( stat == SatBool3::False ) {
     stat = check_condition( lit1, ~lit2);
     if ( stat == SatBool3::False ) {
@@ -236,7 +235,7 @@ FraigSat::handle_lit(
 {
   auto node = handle.node();
   auto lit = node_lit(node);
-  return SatLiteral{lit, handle.inv()};
+  return lit * handle.inv();
 }
 
 // lit1 が成り立つか調べる．
@@ -246,23 +245,23 @@ FraigSat::check_condition(
 )
 {
   vector<SatLiteral> assumptions{lit1};
-  SatBool3 ans1 = mSolver.solve(assumptions);
+  auto ans1 = mSolver.solve(assumptions);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver(nullptr, "minisat");
+  SatSolver solver{SatSolverType{"minisat2"}};
   for ( auto node: mAllNodes ) {
     auto lit = solver.new_variable();
-    ASSERT_COND( lit == node_lit(node) );
+    ASSERT_COND( lit.varid() == node_lit(node).varid() );
     if ( node->is_and() ) {
-      SatLiteral lito(id, false);
-      SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
-      SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
+      auto lito = lit;
+      auto lit1 = node_lit(node->fanin0()) * node->fanin0_inv();
+      auto lit2 = node_lit(node->fanin1()) * node->fanin1_inv();
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause( lit1, ~lito);
       solver.add_clause( lit2, ~lito);
     }
   }
-  SatBool3 ans2 = solver.solve(assumptions);
+  auto ans2 = solver.solve(assumptions);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition(" << lit1 << ")" << endl;
@@ -271,10 +270,9 @@ FraigSat::check_condition(
     cout << " clauses" << endl;
     for ( auto node: mAllNodes ) {
       if ( node->is_and() ) {
-	SatVarId id = node->varid();
-	SatLiteral lito(id, false);
-	SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
-	SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
+	auto lito = node_lit(node);
+	auto lit1 = node_lit(node->fanin0()) * node->fanin0_inv();
+	auto lit2 = node_lit(node->fanin1()) * node->fanin1_inv();
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
@@ -293,23 +291,23 @@ FraigSat::check_condition(
 )
 {
   vector<SatLiteral> assumptions{lit1, lit2};
-  SatBool3 ans1 = mSolver.solve(assumptions);
+  auto ans1 = mSolver.solve(assumptions);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver(nullptr, "minisat");
+  SatSolver solver{SatSolverType{"minisat2"}};
   for ( auto node: mAllNodes ) {
-    SatVarId id = solver.new_variable();
-    ASSERT_COND(id == node->varid() );
+    auto lit = solver.new_variable();
+    ASSERT_COND( lit.varid() == node_lit(node).varid() );
     if ( node->is_and() ) {
-      SatLiteral lito(id, false);
-      SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
-      SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
+      auto lito = lit;
+      auto lit1 = node_lit(node->fanin0()) * node->fanin0_inv();
+      auto lit2 = node_lit(node->fanin1()) * node->fanin1_inv();
       solver.add_clause(~lit1, ~lit2, lito);
       solver.add_clause(lit1, ~lito);
       solver.add_clause(lit2, ~lito);
     }
   }
-  SatBool3 ans2 = solver.solve(assumptions);
+  auto ans2 = solver.solve(assumptions);
   if ( ans1 != ans2 ) {
     cout << endl << "ERROR!" << endl;
     cout << "check_condition("
@@ -319,10 +317,9 @@ FraigSat::check_condition(
     cout << " clauses" << endl;
     for ( auto node: mAllNodes ) {
       if ( node->is_and() ) {
-	SatVarId id = node->varid();
-	SatLiteral lito(id, false);
-	SatLiteral lit1(node->fanin0()->varid(), node->fanin0_inv());
-	SatLiteral lit2(node->fanin1()->varid(), node->fanin1_inv());
+	auto lito = node_lit(node);
+	auto lit1 = node_lit(node->fanin0()) * node->fanin0_inv();
+	auto lit2 = node_lit(node->fanin1()) * node->fanin1_inv();
 	cout << "   " << ~lit1 << " + " << ~lit2 << " + " << lito << endl;
 	cout << "   " << lit1 << " + " << ~lito << endl;
 	cout << "   " << lit2 << " + " << ~lito << endl;
