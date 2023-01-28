@@ -247,8 +247,8 @@ FraigEnc::bdd2aig(
   // インデックスごとのノードリストを作る．
   SizeType max_index = 0;
   for ( auto node: node_list ) {
-    if ( max_index < node.index ) {
-      max_index = node.index;
+    if ( max_index < node.index() ) {
+      max_index = node.index();
     }
   }
   ++ max_index;
@@ -256,7 +256,7 @@ FraigEnc::bdd2aig(
   {
     SizeType id = 1;
     for ( auto node: node_list ) {
-      indexed_node_list[node.index].push_back(make_pair(id, node));
+      indexed_node_list[node.index()].push_back(make_pair(id, node));
       ++ id;
     }
   }
@@ -268,8 +268,8 @@ FraigEnc::bdd2aig(
     for ( auto& p: node_list ) {
       SizeType id = p.first;
       auto& node = p.second;
-      auto r0 = edge2aig(node.edge0, h_map);
-      auto r1 = edge2aig(node.edge1, h_map);
+      auto r0 = edge2aig(node.edge0(), h_map);
+      auto r1 = edge2aig(node.edge1(), h_map);
       auto r = make_mux(cedge, r0, r1);
       h_map.emplace(id, r);
     }
