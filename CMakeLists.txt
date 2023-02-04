@@ -38,8 +38,12 @@ list ( APPEND CMAKE_MODULE_PATH
 
 include (YmUtils)
 
+if ( PYTHON_VERSION )
+  set( INIT_PYTHON_ARGS ${PYTHON_VERSION} EXACT )
+endif ()
+
 ym_init ("USE_POPT" "USE_LZMA" "USE_ZLIB" "USE_BZIP2")
-ym_init_python ( REQUIRED )
+ym_init_python ( ${INIT_PYTHON_ARGS} )
 ym_init_doxygen ()
 ym_init_gperftools ()
 ym_init_ctest ()
