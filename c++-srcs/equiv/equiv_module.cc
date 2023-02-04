@@ -10,9 +10,9 @@
 #include <Python.h>
 
 #include "EquivMgr.h"
-#include "ym/PyModule.h"
-#include "ym/PyBnNetwork.h"
-#include "ym/PySatBool3.h"
+#include "pym/PyModule.h"
+#include "pym/PyBnNetwork.h"
+#include "pym/PySatBool3.h"
 
 
 BEGIN_NAMESPACE_MAGUS

@@ -10,12 +10,12 @@
 #include <Python.h>
 
 #include "magus.h"
-#include "ym/py_ymbase.h"
-#include "ym/py_ymbnet.h"
-#include "ym/py_ymcell.h"
-#include "ym/py_ymsat.h"
-#include "ym/py_ymlogic.h"
-#include "ym/PyModule.h"
+#include "pym/ymbase.h"
+#include "pym/ymbnet.h"
+#include "pym/ymcell.h"
+#include "pym/ymsat.h"
+#include "pym/ymlogic.h"
+#include "pym/PyModule.h"
 
 
 BEGIN_NAMESPACE_MAGUS
