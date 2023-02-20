@@ -9,6 +9,7 @@
 #include "DjDecomp.h"
 #include "DgMgr.h"
 #include "DgEdge.h"
+#include "ym/BnNodeMap.h"
 
 
 BEGIN_NAMESPACE_DG
@@ -19,19 +20,17 @@ DjDecomp::decomp(
   const BnNetwork& src_network ///< [in] 元のネットワーク
 )
 {
-  unordered_map<SizeType, SizeType> id_map;
-
   // ポートの情報をコピーする．
-  make_skelton_copy(src_network, id_map);
+  auto node_map = make_skelton_copy(src_network);
 
-  for ( auto& dff: src_network.dff_list() ) {
-    copy_dff(dff, id_map);
+  for ( auto dff: src_network.dff_list() ) {
+    copy_dff(dff, node_map);
   }
 
   // 論理ノードを分解しつつコピーする．
-  for ( auto& src_node: src_network.logic_list() ) {
+  for ( auto src_node: src_network.logic_list() ) {
     // ファンインのノード番号を求める．
-    SizeType dst_id{BNET_NULLID};
+    BnNode dst_node;
     if ( src_node.type() == BnNodeType::Bdd ) {
       // disjoint 分解を行う．
       DgMgr dgmgr;
@@ -40,37 +39,38 @@ DjDecomp::decomp(
       SizeType ni = src_node.fanin_num();
       mInputList.clear();
       mInputList.reserve(ni);
-      for ( SizeType src_id: src_node.fanin_id_list() ) {
-	ASSERT_COND( id_map.count(src_id) > 0 );
-	SizeType dst_id = id_map.at(src_id);
-	mInputList.push_back(dst_id);
+      for ( auto src_inode: src_node.fanin_list() ) {
+	SizeType src_id = src_inode.id();
+	ASSERT_COND( node_map.is_in(src_id) > 0 );
+	auto dst_inode = node_map.get(src_id);
+	mInputList.push_back(dst_inode);
       }
-      dst_id = make_network(root);
+      dst_node = make_network(root);
     }
     else {
       // 単純にコピーする．
-      dst_id = copy_logic(src_node, src_network, id_map);
+      dst_node = copy_logic(src_node, node_map);
     }
-    id_map.emplace(src_node.id(), dst_id);
+    node_map.put(src_node.id(), dst_node);
   }
 
   // 出力を作る．
-  for ( auto& src_node: src_network.output_list() ) {
-    copy_output(src_node, id_map);
+  for ( auto src_node: src_network.output_list() ) {
+    copy_output(src_node, node_map);
   }
 }
 
 // @brief edge に対応するネットワークを作る．
-SizeType
+BnNode
 DjDecomp::make_network(
   DgEdge edge
 )
 {
   if ( edge.is_zero() ) {
-    return new_logic_primitive({}, BnNodeType::C0, {});
+    return new_logic_primitive({}, PrimType::C0, {});
   }
   if ( edge.is_one() ) {
-    return new_logic_primitive({}, BnNodeType::C1, {});
+    return new_logic_primitive({}, PrimType::C1, {});
   }
 
   auto node = edge.node();
@@ -80,7 +80,7 @@ DjDecomp::make_network(
     auto id = node->top();
     ASSERT_COND( 0 <= id && id < mInputList.size() );
     if ( inv ) {
-      return new_logic_primitive({}, BnNodeType::Not, {mInputList[id]});
+      return new_logic_primitive({}, PrimType::Not, {mInputList[id]});
     }
     else {
       return mInputList[id];
@@ -88,32 +88,32 @@ DjDecomp::make_network(
   }
 
   auto nc = node->child_num();
-  vector<SizeType> fanin_id_list(nc);
+  vector<BnNode> fanin_list(nc);
   for ( SizeType i = 0; i < nc; ++ i ) {
-    fanin_id_list[i] = make_network(node->child(i));
+    fanin_list[i] = make_network(node->child(i));
   }
   if ( node->is_or() ) {
     if ( inv ) {
-      return new_logic_primitive({}, BnNodeType::Nor, fanin_id_list);
+      return new_logic_primitive({}, PrimType::Nor, fanin_list);
     }
     else {
-      return new_logic_primitive({}, BnNodeType::Or, fanin_id_list);
+      return new_logic_primitive({}, PrimType::Or, fanin_list);
     }
   }
   if ( node->is_xor() ) {
     if ( inv ) {
-      return new_logic_primitive({}, BnNodeType::Xnor, fanin_id_list);
+      return new_logic_primitive({}, PrimType::Xnor, fanin_list);
     }
     else {
-      return new_logic_primitive({}, BnNodeType::Xor, fanin_id_list);
+      return new_logic_primitive({}, PrimType::Xor, fanin_list);
     }
   }
   if ( node->is_cplx() ) {
     auto lf = node->local_func() ^ inv;
-    return new_logic_bdd({}, lf, fanin_id_list);
+    return new_logic_bdd({}, lf, fanin_list);
   }
   ASSERT_NOT_REACHED;
-  return BNET_NULLID;
+  return BnNode{}; // 不正値
 }
 
 END_NAMESPACE_DG

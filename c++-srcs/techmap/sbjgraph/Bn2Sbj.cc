@@ -46,62 +46,69 @@ Bn2Sbj::convert(
   vector<SbjHandle> node_map(src_network.node_num());
 
   // 外部入力ノードの生成
-  for ( auto& node: src_network.input_list() ) {
+  for ( auto node: src_network.input_list() ) {
     auto sbj_node = dst_network.new_input(false);
     node_map[node.id()] = SbjHandle{sbj_node};
   }
 
   // 論理ノードの生成
-  for ( auto& bn_node: src_network.logic_list() ) {
+  for ( auto bn_node: src_network.logic_list() ) {
     auto id = bn_node.id();
     auto ni = bn_node.fanin_num();
     vector<SbjHandle> ihandle_list;
     ihandle_list.reserve(ni);
-    for ( auto iid: bn_node.fanin_id_list() ) {
-      ihandle_list.push_back(node_map[iid]);
+    for ( auto inode: bn_node.fanin_list() ) {
+      ihandle_list.push_back(node_map[inode.id()]);
     }
     auto logic_type = bn_node.type();
     switch ( logic_type ) {
-    case BnNodeType::C0:
-      node_map[id] = SbjHandle::make_zero();
-      break;
+    case BnNodeType::Prim:
+      switch ( bn_node.primitive_type() ) {
+      case PrimType::C0:
+	node_map[id] = SbjHandle::make_zero();
+	break;
 
-    case BnNodeType::C1:
-      node_map[id] = SbjHandle::make_one();
-      break;
+      case PrimType::C1:
+	node_map[id] = SbjHandle::make_one();
+	break;
 
-    case BnNodeType::Buff:
-      node_map[id] = ihandle_list[0];
-      break;
+      case PrimType::Buff:
+	node_map[id] = ihandle_list[0];
+	break;
 
-    case BnNodeType::Not:
-      node_map[id] = ~ihandle_list[0];
-      break;
+      case PrimType::Not:
+	node_map[id] = ~ihandle_list[0];
+	break;
 
-    case BnNodeType::And:
-      node_map[id] = dst_network.new_and(ihandle_list);
-      break;
+      case PrimType::And:
+	node_map[id] = dst_network.new_and(ihandle_list);
+	break;
 
-    case BnNodeType::Nand:
-      node_map[id] = ~dst_network.new_and(ihandle_list);
-      break;
+      case PrimType::Nand:
+	node_map[id] = ~dst_network.new_and(ihandle_list);
+	break;
 
-    case BnNodeType::Or:
-      node_map[id] = dst_network.new_or(ihandle_list);
-      break;
+      case PrimType::Or:
+	node_map[id] = dst_network.new_or(ihandle_list);
+	break;
 
-    case BnNodeType::Nor:
-      node_map[id] = ~dst_network.new_or(ihandle_list);
-      break;
+      case PrimType::Nor:
+	node_map[id] = ~dst_network.new_or(ihandle_list);
+	break;
 
-    case BnNodeType::Xor:
-      node_map[id] = dst_network.new_xor(ihandle_list);
-      break;
+      case PrimType::Xor:
+	node_map[id] = dst_network.new_xor(ihandle_list);
+	break;
 
-    case BnNodeType::Xnor:
-      node_map[id] = ~dst_network.new_xor(ihandle_list);
-      break;
+      case PrimType::Xnor:
+	node_map[id] = ~dst_network.new_xor(ihandle_list);
+	break;
 
+      case PrimType::None:
+	ASSERT_NOT_REACHED;
+	break;
+      }
+      break;
     case BnNodeType::Expr:
       {
 	const Expr& expr = src_network.expr(bn_node.expr_id());
@@ -126,35 +133,35 @@ Bn2Sbj::convert(
   }
 
   // 外部出力ノードの生成
-  for ( auto& node: src_network.output_list() ) {
-    SbjHandle ihandle = node_map[node.output_src()];
+  for ( auto node: src_network.output_list() ) {
+    SbjHandle ihandle = node_map[node.output_src().id()];
     SbjNode* sbj_node = dst_network.new_output(ihandle);
     node_map[node.id()] = SbjHandle(sbj_node);
   }
 
   // DFFノードの生成
-  for ( auto& bn_dff: src_network.dff_list() ) {
+  for ( auto bn_dff: src_network.dff_list() ) {
     if ( bn_dff.is_cell() ) {
       cerr << "Sorry, CELL type DFF is not supported!" << endl;
       continue;
     }
 
-    auto iid = bn_dff.data_in();
+    auto iid = bn_dff.data_in().id();
     auto ihandle = node_map[iid];
     ASSERT_COND( !ihandle.inv() );
     auto sbj_input = ihandle.node();
 
-    auto cid = bn_dff.clock();
+    auto cid = bn_dff.clock().id();
     auto chandle = node_map[cid];
     ASSERT_COND( !chandle.inv() );
     auto sbj_clock = chandle.node();
 
-    auto oid = bn_dff.data_out();
+    auto oid = bn_dff.data_out().id();
     auto ohandle = node_map[oid];
     ASSERT_COND( !ohandle.inv() );
     auto sbj_output = ohandle.node();
 
-    auto rid = bn_dff.clear();
+    auto rid = bn_dff.clear().id();
     SbjNode* sbj_clear = nullptr;
     if ( rid != BNET_NULLID ) {
       auto handle1 = node_map[rid];
@@ -162,7 +169,7 @@ Bn2Sbj::convert(
       sbj_clear = handle1.node();
     }
 
-    auto pid = bn_dff.preset();
+    auto pid = bn_dff.preset().id();
     SbjNode* sbj_preset = nullptr;
     if ( pid != BNET_NULLID ) {
       auto handle1 = node_map[pid];
@@ -181,11 +188,11 @@ Bn2Sbj::convert(
   }
 
   // ポートの生成
-  for ( auto& bn_port: src_network.port_list() ) {
+  for ( auto bn_port: src_network.port_list() ) {
     SizeType bw = bn_port.bit_width();
     vector<SbjNode*> sbj_bits(bw);
     for ( int j: Range(bw) ) {
-      SizeType id = bn_port.bit(j);
+      SizeType id = bn_port.bit(j).id();
       SbjHandle handle = node_map[id];
       ASSERT_COND( !handle.inv() );
       SbjNode* sbj_node = handle.node();

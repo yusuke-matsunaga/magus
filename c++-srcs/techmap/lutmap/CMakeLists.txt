@@ -29,6 +29,7 @@ set ( main_SOURCES
   main/LbCalc.cc
   main/DgGraph.cc
   main/MapGen.cc
+  main/MapEst.cc
   )
 
 set ( mct1_SOURCES

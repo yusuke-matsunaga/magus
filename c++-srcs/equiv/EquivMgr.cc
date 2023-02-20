@@ -55,14 +55,12 @@ EquivMgr::check(
     // 入力名をキーにして network1 の入力位置を格納する辞書
     unordered_map<string, SizeType> input_map;
     for ( SizeType i = 0; i < ni; ++ i ) {
-      SizeType id = network1.input_id(i);
-      auto& node = network1.node(id);
+      auto node = network1.input_node(i);
       input_map.emplace(node.name(), i);
     }
     // 入力の対応付を行う．
     for ( SizeType i = 0; i < ni; ++ i ) {
-      SizeType id = network2.input_id(i);
-      auto& node = network2.node(id);
+      auto node = network2.input_node(i);
       auto name = node.name();
       if ( input_map.count(name) == 0 ) {
 	// 入力名が未対応
@@ -73,14 +71,12 @@ EquivMgr::check(
     // 出力名をキーにして network1 の出力位置を格納する辞書
     unordered_map<string, SizeType> output_map;
     for ( SizeType i = 0; i < no; ++ i ) {
-      SizeType id = network1.output_id(i);
-      auto& node = network1.node(id);
+      auto node = network1.output_node(i);
       output_map.emplace(node.name(), i);
     }
     // 出力の対応付を行う．
     for ( SizeType i = 0; i < no; ++ i ) {
-      SizeType id = network2.output_id(i);
-      auto& node = network2.node(id);
+      auto node = network2.output_node(i);
       auto name = node.name();
       if ( output_map.count(name) == 0 ) {
 	// 出力名が未対応

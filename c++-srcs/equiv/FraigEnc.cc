@@ -40,16 +40,13 @@ FraigEnc::operator()(
   //////////////////////////////////////////////////////////////////////
   // 論理ノードを作成する．
   //////////////////////////////////////////////////////////////////////
-  SizeType nl = network.logic_num();
-  for ( auto i: Range(nl) ) {
-    SizeType id = network.logic_id(i);
-    auto& node = network.node(id);
-
+  for ( auto node: network.logic_list() ) {
     // ファンインのノードに対応するハンドルを求める．
     SizeType ni = node.fanin_num();
     vector<FraigHandle> fanin_handles;
     fanin_handles.reserve(ni);
-    for ( SizeType iid: node.fanin_id_list() ) {
+    for ( auto inode: node.fanin_list() ) {
+      SizeType iid = inode.id();
       ASSERT_COND( h_map.count(iid) > 0 );
       fanin_handles.push_back(h_map.at(iid));
     }
@@ -58,44 +55,52 @@ FraigEnc::operator()(
     BnNodeType logic_type = node.type();
     FraigHandle ans;
     switch ( logic_type ) {
-    case BnNodeType::C0:
-      ans = make_zero();
-      break;
+    case BnNodeType::Prim:
+      switch ( node.primitive_type() ) {
+      case PrimType::C0:
+	ans = make_zero();
+	break;
 
-    case BnNodeType::C1:
-      ans = make_one();
-      break;
+      case PrimType::C1:
+	ans = make_one();
+	break;
 
-    case BnNodeType::Buff:
-      ans = make_buff(fanin_handles[0]);
-      break;
+      case PrimType::Buff:
+	ans = make_buff(fanin_handles[0]);
+	break;
 
-    case BnNodeType::Not:
-      ans = make_not(fanin_handles[0]);
-      break;
+      case PrimType::Not:
+	ans = make_not(fanin_handles[0]);
+	break;
 
-    case BnNodeType::And:
-      ans = make_and(fanin_handles);
-      break;
+      case PrimType::And:
+	ans = make_and(fanin_handles);
+	break;
 
-    case BnNodeType::Nand:
-      ans = make_nand(fanin_handles);
-      break;
+      case PrimType::Nand:
+	ans = make_nand(fanin_handles);
+	break;
 
-    case BnNodeType::Or:
-      ans = make_or(fanin_handles);
-      break;
+      case PrimType::Or:
+	ans = make_or(fanin_handles);
+	break;
 
-    case BnNodeType::Nor:
-      ans = make_nor(fanin_handles);
-      break;
+      case PrimType::Nor:
+	ans = make_nor(fanin_handles);
+	break;
 
-    case BnNodeType::Xor:
-      ans = make_xor(fanin_handles);
-      break;
+      case PrimType::Xor:
+	ans = make_xor(fanin_handles);
+	break;
 
-    case BnNodeType::Xnor:
-      ans = make_xnor(fanin_handles);
+      case PrimType::Xnor:
+	ans = make_xnor(fanin_handles);
+	break;
+
+      case PrimType::None:
+	ASSERT_NOT_REACHED;
+	break;
+      }
       break;
 
     case BnNodeType::Expr:
@@ -117,7 +122,7 @@ FraigEnc::operator()(
     }
 
     // 登録しておく．
-    h_map.emplace(id, ans);
+    h_map.emplace(node.id(), ans);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -126,8 +131,9 @@ FraigEnc::operator()(
   SizeType no = network.output_num();
   vector<FraigHandle> output_handles;
   output_handles.reserve(no);
-  for ( auto& node: network.output_list() ) {
-    SizeType iid = node.output_src();
+  for ( auto node: network.output_list() ) {
+    auto inode = node.output_src();
+    SizeType iid = inode.id();
     ASSERT_COND( h_map.count(iid) > 0 );
     output_handles.push_back(h_map.at(iid));
   }

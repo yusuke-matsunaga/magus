@@ -46,6 +46,11 @@ add_library( py_maguslib
   ${YM_SUBMODULE_OBJ_LIST}
   )
 
+target_link_libraries ( py_maguslib
+  ${YM_LIB_DEPENDS}
+  ${Python3_LIBRARIES}
+  )
+
 set_target_properties( py_maguslib
   PROPERTIES
   PREFIX ""

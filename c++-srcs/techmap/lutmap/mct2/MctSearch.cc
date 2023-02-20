@@ -12,6 +12,7 @@
 #include "MctNode.h"
 #include "MapRecord.h"
 #include "MapGen.h"
+#include "MapEst.h"
 #include "LbCalc.h"
 #include "SbjGraph.h"
 
@@ -194,7 +195,7 @@ MctSearch::default_policy(MctNode* node)
       }
       MapRecord record;
       mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
-      MapGen gen;
+      MapEst gen;
       ymuint lut_num1;
       ymuint depth;
       gen.estimate(mSbjGraph, record, lut_num1, depth);
@@ -228,7 +229,7 @@ MctSearch::default_policy(MctNode* node)
   else {
     MapRecord record;
     mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), record);
-    MapGen gen;
+    MapEst gen;
     ymuint depth;
     gen.estimate(mSbjGraph, record, lut_num, depth);
     if ( mMinimumLutNum > lut_num ) {
@@ -288,7 +289,7 @@ MctSearch::default_policy(MctNode* node)
   }
 #endif
 
-  MapGen gen;
+  MapEst gen;
   SizeType lut_num;
   SizeType depth;
   gen.estimate(mSbjGraph, record, lut_num, depth);

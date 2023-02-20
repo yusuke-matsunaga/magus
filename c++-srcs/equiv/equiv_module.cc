@@ -54,8 +54,8 @@ equiv_cmd(
   if ( loglevel != -1 ) {
     mgr.set_loglevel(loglevel);
   }
-  auto net1 = PyBnNetwork::_get(net1_obj);
-  auto net2 = PyBnNetwork::_get(net2_obj);
+  auto net1 = PyBnNetwork::Get(net1_obj);
+  auto net2 = PyBnNetwork::Get(net2_obj);
   auto result = mgr.check(net1, net2, match_by_name);
   const auto& oresults = result.output_results();
   SizeType no = oresults.size();

@@ -65,7 +65,7 @@ private:
     const ClibCell* mCell{nullptr};
 
     // マップ結果
-    SizeType mMapNode{BNET_NULLID};
+    BnNode mMapNode;
 
   };
 
@@ -122,14 +122,11 @@ private:
   );
 
   /// @brief 最終結果を作るためのバックトレースを行う．
-  /// @param[in] node 対象のノード
-  /// @param[in] inv 極性
-  /// @param[in] record セルの割当結果
-  int
+  BnNode
   back_trace(
-    const SbjNode* node,
-    bool inv,
-    const MapRecord& record
+    const SbjNode* node,    ///< [in] 対象のノード
+    bool inv,               ///< [in] 極性
+    const MapRecord& record ///< [in] セルの割当結果
   );
 
   /// @brief node に関係する情報を得る．

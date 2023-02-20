@@ -74,28 +74,27 @@ MapGen::generate(
   for ( const auto& rec: mMapReqList ) {
     const SbjNode* onode = rec.mNode;
     bool ext_inv = rec.mInv;
-    const SbjNode* node = onode->fanin(0);
+    const SbjNode* src_node = onode->fanin(0);
     bool inv = onode->output_fanin_inv() ^ ext_inv;
-    SizeType mapnode = 0;
-    if ( node ) {
-      mapnode = back_trace(node, inv, record);
+    BnNode mapnode;
+    if ( src_node ) {
+      mapnode = back_trace(src_node, inv, record);
     }
     else {
-      SizeType node_id = 0;
       if ( inv ) {
 	// 定数1ノードを作る．
-	SizeType const1_cell = record.const1_cell();
+	auto const1_cell = record.const1_cell();
 	ASSERT_COND( const1_cell != CLIB_NULLID );
 	mapnode = new_logic_cell({}, const1_cell, {});
       }
       else {
 	// 定数0ノードを作る．
-	SizeType const0_cell = record.const0_cell();
+	auto const0_cell = record.const0_cell();
 	ASSERT_COND( const0_cell != CLIB_NULLID );
 	mapnode = new_logic_cell({}, const0_cell, {});
       }
     }
-    SizeType omapnode = node_info(onode, false).mMapNode;
+    auto omapnode = node_info(onode, false).mMapNode;
     set_output_src(omapnode, mapnode);
   }
 }
@@ -117,18 +116,17 @@ MapGen::gen_port(
       iovect[i] = BnDir::OUTPUT;
     }
   }
-  SizeType port_id = new_port(sbj_port->name(), iovect);
-  auto& dst_port = port(port_id);
+  auto dst_port = new_port(sbj_port->name(), iovect);
   for ( SizeType j = 0; j < nb; ++ j ) {
     const SbjNode* sbj_node = sbj_port->bit(j);
-    auto& node = this->node(dst_port.bit(j));
+    auto dst_node = dst_port.bit(j);
     if ( sbj_node->is_input() ) {
-      ASSERT_COND( node.is_input() );
-      node_info(sbj_node, false).mMapNode = node.id();
+      ASSERT_COND( dst_node.is_input() );
+      node_info(sbj_node, false).mMapNode = dst_node;
     }
     else if ( sbj_node->is_output() ) {
-      ASSERT_COND( node.is_output() );
-      node_info(sbj_node, false).mMapNode = node.id();
+      ASSERT_COND( dst_node.is_output() );
+      node_info(sbj_node, false).mMapNode = dst_node;
       add_mapreq(sbj_node, false);
     }
   }
@@ -157,12 +155,11 @@ MapGen::gen_dff(
   }
   const ClibCell& cell = record.cell_library().cell(cell_id);
   //ClibFFInfo ff_info = cell.ff_info();
-  int dff_id = new_dff(string(), cell_id);
-  auto& dff = this->dff(dff_id);
+  auto dff = new_dff({}, cell_id);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
-  SizeType output1 = dff.data_out();
-  ASSERT_COND( output1 != BNET_NULLID );
+  auto output1 = dff.data_out();
+  ASSERT_COND( output1.is_valid() );
   node_info(sbj_output, inv).mMapNode = output1;
 #if 0
   int output2 = dff.xoutput();
@@ -173,12 +170,12 @@ MapGen::gen_dff(
 
 #warning "TODO: type() 別のコード"
   const SbjNode* sbj_input = sbj_dff->data_input();
-  SizeType input = dff.data_in();
+  auto input = dff.data_in();
   node_info(sbj_input, false).mMapNode = input;
   add_mapreq(sbj_input, inv);
 
   const SbjNode* sbj_clock = sbj_dff->clock();
-  int clock = dff.clock();
+  auto clock = dff.clock();
   node_info(sbj_clock, false).mMapNode = clock;
   bool clock_inv = false; /*(ff_info.clock_sense() == 2);*/
   add_mapreq(sbj_clock, clock_inv);
@@ -188,7 +185,7 @@ MapGen::gen_dff(
   if ( clear_sense != 0 ) {
     const SbjNode* sbj_clear = inv ? sbj_dff->preset() : sbj_dff->clear();
     int clear = dff.clear();
-    ASSERT_COND( clear != BNET_NULLID );
+    ASSERT_COND( clear.is_valid() );
     node_info(sbj_clear, false).mMapNode = clear;
     bool clear_inv = (clear_sense == 2);
     // sbj_clear->output_fanin() == nullptr の時もうまくいく．
@@ -199,7 +196,7 @@ MapGen::gen_dff(
   if ( preset_sense != 0 ) {
     const SbjNode* sbj_preset = inv ? sbj_dff->clear() : sbj_dff->preset();
     int preset = dff.preset();
-    ASSERT_COND( preset != BNET_NULLID );
+    ASSERT_COND( preset.is_valid() );
     node_info(sbj_preset, false).mMapNode = preset;
     bool preset_inv = (preset_sense == 2);
     // sbj_preset->output_fanin() == nullptr の時もうまくいく．
@@ -229,7 +226,7 @@ MapGen::add_mapreq(
 
 // サブジェクトグラフの node に対応するマップされたノードを
 // 生成し，それを返す．
-int
+BnNode
 MapGen::back_trace(
   const SbjNode* node,
   bool inv,
@@ -237,8 +234,8 @@ MapGen::back_trace(
 )
 {
   NodeInfo& node_info = this->node_info(node, inv);
-  int mapnode = node_info.mMapNode;
-  if ( mapnode != BNET_NULLID ) {
+  auto mapnode = node_info.mMapNode;
+  if ( mapnode.is_valid() ) {
     // すでに生成済みならそのノードを返す．
     return mapnode;
   }
@@ -249,14 +246,13 @@ MapGen::back_trace(
 
   // 新しいノードを作り mNodeMap に登録する．
   SizeType ni = match.leaf_num();
-  vector<SizeType> fanin_id_list(ni);
-  for ( int i = 0; i < ni; ++ i ) {
-    const SbjNode* inode = match.leaf_node(i);
+  vector<BnNode> fanin_list(ni);
+  for ( SizeType i = 0; i < ni; ++ i ) {
+    const SbjNode* src_inode = match.leaf_node(i);
     bool iinv = match.leaf_inv(i);
-    SizeType iid = back_trace(inode, iinv, record);
-    fanin_id_list[i] = iid;
+    fanin_list[i] = back_trace(src_inode, iinv, record);
   }
-  mapnode = new_logic_cell({}, cell_id, fanin_id_list);
+  mapnode = new_logic_cell({}, cell_id, fanin_list);
   node_info.mMapNode = mapnode;
 
   return mapnode;

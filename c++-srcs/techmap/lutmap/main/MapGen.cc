@@ -91,11 +91,9 @@ MapGen::init(
   // 具体的な初期化は NodeInfo のコンストラクタが行っている．
   mNodeInfo.clear();
   mNodeInfo.resize(node_num);
-  mConst0 = BNET_NULLID;
-  mConst1 = BNET_NULLID;
+  mConst0 = {}; // 不正値
+  mConst1 = {}; // 不正値
   mLutNum = 0;
-
-  mFanoutPointList.clear();
 }
 
 // @brief マッピング結果を BnNetwork にセットする．
@@ -140,8 +138,7 @@ MapGen::generate(
       auto sbjnode = sbjport->bit(j);
       dir_vect[j] = sbjnode->is_input() ? BnDir::INPUT : BnDir::OUTPUT;
     }
-    SizeType port_id = mapgraph.new_port(sbjport->name(), dir_vect);
-    auto& bn_port = mapgraph.port(port_id);
+    auto bn_port = mapgraph.new_port(sbjport->name(), dir_vect);
     for ( SizeType j = 0; j < nb; ++ j ) {
       auto sbjnode = sbjport->bit(j);
       mNodeInfo[sbjnode->id()].set_map(bn_port.bit(j), 0);
@@ -161,8 +158,7 @@ MapGen::generate(
     bool has_clear = (clear != nullptr);
     bool has_preset = (preset != nullptr);
 
-    SizeType dff_id = mapgraph.new_dff(string(), has_clear, has_preset);
-    auto& bn_dff = mapgraph.dff(dff_id);
+    auto bn_dff = mapgraph.new_dff({}, has_clear, has_preset);
 
     mNodeInfo[input->id()].set_map(bn_dff.data_in(), 0);
     mNodeInfo[output->id()].set_map(bn_dff.data_out(), 0);
@@ -188,8 +184,7 @@ MapGen::generate(
     bool has_clear = (clear != nullptr);
     bool has_preset = (preset != nullptr);
 
-    SizeType latch_id = mapgraph.new_latch(string(), has_clear, has_preset);
-    auto& bn_latch = mapgraph.dff(latch_id);
+    auto bn_latch = mapgraph.new_latch({}, has_clear, has_preset);
 
     mNodeInfo[input->id()].set_map(bn_latch.data_in(), 0);
     mNodeInfo[output->id()].set_map(bn_latch.data_out(), 0);
@@ -204,13 +199,13 @@ MapGen::generate(
 
   // 外部入力の生成
   for ( SizeType i = 0; i < ni; ++ i ) {
-    auto node = sbjgraph.input(i);
-    auto& node_info = mNodeInfo[node->id()];
-    SizeType node_id = node_info.map_node();
+    auto src_node = sbjgraph.input(i);
+    auto& node_info = mNodeInfo[src_node->id()];
     if ( node_info.inv_req() ) {
       // NOT ゲートを表す LUT を作る．
       auto tv = TvFunc::make_nega_literal(1, 0);
-      int inv_id = mapgraph.new_logic_tv({}, tv, {node_id});
+      auto node = node_info.map_node();
+      auto inv = mapgraph.new_logic_tv({}, tv, {node});
 
       ++ mLutNum;
 
@@ -218,21 +213,21 @@ MapGen::generate(
       cout << node->id_str() << "[1]" << endl;
 #endif
 
-      node_info.set_map(inv_id, 1, true);
+      node_info.set_map(inv, 1, true);
     }
   }
 
   // 外部出力からバックトレースを行い全ノードの生成を行う．
   SizeType max_depth = 0;
   for ( SizeType i = 0; i < no; ++ i ) {
-    auto onode = sbjgraph.output(i);
-    auto node = onode->output_fanin();
-    bool inv = onode->output_fanin_inv();
-    SizeType node_id;
+    auto src_onode = sbjgraph.output(i);
+    auto src_node = src_onode->output_fanin();
+    bool inv = src_onode->output_fanin_inv();
+    BnNode dst_node;
     SizeType depth;
-    if ( node ) {
-      node_id = gen_back_trace(node, inv, record, mapgraph);
-      depth = mNodeInfo[node->id()].depth(inv);
+    if ( src_node ) {
+      dst_node = gen_back_trace(src_node, inv, record, mapgraph);
+      depth = mNodeInfo[src_node->id()].depth(inv);
       if ( max_depth < depth ) {
 	max_depth = depth;
       }
@@ -240,52 +235,41 @@ MapGen::generate(
     else {
       // 定数の場合
       if ( inv ) {
-	if ( mConst1 == BNET_NULLID ) {
-	  TvFunc tv = TvFunc::make_one(0);
+	if ( mConst1.is_invalid() ) {
+	  auto tv = TvFunc::make_one(0);
 	  mConst1 = mapgraph.new_logic_tv({}, tv, {});
-	  mConst1 = node_id;
 
 	  ++ mLutNum;
 
 #if LUTMAP_DEBUG_MAPGEN
-	  cout << onode->id_str() << endl;
+	  cout << src_onode->id_str() << endl;
 #endif
 	}
-	node_id = mConst1;
+	dst_node = mConst1;
       }
       else {
-	if ( mConst0 == BNET_NULLID ) {
-	  TvFunc tv = TvFunc::make_zero(0);
+	if ( mConst0.is_invalid() ) {
+	  auto tv = TvFunc::make_zero(0);
 	  mConst0 = mapgraph.new_logic_tv({}, tv, {});
 
 	  ++ mLutNum;
 
 #if LUTMAP_DEBUG_MAPGEN
-	  cout << onode->id_str() << endl;
+	  cout << src_onode->id_str() << endl;
 #endif
 	}
-	node_id = mConst0;
+	dst_node = mConst0;
       }
       depth = 0;
     }
-    SizeType onode_id = mNodeInfo[onode->id()].map_node();
-    mapgraph.set_output_src(onode_id, node_id);
+    auto dst_onode = mNodeInfo[src_onode->id()].map_node();
+    mapgraph.set_output_src(dst_onode, dst_node);
     // depth の設定のため
-    mNodeInfo[onode->id()].set_map(onode_id, depth);
+    mNodeInfo[src_onode->id()].set_map(dst_onode, depth);
   }
 
   lut_num = mLutNum;
   depth = max_depth;
-
-  // ファンアウトポイントを記録する．
-  SizeType nl = sbjgraph.logic_num();
-  for ( SizeType i = 0; i < nl; ++ i ) {
-    auto node = sbjgraph.logic(i);
-    auto& node_info = mNodeInfo[node->id()];
-    if ( node_info.ref_count(false) > 1 || node_info.ref_count(true) > 1 ) {
-      mFanoutPointList.push_back(node);
-    }
-  }
 
 #if LUTMAP_DEBUG_MAPGEN
   cout << "MapGen::generate() end" << endl;
@@ -295,32 +279,32 @@ MapGen::generate(
 }
 
 // @brief 最終結果を作るためのバックトレースを行う．
-SizeType
+BnNode
 MapGen::gen_back_trace(
-  const SbjNode* node,
+  const SbjNode* src_node,
   bool output_inv,
   const MapRecord& record,
   BnModifier& mapnetwork
 )
 {
 #if LUTMAP_DEBUG_MAPGEN
-  cout << "back_trace(" << node->id_str() << ", " << output_inv << ")" << endl;
+  cout << "back_trace(" << src_node->id_str() << ", " << output_inv << ")" << endl;
 #endif
-  auto& node_info = mNodeInfo[node->id()];
+  auto& node_info = mNodeInfo[src_node->id()];
 
-  SizeType node_id = node_info.map_node(output_inv);
-  if ( node_id != BNET_NULLID ) {
+  auto dst_node = node_info.map_node(output_inv);
+  if ( dst_node.is_valid() ) {
     // すでに生成済みならそのノードを返す．
-    return node_id;
+    return dst_node;
   }
 
   // 外部入力はどちらの極性でも生成済み
-  ASSERT_COND( !node->is_input() );
+  ASSERT_COND( !src_node->is_input() );
 
   // node を根とするカットを取り出す．
-  auto cut = record.get_cut(node);
+  auto cut = record.get_cut(src_node);
   if ( cut == nullptr ) {
-    cout << "Error!: " << node->id_str()
+    cout << "Error!: " << src_node->id_str()
 	 << " has no cuts" << endl;
     ASSERT_NOT_REACHED;
   }
@@ -344,187 +328,36 @@ MapGen::gen_back_trace(
   }
   ++ depth;
 
-  // ファンインの極性とファンインのノード番号のリストを作る．
+  // ファンインの極性とファンインのノードのリストを作る．
   // 上のループで input_inv の設定を行うこともできるがそうすると
   // gen_back_trace() の再帰のたびにスタック上に input_inv が作られる
   // ことになるのであえてここで行う．
   vector<bool> input_inv(ni, false);
-  vector<SizeType> fanin_id_list(ni);
+  vector<BnNode> fanin_list(ni);
   for ( SizeType i = 0; i < ni; ++ i ) {
-    auto inode = cut->input(i);
-    auto& inode_info = mNodeInfo[inode->id()];
+    auto src_inode = cut->input(i);
+    auto& inode_info = mNodeInfo[src_inode->id()];
     bool iinv = inode_info.inv_req();
     input_inv[i] = iinv;
-    fanin_id_list[i] = inode_info.map_node(iinv);
+    fanin_list[i] = inode_info.map_node(iinv);
   }
 
   // カットの実現している関数の真理値表を得る．
   auto tv = cut->make_tv(output_inv, input_inv);
 
   // 新しいノードを作る．
-  node_id = mapnetwork.new_logic_tv({}, tv, fanin_id_list);
+  dst_node = mapnetwork.new_logic_tv({}, tv, fanin_list);
 
   ++ mLutNum;
 
   // マップ結果をセットする．
-  node_info.set_map(node_id, depth, output_inv);
+  node_info.set_map(dst_node, depth, output_inv);
 
 #if LUTMAP_DEBUG_MAPGEN
-  cout << node->id_str() << " => " << node_id << ": " << depth << endl;
+  cout << src_node->id_str() << " => " << dst_node.id() << ": " << depth << endl;
 #endif
 
-  return node_id;
-}
-
-// @brief マッピング結果から見積もりを行う．
-void
-MapGen::estimate(
-  const SbjGraph& sbjgraph,
-  const MapRecord& record,
-  SizeType& lut_num,
-  SizeType& depth
-)
-{
-#if LUTMAP_DEBUG_MAPEST
-  cout << "MapGen::estimate() start" << endl;
-#endif
-
-  init(sbjgraph.node_num());
-
-  SizeType ni = sbjgraph.input_num();
-  SizeType no = sbjgraph.output_num();
-
-  // 外部出力から要求されている極性を記録する．
-  for ( SizeType i = 0; i < no; ++ i ) {
-    auto onode = sbjgraph.output(i);
-    auto node = onode->output_fanin();
-    if ( node ) {
-      mNodeInfo[node->id()].inc_ref(onode->output_fanin_inv());
-    }
-  }
-
-  // 外部入力の生成
-  for ( SizeType i = 0; i < ni; ++ i ) {
-    auto node = sbjgraph.input(i);
-    auto& node_info = mNodeInfo[node->id()];
-    node_info.set_map(1, 0);
-    if ( node_info.inv_req() ) {
-      ++ mLutNum;
-
-#if LUTMAP_DEBUG_MAPEST
-      cout << node->id_str() << "[1]" << endl;
-#endif
-      node_info.set_map(1, 1, true);
-    }
-  }
-
-  // 外部出力からバックトレースを行い全ノードの生成を行う．
-  lut_num = 0;
-  SizeType max_depth = 0;
-  for ( SizeType i = 0; i < no; ++ i ) {
-    auto onode = sbjgraph.output(i);
-    auto node = onode->output_fanin();
-    bool inv = onode->output_fanin_inv();
-    if ( node ) {
-      est_back_trace(node, inv, record);
-      SizeType depth = mNodeInfo[node->id()].depth(inv);
-      if ( max_depth < depth ) {
-	max_depth = depth;
-      }
-    }
-    else {
-      if ( inv ) {
-	if ( mConst1 == BNET_NULLID ) {
-	  mConst1 = 1;
-
-	  ++ mLutNum;
-
-#if LUTMAP_DEBUG_MAPEST
-	  cout << "constant-1" << endl;
-#endif
-	}
-      }
-      else {
-	if ( mConst0 == BNET_NULLID ) {
-	  mConst0 = 1;
-
-	  ++ mLutNum;
-
-#if LUTMAP_DEBUG_MAPEST
-	  cout << "constant-0" << endl;
-#endif
-	}
-      }
-    }
-  }
-
-  lut_num = mLutNum;
-  depth = max_depth;
-
-  // ファンアウトポイントを記録する．
-  SizeType nl = sbjgraph.logic_num();
-  for ( SizeType i = 0; i < nl; ++ i ) {
-    auto node = sbjgraph.logic(i);
-    auto& node_info = mNodeInfo[node->id()];
-    if ( node_info.ref_count(false) > 1 || node_info.ref_count(true) > 1 ) {
-      mFanoutPointList.push_back(node);
-    }
-  }
-
-#if LUTMAP_DEBUG_MAPEST
-  cout << "MapGen::estimate() end" << endl;
-#endif
-}
-
-// @brief 最終結果を作るためのバックトレースを行う．
-void
-MapGen::est_back_trace(
-  const SbjNode* node,
-  bool inv,
-  const MapRecord& record
-)
-{
-#if LUTMAP_DEBUG_MAPGEN
-  cout << "back_trace(" << node->id_str() << ", " << inv << ")" << endl;
-#endif
-
-  auto& node_info = mNodeInfo[node->id()];
-
-  SizeType node_id = node_info.map_node(inv);
-  if ( node_id != BNET_NULLID ) {
-    return;
-  }
-
-  // 外部入力はどちらの極性でも生成済み
-  ASSERT_COND( !node->is_input() );
-
-  // node を根とするカットを取り出す．
-  auto cut = record.get_cut(node);
-
-  ++ mLutNum;
-
-#if LUTMAP_DEBUG_MAPGEN
-  cout << node->id_str() << "[" << inv << "]" << endl;
-#endif
-
-  // その入力に対応するノードを再帰的に生成する．
-  SizeType ni = cut->input_num();
-  SizeType depth = 0;
-  for ( SizeType i = 0; i < ni; ++ i ) {
-    auto inode = cut->input(i);
-    auto& inode_info = mNodeInfo[inode->id()];
-    bool iinv = inode_info.inv_req();
-
-    inode_info.inc_ref(iinv);
-    est_back_trace(inode, iinv, record);
-
-    SizeType depth1 = inode_info.depth(iinv);
-    if ( depth < depth1 ) {
-      depth = depth1;
-    }
-  }
-
-  node_info.set_map(1, depth, inv);
+  return dst_node;
 }
 
 END_NAMESPACE_LUTMAP

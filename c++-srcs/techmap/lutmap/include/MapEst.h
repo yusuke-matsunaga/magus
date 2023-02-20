@@ -1,8 +1,8 @@
-#ifndef MAPGEN_H
-#define MAPGEN_H
+#ifndef MAPEST_H
+#define MAPEST_H
 
-/// @file MapGen.h
-/// @brief MapGen のヘッダファイル
+/// @file MapEst.h
+/// @brief MapEst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
 /// Copyright (C) 2016, 2018, 2022 Yusuke Matsunaga
@@ -17,18 +17,18 @@ BEGIN_NAMESPACE_LUTMAP
 class MapRecord;
 
 //////////////////////////////////////////////////////////////////////
-/// @class MapGen MapGen.h "MapGen.h"
-/// @brief マッピング結果を BnNetwork にセットするクラス
+/// @class MapEst MapEst.h "MapEst.h"
+/// @brief マッピング結果を見積もるためのクラス
 //////////////////////////////////////////////////////////////////////
-class MapGen
+class MapEst
 {
 public:
 
   /// @brief コンストラクタ
-  MapGen() = default;
+  MapEst() = default;
 
   /// @brief デストラクタ
-  ~MapGen() = default;
+  ~MapEst() = default;
 
 
 public:
@@ -36,14 +36,21 @@ public:
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief マッピング結果を BnNetwork に変換する．
-  BnNetwork
-  generate(
+  /// @brief マッピング結果から見積もりを行う．
+  void
+  estimate(
     const SbjGraph& sbjgraph, ///< [in] サブジェクトグラフ
     const MapRecord& record,  ///< [in] マッピング結果
     SizeType& lut_num,        ///< [out] LUT数
     SizeType& depth           ///< [out] 最大段数
   );
+
+  /// @brief 直前の estimate() の結果ファンアウトポイントになったノードのリストを得る．
+  const vector<const SbjNode*>&
+  fanoutpoint_list() const
+  {
+    return mFanoutPointList;
+  }
 
 
 private:
@@ -69,13 +76,12 @@ private:
     /// @brief マップ結果を設定する．
     void
     set_map(
-      BnNode node,     ///< [in] ノード
       SizeType depth,  ///< [in] 段数
       bool inv = false ///< [in] 反転フラグ
     )
     {
       int idx = inv ? 1 : 0;
-      mMapNode[idx] = node;
+      mMapNode[idx] = true;
       mDepth[idx] = depth;
     }
 
@@ -97,8 +103,8 @@ private:
     }
 
     /// @brief マップ結果を返す．
-    BnNode
-    map_node(
+    bool
+    is_mapped(
       bool inv = false ///< [in] 反転フラグ
     ) const
     {
@@ -126,9 +132,9 @@ private:
     // 正極性と負極性の2通りを保持する．
     SizeType mRefCount[2]{0, 0};
 
-    // マップ結果のノード
+    // マッピングされているかを示すフラグ
     // 正極性と負極性の2通りを保持する．
-    BnNode mMapNode[2]{{}, {}};
+    bitset<2> mMapNode{0};
 
     // 段数
     // 正極性と負極性の2通りを保持する．
@@ -148,14 +154,12 @@ private:
     SizeType node_num ///< [in] ノード数
   );
 
-  /// @brief generate 用のバックトレースを行う．
-  /// @return (node, inv) を実現するノードを返す．
-  BnNode
-  gen_back_trace(
-    const SbjNode* node,     ///< [in] 対象のノード
-    bool inv,                ///< [in] 極性を表すフラグ．inv = true の時，反転を表す．
-    const MapRecord& record, ///< [in] マッピング結果
-    BnModifier& mapnetwork   ///< [in] マッピング結果のネットワーク
+  /// @brief estimate 用のバックトレースを行う．
+  void
+  est_back_trace(
+    const SbjNode* node,    ///< [in] 対象のノード
+    bool inv,               ///< [in] 極性を表すフラグ．inv = true の時，反転を表す．
+    const MapRecord& record ///< [in] マッピング結果
   );
 
 
@@ -167,17 +171,20 @@ private:
   // ノードごとの情報を持つ配列
   vector<NodeInfo> mNodeInfo;
 
-  // 定数0のノード
-  BnNode mConst0;
+  // 定数0のノードが生成されているとき true
+  bool mConst0{false};
 
-  // 定数1のノード
-  BnNode mConst1;
+  // 定数1のノードが生成されているとき true
+  bool mConst1{false};
 
   // LUT数の見積もりに使う作業領域
   SizeType mLutNum;
+
+  // ファンアウトポイントのリスト
+  vector<const SbjNode*> mFanoutPointList;
 
 };
 
 END_NAMESPACE_LUTMAP
 
-#endif // MAPGEN_H
+#endif // MAPEST_H

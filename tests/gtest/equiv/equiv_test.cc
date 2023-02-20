@@ -97,31 +97,27 @@ TEST(EquivTest, EquivTest3)
   // network1 の入力ノードの名前のハッシュ表を作る．
   unordered_map<string, SizeType> input_map;
   for ( SizeType pos: Range(ni) ) {
-    SizeType id1 = network1.input_id(pos);
-    auto& node = network1.node(id1);
+    auto node = network1.input_node(pos);
     input_map.emplace(node.name(), pos);
   }
 
   // network1 の出力ノードの名前のハッシュ表を作る．
   unordered_map<string, SizeType> output_map;
   for ( SizeType pos: Range(no) ) {
-    SizeType id1 = network1.output_id(pos);
-    auto& node = network1.node(id1);
+    auto node = network1.output_node(pos);
     output_map.emplace(node.name(), pos);
   }
 
   vector<SizeType> input2_list(ni);
   for ( SizeType pos2: Range(ni) ) {
-    SizeType id2 = network2.input_id(pos2);
-    auto& node2 = network2.node(id2);
+    auto node2 = network2.input_node(pos2);
     SizeType pos1 = input_map.at(node2.name());
     input2_list[pos2] = pos1;
   }
 
   vector<SizeType> output2_list(no);
   for ( SizeType pos2: Range(no) ) {
-    SizeType id2 = network2.output_id(pos2);
-    auto& node2 = network2.node(id2);
+    auto node2 = network2.output_node(pos2);
     SizeType pos1 = output_map.at(node2.name());
     output2_list[pos2] = pos1;
   }
