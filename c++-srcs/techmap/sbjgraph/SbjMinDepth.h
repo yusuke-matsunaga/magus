@@ -42,7 +42,7 @@ public:
   /// @return 出力の最大深さを返す．
   SizeType
   operator()(
-    SizeType k,              ///< [in] LUT の最大入力数
+    SizeType k,                   ///< [in] LUT の最大入力数
     vector<SizeType>& depth_array ///< [out] 各ノードの深さを収める配列
   );
 

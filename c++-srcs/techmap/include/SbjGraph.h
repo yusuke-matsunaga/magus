@@ -251,7 +251,8 @@ public:
   }
 
   /// @brief 段数を求める．
-  /// @note 副作用として各 SbjNode のレベルが設定される．
+  ///
+  /// 副作用として各 SbjNode のレベルが設定される．
   SizeType
   level() const
   {
@@ -259,13 +260,11 @@ public:
   }
 
   /// @brief 各ノードの minimum depth を求める．
-  /// @param[in] k LUT の最大入力数
-  /// @param[out] depth_array 各ノードの深さを収める配列
   /// @return 出力の最大深さを返す．
   SizeType
   get_min_depth(
-    SizeType k,
-    vector<SizeType>& depth_array
+    SizeType k,                   ///< [in] LUT の最大入力数
+    vector<SizeType>& depth_array ///< [out] 各ノードの深さを収める配列
   ) const;
 
   /// @}

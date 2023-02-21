@@ -26,10 +26,10 @@ class LbCalc
 public:
 
   /// @brief コンストラクタ
-  LbCalc();
+  LbCalc() = default;
 
   /// @brief デストラクタ
-  ~LbCalc();
+  ~LbCalc() = default;
 
 
 public:
@@ -51,10 +51,9 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief カットのカバーしているノードを求める．
-  void
+  vector<const SbjNode*>
   get_node_list(
-    const Cut* cut,
-    vector<const SbjNode*>& node_list
+    const Cut* cut
   );
 
 

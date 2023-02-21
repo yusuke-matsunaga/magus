@@ -5,9 +5,8 @@
 /// @brief DgNode のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2023 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 
@@ -21,13 +20,14 @@ BEGIN_NAMESPACE_LUTMAP
 class DgNode
 {
   friend class DgGraph;
+
 private:
 
   /// @brief コンストラクタ
-  DgNode();
+  DgNode() = default;
 
   /// @brief デストラクタ
-  ~DgNode();
+  ~DgNode() = default;
 
 
 public:
@@ -36,26 +36,32 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を返す．
-  int
-  id() const;
+  SizeType
+  id() const
+  {
+    return mId;
+  }
 
   /// @brief 隣接リストを返す．
   const vector<DgNode*>&
-  adj_link() const;
+  adj_link() const
+  {
+    return mAdjLink;
+  }
 
   /// @brief アクティブフラグを返す．
   bool
-  is_active() const;
+  is_active() const
+  {
+    return mActive;
+  }
 
   /// @brief アクティブでなくす．
   void
-  inactivate();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
+  inactivate()
+  {
+    mActive = false;
+  }
 
 
 private:
@@ -64,64 +70,15 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  int mId;
+  SizeType mId;
 
   // 隣接ノードのリスト
   vector<DgNode*> mAdjLink;
 
   // アクティブフラグ
-  bool mActive;
+  bool mActive{true};
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief コンストラクタ
-inline
-DgNode::DgNode()
-{
-}
-
-// @brief デストラクタ
-inline
-DgNode::~DgNode()
-{
-}
-
-// @brief ID番号を返す．
-inline
-int
-DgNode::id() const
-{
-  return mId;
-}
-
-// @brief 隣接リストを返す．
-inline
-const vector<DgNode*>&
-DgNode::adj_link() const
-{
-  return mAdjLink;
-}
-
-// @brief アクティブフラグを返す．
-inline
-bool
-DgNode::is_active() const
-{
-  return mActive;
-}
-
-// @brief アクティブでなくす．
-inline
-void
-DgNode::inactivate()
-{
-  mActive = false;
-}
 
 END_NAMESPACE_LUTMAP
 

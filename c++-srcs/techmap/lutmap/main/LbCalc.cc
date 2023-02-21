@@ -21,16 +21,6 @@ BEGIN_NAMESPACE_LUTMAP
 // クラス LbCalc
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-LbCalc::LbCalc()
-{
-}
-
-// @brief デストラクタ
-LbCalc::~LbCalc()
-{
-}
-
 // @breif 下界の計算をする．
 SizeType
 LbCalc::lower_bound(
@@ -44,10 +34,10 @@ LbCalc::lower_bound(
   mMark.clear();
   mMark.resize(node_num, false);
 
-  DgGraph dg(node_num);
+  DgGraph dg{node_num};
 
-  vector<int> max_value(node_num, 0);
-  for ( int i = 0; i < node_num; ++ i ) {
+  vector<SizeType> max_value(node_num, 0);
+  for ( SizeType i = 0; i < node_num; ++ i ) {
     auto node = sbjgraph.node(i);
     if ( !node->is_logic() ) {
       auto dgnode = dg.node(node->id());
@@ -56,8 +46,7 @@ LbCalc::lower_bound(
 
     for ( auto cut: cut_holder.cut_list(node) ) {
       // カットがカバーしているノードを求める．
-      vector<const SbjNode*> node_list;
-      get_node_list(cut, node_list);
+      auto node_list = get_node_list(cut);
       SizeType n = node_list.size();
       // ノード数をこのカットの価値とする．
       for ( auto node1: node_list ) {
@@ -68,9 +57,9 @@ LbCalc::lower_bound(
       }
 
       // このカットでカバーされているノード対を隣接リストに入れる．
-      for ( int j1 = 0; j1 < n - 1; ++ j1 ) {
+      for ( SizeType j1 = 0; j1 < n - 1; ++ j1 ) {
 	SizeType id1 = node_list[j1]->id();
-	for ( int j2 = j1 + 1; j2 < n; ++ j2 ) {
+	for ( SizeType j2 = j1 + 1; j2 < n; ++ j2 ) {
 	  SizeType id2 = node_list[j2]->id();
 	  dg.connect(id1, id2);
 	}
@@ -80,8 +69,8 @@ LbCalc::lower_bound(
 
   // 各ノードの最大値の逆数が下界となる．
   double d_lb1 = 0.0;
-  for ( int i = 0; i < node_num; ++ i ) {
-    int n = max_value[i];
+  for ( SizeType i = 0; i < node_num; ++ i ) {
+    SizeType n = max_value[i];
     if ( n == 0 ) {
       continue;
     }
@@ -98,24 +87,23 @@ LbCalc::lower_bound(
 }
 
 // @brief カットのカバーしているノードを求める．
-void
+vector<const SbjNode*>
 LbCalc::get_node_list(
-  const Cut* cut,
-  vector<const SbjNode*>& node_list
+  const Cut* cut
 )
 {
-  node_list.clear();
+  vector<const SbjNode*> node_list;
   auto root = cut->root();
   node_list.push_back(root);
   mMark[root->id()] = true;
 
   // inputs[] のノードに印をつけておく．
   SizeType ni = cut->input_num();
-  for ( int i = 0; i < ni; ++ i ) {
+  for ( SizeType i = 0; i < ni; ++ i ) {
     auto node = cut->input(i);
     mMark[node->id()] = true;
   }
-  for ( int rpos = 0; rpos < node_list.size(); ++ rpos ) {
+  for ( SizeType rpos = 0; rpos < node_list.size(); ++ rpos ) {
     auto node = node_list[rpos];
     ASSERT_COND( node->is_logic() );
 
@@ -136,10 +124,12 @@ LbCalc::get_node_list(
   for ( auto node: node_list ) {
     mMark[node->id()] = false;
   }
-  for ( int i = 0; i < ni; ++ i ) {
+  for ( SizeType i = 0; i < ni; ++ i ) {
     auto node = cut->input(i);
     mMark[node->id()] = false;
   }
+
+  return node_list;
 }
 
 END_NAMESPACE_LUTMAP

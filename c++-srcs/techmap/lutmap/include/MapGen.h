@@ -10,6 +10,8 @@
 
 #include "lutmap.h"
 #include "sbj_nsdef.h"
+#include "ym/bnet.h"
+#include "ym/BnNode.h"
 
 
 BEGIN_NAMESPACE_LUTMAP

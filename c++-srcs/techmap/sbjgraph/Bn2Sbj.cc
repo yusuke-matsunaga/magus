@@ -60,8 +60,7 @@ Bn2Sbj::convert(
     for ( auto inode: bn_node.fanin_list() ) {
       ihandle_list.push_back(node_map[inode.id()]);
     }
-    auto logic_type = bn_node.type();
-    switch ( logic_type ) {
+    switch ( bn_node.type() ) {
     case BnNodeType::Prim:
       switch ( bn_node.primitive_type() ) {
       case PrimType::C0:
@@ -109,9 +108,10 @@ Bn2Sbj::convert(
 	break;
       }
       break;
+
     case BnNodeType::Expr:
       {
-	const Expr& expr = src_network.expr(bn_node.expr_id());
+	auto expr = bn_node.expr();
 	node_map[id] = dst_network.new_expr(expr, ihandle_list);
       }
       break;
@@ -134,8 +134,8 @@ Bn2Sbj::convert(
 
   // 外部出力ノードの生成
   for ( auto node: src_network.output_list() ) {
-    SbjHandle ihandle = node_map[node.output_src().id()];
-    SbjNode* sbj_node = dst_network.new_output(ihandle);
+    auto ihandle = node_map[node.output_src().id()];
+    auto sbj_node = dst_network.new_output(ihandle);
     node_map[node.id()] = SbjHandle(sbj_node);
   }
 
@@ -193,9 +193,9 @@ Bn2Sbj::convert(
     vector<SbjNode*> sbj_bits(bw);
     for ( int j: Range(bw) ) {
       SizeType id = bn_port.bit(j).id();
-      SbjHandle handle = node_map[id];
+      auto handle = node_map[id];
       ASSERT_COND( !handle.inv() );
-      SbjNode* sbj_node = handle.node();
+      auto sbj_node = handle.node();
       sbj_bits[j] = sbj_node;
     }
     dst_network.add_port(bn_port.name(), sbj_bits);

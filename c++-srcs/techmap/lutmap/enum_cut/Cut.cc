@@ -19,7 +19,7 @@ BEGIN_NONAMESPACE
 ymuint64
 eval_node(
   const SbjNode* node,
-  unordered_map<int, ymuint64>& valmap
+  unordered_map<SizeType, ymuint64>& valmap
 )
 {
   if ( node == nullptr ) {
@@ -72,9 +72,9 @@ eval_cut(
   SizeType ni = cut->input_num();
   ASSERT_COND( ni == vals.size() );
 
-  unordered_map<int, ymuint64> valmap;
-  for ( int i = 0; i < ni; ++ i ) {
-    const SbjNode* inode = cut->input(i);
+  unordered_map<SizeType, ymuint64> valmap;
+  for ( SizeType i = 0; i < ni; ++ i ) {
+    auto inode = cut->input(i);
     valmap.emplace(inode->id(), vals[i]);
   }
   return eval_node(cut->root(), valmap);
@@ -92,9 +92,9 @@ Cut::eval(
   ASSERT_COND( ni == vals.size() );
 
   // ノードの ID 番号をキーにして値を保持するハッシュ表
-  unordered_map<int, ymuint64> valmap;
+  unordered_map<SizeType, ymuint64> valmap;
   // 葉のノードの値を登録する．
-  for ( int i = 0; i < ni; ++ i ) {
+  for ( SizeType i = 0; i < ni; ++ i ) {
     valmap.emplace(input(i)->id(), vals[i]);
   }
 

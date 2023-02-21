@@ -25,8 +25,6 @@ BEGIN_NAMESPACE_MAGUS
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-// @param[in] lut_size LUTの入力数
-// @param[in] option オプション文字列
 LutmapMgr::LutmapMgr(
   SizeType lut_size,
   const string& option
@@ -43,7 +41,6 @@ LutmapMgr::~LutmapMgr()
 }
 
 // @brief 面積最小化 DAG covering のヒューリスティック関数
-// @param[in] src_network もとのネットワーク
 BnNetwork
 LutmapMgr::area_map(
   const BnNetwork& src_network
@@ -115,7 +112,6 @@ LutmapMgr::delay_map(
 }
 
 // @brief オプション文字列を設定する．
-// @param[in] option オプション文字列
 void
 LutmapMgr::set_option(
   const string& option

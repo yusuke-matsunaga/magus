@@ -5,9 +5,8 @@
 /// @brief DgGraph のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016, 2018 Yusuke Matsunaga
+/// Copyright (C) 2016, 2018, 2023 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "lutmap.h"
 
@@ -25,8 +24,9 @@ class DgGraph
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] node_num ノード数
-  DgGraph(int node_num);
+  DgGraph(
+    SizeType node_num ///< [in] ノード数
+  );
 
   /// @brief デストラクタ
   ~DgGraph();
@@ -38,29 +38,28 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノード数を得る．
-  int
-  node_num() const;
+  SizeType
+  node_num() const
+  {
+    return mNodeNum;
+  }
 
   /// @brief ノードを得る．
-  /// @param[in] pos 位置番号 ( 0 <= pos < node_num() )
   DgNode*
-  node(int pos);
+  node(
+    SizeType pos ///< [in] 位置番号 ( 0 <= pos < node_num() )
+  );
 
-  /// @brief 枝を張nる．
-  /// @param[in] id1, id2 両端のノード番号
+  /// @brief 枝を張る．
   void
-  connect(int id1,
-	  int id2);
+  connect(
+    SizeType id1, ///< [in] 片方のノード番号
+    SizeType id2  ///< [in] 他方のノード番号
+  );
 
   /// @brief maximal independent set のサイズを求める．
-  int
+  SizeType
   get_mis_size();
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
 
 
 private:
@@ -69,22 +68,18 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノード数
-  int mNodeNum;
+  SizeType mNodeNum;
 
   // ノードの(実体の)配列
+  // サイズは mNodeNum
   DgNode* mNodeArray;
 
-  unordered_map<int, int> mEdgeHash;
+  // 枝を表す辞書
+  // キーは id1 * mNodeNum + id2，値は
+  // node1->adj_list() 中の位置
+  unordered_map<SizeType, SizeType> mEdgeHash;
 
 };
-
-// @brief ノード数を得る．
-inline
-int
-DgGraph::node_num() const
-{
-  return mNodeNum;
-}
 
 END_NAMESPACE_LUTMAP
 
