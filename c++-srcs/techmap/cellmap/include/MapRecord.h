@@ -31,15 +31,25 @@ public:
   explicit
   MapRecord(
     const ClibCellLibrary& library ///< [in] セルライブラリ
-  );
+  ) : mCellLibrary{library}
+  {
+  }
+
 
   /// @brief コピーコンストラクタ
   MapRecord(
     const MapRecord& src ///< [in] コピー元のオブジェクト
-  );
+  ) : mCellLibrary{src.mCellLibrary},
+      mConst0Id{src.mConst0Id},
+      mConst1Id{src.mConst1Id},
+      mDffInfo{src.mDffInfo},
+      mLatchInfo{src.mLatchInfo},
+      mNodeInfo{src.mNodeInfo}
+  {
+  }
 
   /// @brief デストラクタ
-  ~MapRecord();
+  ~MapRecord() = default;
 
 
 public:
@@ -51,19 +61,33 @@ public:
   void
   init(
     const SbjGraph& sbjgraph ///< [in] サブジェクトグラフ
-  );
+  )
+  {
+    mDffInfo.clear();
+    mDffInfo.resize(sbjgraph.dff_num() * 2);
+    mLatchInfo.clear();
+    mLatchInfo.resize(sbjgraph.latch_num() * 2);
+    mNodeInfo.clear();
+    mNodeInfo.resize(sbjgraph.node_num() * 2);
+  }
 
   /// @brief 定数０セルのセル番号をセットする．
   void
   set_const0(
     SizeType cell_id ///< [in] セル番号
-  );
+  )
+  {
+    mConst0Id = cell_id;
+  }
 
   /// @brief 定数1セルをセットする．
   void
   set_const1(
     SizeType cell_id ///< [in] セル番号
-  );
+  )
+  {
+    mConst1Id = cell_id;
+  }
 
   /// @brief D-FF のマッチを記録する．
   void
@@ -71,7 +95,11 @@ public:
     const SbjDff* dff, ///< [in] D-FF
     bool inv,          ///< [in] 極性
     SizeType cell_id   ///< [in] セル番号
-  );
+  )
+  {
+    int offset = inv ? 1 : 0;
+    mDffInfo[dff->id() * 2 + offset] = cell_id;
+  }
 
   /// @brief ラッチのマッチを記録する．
   void
@@ -79,7 +107,11 @@ public:
     const SbjLatch* latch, ///< [in] ラッチ
     bool inv,              ///< [in] 極性
     SizeType cell_id       ///< [in] セル番号
-  );
+  )
+  {
+    int offset = inv ? 1 : 0;
+    mLatchInfo[latch->id() * 2 + offset] = cell_id;
+  }
 
   /// @brief 論理ゲートのマッチを記録する．
   void
@@ -88,7 +120,12 @@ public:
     bool inv,            ///< [in] 極性
     const Cut& match,    ///< [in] 対応するマッチ
     SizeType cell_id     ///< [in] セル番号
-  );
+  )
+  {
+    NodeInfo& node_info = _node_info(node, inv);
+    node_info.mMatch = match;
+    node_info.mCellId = cell_id;
+  }
 
   /// @brief インバータのマッチを記録する．
   void
@@ -96,7 +133,13 @@ public:
     const SbjNode* node, ///< [in] 該当のノード
     bool inv,            ///< [in] 極性
     SizeType cell_id     ///< [in] セル番号
-  );
+  )
+  {
+    NodeInfo& node_info = _node_info(node, inv);
+    node_info.mMatch.resize(1);
+    node_info.mMatch.set_leaf(0, node, !inv);
+    node_info.mCellId = cell_id;
+  }
 
   /// @brief セルライブラリを得る．
   const ClibCellLibrary&

@@ -45,9 +45,6 @@ AreaCover::~AreaCover()
 }
 
 // @brief 面積最小化マッピングを行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cell_mgr セルを管理するオブジェクト
-// @param[out] mapnetwork マッピング結果
 BnNetwork
 AreaCover::operator()(
   const SbjGraph& sbjgraph,
@@ -58,7 +55,7 @@ AreaCover::operator()(
     SbjDumper::dump(cout, sbjgraph);
   }
 
-  MapRecord maprec(cell_library);
+  MapRecord maprec{cell_library};
 
   maprec.init(sbjgraph);
 
@@ -87,9 +84,6 @@ AreaCover::operator()(
 }
 
 // @brief FF のマッピングを行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cell_mgr セルを管理するオブジェクト
-// @param[in] maprec マッピング結果を保持するオブジェクト
 void
 AreaCover::ff_map(
   const SbjGraph& sbjgraph,
@@ -167,9 +161,6 @@ AreaCover::ff_map(
 }
 
 // @brief best cut の記録を行う．
-// @param[in] sbjgraph サブジェクトグラフ
-// @param[in] cell_library セルを管理するオブジェクト
-// @param[out] maprec マッピング結果を記録するオブジェクト
 void
 AreaCover::record_cuts(
   const SbjGraph& sbjgraph,
@@ -317,9 +308,6 @@ AreaCover::record_cuts(
 }
 
 // @brief 逆極性の解にインバーターを付加した解を追加する．
-// @param[in] node 対象のノード
-// @param[in] inv 極性
-// @param[in] inv_func インバータの関数グループ
 void
 AreaCover::add_inv(
   const SbjNode* node,

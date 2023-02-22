@@ -23,7 +23,6 @@ set ( match_SOURCES
 
 set ( mapgen_SOURCES
   mapgen/MapGen.cc
-  mapgen/MapRecord.cc
   )
 
 
