@@ -13,7 +13,6 @@
 #include "SbjNode.h"
 #include "ym/BnNetwork.h"
 #include "ym/clib.h"
-#include "ym/ClibFFInfo.h"
 
 
 BEGIN_NAMESPACE_CELLMAP
@@ -102,8 +101,7 @@ private:
 
   struct FFInfo
   {
-    int mCellId{-1};
-    //ClibFFInfo mPinInfo;
+    SizeType mCellId{CLIB_NULLID};
   };
 
 

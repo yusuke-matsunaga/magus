@@ -12,9 +12,8 @@
 #include "SbjGraph.h"
 #include "Cut.h"
 #include "ym/clib.h"
+#include "ym/ClibCell.h"
 #include "ym/BnModifier.h"
-#include "ym/ClibFFInfo.h"
-#include "ym/ClibLatchInfo.h"
 
 
 BEGIN_NAMESPACE_CELLMAP
@@ -62,7 +61,7 @@ private:
     Cut mMatch;
 
     // セル
-    const ClibCell* mCell{nullptr};
+    ClibCell mCell;
 
     // マップ結果
     BnNode mMapNode;

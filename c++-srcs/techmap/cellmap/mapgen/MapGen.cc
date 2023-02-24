@@ -59,22 +59,22 @@ MapGen::generate(
   // D-FF の生成
   SizeType n_dff = sbjgraph.dff_num();
   for ( SizeType i = 0; i < n_dff; ++ i ) {
-    const SbjDff* sbj_dff = sbjgraph.dff(i);
+    auto sbj_dff = sbjgraph.dff(i);
     gen_dff(sbj_dff, record);
   }
 
   // ラッチの生成
   SizeType n_latch = sbjgraph.latch_num();
   for ( SizeType i = 0; i < n_latch; ++ i ) {
-    const SbjLatch* sbj_latch = sbjgraph.latch(i);
+    auto sbj_latch = sbjgraph.latch(i);
     gen_latch(sbj_latch);
   }
 
   // 組み合わせ回路の出力からバックトレースを行い全ノードの生成を行う．
   for ( const auto& rec: mMapReqList ) {
-    const SbjNode* onode = rec.mNode;
+    auto onode = rec.mNode;
     bool ext_inv = rec.mInv;
-    const SbjNode* src_node = onode->fanin(0);
+    auto src_node = onode->fanin(0);
     bool inv = onode->output_fanin_inv() ^ ext_inv;
     BnNode mapnode;
     if ( src_node ) {
@@ -84,13 +84,13 @@ MapGen::generate(
       if ( inv ) {
 	// 定数1ノードを作る．
 	auto const1_cell = record.const1_cell();
-	ASSERT_COND( const1_cell != CLIB_NULLID );
+	ASSERT_COND( const1_cell.is_valid() );
 	mapnode = new_logic_cell({}, const1_cell, {});
       }
       else {
 	// 定数0ノードを作る．
 	auto const0_cell = record.const0_cell();
-	ASSERT_COND( const0_cell != CLIB_NULLID );
+	ASSERT_COND( const0_cell.is_valid() );
 	mapnode = new_logic_cell({}, const0_cell, {});
       }
     }
@@ -139,23 +139,21 @@ MapGen::gen_dff(
   const MapRecord& record
 )
 {
-  int dff_cell0_id = record.get_dff_cell(sbj_dff, false);
-  int dff_cell1_id = record.get_dff_cell(sbj_dff, true);
-  SizeType cell_id = -1;
+  auto dff_cell0 = record.get_dff_cell(sbj_dff, false);
+  auto dff_cell1 = record.get_dff_cell(sbj_dff, true);
+  ClibCell dff_cell;
   bool inv = false;
-  if ( dff_cell0_id == -1 ) {
-    if ( dff_cell1_id == -1 ) {
+  if ( dff_cell0.is_invalid() ) {
+    if ( dff_cell1.is_invalid() ) {
       ASSERT_NOT_REACHED;
     }
-    cell_id = dff_cell1_id;
+    dff_cell = dff_cell1;
     inv = true;
   }
   else {
-    cell_id = dff_cell0_id;
+    dff_cell = dff_cell0;
   }
-  const ClibCell& cell = record.cell_library().cell(cell_id);
-  //ClibFFInfo ff_info = cell.ff_info();
-  auto dff = new_dff({}, cell_id);
+  auto dff = new_dff_cell({}, dff_cell);
 
   const SbjNode* sbj_output = sbj_dff->data_output();
   auto output1 = dff.data_out();
@@ -242,7 +240,7 @@ MapGen::back_trace(
 
   // node を根とするマッチを取り出す．
   const Cut& match = record.get_node_match(node, inv);
-  SizeType cell_id = record.get_node_cell(node, inv);
+  auto cell = record.get_node_cell(node, inv);
 
   // 新しいノードを作り mNodeMap に登録する．
   SizeType ni = match.leaf_num();
@@ -252,7 +250,7 @@ MapGen::back_trace(
     bool iinv = match.leaf_inv(i);
     fanin_list[i] = back_trace(src_inode, iinv, record);
   }
-  mapnode = new_logic_cell({}, cell_id, fanin_list);
+  mapnode = new_logic_cell({}, cell, fanin_list);
   node_info.mMapNode = mapnode;
 
   return mapnode;

@@ -5,16 +5,15 @@
 /// @brief MapRecord のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2023 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "cellmap_nsdef.h"
 #include "Cut.h"
 #include "SbjDff.h"
 #include "SbjLatch.h"
 #include "SbjNode.h"
-#include "ym/clib.h"
+#include "ym/ClibCellLibrary.h"
 
 
 BEGIN_NAMESPACE_CELLMAP
@@ -40,8 +39,8 @@ public:
   MapRecord(
     const MapRecord& src ///< [in] コピー元のオブジェクト
   ) : mCellLibrary{src.mCellLibrary},
-      mConst0Id{src.mConst0Id},
-      mConst1Id{src.mConst1Id},
+      mConst0{src.mConst0},
+      mConst1{src.mConst1},
       mDffInfo{src.mDffInfo},
       mLatchInfo{src.mLatchInfo},
       mNodeInfo{src.mNodeInfo}
@@ -77,16 +76,16 @@ public:
     SizeType cell_id ///< [in] セル番号
   )
   {
-    mConst0Id = cell_id;
+    mConst0 = cell_id;
   }
 
-  /// @brief 定数1セルをセットする．
+  /// @brief 定数1セルのセル番号をセットする．
   void
   set_const1(
     SizeType cell_id ///< [in] セル番号
   )
   {
-    mConst1Id = cell_id;
+    mConst1 = cell_id;
   }
 
   /// @brief D-FF のマッチを記録する．
@@ -124,7 +123,7 @@ public:
   {
     NodeInfo& node_info = _node_info(node, inv);
     node_info.mMatch = match;
-    node_info.mCellId = cell_id;
+    node_info.mCell = cell_id;
   }
 
   /// @brief インバータのマッチを記録する．
@@ -138,7 +137,7 @@ public:
     NodeInfo& node_info = _node_info(node, inv);
     node_info.mMatch.resize(1);
     node_info.mMatch.set_leaf(0, node, !inv);
-    node_info.mCellId = cell_id;
+    node_info.mCell = cell_id;
   }
 
   /// @brief セルライブラリを得る．
@@ -149,52 +148,52 @@ public:
   }
 
   /// @brief 定数０セルを返す．
-  SizeType
+  ClibCell
   const0_cell() const
   {
-    return mConst0Id;
+    return cell_library().cell(mConst0);
   }
 
   /// @brief 定数1セルを返す．
-  SizeType
+  ClibCell
   const1_cell() const
   {
-    return mConst1Id;
+    return cell_library().cell(mConst1);
   }
 
   /// @brief D-FF の割り当て情報を取り出す．
-  /// @return D-FFのセル番号を返す．
-  SizeType
+  /// @return D-FFのセルを返す．
+  ClibCell
   get_dff_cell(
     const SbjDff* dff, ///< [in] 対象の D-FF
     bool inv           ///< [in] 出力の極性
   ) const
   {
     int offset = inv ? 1 : 0;
-    return mDffInfo[dff->id() * 2 + offset];
+    return cell_library().cell(mDffInfo[dff->id() * 2 + offset]);
   }
 
   /// @brief ラッチの割り当て情報を取り出す．
-  /// @return ラッチのセル番号を返す．
-  SizeType
+  /// @return ラッチのセルを返す．
+  ClibCell
   get_latch_cell(
     const SbjLatch* latch, ///< [in] 対象のラッチ
     bool inv               ///< [in] 出力の極性
   ) const
   {
     int offset = inv ? 1 : 0;
-    return mDffInfo[latch->id() * 2 + offset];
+    return cell_library().cell(mDffInfo[latch->id() * 2 + offset]);
   }
 
   /// @brief node に対応するセルを返す．
-  /// @return セル番号を返す．
-  SizeType
+  /// @return セルを返す．
+  ClibCell
   get_node_cell(
     const SbjNode* node, ///< [in] 対象のノード
     bool inv             ///< [in] 極性
   ) const
   {
-    return _node_info(node, inv).mCellId;
+    return cell_library().cell(_node_info(node, inv).mCell);
   }
 
   /// @brief node に対応するマッチ(Cut)を返す．
@@ -221,7 +220,7 @@ private:
     Cut mMatch;
 
     // セル番号
-    SizeType mCellId{CLIB_NULLID};
+    SizeType mCell;
 
   };
 
@@ -262,19 +261,19 @@ private:
   // セルライブラリ
   const ClibCellLibrary& mCellLibrary;
 
-  // 定数０セルのセル番号
-  SizeType mConst0Id;
+  // 定数０セルのセル
+  SizeType mConst0{CLIB_NULLID};
 
-  // 定数1セルのセル番号
-  SizeType mConst1Id;
+  // 定数1セルのセル
+  SizeType mConst1{CLIB_NULLID};
 
   // D-FF の割り当て情報を格納した配列
   // キーは SbjDff の ID 番号 * 2 + (0/1)
-  vector<int> mDffInfo;
+  vector<SizeType> mDffInfo;
 
   // ラッチの割り当て情報を格納した配列
   // キーは SbjLatch の ID 番号 * 2 + (0/1)
-  vector<int> mLatchInfo;
+  vector<SizeType> mLatchInfo;
 
   // 各ノードの極性ごと作業領域を格納した配列
   // キーは SbjNode の ID 番号 * 2 + (0/1)
