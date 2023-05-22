@@ -420,7 +420,7 @@ void
 MCAnalysis::calc_steady_prob()
 {
   cout << "calculate steady state probability" << endl;
-  ymuint32 n = mReachableStates1.size();
+  std::uint32_t n = mReachableStates1.size();
   Matrix m(n, n + 1);
   for (ymuint i = 0; i < n; ++ i) {
     for (ymuint j = 0; j < n; ++ j) {
@@ -451,11 +451,11 @@ MCAnalysis::calc_steady_prob()
 void
 MCAnalysis::calc_error_prob(const vector<double>& error_rate)
 {
-  ymuint32 ff_num = error_rate.size();
-  ymuint32 state_num = mReachableStates1.size();
-  for (ymuint32 i = 0; i < state_num; ++ i) {
+  std::uint32_t ff_num = error_rate.size();
+  std::uint32_t state_num = mReachableStates1.size();
+  for (std::uint32_t i = 0; i < state_num; ++ i) {
     State correct_state = mReachableStates1[i];
-    for (ymuint32 j = 0; j < ff_num; ++ j) {
+    for (std::uint32_t j = 0; j < ff_num; ++ j) {
       State error_state = correct_state;
       // j ビット目を反転させる．
       if ( error_state[j] == '0' ) {

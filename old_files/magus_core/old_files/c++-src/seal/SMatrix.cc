@@ -50,8 +50,8 @@ SMatrix::SMatrix(const SMatrix& src) :
   mSize(src.mSize),
   mBody(new double[mSize * mSize])
 {
-  ymuint32 n = mSize * mSize;
-  for (ymuint32 i = 0; i < n; ++ i) {
+  std::uint32_t n = mSize * mSize;
+  for (std::uint32_t i = 0; i < n; ++ i) {
     mBody[i] = src.mBody[i];
   }
 }
@@ -61,13 +61,13 @@ const SMatrix&
 SMatrix::operator=(const SMatrix& src)
 {
   if ( &src != this ) {
-    ymuint32 n = src.mSize * src.mSize;
+    std::uint32_t n = src.mSize * src.mSize;
     if ( mSize != src.mSize ||
 	 mSize != src.mSize ) {
       delete [] mBody;
       mBody = new double[n];
     }
-    for (ymuint32 i = 0; i < n; ++ i) {
+    for (std::uint32_t i = 0; i < n; ++ i) {
       mBody[i] = src.mBody[i];
     }
   }
@@ -305,9 +305,9 @@ void
 display(ostream& s,
 	const SMatrix& m)
 {
-  ymuint32 nv = m.size();
+  std::uint32_t nv = m.size();
 
-  for (ymuint32 i = 0; i < nv; ++ i) {
+  for (std::uint32_t i = 0; i < nv; ++ i) {
     cout << setw(7) << i << ":";
     for (SmCell* cell = m.row_top(i); cell != m.row_end(i); cell = cell->right()) {
       cout << " " << setw(7) << cell->col_pos() << ", "

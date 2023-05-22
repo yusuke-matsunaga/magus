@@ -137,7 +137,7 @@ private:
   LnNode* mTo;
   
   // 入力位置
-  ymuint32 mIpos;
+  std::uint32_t mIpos;
 
   // ODC パタンベクタ
   PatVect mOdcPat;
@@ -343,16 +343,16 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // ID 番号
-  ymuint32 mId;
+  std::uint32_t mId;
 
   // 名前
   string mName;
 
   // タイプ (+ 入力／出力番号)
-  ymuint32 mFlags;
+  std::uint32_t mFlags;
 
   // 入力数
-  ymuint32 mNi;
+  std::uint32_t mNi;
   
   // ファンインの枝(そのもの)の配列
   LnEdge* mFanins;
@@ -367,10 +367,10 @@ private:
   vector<int> mTv;
   
   // 作業用のマーク
-  ymuint32 mMark;
+  std::uint32_t mMark;
   
   // レベル
-  ymuint32 mLevel;
+  std::uint32_t mLevel;
   
   // GF パタンベクタ
   PatVect mGfPat;
@@ -388,7 +388,7 @@ private:
   const int kPoShift = 5;
 
   static
-  const ymuint32 kPoMask = 1U << kPoShift;
+  const std::uint32_t kPoMask = 1U << kPoShift;
 
 };
 
@@ -681,7 +681,7 @@ private:
   
   // 最大レベル
   mutable
-  ymuint32 mLevel;
+  std::uint32_t mLevel;
 
   // mLevel および各 LnNode::mLevel が正しいとき true となるフラグ
   mutable

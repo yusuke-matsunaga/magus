@@ -12,7 +12,7 @@
 BEGIN_NAMESPACE_FRAIG
 
 // 本当は 1 は素数ではないがここの目的としては可
-ymuint64 FraigNode::mPrimes[] = {
+std::uint64_t FraigNode::mPrimes[] = {
     1,    2,    3,    5,    7,   11,   13,   17,   19,   23,
    29,   31,   37,   41,   43,   47,   53,   59,   61,   67,
    71,   73,   79,   83,   89,   97,  101,  103,  107,  109,
@@ -126,7 +126,7 @@ SizeType FraigNode::mPatUsed = 0;
 FraigNode::FraigNode(
   SizeType id,
   SizeType input_id,
-  const vector<ymuint64>& init_pat
+  const vector<std::uint64_t>& init_pat
 ) : mId{id}
 {
   resize_pat(mPatSize);
@@ -166,7 +166,7 @@ FraigNode::~FraigNode()
 // @brief パタンを追加する．
 void
 FraigNode::add_pat(
-  ymuint64 pat
+  std::uint64_t pat
 )
 {
   mPat[mPatUsed] = pat;
@@ -180,10 +180,10 @@ FraigNode::calc_pat(
   SizeType end
 )
 {
-  ymuint64* dst = mPat + start;
-  ymuint64* dst_end = mPat + end;
-  ymuint64* src1 = mFanins[0]->mPat + start;
-  ymuint64* src2 = mFanins[1]->mPat + start;
+  std::uint64_t* dst = mPat + start;
+  std::uint64_t* dst_end = mPat + end;
+  std::uint64_t* src1 = mFanins[0]->mPat + start;
+  std::uint64_t* src2 = mFanins[1]->mPat + start;
   if ( fanin0_inv() ) {
     if ( fanin1_inv() ) {
       for ( ; dst != dst_end; ++ dst, ++src1, ++src2) {
@@ -217,8 +217,8 @@ FraigNode::resize_pat(
   SizeType size
 )
 {
-  ymuint64* old_array = mPat;
-  mPat = new ymuint64[size];
+  std::uint64_t* old_array = mPat;
+  mPat = new std::uint64_t[size];
   if ( old_array != nullptr ) {
     for ( SizeType i = 0; i < mPatUsed; ++ i ) {
       mPat[i] = old_array[i];
@@ -241,13 +241,13 @@ FraigNode::calc_hash(
     }
   }
 
-  ymuint64* src = mPat + start;
-  ymuint64* src_end = mPat + end;
-  ymuint64* prime = mPrimes + start;
-  ymuint64* prime_end = mPrimes + 1023;
+  std::uint64_t* src = mPat + start;
+  std::uint64_t* src_end = mPat + end;
+  std::uint64_t* prime = mPrimes + start;
+  std::uint64_t* prime_end = mPrimes + 1023;
   if ( pat_hash_inv() ) {
     for ( ; src != src_end; ++ src) {
-      ymuint64 pat = *src;
+      std::uint64_t pat = *src;
       mHash ^= (pat * *prime);
       if ( pat != 0U ) {
 	set_1mark();
@@ -262,7 +262,7 @@ FraigNode::calc_hash(
   }
   else {
     for ( ; src != src_end; ++ src) {
-      ymuint64 pat = *src;
+      std::uint64_t pat = *src;
       mHash ^= (~pat * *prime);
       if ( pat != 0U ) {
 	set_1mark();

@@ -48,7 +48,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ただの配列
-  vector<ympuint> mArray;
+  vector<PtrIntType> mArray;
 
 };
 
@@ -64,7 +64,7 @@ BNodeMap::put(BNode* bnode,
 	      SbjNode* sbjnode,
 	      bool inv)
 {
-  mArray[bnode->id()] = reinterpret_cast<ympuint>(sbjnode) | (inv & 1);
+  mArray[bnode->id()] = reinterpret_cast<PtrIntType>(sbjnode) | (inv & 1);
 }
 
 // 探す．
@@ -73,7 +73,7 @@ BNodeMap::get(BNode* bnode,
 	      SbjNode*& sbjnode,
 	      bool& inv) const
 {
-  ympuint tmp = mArray[bnode->id()];
+  PtrIntType tmp = mArray[bnode->id()];
   sbjnode = reinterpret_cast<SbjNode*>(tmp & ~1UL);
   inv = static_cast<bool>(tmp & 1);
   return sbjnode != NULL;

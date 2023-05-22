@@ -121,7 +121,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // カットサイズ
-  ymuint32 mLimit;
+  std::uint32_t mLimit;
 
   // 各ノードのカットのリスト
   CutList* mCutList;
@@ -131,7 +131,7 @@ private:
 
   char* mCurChunk;
 
-  ymuint32 mLast;
+  std::uint32_t mLast;
 
   vector<char*> mChunk;
 

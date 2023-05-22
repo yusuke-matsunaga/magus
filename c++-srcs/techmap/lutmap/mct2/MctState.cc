@@ -22,7 +22,7 @@ BEGIN_NAMESPACE_LUTMAP_MCT2
 // @param[in] sbjgraph サブジェクトグラフ
 MctState::MctState(const SbjGraph& sbjgraph)
 {
-  for (ymuint i = 0; i < sbjgraph.output_num(); ++ i) {
+  for (int i = 0; i < sbjgraph.output_num(); ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
     mOutputList.push_back(node);
@@ -40,7 +40,7 @@ MctState::init()
 {
   mBoundaryList.clear();
 
-  for (ymuint i = 0; i < mOutputList.size(); ++ i) {
+  for (int i = 0; i < mOutputList.size(); ++ i) {
     const SbjNode* node = mOutputList[i];
     add_boundary(node);
   }

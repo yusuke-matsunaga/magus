@@ -34,7 +34,7 @@ public:
   /// @param[in] sbjgraph サブジェクトグラフ
   /// @param[in] cut_size カットサイズ
   MctState(const SbjGraph& sbjgraph,
-	   ymuint cut_size);
+	   SizeType cut_size);
 
   /// @brief デストラクタ
   ~MctState();
@@ -58,7 +58,7 @@ public:
   candidates() const;
 
   /// @brief カット候補の重みリストを得る．
-  const vector<ymuint>&
+  const vector<SizeType>&
   weight_list() const;
 
   /// @brief カットを追加して状態を更新する．
@@ -71,7 +71,7 @@ public:
   copy_to(MapRecord& maprecord);
 
   /// @brief LUT 数を得る．
-  ymuint
+  SizeType
   lut_num() const;
 
   /// @brief 全体の段数を得る．
@@ -200,7 +200,7 @@ private:
     vector<const SbjNode*> mCutInputs;
 
     // いくつかの情報をパックしたフィールド
-    ymuint mFlags;
+    SizeType mFlags;
 
     // 段数
     int mDepth;
@@ -216,10 +216,10 @@ private:
   const SbjGraph& mSbjGraph;
 
   // カットサイズ
-  ymuint mCutSize;
+  SizeType mCutSize;
 
   // ノード番号の最大値
-  ymuint mMaxNodeId;
+  SizeType mMaxNodeId;
 
   // 各ノードごと作業領域を格納した配列
   // サイズは mMaxNodeId
@@ -235,16 +235,16 @@ private:
   vector<const SbjNode*> mPoCandidateList;
 
   // カット候補の入力数のリスト
-  vector<ymuint> mCandNiList;
+  vector<SizeType> mCandNiList;
 
   // カットとして選ばれたノードのリスト
   vector<const SbjNode*> mSelectedList;
 
   // set_mark() でマークされたノード番号のリスト
-  vector<ymuint> mMarkedList;
+  vector<SizeType> mMarkedList;
 
   // 余分に必要となるNOTゲートの数
-  ymuint mInvNum;
+  SizeType mInvNum;
 
   // 回路全体のレベル
   int mDepth;
@@ -334,8 +334,8 @@ inline
 void
 MctState::clear_mark()
 {
-  for (ymuint i = 0; i < mMarkedList.size(); ++ i) {
-    ymuint id = mMarkedList[i];
+  for (int i = 0; i < mMarkedList.size(); ++ i) {
+    auto id = mMarkedList[i];
     mNodeInfo[id].mFlags &= ~(1U << 3);
   }
   mMarkedList.clear();

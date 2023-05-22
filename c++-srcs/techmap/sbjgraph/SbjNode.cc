@@ -23,8 +23,8 @@ SbjNode::SbjNode(
 ) : mId{id},
     mSubId{subid}
 {
-  mFlags = static_cast<ymuint>(SbjNodeType::Input) |
-    (static_cast<ymuint>(bipol) << kBiPolShift);
+  mFlags = static_cast<std::uint32_t>(SbjNodeType::Input) |
+    (static_cast<std::uint32_t>(bipol) << kBiPolShift);
 }
 
 // @brief コンストラクタ(出力)
@@ -35,11 +35,11 @@ SbjNode::SbjNode(
 ) : mId{id},
     mSubId{subid}
 {
-  mFlags = static_cast<ymuint>(SbjNodeType::Output);
+  mFlags = static_cast<std::uint32_t>(SbjNodeType::Output);
   mFanins[0] = input;
 
   auto inode = input.node();
-  mFlags |= static_cast<ymuint>(inode->level() << kLevelShift);
+  mFlags |= static_cast<std::uint32_t>(inode->level() << kLevelShift);
 
   inode->mFlags |= kPoMask;
   inode->mFanoutList.push_back(SbjEdge(this, 0));
@@ -54,7 +54,7 @@ SbjNode::SbjNode(
 ) : mId{id},
     mSubId{0}
 {
-  mFlags = static_cast<ymuint>(type);
+  mFlags = static_cast<std::uint32_t>(type);
   mFanins[0] = input0;
   mFanins[1] = input1;
 
@@ -70,7 +70,7 @@ SbjNode::SbjNode(
     level = inode1->level();
   }
   level += 1;
-  mFlags |= static_cast<ymuint>(level << kLevelShift);
+  mFlags |= static_cast<std::uint32_t>(level << kLevelShift);
 }
 
 // @brief ID を表す文字列の取得

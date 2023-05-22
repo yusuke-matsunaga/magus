@@ -63,7 +63,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID 番号
-  ymuint32 mId;
+  std::uint32_t mId;
   
   // 根のノード
   SbjNode* mRoot;
@@ -161,13 +161,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 次に生成されるカットの ID 番号
-  ymuint32 mCutId;
+  std::uint32_t mCutId;
 
   // すべてのカット
   // 各ノードごとにそのノードを根とするカットのリストを入れておく配列
   vector<list<ILPGenCut*> > mAllCut;
 
-  list<ymuint32> mVars;
+  list<std::uint32_t> mVars;
   
   list<string> mConstr;
 

@@ -69,13 +69,13 @@ private:
   vector<list<CrNode*> > mLevelQ;
 
   // mLevelQ に入っている全要素数
-  ymuint32 mNum;
+  std::uint32_t mNum;
 
   // 現在要素が入っている最小レベル
-  ymuint32 mMinLevel;
+  std::uint32_t mMinLevel;
 
   // 現在要素が入っている最大レベル
-  ymuint32 mMaxLevel;
+  std::uint32_t mMaxLevel;
 
 };
 

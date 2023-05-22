@@ -254,7 +254,7 @@ private:
 
   Page* mTopPage;
 
-  ymuint32 mNextPos;
+  std::uint32_t mNextPos;
 
   ADCost<AreaT>* mAvail;
 

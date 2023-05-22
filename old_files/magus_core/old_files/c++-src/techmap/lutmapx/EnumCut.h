@@ -249,7 +249,7 @@ private:
     vector<const BdnNode*> mCnodeList;
 
     // 種々のマーク
-    ymuint32 mMarks;
+    std::uint32_t mMarks;
 
   };
 
@@ -260,25 +260,25 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 入力数の最大値
-  ymuint32 mLimit;
+  std::uint32_t mLimit;
 
   // 全ノード数
-  ymuint32 mNall;
+  std::uint32_t mNall;
 
   // 現在処理中のノード番号
-  ymuint32 mCurPos;
+  std::uint32_t mCurPos;
 
   // 全 cut 数
-  ymuint32 mNcAll;
+  std::uint32_t mNcAll;
 
   // 現在処理中のノードの cut 数
-  ymuint32 mNcCur;
+  std::uint32_t mNcCur;
 
   // 根のノード
   const BdnNode* mRoot;
 
   // mFrontierStack のサイズ
-  ymuint32 mFsSize;
+  std::uint32_t mFsSize;
 
   // 最前線ノードのスタック
   const BdnNode** mFrontierStack;
@@ -290,13 +290,13 @@ private:
   const BdnNode** mInputs;
 
   // mInputs の次の書き込み位置
-  ymuint32 mInputPos;
+  std::uint32_t mInputPos;
 
   // 内部ノードのスタック
-  ymuint32* mInodeStack;
+  std::uint32_t* mInodeStack;
 
   // 内部ノードスタックのスタックポインタ
-  ymuint32* mIsPos;
+  std::uint32_t* mIsPos;
 
   // 各ノードごとの作業領域
   vector<NodeTemp> mNodeTemp;
@@ -305,7 +305,7 @@ private:
   vector<const BdnNode*> mMarkedNodes;
 
   // mMarkedNodes の末尾
-  ymuint32 mMarkedNodesLast;
+  std::uint32_t mMarkedNodesLast;
 
   // カットが列挙されたときに呼ばれるクラス
   EnumCutOp* mOp;

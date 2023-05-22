@@ -137,7 +137,7 @@ AreaCover::cost(
   bool inv
 )
 {
-  return mCostArray[node->id() * 2 + static_cast<ymuint>(inv)];
+  return mCostArray[node->id() * 2 + static_cast<SizeType>(inv)];
 }
 
 END_NAMESPACE_CELLMAP

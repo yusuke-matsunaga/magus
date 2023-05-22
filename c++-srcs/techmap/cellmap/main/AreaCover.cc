@@ -92,7 +92,7 @@ AreaCover::ff_map(
 )
 {
   // FFの割り当て情報を作る．
-  for (ymuint i = 0; i < 8; ++ i) {
+  for ( int i = 0; i < 8; ++ i) {
     FFInfo& ff_info = mFFInfo[i];
     bool master_slave = false;
     bool has_clear = false;
@@ -134,8 +134,8 @@ AreaCover::ff_map(
     auto preset = dff->preset();
     bool has_clear = false;
     bool has_preset = false;
-    ymuint sig = 0U;
-    ymuint xsig = 0U;
+    SizeType sig = 0U;
+    SizeType xsig = 0U;
     if ( clear->output_fanin() ) {
       has_clear = true;
       sig |= 1U;

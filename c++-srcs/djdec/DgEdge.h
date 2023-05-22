@@ -29,7 +29,7 @@ public:
   DgEdge(
     DgNode* node,    ///< [in] ノード
     bool inv = false ///< [in] 反転フラグ
-  ) : mBody{reinterpret_cast<ympuint>(node) | static_cast<ympuint>(inv)}
+  ) : mBody{reinterpret_cast<PtrIntType>(node) | static_cast<PtrIntType>(inv)}
   {
   }
 
@@ -159,7 +159,7 @@ public:
     bool inv ///< [in] 反転フラグ
   ) const
   {
-    return DgEdge{mBody ^ static_cast<ympuint>(inv)};
+    return DgEdge{mBody ^ static_cast<PtrIntType>(inv)};
   }
 
   /// @brief 反転フラグをかけて代入する．
@@ -168,7 +168,7 @@ public:
     bool inv ///< [in] 反転フラグ
   )
   {
-    mBody ^= static_cast<ympuint>(inv);
+    mBody ^= static_cast<PtrIntType>(inv);
     return *this;
   }
 
@@ -236,7 +236,7 @@ private:
 
   /// @brief 内容を指定したコンストラクタ
   DgEdge(
-    ympuint body
+    PtrIntType body
   ) : mBody{body}
   {
   }
@@ -248,7 +248,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 本体
-  ympuint mBody{0UL};
+  PtrIntType mBody{0UL};
 
 };
 

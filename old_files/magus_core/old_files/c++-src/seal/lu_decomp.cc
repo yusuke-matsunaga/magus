@@ -20,7 +20,7 @@ bool
 lu_decomp(const Matrix& src_matrix,
 	  vector<double>& solution)
 {
-  ymuint32 nv = src_matrix.row_size();
+  std::uint32_t nv = src_matrix.row_size();
 
   if ( nv + 1 != src_matrix.col_size() ) {
     // 1列は右辺の定数だとして変数と数と方程式の数は等しくなければならない．
@@ -30,7 +30,7 @@ lu_decomp(const Matrix& src_matrix,
 
 #if 0
   Matrix works(src_matrix);
-  vector<ymuint32> row_idx(nv);
+  vector<std::uint32_t> row_idx(nv);
 #endif
   vector<double> max_elem(nv);
   // max_elem の計算

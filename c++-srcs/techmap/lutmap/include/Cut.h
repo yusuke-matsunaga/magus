@@ -92,9 +92,9 @@ public:
   ///
   /// vals[i] が input(i) の葉の値に対応する．
   /// 値は64ビットのビットベクタで表す．
-  ymuint64
+  std::uint64_t
   eval(
-    const vector<ymuint64>& vals ///< [in] 葉のノードの値
+    const vector<std::uint64_t>& vals ///< [in] 葉のノードの値
   ) const;
 
   /// @brief 論理関数を表す真理値表を得る．

@@ -87,13 +87,13 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 外部入力数
-  ymuint32 mInputNum;
+  std::uint32_t mInputNum;
 
   // 外部出力数
-  ymuint32 mOutputNum;
+  std::uint32_t mOutputNum;
 
   // FF数
-  ymuint32 mFFNum;
+  std::uint32_t mFFNum;
 
 };
 

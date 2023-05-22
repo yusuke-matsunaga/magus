@@ -54,7 +54,7 @@ EnumCut::operator()(const BdnMgr& sbjgraph,
 
   mInputs = new const BdnNode*[limit];
 
-  mInodeStack = new ymuint32[sbjgraph.lnode_num()];
+  mInodeStack = new std::uint32_t[sbjgraph.lnode_num()];
   mIsPos = &mInodeStack[0];
 
   // 外部入力用の(ダミーの)クラスタを作る．

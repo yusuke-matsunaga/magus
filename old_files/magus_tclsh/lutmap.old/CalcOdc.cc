@@ -144,10 +144,10 @@ OdcNode::make_tree(const Expr& expr,
   }
   else if ( expr.is_and() ) {
     node->mType = kAnd;
-    ymuint32 nc = expr.child_num();
+    std::uint32_t nc = expr.child_num();
     node->mInputs.resize(nc, NULL);
     Bdd f = bddmgr.make_one();
-    for (ymuint32 i = 0; i < nc; ++ i) {
+    for (std::uint32_t i = 0; i < nc; ++ i) {
       OdcNode* inode = make_tree(expr.child(i), leaf_gf, bddmgr, alloc);
       node->mInputs[i] = inode;
       f &= inode->mGf;
@@ -156,10 +156,10 @@ OdcNode::make_tree(const Expr& expr,
   }
   else if ( expr.is_or() ) {
     node->mType = kOr;
-    ymuint32 nc = expr.child_num();
+    std::uint32_t nc = expr.child_num();
     node->mInputs.resize(nc, NULL);
     Bdd f = bddmgr.make_zero();
-    for (ymuint32 i = 0; i < nc; ++ i) {
+    for (std::uint32_t i = 0; i < nc; ++ i) {
       OdcNode* inode = make_tree(expr.child(i), leaf_gf, bddmgr, alloc);
       node->mInputs[i] = inode;
       f |= inode->mGf;
@@ -168,10 +168,10 @@ OdcNode::make_tree(const Expr& expr,
   }
   else if ( expr.is_xor() ) {
     node->mType = kXor;
-    ymuint32 nc = expr.child_num();
+    std::uint32_t nc = expr.child_num();
     node->mInputs.resize(nc, NULL);
     Bdd f = bddmgr.make_zero();
-    for (ymuint32 i = 0; i < nc; ++ i) {
+    for (std::uint32_t i = 0; i < nc; ++ i) {
       OdcNode* inode = make_tree(expr.child(i), leaf_gf, bddmgr, alloc);
       node->mInputs[i] = inode;
       f |= inode->mGf;
@@ -227,11 +227,11 @@ OdcNode::calc_odc(Bdd odc,
   case kAnd:
     { // 優先順位の高い他の入力が 0 を出している場合と
       // 自分が 1 で出力が 0 の場合が don't care となる．
-      ymuint32 n = mInputs.size();
-      for (ymuint32 i = 0; i < n; ++ i) {
+      std::uint32_t n = mInputs.size();
+      for (std::uint32_t i = 0; i < n; ++ i) {
 	OdcNode* inode = mInputs[i];
 	Bdd i_odc = odc;
-	for (ymuint32 j = 0; j < i; ++ j) {
+	for (std::uint32_t j = 0; j < i; ++ j) {
 	  i_odc |= ~mInputs[j]->mGf;
 	}
 	i_odc |= inode->mGf & ~mGf;
@@ -243,11 +243,11 @@ OdcNode::calc_odc(Bdd odc,
   case kOr:
     { // 優先順位の高い他の入力が 1 を出している場合と
       // 自分が 0 で出力が 1 の場合が don't care となる．
-      ymuint32 n = mInputs.size();
-      for (ymuint32 i = 0; i < n; ++ i) {
+      std::uint32_t n = mInputs.size();
+      for (std::uint32_t i = 0; i < n; ++ i) {
 	OdcNode* inode = mInputs[i];
 	Bdd i_odc = odc;
-	for (ymuint32 j = 0; j < i; ++ j) {
+	for (std::uint32_t j = 0; j < i; ++ j) {
 	  i_odc |= mInputs[j]->mGf;
 	}
 	i_odc |= ~inode->mGf & mGf;
@@ -258,8 +258,8 @@ OdcNode::calc_odc(Bdd odc,
 
   case kXor:
     { // XOR は don't care を生み出さない．
-      ymuint32 n = mInputs.size();
-      for (ymuint32 i = 0; i < n; ++ i) {
+      std::uint32_t n = mInputs.size();
+      for (std::uint32_t i = 0; i < n; ++ i) {
 	mInputs[i]->calc_odc(odc, leaf_odc);
       }
     }
@@ -273,8 +273,8 @@ check_odc_sub(BddMgrRef bddmgr,
 	      Bdd lf,
 	      const vector<Bdd>& leaf_gf,
 	      const vector<Bdd>& leaf_odc,
-	      ymuint32 pos,
-	      ymuint32 n)
+	      std::uint32_t pos,
+	      std::uint32_t n)
 {
   if ( pos == n ) {
     return lf.is_const();
@@ -285,7 +285,7 @@ check_odc_sub(BddMgrRef bddmgr,
       Bdd range0 = ~leaf_gf[pos] & ~leaf_odc[pos];
       vector<Bdd> leaf_gf0(n);
       vector<Bdd> leaf_odc0(n);
-      for (ymuint32 i = pos + 1; i < n; ++ i) {
+      for (std::uint32_t i = pos + 1; i < n; ++ i) {
 	leaf_gf0[i] = leaf_gf[i] & range0;
 	leaf_odc0[i] = leaf_odc[i] & range0;
       }
@@ -301,7 +301,7 @@ check_odc_sub(BddMgrRef bddmgr,
       Bdd range1 = leaf_gf[pos] & ~leaf_odc[pos];
       vector<Bdd> leaf_gf1(n);
       vector<Bdd> leaf_odc1(n);
-      for (ymuint32 i = pos + 1; i < n; ++ i) {
+      for (std::uint32_t i = pos + 1; i < n; ++ i) {
 	leaf_gf1[i] = leaf_gf[i] & range1;
 	leaf_odc1[i] = leaf_odc[i] & range1;
       }
@@ -317,7 +317,7 @@ check_odc_sub(BddMgrRef bddmgr,
       Bdd range2 = leaf_odc[pos];
       vector<Bdd> leaf_gf2(n);
       vector<Bdd> leaf_odc2(n);
-      for (ymuint32 i = pos + 1; i < n; ++ i) {
+      for (std::uint32_t i = pos + 1; i < n; ++ i) {
 	leaf_gf2[i] = leaf_gf[i] & range2;
 	leaf_odc2[i] = leaf_odc[i] & range2;
       }
@@ -338,10 +338,10 @@ check_odc(const Expr& expr,
 {
   BddMgrRef bddmgr = root_odc.mgr();
   Bdd lf = bddmgr.expr_to_bdd(expr);
-  ymuint32 n = leaf_gf.size();
+  std::uint32_t n = leaf_gf.size();
   vector<Bdd> leaf_gf1(n);
   vector<Bdd> leaf_odc1(n);
-  for (ymuint32 i = 0; i < n; ++ i) {
+  for (std::uint32_t i = 0; i < n; ++ i) {
     leaf_gf1[i] = leaf_gf[i] & ~root_odc;
     leaf_odc1[i] = leaf_odc[i] & ~root_odc;
   }
@@ -377,10 +377,10 @@ CalcOdc::operator()(const Expr& expr,
 		    const vector<Bdd>& leaf_gf,
 		    vector<Bdd>& leaf_odc)
 {
-  ymuint32 n_leaf = leaf_gf.size();
+  std::uint32_t n_leaf = leaf_gf.size();
   ASSERT_COND(n_leaf == leaf_odc.size() );
   BddMgrRef bddmgr = root_odc.mgr();
-  for (ymuint32 i = 0; i < n_leaf; ++ i) {
+  for (std::uint32_t i = 0; i < n_leaf; ++ i) {
     ASSERT_COND(bddmgr == leaf_gf[i].mgr() );
   }
   
@@ -388,7 +388,7 @@ CalcOdc::operator()(const Expr& expr,
   OdcNode* root_node = OdcNode::make_tree(expr, leaf_gf, bddmgr, mAlloc);
 
   // 各ノードの ODC を計算する．
-  for (ymuint32 i = 0; i < n_leaf; ++ i) {
+  for (std::uint32_t i = 0; i < n_leaf; ++ i) {
     leaf_odc[i] = root_odc;
   }
   root_node->calc_odc(root_odc, leaf_odc);

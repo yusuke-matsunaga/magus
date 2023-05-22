@@ -21,7 +21,7 @@ bool
 gaussian_elimination(const Matrix& src_matrix,
 		     vector<double>& solution)
 {
-  ymuint32 nv = src_matrix.row_size();
+  std::uint32_t nv = src_matrix.row_size();
 
   if ( nv + 1 != src_matrix.col_size() ) {
     // 1列は右辺の定数だとして変数と数と方程式の数は等しくなければならない．
@@ -30,7 +30,7 @@ gaussian_elimination(const Matrix& src_matrix,
   }
 
   Matrix works(src_matrix);
-  vector<ymuint32> row_idx(nv);
+  vector<std::uint32_t> row_idx(nv);
   vector<double> max_elem(nv);
   // max_elem の計算
   for (ymuint i = 0; i < nv; ++ i) {
@@ -74,7 +74,7 @@ gaussian_elimination(const Matrix& src_matrix,
 
     // i 番めと max_j 番めの行を入れ替える．
     if ( i != max_j ) {
-      ymuint32 tmp = row_idx[i];
+      std::uint32_t tmp = row_idx[i];
       row_idx[i] = row_idx[max_j];
       row_idx[max_j] = tmp;
     }
@@ -163,12 +163,12 @@ gaussian_elimination(const SMatrix& src_matrix,
 		     vector<double>& solution)
 {
   StopWatch watch;
-  ymuint32 nv = src_matrix.size();
+  std::uint32_t nv = src_matrix.size();
 
   watch.start();
   cout << "gaussian_elimination(" << nv << ")" << endl;
   SMatrix works(nv);
-  vector<ymuint32> row_idx(nv);
+  vector<std::uint32_t> row_idx(nv);
   vector<double> max_elem(nv);
   vector<bool> fixed(nv, false);
   for (ymuint i = 0; i < nv; ++ i) {

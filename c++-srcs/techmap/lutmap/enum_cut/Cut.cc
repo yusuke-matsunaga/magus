@@ -16,10 +16,10 @@ BEGIN_NONAMESPACE
 
 // valmap に終端のノード番号をキーとしてビットベクタ値を登録する．
 // その時の node の値を計算する．
-ymuint64
+std::uint64_t
 eval_node(
   const SbjNode* node,
-  unordered_map<SizeType, ymuint64>& valmap
+  unordered_map<SizeType, std::uint64_t>& valmap
 )
 {
   if ( node == nullptr ) {
@@ -28,18 +28,18 @@ eval_node(
 
   // まずすでに評価済みかどうか調べる．
   // 葉のノードの場合もここに登録されている．
-  ymuint64 ans;
+  std::uint64_t ans;
   if ( valmap.count(node->id()) == 0 ) {
     // 未登録の場合は必ず論理ノード
     ASSERT_COND( node->is_logic() );
 
     // 子供の値を評価する．
-    ymuint64 val0 = eval_node(node->fanin(0), valmap);
+    std::uint64_t val0 = eval_node(node->fanin(0), valmap);
     if ( node->fanin_inv(0) ) {
       val0 ^= 0xFFFFFFFFFFFFFFFFULL;
     }
 
-    ymuint64 val1 = eval_node(node->fanin(1), valmap);
+    std::uint64_t val1 = eval_node(node->fanin(1), valmap);
     if ( node->fanin_inv(0) ) {
       val1 ^= 0xFFFFFFFFFFFFFFFFULL;
     }
@@ -63,16 +63,16 @@ eval_node(
 }
 
 // カットの表している論理関数を評価する．
-ymuint64
+std::uint64_t
 eval_cut(
   const Cut* cut,
-  const vector<ymuint64>& vals
+  const vector<std::uint64_t>& vals
 )
 {
   SizeType ni = cut->input_num();
   ASSERT_COND( ni == vals.size() );
 
-  unordered_map<SizeType, ymuint64> valmap;
+  unordered_map<SizeType, std::uint64_t> valmap;
   for ( SizeType i = 0; i < ni; ++ i ) {
     auto inode = cut->input(i);
     valmap.emplace(inode->id(), vals[i]);
@@ -83,16 +83,16 @@ eval_cut(
 END_NONAMESPACE
 
 // @brief 論理シミュレーションを行う．
-ymuint64
+std::uint64_t
 Cut::eval(
-  const vector<ymuint64>& vals
+  const vector<std::uint64_t>& vals
 ) const
 {
   SizeType ni = input_num();
   ASSERT_COND( ni == vals.size() );
 
   // ノードの ID 番号をキーにして値を保持するハッシュ表
-  unordered_map<SizeType, ymuint64> valmap;
+  unordered_map<SizeType, std::uint64_t> valmap;
   // 葉のノードの値を登録する．
   for ( SizeType i = 0; i < ni; ++ i ) {
     valmap.emplace(input(i)->id(), vals[i]);
@@ -130,14 +130,14 @@ Cut::make_tv(
 
   // 真理値表の各変数の値を表すビットベクタ
   // 6入力以上の場合には1語に収まらないので複数回にわけて処理する．
-  vector<ymuint64> vals(ni, 0ULL);
+  vector<std::uint64_t> vals(ni, 0ULL);
 
-  ymuint64 s = 1ULL;
+  std::uint64_t s = 1ULL;
   int p0 = 0;
   for ( int p = 0; p < np; ++ p ) {
     for ( int i = 0; i < ni; ++ i ) {
-      ymuint mask = 1U << i;
-      ymuint mask1 = iinv[i] ? 0U : mask;
+      std::uint64_t mask = 1U << i;
+      std::uint64_t mask1 = iinv[i] ? 0U : mask;
       if ( (p & mask) == mask1 ) {
 	vals[i] |= s;
       }
@@ -145,7 +145,7 @@ Cut::make_tv(
     s <<= 1;
     if ( s == 0ULL ) {
       // 64 パタン目
-      ymuint64 tmp = eval_cut(this, vals);
+      std::uint64_t tmp = eval_cut(this, vals);
       for ( int p1 = p0; p1 < p; ++ p1 ) {
 	if ( tmp & (1ULL << (p1 - p0)) ) {
 	  tv[p1] = v1;
@@ -163,7 +163,7 @@ Cut::make_tv(
   }
   if ( s != 1ULL ) {
     // 処理されていない残りがあった．
-    ymuint64 tmp = eval_cut(this, vals);
+    std::uint64_t tmp = eval_cut(this, vals);
     for ( int p1 = p0; p1 < np; ++ p1 ) {
       if ( tmp & (1ULL << (p1 - p0)) ) {
 	tv[p1] = v1;

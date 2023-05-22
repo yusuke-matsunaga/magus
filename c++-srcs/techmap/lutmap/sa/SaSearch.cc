@@ -48,7 +48,7 @@ SaSearch::SaSearch(
   mWidth = static_cast<double>(mUpperBound - mLowerBound);
 
   // ファンアウトポイントを求める．
-  for (ymuint i = 0; i < sbjgraph.logic_num(); ++ i) {
+  for ( int i = 0; i < sbjgraph.logic_num(); ++ i ) {
     const SbjNode* node = sbjgraph.logic(i);
     if ( node->fanout_num() > 1 ) {
       mFanoutPointList.push_back(node);
@@ -74,17 +74,17 @@ SaSearch::search(
 )
 {
   mVerbose = verbose;
-  ymuint nf = mFanoutPointList.size();
+  auto nf = mFanoutPointList.size();
   std::uniform_int_distribution<int> rd(0, nf - 1);
   std::uniform_real_distribution<double> rd_real1(0, 1.0);
   vector<bool> state(nf, false);
-  ymuint prev_val = evaluate(state);
+  auto prev_val = evaluate(state);
   for (double T = mInitTemp; T > mEndTemp; T = T * mDecrement) {
-    ymuint n_acc = 0;
+    int n_acc = 0;
     for (mNumAll = 1; mNumAll <= search_limit; ++ mNumAll) {
       int pos = rd(mRandGen);
       state[pos] = !state[pos];
-      ymuint val = evaluate(state);
+      auto val = evaluate(state);
       if ( mVerbose ) {
 	cout << "#LUT = " << val << " / " << mMinimumLutNum
 	     << " @ " << T << " (" << n_acc << " / " << mNumAll << ")" << endl;
@@ -114,15 +114,15 @@ SaSearch::search(
 #if 0
 
 // @brief 現在の割り当てのもとで評価を行う．
-ymuint
+int
 SaSearch::evaluate(const vector<bool>& state)
 {
-  ymuint nf = mFanoutPointList.size();
+  auto nf = mFanoutPointList.size();
   vector<const SbjNode*> boundary_list;
   boundary_list.reserve(nf);
   vector<const SbjNode*> dupnode_list;
   dupnode_list.reserve(nf);
-  for (ymuint i = 0; i < nf; ++ i) {
+  for (int i = 0; i < nf; ++ i) {
     const SbjNode* fpnode = mFanoutPointList[i];
     if ( state[i] ) {
       boundary_list.push_back(fpnode);

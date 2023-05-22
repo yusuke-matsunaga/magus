@@ -26,7 +26,7 @@ public:
   FraigNode(
     SizeType id,                     ///< [in] ノード番号
     SizeType input_id,               ///< [in] 入力番号
-    const vector<ymuint64>& init_pat ///< [in] 初期パタン
+    const vector<std::uint64_t>& init_pat ///< [in] 初期パタン
   );
 
   /// @brief AND用のコンストラクタ
@@ -69,7 +69,7 @@ public:
   SizeType
   input_id() const
   {
-    return reinterpret_cast<ympuint>(mFanins[0]);
+    return reinterpret_cast<PtrIntType>(mFanins[0]);
   }
 
 
@@ -173,7 +173,7 @@ public:
   /// @brief パタンを追加する．
   void
   add_pat(
-    ymuint64 pat ///< [in] 追加するパタン
+    std::uint64_t pat ///< [in] 追加するパタン
   );
 
   /// @brief パタンを計算する．
@@ -186,14 +186,14 @@ public:
   );
 
   /// @brief パタンの先頭を返す．
-  const ymuint64*
+  const std::uint64_t*
   pat() const
   {
     return mPat;
   }
 
   /// @brief パタンの末尾を返す．
-  const ymuint64*
+  const std::uint64_t*
   pat_end() const
   {
     return mPat + mPatUsed;
@@ -270,7 +270,7 @@ private:
   bitset<7> mFlags{0};
 
   // シミュレーションパタン
-  ymuint64* mPat{nullptr};
+  std::uint64_t* mPat{nullptr};
 
   // mPat のハッシュ値
   SizeType mHash{0UL};
@@ -283,7 +283,7 @@ private:
 
   // ハッシュ用の素数配列
   static
-  ymuint64 mPrimes[];
+  std::uint64_t mPrimes[];
 
 
 public:

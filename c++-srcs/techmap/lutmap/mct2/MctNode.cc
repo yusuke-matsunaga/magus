@@ -21,7 +21,7 @@ BEGIN_NAMESPACE_LUTMAP_MCT2
 // @param[in] index ファンアウトノードのインデックス
 // @param[in] select 境界ノードとして選ぶ時 true にするフラグ
 MctNode::MctNode(MctNode* parent,
-		 ymuint index,
+		 SizeType index,
 		 bool select) :
   mParent(parent),
   mIndex(index),

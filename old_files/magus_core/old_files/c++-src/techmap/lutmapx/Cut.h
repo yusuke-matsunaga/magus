@@ -74,7 +74,7 @@ private:
   Cut* mLink;
 
   // 入力数
-  ymuint32 mNi;
+  std::uint32_t mNi;
 
   // 入力のノード配列
   const BdnNode* mInputs[1];
@@ -192,7 +192,7 @@ private:
   Cut* mTail;
 
   // 要素数
-  ymuint32 mNum;
+  std::uint32_t mNum;
 
 };
 

@@ -18,11 +18,11 @@ BEGIN_NAMESPACE_CELLMAP
 
 // @brief コンストラクタ
 // @param[in] nl 葉の数(入力数)
-Cut::Cut(ymuint nl) :
+Cut::Cut(SizeType nl) :
   mLeafNum(nl)
 {
   if ( nl > 0 ) {
-    mLeafArray = new ympuint[nl];
+    mLeafArray = new PtrIntType[nl];
   }
   else {
     mLeafArray = nullptr;
@@ -34,8 +34,8 @@ Cut::Cut(const Cut& src) :
   mLeafNum(src.leaf_num())
 {
   if ( mLeafNum > 0 ) {
-    mLeafArray = new ympuint[mLeafNum];
-    for (ymuint i = 0; i < mLeafNum; ++ i) {
+    mLeafArray = new PtrIntType[mLeafNum];
+    for ( SizeType i = 0; i < mLeafNum; ++ i) {
       mLeafArray[i] = src.mLeafArray[i];
     }
   }
@@ -49,7 +49,7 @@ const Cut&
 Cut::operator=(const Cut& src)
 {
   resize(src.leaf_num());
-  for (ymuint i = 0; i < mLeafNum; ++ i) {
+  for ( SizeType i = 0; i < mLeafNum; ++ i) {
     mLeafArray[i] = src.mLeafArray[i];
   }
 

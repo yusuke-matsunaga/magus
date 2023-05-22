@@ -36,12 +36,12 @@ void
 OdcMgr::calc_odc(BddMgrRef& bddmgr,
 		 const BNetwork& bnetwork)
 {
-  ymuint32 n = bnetwork.max_node_id();
+  std::uint32_t n = bnetwork.max_node_id();
   mNodeData.resize(n);
   
   // global function の計算
   cout << "calculating GF" << endl;
-  ymuint32 index = 0;
+  std::uint32_t index = 0;
   for (BNodeList::const_iterator p = bnetwork.inputs_begin();
        p != bnetwork.inputs_end(); ++ p, ++ index) {
     BNode* node = *p;
@@ -54,9 +54,9 @@ OdcMgr::calc_odc(BddMgrRef& bddmgr,
   for (BNodeVector::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     BNode* node = *p;
-    ymuint32 ni = node->ni();
+    std::uint32_t ni = node->ni();
     VarBddMap varmap;
-    for (ymuint32 i = 0; i < ni; ++ i) {
+    for (std::uint32_t i = 0; i < ni; ++ i) {
       BNode* inode = node->fanin(i);
       Bdd igf = mNodeData[inode->id()].mGf;
       varmap.insert(make_pair(i, igf));
@@ -84,10 +84,10 @@ OdcMgr::calc_odc(BddMgrRef& bddmgr,
       odc &= input_odc(onode, e->pos());
     }
     node_data.mOutputOdc = odc;
-    ymuint32 ni = node->ni();
+    std::uint32_t ni = node->ni();
     vector<Bdd> leaf_gf(ni);
     node_data.mInputOdc.resize(ni);
-    for (ymuint32 i = 0; i < ni; ++ i) {
+    for (std::uint32_t i = 0; i < ni; ++ i) {
       leaf_gf[i] = mNodeData[node->fanin(i)->id()].mGf;
     }
     mCalcOdc(node->func(), odc, leaf_gf, node_data.mInputOdc);
@@ -109,7 +109,7 @@ OdcMgr::output_odc(const BNode* node)
 // @param[in] pos 入力位置
 Bdd
 OdcMgr::input_odc(const BNode* node,
-		  ymuint32 pos)
+		  std::uint32_t pos)
 {
   return mNodeData[node->id()].mInputOdc[pos];
 }

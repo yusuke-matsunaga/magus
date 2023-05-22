@@ -101,9 +101,9 @@ McaCmd::cmd_proc(TclObjVector& objv)
     read_kiss(fi, init_states);
   }
   else {
-    ymuint32 n = bnetwork->latch_node_num();
+    std::uint32_t n = bnetwork->latch_node_num();
     State s;
-    for (ymuint32 i = 0; i < n; ++ i) {
+    for (std::uint32_t i = 0; i < n; ++ i) {
       s += '0';
     }
     init_states.push_back(s);

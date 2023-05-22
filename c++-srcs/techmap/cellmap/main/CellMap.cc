@@ -37,7 +37,7 @@ BnNetwork
 CellMap::area_map(
   const ClibCellLibrary& cell_library,
   const BnNetwork& src_network,
-  ymuint mode
+  int mode
 )
 {
   AreaCover area_cover;

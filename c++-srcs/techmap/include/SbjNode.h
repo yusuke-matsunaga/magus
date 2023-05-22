@@ -357,7 +357,7 @@ private:
   // 2     : bipol (Inputのみ)
   // 3     : pomark(外部出力にファンアウトしている)
   // 4 - 31: レベル
-  ymuint32 mFlags;
+  std::uint32_t mFlags;
 
   // ファンインのハンドルの配列
   SbjHandle mFanins[2];
@@ -382,9 +382,9 @@ private:
   constexpr int kLevelShift = 4;
 
   static
-  constexpr ymuint kTypeMask = 3U;
+  constexpr SizeType kTypeMask = 3U;
   static
-  constexpr ymuint kPoMask = 1U << kPoShift;
+  constexpr SizeType kPoMask = 1U << kPoShift;
 
 };
 

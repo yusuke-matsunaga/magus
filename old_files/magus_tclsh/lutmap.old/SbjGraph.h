@@ -155,7 +155,7 @@ private:
   // bit-0: flow フラグ
   // bit-1: tree フラグ
   // bit-2: 入力位置
-  ymuint32 mFlags;
+  std::uint32_t mFlags;
   
   
 private:
@@ -496,13 +496,13 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // ID 番号
-  ymuint32 mId;
+  std::uint32_t mId;
 
   // 名前
   string mName;
 
   // タイプ (+ 入力／出力番号/機能コード)
-  ymuint32 mFlags;
+  std::uint32_t mFlags;
 
   // ファンインの枝(そのもの)の配列
   SbjEdge mFanins[2];
@@ -511,19 +511,19 @@ private:
   SbjEdgeList mFanoutList;
 
   // 実効的なファンアウト数
-  ymuint32 mNefo;
+  std::uint32_t mNefo;
   
   // immediate dominator
   const SbjNode* mImmDom;
   
   // 作業用のマーク
-  ymuint32 mMark;
+  std::uint32_t mMark;
   
   // 深さ
-  ymuint32 mDepth;
+  std::uint32_t mDepth;
 
   // レベル
-  ymuint32 mLevel;
+  std::uint32_t mLevel;
 
 
 private:
@@ -859,7 +859,7 @@ private:
   
   // 最大レベル
   mutable
-  ymuint32 mLevel;
+  std::uint32_t mLevel;
 
   // mLevel および各 SbjNode::mLevel が正しいとき true となるフラグ
   mutable

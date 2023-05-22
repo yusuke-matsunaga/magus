@@ -237,7 +237,7 @@ private:
     bool inv
   )
   {
-    ymuint offset = inv ? 1 : 0;
+    SizeType offset = inv ? 1 : 0;
     return mNodeInfo[node->id() * 2 + offset];
   }
 
@@ -248,7 +248,7 @@ private:
     bool inv
   ) const
   {
-    ymuint offset = inv ? 1 : 0;
+    SizeType offset = inv ? 1 : 0;
     return mNodeInfo[node->id() * 2 + offset];
   }
 

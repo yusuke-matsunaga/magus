@@ -39,7 +39,7 @@ public:
   /// @param[in] cut_size カットサイズ
   MctSearch(const SbjGraph& sbjgraph,
 	    const CutHolder& cut_holder,
-	    ymuint cut_size);
+	    SizeType cut_size);
 
   /// @brief デストラクタ
   ~MctSearch();
@@ -53,7 +53,7 @@ public:
   /// @brief 探索を行う．
   /// @param[in] search_limit 試行回数
   void
-  search(ymuint search_limit);
+  search(SizeType search_limit);
 
   /// @brief 最良解を返す．
   const MapRecord&
@@ -103,10 +103,10 @@ private:
   MctState mState;
 
   // トータルの試行回数
-  ymuint mNumAll;
+  SizeType mNumAll;
 
   // 最良値
-  ymuint mMinimumLutNum;
+  SizeType mMinimumLutNum;
 
   // 最良解
   MapRecord mBestRecord;

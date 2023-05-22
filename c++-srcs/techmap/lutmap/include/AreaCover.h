@@ -92,7 +92,7 @@ private:
   vector<double> mBestCost;
 
   // 境界ノードの印
-  vector<ymuint8> mBoundaryMark;
+  vector<std::uint8_t> mBoundaryMark;
 
   // 各入力から根の出力に抜ける経路上の重みを入れる配列
   vector<double> mWeight;

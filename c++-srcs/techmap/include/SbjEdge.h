@@ -33,7 +33,7 @@ public:
   SbjEdge(
     const SbjNode* node, ///< [in] ノード
     SizeType pos         ///< [in] ファンイン番号
-  ) : mToPos{reinterpret_cast<ympuint>(node) | pos}
+  ) : mToPos{reinterpret_cast<PtrIntType>(node) | pos}
   {
   }
 
@@ -68,7 +68,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 出力側のノード+入力位置
-  ympuint mToPos{0ULL};
+  PtrIntType mToPos{0ULL};
 
 };
 

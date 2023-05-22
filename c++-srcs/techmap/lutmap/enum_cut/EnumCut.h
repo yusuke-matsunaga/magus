@@ -221,7 +221,7 @@ private:
   bool
   edge_mark(
     const SbjNode* node,
-    ymuint pos
+    SizeType pos
   )
   {
     return node_temp(node).edge_mark(pos);
@@ -230,7 +230,7 @@ private:
   void
   set_edge_mark(
     const SbjNode* node,
-    ymuint pos
+    SizeType pos
   )
   {
     node_temp(node).set_edge_mark(pos);
@@ -239,7 +239,7 @@ private:
   void
   clear_edge_mark(
     const SbjNode* node,
-    ymuint pos
+    SizeType pos
   )
   {
     node_temp(node).clear_edge_mark(pos);
@@ -365,7 +365,7 @@ private:
     /// @note pos < 20
     bool
     edge_mark(
-      ymuint pos
+      SizeType pos
     ) const
     {
       return static_cast<bool>((mMarks >> (pos + 5)) & 1U);
@@ -374,7 +374,7 @@ private:
     /// @brief pos 番めの枝のマークを付ける．
     void
     set_edge_mark(
-      ymuint pos
+      SizeType pos
     )
     {
       mMarks |= (32U << pos);
@@ -383,7 +383,7 @@ private:
     /// @brief pos 番めの枝のマークを消す．
     void
     clear_edge_mark(
-      ymuint pos
+      SizeType pos
     )
     {
       mMarks &= ~(32U << pos);
@@ -413,7 +413,7 @@ private:
     vector<const SbjNode*> mCnodeList;
 
     // 種々のマーク
-    ymuint32 mMarks{0U};
+    std::uint32_t mMarks{0U};
 
   };
 

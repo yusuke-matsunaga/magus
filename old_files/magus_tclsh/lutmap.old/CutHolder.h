@@ -145,7 +145,7 @@ private:
   //////////////////////////////////////////////////////////////////////
   
   // カットサイズ
-  ymuint32 mLimit;
+  std::uint32_t mLimit;
 
   // カットモード
   tCutMode mCutMode;
@@ -158,7 +158,7 @@ private:
   
   char* mCurChunk;
 
-  ymuint32 mLast;
+  std::uint32_t mLast;
   
   vector<char*> mChunk;
 

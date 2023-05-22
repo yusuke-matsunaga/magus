@@ -48,7 +48,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 列番号
-  ymuint32 mColPos;
+  std::uint32_t mColPos;
 
   // 値
   double mVal;
@@ -88,7 +88,7 @@ public:
 public:
 
   /// @brief 変数の数を返す．
-  ymuint32
+  std::uint32_t
   size() const;
 
   /// @brief 行の先頭を得る．
@@ -185,7 +185,7 @@ private:
   UnitAlloc mAlloc;
 
   // サイズ
-  ymuint32 mSize;
+  std::uint32_t mSize;
 
   // 行の先頭の配列
   SmCell* mRowArray;
@@ -194,7 +194,7 @@ private:
   double* mConstArray;
 
   // 使用中のセル数
-  ymuint64 mCellNum;
+  std::uint64_t mCellNum;
 
 #ifdef SANITY_CHECK
   double* mShadowArray;
@@ -257,7 +257,7 @@ SmCell::right() const
 
 // @brief 行数を返す．
 inline
-ymuint32
+std::uint32_t
 SMatrix::size() const
 {
   return mSize;

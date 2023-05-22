@@ -57,12 +57,12 @@ public:
   
   /// @brief pos 番目のブロックを得る．
   /// @param[in] pos ブロック位置
-  ymuint32
+  std::uint32_t
   block(ymuint pos) const;
   
   /// @brief pos 番目のブロックを得る．
   /// @param[in] pos ブロック位置
-  ymuint32&
+  std::uint32_t&
   block(ymuint pos);
   
   /// @brief 内容をクリアする(0に初期化する)．
@@ -115,10 +115,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // サイズ
-  ymuint32 mSize;
+  std::uint32_t mSize;
 
   // ベクタ本体
-  ymuint32* mVect;
+  std::uint32_t* mVect;
   
 };
 
@@ -201,7 +201,7 @@ PatVect::size() const
 // @brief pos 番目のブロックを得る．
 // @param[in] pos ブロック位置
 inline
-ymuint32
+std::uint32_t
 PatVect::block(ymuint pos) const
 {
   return mVect[pos];
@@ -210,7 +210,7 @@ PatVect::block(ymuint pos) const
 // @brief pos 番目のブロックを得る．
 // @param[in] pos ブロック位置
 inline
-ymuint32&
+std::uint32_t&
 PatVect::block(ymuint pos)
 {
   return mVect[pos];

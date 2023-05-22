@@ -29,7 +29,7 @@ public:
 
   /// @brief コンストラクタ
   /// @param[in] nl 葉の数(入力数)
-  Cut(ymuint nl = 0);
+  Cut(SizeType nl = 0);
 
   /// @brief コピーコンストラクタ
   /// @param[in] src コピー元のオブジェクト
@@ -50,14 +50,14 @@ public:
 
   /// @brief 葉の数を再設定する．
   void
-  resize(ymuint nl);
+  resize(SizeType nl);
 
   /// @brief 葉のノードを設定する．
   /// @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
   /// @param[in] leaf_node 葉のノード
   /// @param[in] leaf_inv 葉の極性
   void
-  set_leaf(ymuint pos,
+  set_leaf(SizeType pos,
 	   const SbjNode* leaf_node,
 	   bool leaf_inv);
 
@@ -68,18 +68,18 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 葉の数を得る．
-  ymuint
+  SizeType
   leaf_num() const;
 
   /// @brief 葉のノードを得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
   const SbjNode*
-  leaf_node(ymuint pos) const;
+  leaf_node(SizeType pos) const;
 
   /// @brief 葉の極性を得る．
   /// @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
   bool
-  leaf_inv(ymuint pos) const;
+  leaf_inv(SizeType pos) const;
 
 
 private:
@@ -88,10 +88,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 葉の数
-  ymuint mLeafNum;
+  SizeType mLeafNum;
 
   // 葉のノードと極性をパックしたの配列
-  ympuint* mLeafArray;
+  PtrIntType* mLeafArray;
 
 };
 
@@ -103,12 +103,12 @@ private:
 // @brief 葉の数を再設定する．
 inline
 void
-Cut::resize(ymuint nl)
+Cut::resize(SizeType nl)
 {
   if ( mLeafNum != nl ) {
     delete [] mLeafArray;
     mLeafNum = nl;
-    mLeafArray = new ympuint[nl];
+    mLeafArray = new PtrIntType[nl];
   }
 }
 
@@ -118,17 +118,17 @@ Cut::resize(ymuint nl)
 // @param[in] leaf_inv 葉の極性
 inline
 void
-Cut::set_leaf(ymuint pos,
+Cut::set_leaf(SizeType pos,
 	      const SbjNode* leaf_node,
 	      bool leaf_inv)
 {
   ASSERT_COND( pos < leaf_num() );
-  mLeafArray[pos] = reinterpret_cast<ympuint>(leaf_node) | leaf_inv;
+  mLeafArray[pos] = reinterpret_cast<PtrIntType>(leaf_node) | leaf_inv;
 }
 
 // @brief 葉の数を得る．
 inline
-ymuint
+SizeType
 Cut::leaf_num() const
 {
   return mLeafNum;
@@ -138,7 +138,7 @@ Cut::leaf_num() const
 // @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
 inline
 const SbjNode*
-Cut::leaf_node(ymuint pos) const
+Cut::leaf_node(SizeType pos) const
 {
   ASSERT_COND( pos < leaf_num() );
   return reinterpret_cast<const SbjNode*>(mLeafArray[pos] & ~1UL);
@@ -148,7 +148,7 @@ Cut::leaf_node(ymuint pos) const
 // @param[in] pos 位置番号 ( 0 <= pos < leaf_num() )
 inline
 bool
-Cut::leaf_inv(ymuint pos) const
+Cut::leaf_inv(SizeType pos) const
 {
   ASSERT_COND( pos < leaf_num() );
   return static_cast<bool>(mLeafArray[pos] & 1U);

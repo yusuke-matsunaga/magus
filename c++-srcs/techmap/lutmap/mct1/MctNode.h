@@ -60,7 +60,7 @@ public:
   expand_child();
 
   /// @brief 子供の数を返す．
-  ymuint
+  SizeType
   child_num() const;
 
   /// @brief 子供ノードを取り出す．
@@ -108,7 +108,7 @@ private:
   vector<const SbjNode*> mUnexpandedList;
 
   // 未展開の子供のインデックス
-  ymuint mNextPos;
+  SizeType mNextPos;
 
   // 子ノードのリスト
   vector<MctNode*> mChildList;
@@ -117,7 +117,7 @@ private:
   double mSum;
 
   // 試行回数
-  ymuint mNum;
+  SizeType mNum;
 
   // 現在の期待値 = mSum / mNum
   double mMean;
@@ -155,7 +155,7 @@ MctNode::is_expanded() const
 
 // @brief 子供の数を返す．
 inline
-ymuint
+SizeType
 MctNode::child_num() const
 {
   return mChildList.size();

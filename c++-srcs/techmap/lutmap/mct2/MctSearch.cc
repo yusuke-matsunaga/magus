@@ -26,7 +26,7 @@ BEGIN_NAMESPACE_LUTMAP_MCT2
 
 BEGIN_NONAMESPACE
 
-ymuint
+int
 dfs(const SbjNode* node,
     vector<bool>& mark)
 {
@@ -35,7 +35,7 @@ dfs(const SbjNode* node,
   }
   mark[node->id()] = true;
 
-  ymuint n = 1;
+  int n = 1;
   if ( node->fanout_num() == 1 && node->is_logic() ) {
     n += dfs(node->fanin(0), mark);
     n += dfs(node->fanin(1), mark);
@@ -46,8 +46,8 @@ dfs(const SbjNode* node,
 struct Lt
 {
   bool
-  operator()(const pair<const SbjNode*, ymuint>& left,
-	     const pair<const SbjNode*, ymuint>& right) {
+  operator()(const pair<const SbjNode*, int>& left,
+	     const pair<const SbjNode*, int>& right) {
     return left.second < right.second;
   }
 };
@@ -55,8 +55,8 @@ struct Lt
 struct Gt
 {
   bool
-  operator()(const pair<const SbjNode*, ymuint>& left,
-	     const pair<const SbjNode*, ymuint>& right) {
+  operator()(const pair<const SbjNode*, int>& left,
+	     const pair<const SbjNode*, int>& right) {
     return left.second > right.second;
   }
 };
@@ -75,7 +75,7 @@ END_NONAMESPACE
 // @param[in] flow_mode area_cover のモード
 MctSearch::MctSearch(const SbjGraph& sbjgraph,
 		     const CutHolder& cut_holder,
-		     ymuint cut_size,
+		     SizeType cut_size,
 		     bool flow_mode) :
   mSbjGraph(sbjgraph),
   mCutHolder(cut_holder),
@@ -91,13 +91,13 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
   mWidth = static_cast<double>(mUpperBound - mLowerBound);
 
   // ファンアウトポイントを求める．
-  vector<pair<const SbjNode*, ymuint> > tmp_list;
-  for (ymuint i = 0; i < sbjgraph.logic_num(); ++ i) {
+  vector<pair<const SbjNode*, int> > tmp_list;
+  for (int i = 0; i < sbjgraph.logic_num(); ++ i) {
     const SbjNode* node = sbjgraph.logic(i);
     if ( node->fanout_num() > 1 ) {
 #if 0
       vector<bool> mark(sbjgraph.node_num(), false);
-      ymuint ni = dfs(node->fanin(0), mark);
+      int ni = dfs(node->fanin(0), mark);
       ni += dfs(node->fanin(1), mark);
       tmp_list.push_back(make_pair(node, ni));
 #else
@@ -107,11 +107,11 @@ MctSearch::MctSearch(const SbjGraph& sbjgraph,
   }
   // サイズの降順にソートする．
   //sort(tmp_list.begin(), tmp_list.end(), Gt());
-  ymuint n = tmp_list.size();
+  int n = tmp_list.size();
   mFanoutPointList.reserve(n);
   mInputSizeList.reserve(n);
-  for (ymuint i = 0; i < n; ++ i) {
-    const pair<const SbjNode*, ymuint>& p = tmp_list[i];
+  for (int i = 0; i < n; ++ i) {
+    const pair<const SbjNode*, int>& p = tmp_list[i];
     mFanoutPointList.push_back(p.first);
     mInputSizeList.push_back(p.second);
   }
@@ -132,7 +132,7 @@ MctSearch::~MctSearch()
 // @param[in] verbose verbose フラグ
 // @return 最良解を返す．
 const MapRecord&
-MctSearch::search(ymuint search_limit,
+MctSearch::search(SizeType search_limit,
 		  bool verbose)
 {
   mVerbose = verbose;
@@ -180,15 +180,15 @@ double
 MctSearch::default_policy(MctNode* node)
 {
 #if 0
-  ymuint nf = mFanoutPointList.size();
-  ymuint lut_num = INT_MAX;
+  int nf = mFanoutPointList.size();
+  int lut_num = INT_MAX;
   if ( mState.index() < nf ) {
     vector<bool> state(nf, false);
     vector<bool> old_state(nf, false);
-    for (ymuint i = 0; i < 100; ++ i) {
+    for (int i = 0; i < 100; ++ i) {
       vector<const SbjNode*> boundary_list = mState.boundary_list();
       boundary_list.reserve(nf);
-      for (ymuint i = mState.index(); i < nf; ++ i) {
+      for (int i = mState.index(); i < nf; ++ i) {
 	if ( state[i] ) {
 	  boundary_list.push_back(mFanoutPointList[i]);
 	}
@@ -196,8 +196,8 @@ MctSearch::default_policy(MctNode* node)
       MapRecord record;
       mAreaCover.record_cuts(mSbjGraph, mCutHolder, boundary_list, record);
       MapEst gen;
-      ymuint lut_num1;
-      ymuint depth;
+      int lut_num1;
+      int depth;
       gen.estimate(mSbjGraph, record, lut_num1, depth);
       cout << "  #LUT1 = " << lut_num1 << " / " << mMinimumLutNum << endl;
       if ( lut_num > lut_num1 ) {
@@ -230,7 +230,7 @@ MctSearch::default_policy(MctNode* node)
     MapRecord record;
     mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), record);
     MapEst gen;
-    ymuint depth;
+    int depth;
     gen.estimate(mSbjGraph, record, lut_num, depth);
     if ( mMinimumLutNum > lut_num ) {
       mMinimumLutNum = lut_num;
@@ -240,8 +240,8 @@ MctSearch::default_policy(MctNode* node)
 #else
 #if 1
   while ( mState.index() < mFanoutPointList.size() ) {
-    ymuint index = mState.index();
-    ymuint ni = mInputSizeList[index];
+    int index = mState.index();
+    int ni = mInputSizeList[index];
 #if 1
     // 1/2 の確率で選ばない．
     double ratio = 0.50;
@@ -271,8 +271,8 @@ MctSearch::default_policy(MctNode* node)
   mAreaCover.record_cuts(mSbjGraph, mCutHolder, mState.boundary_list(), mState.block_list(), record);
 #else
 
-  ymuint nf = mFanoutPointList.size();
-  ymuint idx = mState.index();
+  int nf = mFanoutPointList.size();
+  int idx = mState.index();
   MapRecord record;
   if ( idx < nf ) {
     vector<const SbjNode*> boundary_list = mState.boundary_list();
@@ -300,7 +300,7 @@ MctSearch::default_policy(MctNode* node)
 #endif
   double val = static_cast<double>(mUpperBound - lut_num) / mWidth;
   if ( mVerbose ) {
-    ymuint slack = mFanoutPointList.size() - node->index();
+    int slack = mFanoutPointList.size() - node->index();
     cout << "#LUT = " << lut_num << "(" << slack << ")" << " / " << mMinimumLutNum << endl;
   }
   return val;

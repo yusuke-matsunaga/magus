@@ -60,7 +60,7 @@ EnumCut::operator()(const SbjGraph& sbjgraph,
   
   mInputs = new SbjNode*[limit];
 
-  mInodeStack = new ymuint32[sbjgraph.n_lnodes()];
+  mInodeStack = new std::uint32_t[sbjgraph.n_lnodes()];
   mIsPos = &mInodeStack[0];
   
   if ( mMode == kCmMinDepth ) {

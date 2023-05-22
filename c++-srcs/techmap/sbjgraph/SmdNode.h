@@ -44,7 +44,7 @@ public:
   SizeType
   pos()
   {
-    return (mFlags & 1U);
+    return static_cast<SizeType>(mFlags[0]);
   }
 
 
@@ -57,21 +57,21 @@ public:
   bool
   flow() const
   {
-    return static_cast<bool>((mFlags >> 1) & 1U);
+    return mFlags[1];
   }
 
   /// @brief flow フラグをセットする．
   void
   set_flow()
   {
-    mFlags |= 2U;
+    mFlags[1] = true;
   }
 
   /// @brief flow フラグをクリアする．
   void
   clear_flow()
   {
-    mFlags &= ~2U;
+    mFlags[1] = false;
   }
 
 
@@ -87,7 +87,7 @@ private:
   SmdNode* mTo;
 
   // ファンイン番号＋ flow フラグ
-  ymuint mFlags;
+  bitset<2> mFlags;
 
 };
 
@@ -244,7 +244,7 @@ public:
   bool
   check_rmark()
   {
-    ymuint old_mark = mMark;
+    auto old_mark = mMark;
     mMark |= kRangeMask;
     return static_cast<bool>((old_mark >> kRangeShift) & 1U);
   }
@@ -296,7 +296,7 @@ public:
   bool
   check_vmark1()
   {
-    ymuint old_mark = mMark;
+    auto old_mark = mMark;
     mMark |= kV1Mask;
     return static_cast<bool>((old_mark >> kV1Shift) & 1U);
   }
@@ -306,7 +306,7 @@ public:
   bool
   check_vmark2()
   {
-    ymuint old_mark = mMark;
+    auto old_mark = mMark;
     mMark |= kV2Mask;
     return static_cast<bool>((old_mark >> kV2Shift) & 1U);
   }
@@ -346,7 +346,7 @@ private:
   vector<SmdEdge*> mFanoutArray;
 
   // get_min_depth() 用の作業領域
-  ymuint mMark;
+  SizeType mMark;
 
   // 深さ
   SizeType mDepth;
@@ -372,17 +372,17 @@ private:
   const int kV2Shift = 5;
 
   static
-  const ymuint kRangeMask = 1U << kRangeShift;
+  const SizeType kRangeMask = 1U << kRangeShift;
   static
-  const ymuint kTargetMask = 1U << kTargetShift;
+  const SizeType kTargetMask = 1U << kTargetShift;
   static
-  const ymuint kFlowMask = 1U << kFlowShift;
+  const SizeType kFlowMask = 1U << kFlowShift;
   static
-  const ymuint kPoMask = 1U << kPoShift;
+  const SizeType kPoMask = 1U << kPoShift;
   static
-  const ymuint kV1Mask = 1U << kV1Shift;
+  const SizeType kV1Mask = 1U << kV1Shift;
   static
-  const ymuint kV2Mask = 1U << kV2Shift;
+  const SizeType kV2Mask = 1U << kV2Shift;
 
 };
 

@@ -28,7 +28,7 @@ public:
   /// @param[in] index ファンアウトノードのインデックス
   /// @param[in] select 境界ノードとして選ぶ時 true にするフラグ
   MctNode(MctNode* parent,
-	  ymuint index,
+	  SizeType index,
 	  bool select);
 
   /// @brief デストラクタ
@@ -45,7 +45,7 @@ public:
   parent() const;
 
   /// @brief ファンアウトノードのインデックスを返す．
-  ymuint
+  SizeType
   index() const;
 
   /// @brief ファンアウトノードを境界ノードとして選ぶ時 true を返す．
@@ -102,13 +102,13 @@ private:
   MctNode* mParent;
 
   // インデックス
-  ymuint mIndex;
+  SizeType mIndex;
 
   // 境界として選ばれるかどうか
   bool mSelected;
 
   // 未展開の子供の数
-  ymuint mUnexpandedNum;
+  SizeType mUnexpandedNum;
 
   // 子ノードのリスト
   MctNode* mChildList[2];
@@ -117,7 +117,7 @@ private:
   double mSum;
 
   // 試行回数
-  ymuint mNum;
+  SizeType mNum;
 
   // 現在の期待値 = mSum / mNum
   double mMean;
@@ -139,7 +139,7 @@ MctNode::parent() const
 
 // @brief ファンアウトノードのインデックスを返す．
 inline
-ymuint
+SizeType
 MctNode::index() const
 {
   return mIndex;

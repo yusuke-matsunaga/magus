@@ -86,7 +86,7 @@ private:
   vector<CrNode*> mHeap;
 
   // ヒープ木の要素数
-  ymuint32 mNum;
+  std::uint32_t mNum;
 
 };
 

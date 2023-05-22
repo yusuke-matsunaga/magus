@@ -41,7 +41,7 @@ public:
   /// @param[in] flow_mode area_cover のモード
   MctSearch(const SbjGraph& sbjgraph,
 	    const CutHolder& cut_holder,
-	    ymuint cut_size,
+	    SizeType cut_size,
 	    bool flow_mode);
 
   /// @brief デストラクタ
@@ -58,7 +58,7 @@ public:
   /// @param[in] verbose verbose フラグ
   /// @return 最良解を返す．
   const MapRecord&
-  search(ymuint search_limit,
+  search(SizeType search_limit,
 	 bool verbose);
 
 
@@ -93,13 +93,13 @@ private:
   const CutHolder& mCutHolder;
 
   // カットサイズ
-  ymuint mCutSize;
+  SizeType mCutSize;
 
   // ファンアウトポイントのリスト
   vector<const SbjNode*> mFanoutPointList;
 
   // ファンアウトポイントの入力サイズのリスト
-  vector<ymuint> mInputSizeList;
+  vector<SizeType> mInputSizeList;
 
   // マッパー
   AreaCover mAreaCover;
@@ -108,19 +108,19 @@ private:
   MctState mState;
 
   // 上界
-  ymuint mUpperBound;
+  SizeType mUpperBound;
 
   // 下界
-  ymuint mLowerBound;
+  SizeType mLowerBound;
 
   // 上界と下界の幅
   double mWidth;
 
   // トータルの試行回数
-  ymuint mNumAll;
+  SizeType mNumAll;
 
   // 最良値
-  ymuint mMinimumLutNum;
+  SizeType mMinimumLutNum;
 
   // 最良解
   MapRecord mBestRecord;

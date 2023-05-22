@@ -26,8 +26,8 @@ public:
   /// @param[in] row_num 行数
   /// @param[in] col_num 列数
   /// @note 内容は不定
-  Matrix(ymuint32 row_num,
-	 ymuint32 col_num);
+  Matrix(std::uint32_t row_num,
+	 std::uint32_t col_num);
 
   /// @brief コピーコンストラクタ
   Matrix(const Matrix& src);
@@ -43,26 +43,26 @@ public:
 public:
 
   /// @brief 行数を返す．
-  ymuint32
+  std::uint32_t
   row_size() const;
 
   /// @brief 列数を返す．
-  ymuint32
+  std::uint32_t
   col_size() const;
 
   /// @brief 要素に対するアクセス関数
   /// @param[in] r_pos 行位置
   /// @param[in] c_pos 列位置
   double&
-  elem(ymuint32 r_pos,
-       ymuint32 c_pos);
+  elem(std::uint32_t r_pos,
+       std::uint32_t c_pos);
 
   /// @brief 要素に対するアクセス関数
   /// @param[in] r_pos 行位置
   /// @param[in] c_pos 列位置
   double
-  elem(ymuint32 r_pos,
-       ymuint32 c_pos) const;
+  elem(std::uint32_t r_pos,
+       std::uint32_t c_pos) const;
 
 
 private:
@@ -71,10 +71,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 行数
-  ymuint32 mRowNum;
+  std::uint32_t mRowNum;
 
   // 列数
-  ymuint32 mColNum;
+  std::uint32_t mColNum;
 
   // 本体
   double* mBody;
@@ -112,7 +112,7 @@ lu_decomp(const Matrix& src_matrix,
 
 // @brief 行数を返す．
 inline
-ymuint32
+std::uint32_t
 Matrix::row_size() const
 {
   return mRowNum;
@@ -120,7 +120,7 @@ Matrix::row_size() const
 
 // @brief 列数を返す．
 inline
-ymuint32
+std::uint32_t
 Matrix::col_size() const
 {
   return mColNum;
@@ -131,8 +131,8 @@ Matrix::col_size() const
 // @param[in] c_pos 列位置
 inline
 double&
-Matrix::elem(ymuint32 r_pos,
-	     ymuint32 c_pos)
+Matrix::elem(std::uint32_t r_pos,
+	     std::uint32_t c_pos)
 {
   return mBody[r_pos * mColNum + c_pos];
 }
@@ -142,8 +142,8 @@ Matrix::elem(ymuint32 r_pos,
 // @param[in] c_pos 列位置
 inline
 double
-Matrix::elem(ymuint32 r_pos,
-	     ymuint32 c_pos) const
+Matrix::elem(std::uint32_t r_pos,
+	     std::uint32_t c_pos) const
 {
   return mBody[r_pos * mColNum + c_pos];
 }

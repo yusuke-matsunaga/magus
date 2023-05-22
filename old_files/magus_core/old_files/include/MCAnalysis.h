@@ -114,7 +114,7 @@ private:
   bool mUseBdd;
 
   // FF 数
-  ymuint32 mFFNum;
+  std::uint32_t mFFNum;
 
   // 正常回路の到達可能状態の集合
   vector<State> mReachableStates1;

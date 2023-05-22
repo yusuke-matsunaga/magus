@@ -46,7 +46,7 @@ PatMatcher::operator()(const SbjNode* sbj_root,
 		       Cut& match)
 {
   // 根のノードを調べる．
-  ymuint root_id = pat_graph.root_id();
+  auto root_id = pat_graph.root_id();
   switch ( mLibrary.pg_node_type(root_id) ) {
   case ClibPatType::Input:
     // これはなんでも OK
@@ -75,12 +75,12 @@ PatMatcher::operator()(const SbjNode* sbj_root,
   bool success = false;
 
   // 各枝の入力と出力の対応を調べる．
-  ymuint ne = pat_graph.edge_num();
-  for (ymuint i = 0; i < ne; ++ i) {
-    ymuint edge_id = pat_graph.edge(i);
-    ymuint to_id = mLibrary.pg_edge_to(edge_id);
-    ymuint from_id = mLibrary.pg_edge_from(edge_id);
-    ymuint f_pos = mLibrary.pg_edge_pos(edge_id);
+  auto ne = pat_graph.edge_num();
+  for ( SizeType i = 0; i < ne; ++ i) {
+    auto edge_id = pat_graph.edge(i);
+    auto to_id = mLibrary.pg_edge_to(edge_id);
+    auto from_id = mLibrary.pg_edge_from(edge_id);
+    auto f_pos = mLibrary.pg_edge_pos(edge_id);
     const SbjNode* to_node = mSbjMap[to_id];
     ASSERT_COND( to_node->is_logic() );
     const SbjNode* from_node = to_node->fanin(f_pos);
@@ -126,19 +126,17 @@ PatMatcher::operator()(const SbjNode* sbj_root,
 
   { // 成功した．
     success = true;
-    ymuint ni = pat_graph.input_num();
+    auto ni = pat_graph.input_num();
     match.resize(ni);
-    for (ymuint i = 0; i < ni; ++ i) {
-      ymuint node_id = mLibrary.pg_input_node(i);
+    for ( SizeType i = 0; i < ni; ++ i) {
+      auto node_id = mLibrary.pg_input_node(i);
       match.set_leaf(i, mSbjMap[node_id], mInvMap[node_id]);
     }
   }
 
  end:// 後始末．
 
-  for (vector<ymuint>::iterator p = mClearQueue.begin();
-       p != mClearQueue.end(); ++ p) {
-    ymuint id = *p;
+  for ( auto id: mClearQueue ) {
     mSbjMap[id] = nullptr;
     mInvMap[id] = false;
   }
@@ -156,7 +154,7 @@ PatMatcher::operator()(const SbjNode* sbj_root,
 // @retval false バインドが失敗した．
 bool
 PatMatcher::bind(const SbjNode* sbj_node,
-		 ymuint pat_id,
+		 SizeType pat_id,
 		 bool inv)
 {
   if ( mSbjMap[pat_id] != nullptr ) {
@@ -175,7 +173,7 @@ PatMatcher::bind(const SbjNode* sbj_node,
     mClearQueue.push_back(pat_id);
   }
 
-  ymuint pat_id1;
+  SizeType pat_id1;
   if ( mPatMap.count(sbj_node->id()) > 0 ) {
     pat_id1 = mPatMap.at(sbj_node->id());
     if ( pat_id1 != pat_id ) {

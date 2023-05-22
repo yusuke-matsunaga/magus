@@ -66,8 +66,8 @@ FraigMgr::make_input()
 
   SizeType id = mAllNodes.size();
   SizeType iid = mInputNodes.size();
-  vector<ymuint64> init_pat(FraigNode::mPatUsed);
-  std::uniform_int_distribution<ymuint64> rd;
+  vector<std::uint64_t> init_pat(FraigNode::mPatUsed);
+  std::uniform_int_distribution<std::uint64_t> rd;
   for ( int i: Range(FraigNode::mPatUsed) ) {
     init_pat[i] = rd(mRandGen);
   }
@@ -344,7 +344,7 @@ FraigMgr::add_pat(
   std::uniform_int_distribution<int> rd100(0, 99);
   for ( auto node1: mAllNodes ) {
     if ( node1->is_input() ) {
-      ymuint64 pat = 0UL;
+      std::uint64_t pat = 0UL;
       if ( mSolver.model_val(node1) == SatBool3::True ) {
 	pat = ~0UL;
       }

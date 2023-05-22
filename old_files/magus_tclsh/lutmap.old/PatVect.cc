@@ -27,7 +27,7 @@ BEGIN_NAMESPACE_MAGUS_LUTMAP
 PatVect::PatVect(ymuint size) :
   mSize(size)
 {
-  mVect = new ymuint32[mSize];
+  mVect = new std::uint32_t[mSize];
 }
 
 // @brief コピーコンストラクタ
@@ -35,7 +35,7 @@ PatVect::PatVect(ymuint size) :
 PatVect::PatVect(const PatVect& src) :
   mSize(src.mSize)
 {
-  mVect = new ymuint32[mSize];
+  mVect = new std::uint32_t[mSize];
   copy(src);
 }
 
@@ -47,7 +47,7 @@ PatVect::operator=(const PatVect& src)
   if ( mSize != src.mSize ) {
     delete [] mVect;
     mSize = src.mSize;
-    mVect = new ymuint32[mSize];
+    mVect = new std::uint32_t[mSize];
   }
   copy(src);
   return *this;
@@ -77,7 +77,7 @@ PatVect::resize(ymuint size)
   if ( mSize != size ) {
     delete [] mVect;
     mSize = size;
-    mVect = new ymuint32[mSize];
+    mVect = new std::uint32_t[mSize];
   }
 }
   

@@ -25,10 +25,10 @@ BEGIN_NAMESPACE_CELLMAP
 BEGIN_NONAMESPACE
 
 inline
-ymuint
+SizeType
 encode(
-  ymuint pos,
-  ymuint sense
+  SizeType pos,
+  SizeType sense
 )
 {
   return pos | (sense << 3);

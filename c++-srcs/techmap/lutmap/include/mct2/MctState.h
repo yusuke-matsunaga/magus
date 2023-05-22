@@ -57,7 +57,7 @@ public:
   block_list() const;
 
   /// @brief 処理済みのファンアウトポイントのインデックスを得る．
-  ymuint
+  SizeType
   index() const;
 
   /// @brief インデックスを一つすすめる．
@@ -87,7 +87,7 @@ private:
   vector<const SbjNode*> mBlockList;
 
   // 処理済みのファンアウトポイントのインデックス
-  ymuint mIndex;
+  SizeType mIndex;
 
 };
 
@@ -132,7 +132,7 @@ MctState::block_list() const
 
 // @brief 処理済みのファンアウトポイントのインデックスを得る．
 inline
-ymuint
+SizeType
 MctState::index() const
 {
   return mIndex;

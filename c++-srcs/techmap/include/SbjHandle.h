@@ -45,7 +45,7 @@ public:
   SbjHandle
   make_zero()
   {
-    return SbjHandle{static_cast<ympuint>(0ULL)};
+    return SbjHandle{static_cast<PtrIntType>(0ULL)};
   }
 
   /// @brief 定数1を返す．
@@ -53,7 +53,7 @@ public:
   SbjHandle
   make_one()
   {
-    return SbjHandle(static_cast<ympuint>(1ULL));
+    return SbjHandle(static_cast<PtrIntType>(1ULL));
   }
 
 
@@ -135,7 +135,7 @@ public:
     bool inv       ///< [in] 極性
   )
   {
-    mData = reinterpret_cast<ympuint>(node) | static_cast<ympuint>(inv);
+    mData = reinterpret_cast<PtrIntType>(node) | static_cast<PtrIntType>(inv);
   }
 
   /// @brief 極性を反転させる．
@@ -153,7 +153,7 @@ private:
 
   /// @brief データを直接指定したコンストラクタ
   SbjHandle(
-    ympuint data ///< [in] データ
+    PtrIntType data ///< [in] データ
   ) : mData{data}
   {
   }
@@ -165,7 +165,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノードのポインタと極性をパックしたもの
-  ympuint mData;
+  PtrIntType mData;
 
 };
 

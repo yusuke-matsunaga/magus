@@ -30,7 +30,7 @@ void
 dump_input(ostream& s,
 	   ymuint input_id)
 {
-  dump_word(s, static_cast<ymuint32>(PatMgr::kInput) | (input_id << 2));
+  dump_word(s, static_cast<std::uint32_t>(PatMgr::kInput) | (input_id << 2));
   dump_word(s, 0);
   dump_word(s, 0);
 }
@@ -42,9 +42,9 @@ dump_and(ostream& s,
 	 bool l_inv,
 	 bool r_inv)
 {
-  dump_word(s, static_cast<ymuint32>(PatMgr::kAnd));
-  dump_word(s, (l_id << 1) | static_cast<ymuint32>(l_inv));
-  dump_word(s, (r_id << 1) | static_cast<ymuint32>(r_inv));
+  dump_word(s, static_cast<std::uint32_t>(PatMgr::kAnd));
+  dump_word(s, (l_id << 1) | static_cast<std::uint32_t>(l_inv));
+  dump_word(s, (r_id << 1) | static_cast<std::uint32_t>(r_inv));
 }
 
 void
@@ -52,7 +52,7 @@ dump_xor(ostream& s,
 	 ymuint l_id,
 	 ymuint r_id)
 {
-  dump_word(s, static_cast<ymuint32>(PatMgr::kXor));
+  dump_word(s, static_cast<std::uint32_t>(PatMgr::kXor));
   dump_word(s, (l_id << 1));
   dump_word(s, (r_id << 1));
 }

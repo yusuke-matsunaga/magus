@@ -56,7 +56,7 @@ public:
   /// @param[in] pos 入力位置
   Bdd
   input_odc(const BNode* node,
-	    ymuint32 pos);
+	    std::uint32_t pos);
   
 
 private:

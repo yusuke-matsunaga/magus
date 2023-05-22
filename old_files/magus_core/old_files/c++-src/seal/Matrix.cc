@@ -17,8 +17,8 @@ BEGIN_NAMESPACE_YM_SEAL
 // @brief コンストラクタ
 // @param[in] row_num 行数
 // @param[in] col_num 列数
-Matrix::Matrix(ymuint32 row_num,
-	       ymuint32 col_num) :
+Matrix::Matrix(std::uint32_t row_num,
+	       std::uint32_t col_num) :
   mRowNum(row_num),
   mColNum(col_num),
   mBody(new double[row_num * col_num])
@@ -34,8 +34,8 @@ Matrix::Matrix(const Matrix& src) :
   mColNum(src.mColNum),
   mBody(new double[mRowNum * mColNum])
 {
-  ymuint32 n = mRowNum * mColNum;
-  for (ymuint32 i = 0; i < n; ++ i) {
+  std::uint32_t n = mRowNum * mColNum;
+  for (std::uint32_t i = 0; i < n; ++ i) {
     mBody[i] = src.mBody[i];
   }
 }
@@ -45,13 +45,13 @@ const Matrix&
 Matrix::operator=(const Matrix& src)
 {
   if ( &src != this ) {
-    ymuint32 n = src.mRowNum * src.mColNum;
+    std::uint32_t n = src.mRowNum * src.mColNum;
     if ( mRowNum != src.mRowNum ||
 	 mColNum != src.mColNum ) {
       delete [] mBody;
       mBody = new double[n];
     }
-    for (ymuint32 i = 0; i < n; ++ i) {
+    for (std::uint32_t i = 0; i < n; ++ i) {
       mBody[i] = src.mBody[i];
     }
   }
@@ -69,11 +69,11 @@ void
 display(ostream& s,
 	const Matrix& m)
 {
-  ymuint32 nr = m.row_size();
-  ymuint32 nc = m.col_size();
+  std::uint32_t nr = m.row_size();
+  std::uint32_t nc = m.col_size();
 
-  for (ymuint32 i = 0; i < nr; ++ i) {
-    for (ymuint32 j = 0; j < nc; ++ j) {
+  for (std::uint32_t i = 0; i < nr; ++ i) {
+    for (std::uint32_t j = 0; j < nc; ++ j) {
       cout << " " << setw(7) << setprecision(4) << m.elem(i, j);
     }
     cout << endl;

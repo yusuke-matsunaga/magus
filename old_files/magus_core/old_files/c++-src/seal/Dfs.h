@@ -23,13 +23,13 @@ BEGIN_NAMESPACE_YM_SEAL
 struct DfsNode
 {
   // 状態番号
-  ymuint32 mId;
+  std::uint32_t mId;
 
   // DEFNUMBER
-  ymuint32 mDefnumber;
+  std::uint32_t mDefnumber;
 
   // LOWLINK
-  ymuint32 mLowlink;
+  std::uint32_t mLowlink;
 
   // 訪問したかどうかを表すフラグ
   bool mVisited;
@@ -47,10 +47,10 @@ struct DfsNode
   DfsNode* mLink;
 
   // ヒープ用の値
-  ymuint32 mCost;
+  std::uint32_t mCost;
 
   // ヒープ上の位置
-  ymuint32 mHeapPos;
+  std::uint32_t mHeapPos;
 
   // 選ばれたかどうかを表すフラグ
   bool mSelected;
@@ -114,7 +114,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノード数
-  ymuint32 mNum;
+  std::uint32_t mNum;
 
   // ノードの配列
   DfsNode* mNodeArray;
@@ -123,7 +123,7 @@ private:
   vector<DfsNode*> mRepNodes;
 
   // カウント値
-  ymuint32 mCount;
+  std::uint32_t mCount;
 
   // ノードスタック
   vector<DfsNode*> mStack;

@@ -154,16 +154,16 @@ private:
       SizeType mRestart;
 
       // コンフリクト数
-      ymuint64 mConflictNum;
+      std::uint64_t mConflictNum;
 
       // decision 数
-      ymuint64 mDecisionNum;
+      std::uint64_t mDecisionNum;
 
       // implication 数
-      ymuint64 mPropagationNum;
+      std::uint64_t mPropagationNum;
 
       // 学習説のリテラル数
-      ymuint64 mLearntLitNum;
+      std::uint64_t mLearntLitNum;
 
     } mTimeStat[3];
 

@@ -27,7 +27,7 @@ MctNode::MctNode(MctNode* parent,
   mParent(parent),
   mRoot(root)
 {
-  for (ymuint i = 0; i < cand_list.size(); ++ i) {
+  for (int i = 0; i < cand_list.size(); ++ i) {
     const SbjNode* node = cand_list[i];
     if ( root == nullptr || node->id() > root->id() ) {
       mUnexpandedList.push_back(node);
@@ -66,12 +66,12 @@ MctNode::expand_child()
 void
 MctNode::reorder(double n_all_ln)
 {
-  ymuint n = mChildList.size();
-  for (ymuint i = n - 1; i > 0; -- i) {
+  auto n = mChildList.size();
+  for (int i = n - 1; i > 0; -- i) {
     MctNode* node1 = mChildList[i];
     double val1 = node1->UCB1(n_all_ln);
-    for (ymuint j = 1; j <= i; ++ j) {
-      ymuint idx = i - j;
+    for (int j = 1; j <= i; ++ j) {
+      auto idx = i - j;
       MctNode* node2 = mChildList[i - j];
       double val2 = node2->UCB1(n_all_ln);
       if ( val2 > val1 ) {
@@ -85,7 +85,7 @@ MctNode::reorder(double n_all_ln)
   }
   if ( false ) {
     cout << "reorder" << endl;
-    for (ymuint i = 0; i < n; ++ i) {
+    for (int i = 0; i < n; ++ i) {
       MctNode* node = mChildList[n - i - 1];
       cout << " " << node->UCB1(n_all_ln)
 	   << "(" << node->mMean << ":" << node->mNum << ")";

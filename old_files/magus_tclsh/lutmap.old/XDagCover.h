@@ -105,13 +105,13 @@ private:
   DagACover* mDagCover;
   
   // fanout node を探すときの上限
-  ymuint32 mClimit;
+  std::uint32_t mClimit;
 
   // search 全体の上限
-  ymuint32 mSlimit;
+  std::uint32_t mSlimit;
 
   // search の呼ばれた回数
-  ymuint32 mScount;
+  std::uint32_t mScount;
 
   // 制限時間(秒)
   double mTlimit;

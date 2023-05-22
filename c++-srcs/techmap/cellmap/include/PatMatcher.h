@@ -49,14 +49,14 @@ public:
   /// @brief 直前のマッチングにおける入力のノードを得る．
   /// @param[in] pos 入力番号
   const SbjNode*
-  leaf_node(ymuint pos) const;
+  leaf_node(SizeType pos) const;
 
   /// @brief 直前のマッチングにおける入力の極性を得る．
   /// @param[in] pos 入力番号
   /// @retval true 反転あり
   /// @retval false 反転なし
   bool
-  leaf_inv(ymuint pos) const;
+  leaf_inv(SizeType pos) const;
 #endif
 
 private:
@@ -72,7 +72,7 @@ private:
   /// @retval false バインドが失敗した．
   bool
   bind(const SbjNode* sbj_node,
-       ymuint pat_id,
+       SizeType pat_id,
        bool inv);
 
 
@@ -89,13 +89,13 @@ private:
 
   // サブジェクトノードの ID をキーとしてパタンノードの ID を
   // 入れる配列
-  unordered_map<ymuint, ymuint> mPatMap;
+  unordered_map<SizeType, SizeType> mPatMap;
 
   // パタンノードの ID をキーとして極性を入れる配列
   vector<bool> mInvMap;
 
   // mSbjMap と mInvMap のクリア用キュー
-  vector<ymuint> mClearQueue;
+  vector<SizeType> mClearQueue;
 
 #if 0
   // 直前のマッチングにおけるパタンの入力ノードを記録する配列
@@ -117,7 +117,7 @@ private:
 // @param[in] pos 入力番号
 inline
 const SbjNode*
-PatMatcher::leaf_node(ymuint pos) const
+PatMatcher::leaf_node(SizeType pos) const
 {
   return mLeafNodeArray[pos];
 }
@@ -128,7 +128,7 @@ PatMatcher::leaf_node(ymuint pos) const
 // @retval false 反転なし
 inline
 bool
-PatMatcher::leaf_inv(ymuint pos) const
+PatMatcher::leaf_inv(SizeType pos) const
 {
   return mLeafInvArray[pos];
 }

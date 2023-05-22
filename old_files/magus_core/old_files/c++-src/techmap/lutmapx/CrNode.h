@@ -201,20 +201,20 @@ private:
   vector<CrNode*> mFanoutList;
 
   // 種々のフラグ
-  ymuint32 mFlags;
+  std::uint32_t mFlags;
 
   // 現在のゲイン
-  ymuint32 mCurGain;
+  std::uint32_t mCurGain;
 
   // ヒープ上のインデックス
   // ヒープに入っていない時は -1
   int mHeapIndex;
 
   // CrNode のネットワーク中の段数
-  ymuint32 mLevel;
+  std::uint32_t mLevel;
 
   // CrNode のネットワーク中の要求段数
-  ymuint32 mReqLevel;
+  std::uint32_t mReqLevel;
 
 
 private:

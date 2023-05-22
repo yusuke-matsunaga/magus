@@ -29,7 +29,7 @@ END_NONAMESPACE
 // @param[in] sbjgraph サブジェクトグラフ
 // @param[in] cut_size カットサイズ
 MctState::MctState(const SbjGraph& sbjgraph,
-		   ymuint cut_size) :
+		   SizeType cut_size) :
   mSbjGraph(sbjgraph),
   mCutSize(cut_size),
   mMaxNodeId(sbjgraph.node_num())
@@ -46,11 +46,11 @@ MctState::MctState(const SbjGraph& sbjgraph,
 
   // 異なる出力から相異なる極性が必要とされているノードを数える．
   mInvNum = 0;
-  vector<ymuint> phase_map(mMaxNodeId, 0);
-  for (ymuint i = 0; i < sbjgraph.output_num(); ++ i) {
+  vector<SizeType> phase_map(mMaxNodeId, 0);
+  for (int i = 0; i < sbjgraph.output_num(); ++ i) {
     const SbjNode* onode = sbjgraph.output(i);
     const SbjNode* node = onode->output_fanin();
-    ymuint mask = 0;
+    SizeType mask = 0;
     if ( onode->output_fanin_inv() ) {
       mask = 2;
     }
@@ -76,7 +76,7 @@ MctState::~MctState()
 void
 MctState::init()
 {
-  for (ymuint i = 0; i < mMaxNodeId; ++ i) {
+  for (int i = 0; i < mMaxNodeId; ++ i) {
     NodeInfo& node_info = mNodeInfo[i];
     node_info.mInputs.clear();
     node_info.mCutInputs.clear();
@@ -87,9 +87,9 @@ MctState::init()
   mSelectedList.clear();
 
   // 入力ノードをフロンティアリストに入れる．
-  ymuint ni = mSbjGraph.input_num();
+  auto ni = mSbjGraph.input_num();
   mQueue.clear();
-  for (ymuint i = 0; i < ni; ++ i) {
+  for (int i = 0; i < ni; ++ i) {
     const SbjNode* node = mSbjGraph.input(i);
     set_selected(node);
     check_blocked(node);
@@ -109,7 +109,7 @@ MctState::get_cut_candidates()
 {
   // キューに積まれたノードのファンアウトのノードを根とするカットを探す．
   // カットが見つかったノードをキューに積む．
-  for (ymuint rpos = 0; rpos < mQueue.size(); ++ rpos) {
+  for (int rpos = 0; rpos < mQueue.size(); ++ rpos) {
     const SbjNode* node = mQueue[rpos];
     const vector<const SbjNode*>& inputs1 = mNodeInfo[node->id()].mInputs;
     for ( auto e: node->fanout_list() ) {
@@ -131,7 +131,7 @@ MctState::get_cut_candidates()
 	continue;
       }
 
-      ymuint to_id = to->id();
+      auto to_id = to->id();
 
       // 反対側のファンインを求める．
       const SbjNode* inode0 = to->fanin(e.pos() ^ 1);
@@ -148,7 +148,7 @@ MctState::get_cut_candidates()
 	if ( debug ) { // デバッグ用
 	  cout << " " << node->id() << ", " << inode0->id()
 	       << " --> " << to_id << ": ";
-	  for (ymuint i = 0; i < tmp_inputs.size(); ++ i) {
+	  for (int i = 0; i < tmp_inputs.size(); ++ i) {
 	    cout << " " << tmp_inputs[i]->id();
 	  }
 	  cout << endl;
@@ -185,7 +185,7 @@ MctState::put_queue(const SbjNode* node)
 void
 MctState::clear_queue()
 {
- for (ymuint i = 0; i < mQueue.size(); ++ i) {
+ for (int i = 0; i < mQueue.size(); ++ i) {
    const SbjNode* node = mQueue[i];
    mNodeInfo[node->id()].mFlags &= ~(1U << 4);
   }
@@ -198,15 +198,15 @@ MctState::merge_inputs(const vector<const SbjNode*>& inputs1,
 		       const vector<const SbjNode*>& inputs2,
 		       vector<const SbjNode*>& new_inputs)
 {
-  ymuint ni1 = inputs1.size();
-  ymuint ni2 = inputs2.size();
+  auto ni1 = inputs1.size();
+  auto ni2 = inputs2.size();
   new_inputs.reserve(ni1 + ni2);
-  for (ymuint i = 0; i < ni1; ++ i) {
+  for (int i = 0; i < ni1; ++ i) {
     const SbjNode* inode = inputs1[i];
     new_inputs.push_back(inode);
     set_mark(inode);
   }
-  for (ymuint i = 0; i < ni2; ++ i) {
+  for (int i = 0; i < ni2; ++ i) {
     const SbjNode* inode = inputs2[i];
     if ( !is_marked(inode) ) {
       new_inputs.push_back(inode);
@@ -230,7 +230,7 @@ MctState::candidates() const
 {
   if ( debug ) {
     cout << "CANDIDATES: ";
-    for (ymuint i = 0; i < mCandidateList.size(); ++ i) {
+    for (int i = 0; i < mCandidateList.size(); ++ i) {
       const SbjNode* node = mCandidateList[i];
       cout << " " << node->id_str();
     }
@@ -240,14 +240,14 @@ MctState::candidates() const
 }
 
 // @brief カット候補の重みリストを得る．
-const vector<ymuint>&
+const vector<SizeType>&
 MctState::weight_list() const
 {
   return mCandNiList;
 }
 
 // @brief LUT 数を得る．
-ymuint
+SizeType
 MctState::lut_num() const
 {
   return mSelectedList.size() + mInvNum;
@@ -288,8 +288,8 @@ MctState::update(const SbjNode* root)
   vector<const SbjNode*> node_list;
   mark[root->id()] = true;
   node_list.push_back(root);
-  ymuint depth = 0;
-  for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
+  int depth = 0;
+  for (int rpos = 0; rpos < node_list.size(); ++ rpos) {
     const SbjNode* node = node_list[rpos];
     if ( node != root && is_selected(node) ) {
       // カットの入力よりファンイン側にはたどらない．
@@ -323,10 +323,10 @@ MctState::update(const SbjNode* root)
   // node_list を出力側からのトポロジカル順に並べる．
   // 具体的には mark[] を参考にしながらもう一度おなじことをする．
   // なんかもっとスマートな方法があるような気がする．
-  ymuint n0 = node_list.size();
+  auto n0 = node_list.size();
   node_list.clear();
   node_list.push_back(root);
-  for (ymuint rpos = 0; rpos < node_list.size(); ++ rpos) {
+  for (int rpos = 0; rpos < node_list.size(); ++ rpos) {
     const SbjNode* node = node_list[rpos];
     mark[node->id()] = false;
     if ( node != root && is_selected(node) ) {
@@ -370,8 +370,8 @@ MctState::update(const SbjNode* root)
   }
 
   // mCandidateList を作り直す．
-  ymuint wpos = 0;
-  for (ymuint rpos = 0; rpos < mCandidateList.size(); ++ rpos) {
+  int wpos = 0;
+  for (int rpos = 0; rpos < mCandidateList.size(); ++ rpos) {
     const SbjNode* node = mCandidateList[rpos];
     if ( node == root ) {
       mNodeInfo[node->id()].mInputs = vector<const SbjNode*>(1, node);
@@ -399,7 +399,7 @@ MctState::update(const SbjNode* root)
 
   // mPoCandidateList を作り直す．
   wpos = 0;
-  for (ymuint rpos = 0; rpos < mPoCandidateList.size(); ++ rpos) {
+  for (int rpos = 0; rpos < mPoCandidateList.size(); ++ rpos) {
     const SbjNode* node = mPoCandidateList[rpos];
     if ( node == root ) {
       mNodeInfo[node->id()].mInputs = vector<const SbjNode*>(1, node);
@@ -428,7 +428,7 @@ void
 MctState::copy_to(MapRecord& maprecord)
 {
   maprecord.init(mSbjGraph);
-  for (ymuint i = 0; i < mSelectedList.size(); ++ i) {
+  for (int i = 0; i < mSelectedList.size(); ++ i) {
     const SbjNode* node = mSelectedList[i];
     //maprecord.set_cut(node, mNodeInfo[node->id()].mCutInputs);
   }
@@ -474,13 +474,13 @@ MctState::check_blocked(const SbjNode* node)
 void
 MctState::check_cover()
 {
-  ymuint nl = mSbjGraph.logic_num();
-  for (ymuint i = 0; i < nl; ++ i) {
+  auto nl = mSbjGraph.logic_num();
+  for (int i = 0; i < nl; ++ i) {
     const SbjNode* node = mSbjGraph.logic(nl - i - 1);
     check_cover_node(node);
   }
-  ymuint ni = mSbjGraph.input_num();
-  for (ymuint i = 0; i < ni; ++ i) {
+  auto ni = mSbjGraph.input_num();
+  for (int i = 0; i < ni; ++ i) {
     const SbjNode* node = mSbjGraph.input(i);
     check_cover_node(node);
   }

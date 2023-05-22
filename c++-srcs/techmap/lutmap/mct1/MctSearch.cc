@@ -32,15 +32,15 @@ BEGIN_NAMESPACE_LUTMAP_MCT1
 // @param[in] cut_size カットサイズ
 MctSearch::MctSearch(const SbjGraph& sbjgraph,
 		     const CutHolder& cut_holder,
-		     ymuint cut_size) :
+		     SizeType cut_size) :
   mState(sbjgraph, cut_size),
   mInsideNodeMark(sbjgraph.node_num(), false)
 {
   LbCalc lbcalc;
   mBaseline = lbcalc.lower_bound(sbjgraph, cut_holder);
 
-  ymuint nf = 0;
-  for (ymuint i = 0; i < sbjgraph.logic_num(); ++ i) {
+  SizeType nf = 0;
+  for (int i = 0; i < sbjgraph.logic_num(); ++ i) {
     const SbjNode* node = sbjgraph.logic(i);
     if ( node->fanout_num() > 1 ) {
       ++ nf;
@@ -64,7 +64,7 @@ MctSearch::~MctSearch()
 // @brief 探索を行う．
 // @param[in] search_limit 試行回数
 void
-MctSearch::search(ymuint search_limit)
+MctSearch::search(SizeType search_limit)
 {
   for (mNumAll = 1; mNumAll <= search_limit; ++ mNumAll) {
     mState.init();
@@ -99,10 +99,10 @@ MctSearch::tree_policy(MctNode* node)
 double
 MctSearch::default_policy(MctNode* node)
 {
-  ymuint ln0 = mState.lut_num();
+  SizeType ln0 = mState.lut_num();
   for ( ; ; ) {
-    const vector<const SbjNode*>& cut_list = mState.candidates();
-    const vector<ymuint>& w_list = mState.weight_list();
+    const auto& cut_list = mState.candidates();
+    const auto& w_list = mState.weight_list();
     if ( cut_list.empty() ) {
       break;
     }
@@ -114,12 +114,12 @@ MctSearch::default_policy(MctNode* node)
     const SbjNode* root = cut_list[r];
     move(root);
 #else
-    ymuint n = cut_list.size();
-    vector<ymuint> acc_w(n);
-    ymuint sum = 0;
-    for (ymuint i = 0; i < n; ++ i) {
-      const SbjNode* node = cut_list[i];
-      ymuint w = 1U << (w_list[i] - 1);
+    auto n = cut_list.size();
+    vector<SizeType> acc_w(n);
+    SizeType sum = 0;
+    for (int i = 0; i < n; ++ i) {
+      auto node = cut_list[i];
+      SizeType w = 1U << (w_list[i] - 1);
       w *= (node->fanout_num() * 2);
       sum += w;
       acc_w[i] = sum;
@@ -137,7 +137,7 @@ MctSearch::default_policy(MctNode* node)
     move(root);
 #endif
   }
-  ymuint ln = mState.lut_num();
+  SizeType ln = mState.lut_num();
   if ( mMinimumLutNum > ln ) {
     mMinimumLutNum = ln;
     mState.copy_to(mBestRecord);

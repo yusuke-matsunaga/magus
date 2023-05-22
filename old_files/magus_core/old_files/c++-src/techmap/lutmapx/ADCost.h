@@ -193,7 +193,7 @@ private:
   Page* mTopPage;
 
   // 次に使用可能な位置
-  ymuint32 mNextPos;
+  std::uint32_t mNextPos;
 
   // 再利用リスト
   ADCost<AreaT>* mAvail;

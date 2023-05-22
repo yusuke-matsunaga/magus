@@ -48,7 +48,7 @@ public:
   area_map(
     const ClibCellLibrary& cell_library,
     const BnNetwork& src_network,
-    ymuint mode
+    int mode
   );
 
 #if 0
@@ -66,9 +66,9 @@ public:
   /// @param[out] depth 段数
   void
   delay_map(const BnNetwork& sbjgraph,
-	    ymuint limit,
-	    ymuint slack,
-	    ymuint mode,
+	    SizeType limit,
+	    int slack,
+	    int mode,
 	    BnNetwork& mapnetwork);
 #endif
 

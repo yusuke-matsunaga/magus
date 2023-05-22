@@ -33,7 +33,7 @@ public:
   FraigHandle(
     FraigNode* node, ///< [in] ノード
     bool inv         ///< [in] 反転している時に true とするフラグ
-  ) : FraigHandle{reinterpret_cast<ympuint>(node) | inv}
+  ) : FraigHandle{reinterpret_cast<PtrIntType>(node) | inv}
   {
   }
 
@@ -184,7 +184,7 @@ private:
   /// @brief 内容を直接指定したコンストラクタ
   explicit
   FraigHandle(
-    ympuint data ///< [in] 内容
+    PtrIntType data ///< [in] 内容
   ) : mPackedData{data}
   {
   }
@@ -196,7 +196,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // すべてのデータをまとめたもの
-  ympuint mPackedData{0UL};
+  PtrIntType mPackedData{0UL};
 
 };
 
