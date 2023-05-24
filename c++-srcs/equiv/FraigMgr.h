@@ -16,7 +16,7 @@
 #include <random>
 
 #include "ym/SatBool3.h"
-#include "ym/SatSolverType.h"
+#include "ym/SatInitParam.h"
 
 
 BEGIN_NAMESPACE_FRAIG
@@ -31,9 +31,8 @@ public:
 
   /// @brief コンストラクタ
   FraigMgr(
-    SizeType sig_size,               ///< [in] シグネチャのサイズ
-    const SatSolverType& solver_type ///< [in] SAT-solver の種類を表すオブジェクト
-    = SatSolverType()
+    SizeType sig_size,                  ///< [in] シグネチャのサイズ
+    const SatInitParam& init_param = {} ///< [in] SAT-solver の初期化パラメータ
   );
 
   /// @brief デストラクタ

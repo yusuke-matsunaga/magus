@@ -36,8 +36,8 @@ END_NONAMESPACE
 // @brief コンストラクタ
 FraigMgr::FraigMgr(
   SizeType sig_size,
-  const SatSolverType& solver_type
-) : mSolver{solver_type},
+  const SatInitParam& init_param
+) : mSolver{init_param},
     mLogLevel{0},
     mLogStream{new ofstream("/dev/null")}
 {

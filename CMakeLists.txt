@@ -44,9 +44,12 @@ endif ()
 
 ym_init ("USE_POPT" "USE_LZMA" "USE_ZLIB" "USE_BZIP2")
 ym_init_python ( ${INIT_PYTHON_ARGS} )
+ym_init_jsoncpp ()
 ym_init_doxygen ()
 ym_init_gperftools ()
 ym_init_ctest ()
+
+list ( APPEND YM_LIB_DEPENDS ${JsonCpp_LIBRARY} )
 
 # ===================================================================
 # google-test は内蔵のものを使う．

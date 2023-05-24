@@ -11,7 +11,7 @@
 #include "fraig_nsdef.h"
 #include "FraigNode.h"
 #include "ym/SatBool3.h"
-#include "ym/SatSolverType.h"
+#include "ym/SatInitParam.h"
 #include "ym/SatSolver.h"
 #include "ym/SatModel.h"
 
@@ -28,8 +28,7 @@ public:
 
   /// @brief コンストラクタ
   FraigSat(
-    const SatSolverType& solver_type ///< [in] SAT-solver の種類を表すオブジェクト
-    = SatSolverType{}
+    const SatInitParam& init_param = {} ///< [in] SATソルバの初期化パラメータ
   );
 
   /// @brief デストラクタ

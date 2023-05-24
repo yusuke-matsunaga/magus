@@ -35,8 +35,8 @@ END_NONAMESPACE
 
 // @brief コンストラクタ
 FraigSat::FraigSat(
-  const SatSolverType& solver_type
-) : mSolver{solver_type},
+  const SatInitParam& init_param
+) : mSolver{init_param},
     mLogLevel{0},
     mLogStream{new ofstream("/dev/null")}
 {
@@ -248,7 +248,7 @@ FraigSat::check_condition(
   auto ans1 = mSolver.solve(assumptions);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver{SatSolverType{"minisat2"}};
+  SatSolver solver{SatInitParam{"minisat2"}};
   for ( auto node: mAllNodes ) {
     auto lit = solver.new_variable();
     ASSERT_COND( lit.varid() == node_lit(node).varid() );
@@ -294,7 +294,7 @@ FraigSat::check_condition(
   auto ans1 = mSolver.solve(assumptions);
 
 #if defined(VERIFY_SATSOLVER)
-  SatSolver solver{SatSolverType{"minisat2"}};
+  SatSolver solver{SatInitParam{"minisat2"}};
   for ( auto node: mAllNodes ) {
     auto lit = solver.new_variable();
     ASSERT_COND( lit.varid() == node_lit(node).varid() );

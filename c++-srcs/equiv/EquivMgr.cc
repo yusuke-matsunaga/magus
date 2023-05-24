@@ -25,9 +25,9 @@ BEGIN_NAMESPACE_MAGUS
 // @param[in] solver_type SAT-solver の種類を表すオブジェクト
 EquivMgr::EquivMgr(
   SizeType sig_size,
-  const SatSolverType& solver_type
+  const SatInitParam& init_param
 ) : mSigSize{sig_size},
-    mSolverType{solver_type}
+    mInitParam{init_param}
 {
 }
 
@@ -117,7 +117,7 @@ EquivMgr::check(
   ASSERT_COND( output2_list.size() == no );
 
   // FraigMgr を初期化する．
-  FraigMgr fraig_mgr(mSigSize, mSolverType);
+  FraigMgr fraig_mgr{mSigSize, mInitParam};
 
   // 外部入力に対応する FraigHandle を作る．
   vector<FraigHandle> input1_handles(ni);

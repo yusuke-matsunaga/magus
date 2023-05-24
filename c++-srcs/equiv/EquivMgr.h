@@ -11,7 +11,7 @@
 #include "magus.h"
 #include "ym/bnet.h"
 #include "ym/SatBool3.h"
-#include "ym/SatSolverType.h"
+#include "ym/SatInitParam.h"
 
 
 BEGIN_NAMESPACE_MAGUS
@@ -84,9 +84,8 @@ public:
 
   /// @brief コンストラクタ
   EquivMgr(
-    SizeType sig_size = 1,           ///< [in] シグネチャのサイズ
-    const SatSolverType& solver_type ///< [in] SAT-solver の種類を表すオブジェクト
-    = SatSolverType{}
+    SizeType sig_size = 1,              ///< [in] シグネチャのサイズ
+    const SatInitParam& init_param = {} ///< [in] SAT-solver の初期化パラメータ
   );
 
   /// @brief デストラクタ
@@ -139,10 +138,10 @@ public:
   /// @brief SATソルバの種類を設定する．
   void
   set_sat_solver_type(
-    const SatSolverType& solver_type ///< [in] SAT-solver の種類を表すオブジェクト
+    const SatInitParam& init_param ///< [in] SAT-solver の種類を表すオブジェクト
   )
   {
-    mSolverType = solver_type;
+    mInitParam = init_param;
   }
 
   /// @brief ログレベルを設定する．
@@ -192,8 +191,8 @@ private:
   // シグネチャのサイズ
   SizeType mSigSize;
 
-  // SATソルバのタイプ
-  SatSolverType mSolverType;
+  // SATソルバの初期化パラメータ
+  SatInitParam mInitParam;
 
   // ログレベル
   int mLogLevel{0};
