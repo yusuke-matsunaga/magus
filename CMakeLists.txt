@@ -49,8 +49,6 @@ ym_init_doxygen ()
 ym_init_gperftools ()
 ym_init_ctest ()
 
-list ( APPEND YM_LIB_DEPENDS ${JsonCpp_LIBRARY} )
-
 # ===================================================================
 # google-test は内蔵のものを使う．
 # ===================================================================
