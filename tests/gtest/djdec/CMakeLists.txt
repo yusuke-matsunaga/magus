@@ -10,7 +10,7 @@ include_directories(
 # ===================================================================
 #  テスト用のターゲットの設定
 # ===================================================================
-ym_add_gtest( DgNode_test
+ym_add_gtest( magus_DgNode_test
   DgNode_test.cc
   $<TARGET_OBJECTS:magus_dg_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
