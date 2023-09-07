@@ -111,7 +111,6 @@ foreach ( dir ${YM_SUBMODULE_LIST} )
 endforeach ()
 
 add_subdirectory ( c++-srcs )
-add_subdirectory ( py_magus )
 add_subdirectory ( tests )
 
 
@@ -125,7 +124,6 @@ if (DOXYGEN_FOUND)
   set ( DOXY_SRCS
     ${PROJECT_SOURCE_DIR}/etc/mainpage.h
     ${PROJECT_BINARY_DIR}/include
-    ${PROJECT_SOURCE_DIR}/include
     ${YM_SUBMODULE_INCLUDE_LIST}
     )
 

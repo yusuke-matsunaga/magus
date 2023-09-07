@@ -11,6 +11,7 @@
 add_subdirectory ( equiv )
 add_subdirectory ( techmap )
 add_subdirectory ( djdec )
+add_subdirectory ( py_magus )
 
 
 # ===================================================================

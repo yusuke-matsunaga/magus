@@ -1,6 +1,8 @@
 ﻿#ifndef LUTMAPMGR_H
 #define LUTMAPMGR_H
 
+#error "obsolete"
+
 /// @file LutmapMgr.h
 /// @brief LutmapMgr のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
