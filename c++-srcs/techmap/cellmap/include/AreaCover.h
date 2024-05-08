@@ -5,14 +5,14 @@
 /// @brief AreaCover のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2015, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2015, 2016, 2023 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "cellmap_nsdef.h"
 #include "SbjNode.h"
 #include "ym/BnNetwork.h"
 #include "ym/clib.h"
+#include <json/json.h>
 
 
 BEGIN_NAMESPACE_CELLMAP
@@ -28,22 +28,20 @@ class AreaCover
 public:
 
   /// @brief コンストラクタ
-  AreaCover();
+  AreaCover() = default;
 
   /// @brief デストラクタ
-  ~AreaCover();
+  ~AreaCover() = default;
 
 
 public:
 
   /// @brief 面積最小化マッピングを行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cell_library セルを管理するオブジェクト
-  /// @param[out] mapnetwork マッピング結果
   BnNetwork
   operator()(
-    const SbjGraph& sbjgraph,
-    const ClibCellLibrary& cell_library
+    const SbjGraph& sbjgraph,            ///< [in] サブジェクトグラフ
+    const ClibCellLibrary& cell_library, ///< [in] セルライブラリ
+    const Json::Value& option            ///< [in] オプションを表すJSONオブジェクト
   );
 
 
@@ -53,45 +51,46 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief FF のマッピングを行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cell_library セルを管理するオブジェクト
-  /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
-  ff_map(const SbjGraph& sbjgraph,
-	 const ClibCellLibrary& cell_library,
-	 MapRecord& maprec);
+  ff_map(
+    const SbjGraph& sbjgraph,            ///< [in] サブジェクトグラフ
+    const ClibCellLibrary& cell_library, ///< [in] セルライブラリ
+    MapRecord& maprec                    ///< [out] マッピング結果を保持するオブジェクト
+  );
 
   /// @brief best cut の記録を行う．
-  /// @param[in] sbjgraph サブジェクトグラフ
-  /// @param[in] cell_library セルを管理するオブジェクト
-  /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
-  record_cuts(const SbjGraph& sbjgraph,
-	      const ClibCellLibrary& cell_library,
-	      MapRecord& maprec);
+  record_cuts(
+    const SbjGraph& sbjgraph,            ///< [in] サブジェクトグラフ
+    const ClibCellLibrary& cell_library, ///< [in] セルライブラリ
+    MapRecord& maprec			 ///< [out] マッピング結果を保持するオブジェクト
+  );
 
   /// @brief 逆極性の解にインバーターを付加した解を追加する．
-  /// @param[in] node 対象のノード
-  /// @param[in] inv 極性
-  /// @param[in] inv_func インバータの関数グループ
-  /// @param[in] maprec マッピング結果を保持するオブジェクト
   void
-  add_inv(const SbjNode* node,
-	  bool inv,
-	  const ClibCellGroup& inv_func,
-	  MapRecord& maprec);
+  add_inv(
+    const SbjNode* node,           ///< [in] 対象のノード
+    bool inv,                      ///< [in] 極性
+    const ClibCellGroup& inv_func, ///< [in] インバータのセルグループ
+    MapRecord& maprec              ///< [out] マッピング結果を保持するオブジェクト
+  );
 
   /// @brief node から各入力にいたる経路の重みを計算する．
-  /// @param[in] node 対象のノード
-  /// @param[in] cur_weight
   void
-  calc_weight(const SbjNode* node,
-	      double cur_weight);
+  calc_weight(
+    const SbjNode* node, ///< [in] 対象のノード
+    double cur_weight    ///< [in] cur_weight
+  );
 
   /// @brief (node, inv) に対応するコストを取り出す．
   double&
-  cost(const SbjNode* node,
-       bool inv);
+  cost(
+    const SbjNode* node, ///< [in] 対象のノード
+    bool inv             ///< [in] 極性
+  )
+  {
+    return mCostArray[node->id() * 2 + static_cast<SizeType>(inv)];
+  }
 
 
 private:
@@ -123,22 +122,6 @@ private:
   FFInfo mFFInfo[8];
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief (node, inv) に対応する NodeInfo を取り出す．
-inline
-double&
-AreaCover::cost(
-  const SbjNode* node,
-  bool inv
-)
-{
-  return mCostArray[node->id() * 2 + static_cast<SizeType>(inv)];
-}
 
 END_NAMESPACE_CELLMAP
 

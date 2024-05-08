@@ -27,30 +27,25 @@ BEGIN_NAMESPACE_CELLMAP
 
 BEGIN_NONAMESPACE
 // デバッグする時に true にするフラグ
-const bool debug = false;
+bool debug = false;
 END_NONAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // クラス AreaCover
 //////////////////////////////////////////////////////////////////////
 
-// @brief コンストラクタ
-AreaCover::AreaCover()
-{
-}
-
-// @brief デストラクタ
-AreaCover::~AreaCover()
-{
-}
-
 // @brief 面積最小化マッピングを行う．
 BnNetwork
 AreaCover::operator()(
   const SbjGraph& sbjgraph,
-  const ClibCellLibrary& cell_library
+  const ClibCellLibrary& cell_library,
+  const Json::Value& option
 )
 {
+  if ( option.isMember("debug") ) {
+    debug = option["debug"].asBool();
+  }
+
   if ( debug ) {
     SbjDumper::dump(cout, sbjgraph);
   }
@@ -166,8 +161,10 @@ AreaCover::record_cuts(
 )
 {
   int n = sbjgraph.node_num();
+  mCostArray.clear();
   mCostArray.resize(n * 2);
   int max_input = cell_library.pg_max_input();
+  mWeight.clear();
   mWeight.resize(max_input);
   mLeafNum.clear();
   mLeafNum.resize(n, -1);

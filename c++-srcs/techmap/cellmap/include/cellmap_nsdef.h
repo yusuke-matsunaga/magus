@@ -8,9 +8,11 @@
 /// Copyright (C) 2005-2011 Yusuke Matsunaga
 /// All rights reserved.
 
-
 #include "magus.h"
 
+
+/// @brief cellmap 用の名前空間名
+#define CELLMAP_NSNAME nsCellmap
 
 /// @brief cellmap 用の名前空間の開始
 #define BEGIN_NAMESPACE_CELLMAP \
@@ -22,16 +24,17 @@ BEGIN_NAMESPACE(nsCellmap)
 END_NAMESPACE(nsCellmap) \
 END_NAMESPACE_MAGUS
 
+/// @brief cellmap 用の名前空間
+#define CELLMAP_NAMESPACE MAGUS_NAMESPACE::CELLMAP_NSNAME
+
+/// @brief cellmap 用の名前空間を表す文字列
+#define CELLMAP_NAMESPACE_STR MAGUS_NAMESPACE_STR "::" CELLMAP_NSNAME
 
 BEGIN_NAMESPACE_CELLMAP
-
-class CellMap;
 
 END_NAMESPACE_CELLMAP
 
 BEGIN_NAMESPACE_MAGUS
-
-using nsCellmap::CellMap;
 
 END_NAMESPACE_MAGUS
 

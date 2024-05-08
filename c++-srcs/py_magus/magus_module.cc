@@ -22,6 +22,8 @@ BEGIN_NAMESPACE_MAGUS
 
 extern "C" PyObject* PyInit_equiv();
 
+extern "C" PyObject* PyInit_techmap();
+
 BEGIN_NONAMESPACE
 
 // メソッド定義構造体
@@ -85,6 +87,9 @@ PyInit_magus()
     goto error;
   }
   if ( !PyModule::reg_submodule(m, "equiv", PyInit_equiv()) ) {
+    goto error;
+  }
+  if ( !PyModule::reg_submodule(m, "techmap", PyInit_techmap()) ) {
     goto error;
   }
 

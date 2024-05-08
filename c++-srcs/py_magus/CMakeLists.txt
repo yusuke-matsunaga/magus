@@ -23,6 +23,8 @@ include_directories(
 
 set ( py_magus_SOURCES
   magus_module.cc
+  equiv_module.cc
+  techmap_module.cc
   )
 
 
@@ -37,12 +39,14 @@ ym_add_object_library( py_magus
 add_library( py_maguslib
   SHARED
   $<TARGET_OBJECTS:py_magus_obj>
-  $<TARGET_OBJECTS:py_magus_equiv_obj>
   $<TARGET_OBJECTS:py_ymbnet_obj>
   $<TARGET_OBJECTS:py_ymcell_obj>
   $<TARGET_OBJECTS:py_ymsat_obj>
   $<TARGET_OBJECTS:py_ymlogic_obj>
   $<TARGET_OBJECTS:py_ymbase_obj>
+  $<TARGET_OBJECTS:magus_equiv_obj>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj>
+  $<TARGET_OBJECTS:magus_cellmap_obj>
   ${YM_SUBMODULE_OBJ_LIST}
   )
 
@@ -60,12 +64,14 @@ set_target_properties( py_maguslib
 add_executable( py_magus
   py_magus.cc
   $<TARGET_OBJECTS:py_magus_obj>
-  $<TARGET_OBJECTS:py_magus_equiv_obj>
   $<TARGET_OBJECTS:py_ymbnet_obj>
   $<TARGET_OBJECTS:py_ymcell_obj>
   $<TARGET_OBJECTS:py_ymsat_obj>
   $<TARGET_OBJECTS:py_ymlogic_obj>
   $<TARGET_OBJECTS:py_ymbase_obj>
+  $<TARGET_OBJECTS:magus_equiv_obj>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj>
+  $<TARGET_OBJECTS:magus_cellmap_obj>
   ${YM_SUBMODULE_OBJ_LIST}
   )
 
@@ -85,12 +91,14 @@ target_link_libraries ( py_magus
 add_executable( py_magus_d
   py_magus.cc
   $<TARGET_OBJECTS:py_magus_obj_d>
-  $<TARGET_OBJECTS:py_magus_equiv_obj_d>
   $<TARGET_OBJECTS:py_ymbnet_obj_d>
   $<TARGET_OBJECTS:py_ymcell_obj_d>
   $<TARGET_OBJECTS:py_ymsat_obj_d>
   $<TARGET_OBJECTS:py_ymlogic_obj_d>
   $<TARGET_OBJECTS:py_ymbase_obj_d>
+  $<TARGET_OBJECTS:magus_equiv_obj_d>
+  $<TARGET_OBJECTS:magus_sbjgraph_obj_d>
+  $<TARGET_OBJECTS:magus_cellmap_obj_d>
   ${YM_SUBMODULE_OBJ_D_LIST}
   )
 

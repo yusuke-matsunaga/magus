@@ -23,20 +23,12 @@ BEGIN_NAMESPACE_SBJ
 class Bn2Sbj
 {
 public:
-
-  /// @brief コンストラクタ
-  Bn2Sbj() = default;
-
-  /// @brief デストラクタ
-  ~Bn2Sbj() = default;
-
-
-public:
   //////////////////////////////////////////////////////////////////////
   // 外部インターフェイス
   //////////////////////////////////////////////////////////////////////
 
   /// @brief BnNetwork を SbjGraph に変換する．
+  static
   void
   convert(
     const BnNetwork& src_network, ///< [in] もとのネットワーク

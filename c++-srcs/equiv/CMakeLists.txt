@@ -33,8 +33,3 @@ set ( equiv_SOURCES
 ym_add_object_library (magus_equiv
   ${equiv_SOURCES}
   )
-
-ym_add_object_library (py_magus_equiv
-  equiv_module.cc
-  ${equiv_SOURCES}
-  )
